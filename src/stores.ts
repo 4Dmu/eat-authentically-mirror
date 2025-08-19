@@ -1,0 +1,53 @@
+import { create } from "zustand";
+import {
+  ListingRegisterArgs,
+  ListingTypes,
+} from "@/backend/validators/listings";
+
+type CertificationFilter = {
+  id: string;
+  name: string;
+  mustBeVerified: boolean;
+};
+
+export type HomePageState = {
+  page: number;
+  typeFilter: ListingTypes | undefined;
+  query: string | undefined;
+  certs: CertificationFilter[];
+  locationSearchArea: google.maps.LatLngBounds | undefined;
+  setPage: (page: number | ((current: number) => number)) => void;
+  setTypeFilter: (type: ListingTypes | undefined) => void;
+  setQuery: (query: string | undefined) => void;
+  setCerts: (certs: CertificationFilter[]) => void;
+  setLocationSearchArea: (
+    locationSearchArea: google.maps.LatLngBounds | undefined
+  ) => void;
+};
+
+export const useHomePageStore = create<HomePageState>((set, get) => ({
+  page: 0,
+  setPage: (page) => {
+    if (typeof page === "number") {
+      set({ page });
+    } else {
+      set({ page: page(get().page) });
+    }
+  },
+  typeFilter: undefined,
+  setTypeFilter: (typeFilter) => set({ typeFilter: typeFilter, page: 0 }),
+  query: undefined,
+  setQuery: (query) => set({ query }),
+  certs: [],
+  setCerts: (certs) => set({ certs }),
+  locationSearchArea: undefined,
+  setLocationSearchArea: (locationSearchArea) => set({ locationSearchArea }),
+}));
+
+export const useProducerRegisterStore = create<{
+  args: ListingRegisterArgs | undefined;
+  setArgs: (args: ListingRegisterArgs | undefined) => void;
+}>((set) => ({
+  args: undefined,
+  setArgs: (args) => set({ args }),
+}));
