@@ -1,0 +1,45 @@
+"use client";
+import { usePathname } from "next/navigation";
+import { AppNavSheet } from "./AppNavSheet";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { MemberNotSubbed } from "./auth/RequireSub";
+import { UserButton } from "./auth/UserButton";
+
+export function Header() {
+  const pathname = usePathname();
+
+  return (
+    <div
+      className={`${
+        pathname === "/" ? "fixed top-0 left-0 z-10" : ""
+      } bg-green-900 text-white w-full`}
+    >
+      <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">
+        <AppNavSheet />
+        <Link
+          className="font-bold justify-self-center text-lg self-center"
+          href={"/"}
+        >
+          FindRealFood
+        </Link>
+        <div className="flex gap-2 justify-end items-center">
+          <SignedIn>
+            <MemberNotSubbed>
+              <Button asChild>
+                <Link href="/members/subscribe">Upgrade</Link>
+              </Button>
+            </MemberNotSubbed>
+          </SignedIn>
+          <UserButton />
+          <SignedOut>
+            <Button variant={"secondary"} asChild>
+              <Link href="/sign-in">Sign In</Link>
+            </Button>
+          </SignedOut>
+        </div>
+      </div>
+    </div>
+  );
+}

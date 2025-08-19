@@ -19,6 +19,7 @@ export const env = createEnv({
     PRODUCER_PRO_YEARLY_PRICE_ID: type("string > 1"),
     PRODUCER_PREMIUM_MONTLY_PRICE_ID: type("string > 1"),
     PRODUCER_PREMIUM_YEARLY_PRICE_ID: type("string > 1"),
+    COMMUNITY_MEMBER_MONTLY_PRICE_ID: type("string > 1"),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: type("string > 1"),

@@ -11,7 +11,7 @@ export function throwErrors<
     throw new Error(result.serverError);
   } else if (result.validationErrors) {
     throw new Error(JSON.stringify(result.validationErrors));
-  } else if (!result.data) {
+  } else if (result.data === undefined) {
     throw new Error("Missing data");
   }
 
