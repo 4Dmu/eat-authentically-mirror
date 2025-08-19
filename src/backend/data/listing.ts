@@ -4,7 +4,7 @@ import type {
   PublicListing,
 } from "@/backend/validators/listings";
 import { db } from "../db";
-import { and, desc, eq, inArray, SQL, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
 import { certificationsToListings, listings } from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
 
@@ -130,6 +130,11 @@ export async function listListingsPublicLight(args: ListListingsArgs) {
           sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`
         )
       );
+    }
+
+    if (args.query) {
+      console.log(args.query);
+      queries.push(like(listings.name, `%${args.query.toLowerCase()}%`));
     }
 
     const listingsQuery = await db.query.listings.findMany({

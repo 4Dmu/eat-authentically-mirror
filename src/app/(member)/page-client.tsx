@@ -9,10 +9,13 @@ import { useHomePageStore } from "@/stores";
 import { listingsQueryOptions } from "@/utils/listings";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useDebounce } from "@uidotdev/usehooks";
 
 export function Page() {
   const { typeFilter, query, certs, locationSearchArea, page, setPage } =
     useHomePageStore();
+
+  const debouncedQuery = useDebounce(query, 500);
 
   const { data, isPlaceholderData } = useQuery(
     listingsQueryOptions({
@@ -22,6 +25,7 @@ export function Page() {
       locationSearchArea: locationSearchArea
         ? locationSearchArea.toJSON()
         : undefined,
+      query: debouncedQuery,
     })
   );
 
