@@ -22,7 +22,7 @@ export function Header() {
           className="font-bold justify-self-center text-lg self-center"
           href={"/"}
         >
-          FindRealFood
+          Eat Authentically
         </Link>
         <div className="flex gap-2 justify-end items-center">
           <SignedIn>

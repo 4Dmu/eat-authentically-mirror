@@ -24,25 +24,25 @@ const slides = [
     id: "food",
     imageUrl: "/hero/FRF_Food.png",
     filter: undefined,
-    title: "Find Real Food",
+    title: "Eat Authentically",
   },
   {
     id: "farm",
     imageUrl: "/hero/FRF_Farm_Default.jpg",
     filter: "farm",
-    title: "Find Real Farms",
+    title: "Authentic Farms",
   },
   {
     id: "ranch",
     imageUrl: "/hero/FRF_Ranch_Default.jpg",
     filter: "ranch",
-    title: "Find Real Ranches",
+    title: "Authentic Ranches",
   },
   {
     id: "eatery",
     imageUrl: "/hero/FRF_Eaterie_Default.jpg",
     filter: "eatery",
-    title: "Find Real Eateries",
+    title: "Authentic Eateries",
   },
 ];
 
