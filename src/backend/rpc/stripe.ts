@@ -1,4 +1,5 @@
 "use server";
+
 import { stripe } from "../lib/stripe";
 import { env } from "@/env";
 import {
@@ -9,6 +10,8 @@ import {
   STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "../kv";
+import { auth } from "@clerk/nextjs/server";
+import { updateKvWithLatestStripeData } from "../stripe/stripe-sync";
 
 export const createMemberCheckoutSession =
   authenticatedWithUserActionClient.action(
@@ -102,3 +105,13 @@ export const createBillingPortalSession = membeSubedActionClient.action(
     return session.url;
   }
 );
+
+export async function triggerStripeSyncForUser() {
+  const user = await auth();
+  if (!user.userId) return;
+
+  const stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(user.userId);
+  if (!stripeCustomerId) return;
+
+  return await updateKvWithLatestStripeData(stripeCustomerId);
+}

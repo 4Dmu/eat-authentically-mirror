@@ -15,7 +15,7 @@ export function Header({ authState }: { authState: AuthState }) {
     <div
       className={`${
         pathname === "/" ? "fixed top-0 left-0 z-10" : ""
-      } bg-green-900 text-white w-full`}
+      } bg-primary text-primary-foreground w-full`}
     >
       <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">
         <AppNavSheet />

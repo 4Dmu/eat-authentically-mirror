@@ -1,4 +1,5 @@
 "use server";
+
 import {
   authenticatedActionClient,
   organizationActionClient,
@@ -7,7 +8,6 @@ import { db } from "../db";
 import { listings, organizations } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { ListingRegisterArgsValidator } from "../validators/listings";
-import { env } from "@/env";
 import { ORG_DATA_KV } from "../kv";
 
 export const registerOrganization = authenticatedActionClient
