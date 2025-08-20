@@ -12,7 +12,7 @@ export function Header({ authState }: { authState: AuthState }) {
   const pathname = usePathname();
 
   return (
-    <div className={` bg-green-900 text-white w-full`}>
+    <div className={` bg-primary text-primary-foreground w-full`}>
       <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">
         <div />
         <Link
@@ -26,7 +26,7 @@ export function Header({ authState }: { authState: AuthState }) {
         <div className="flex gap-2 justify-end items-center">
           <OrgSignedIn initialAuthState={authState}>
             <OrgNotSubbed initialAuthState={authState}>
-              <Button asChild>
+              <Button variant={"secondary"} asChild>
                 <Link href="/organization/subscribe">Upgrade</Link>
               </Button>
             </OrgNotSubbed>

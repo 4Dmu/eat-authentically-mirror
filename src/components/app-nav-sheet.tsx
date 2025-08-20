@@ -17,6 +17,7 @@ import { Separator } from "./ui/separator";
 import { MemberNotSubbed } from "./auth/RequireSub";
 import { OrgSignedOut } from "./auth/RequireOrg";
 import Link from "next/link";
+import Image from "next/image";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 export function AppNavSheet() {
@@ -29,7 +30,14 @@ export function AppNavSheet() {
       </SheetTrigger>
       <SheetContent side="left" className="p-2 gap-0">
         <SheetHeader>
-          <SheetTitle>FindRealFood</SheetTitle>
+          <SheetTitle>
+            <Image
+              src={"/logo.png"}
+              width={50}
+              height={50}
+              alt="Eat Authentically"
+            />
+          </SheetTitle>
         </SheetHeader>
         <div className="p-5 flex flex-col gap-5">
           <Button
