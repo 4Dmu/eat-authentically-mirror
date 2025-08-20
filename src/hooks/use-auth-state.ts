@@ -1,16 +1,13 @@
-import { getAuthState } from "@/backend/rpc/auth";
+import { AuthState, getAuthState } from "@/backend/rpc/auth";
 import { throwErrors } from "@/utils/actions";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 
-export function useAuthState() {
-  const { isLoaded, userId } = useAuth();
-
-  const { data, ...rest } = useQuery({
+export function useAuthState(props?: { initialData?: AuthState }) {
+  const { userId } = useAuth();
+  return useQuery({
     queryKey: ["auth-state", userId],
-    enabled: isLoaded,
-    queryFn: () => getAuthState().then((s) => throwErrors(s)),
+    initialData: props?.initialData,
+    queryFn: () => getAuthState().then((t) => throwErrors(t)),
   });
-
-  return { authState: data, query: { ...rest } };
 }

@@ -17,7 +17,7 @@ export const registerOrganization = authenticatedActionClient
       throw new Error("Already logged in as listing");
     }
 
-    const profileUrl = `${env.SITE_URL}/defaults/store.svg`;
+    const profileUrl = `/defaults/store.png`;
 
     const newOrganizationId = crypto.randomUUID();
 

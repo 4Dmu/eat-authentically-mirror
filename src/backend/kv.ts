@@ -25,19 +25,36 @@ export const USER_DATA_KV = {
     return `users.${userId}`;
   },
   async get(userId: string) {
-    const data = await redis.get<string>(this.generateKey(userId));
-    if (data == null) {
-      return data;
-    }
-    return JSON.parse(data) as UserJSON;
+    return await redis.get<UserJSON>(this.generateKey(userId));
   },
   async set(user: UserJSON) {
-    await redis.set(this.generateKey(user.id), JSON.stringify(user));
+    await redis.set(this.generateKey(user.id), user);
+  },
+  async delete(userId: string) {
+    await redis.del(this.generateKey(userId));
   },
 };
 
 export const USER_COUNT_KV = {
   key: `users.count`,
+  async get() {
+    return await redis.get<number>(this.key);
+  },
+  async set(count: number) {
+    await redis.set(this.key, count);
+  },
+  async increment() {
+    const count = await this.get();
+    await redis.set(this.key, count ? count + 1 : 1);
+  },
+  async decrement() {
+    const count = await this.get();
+    await redis.set(this.key, count ? count - 1 : 0);
+  },
+};
+
+export const USER_DELETED_COUNT_KV = {
+  key: `users.deleted-count`,
   async get() {
     return await redis.get<number>(this.key);
   },
@@ -62,7 +79,7 @@ export const USER_STRIPE_CUSTOMER_ID_KV = {
     return await redis.get<string>(this.generateKey(userId));
   },
   async set(userId: string, stripeCustomerId: string) {
-    await redis.set(this.generateKey(userId), JSON.stringify(stripeCustomerId));
+    await redis.set(this.generateKey(userId), stripeCustomerId);
   },
 };
 
@@ -95,17 +112,14 @@ export const ORG_DATA_KV = {
     return `orginizations.${orgId}`;
   },
   async get(orgId: string) {
-    const data = await redis.get<string>(this.generateKey(orgId));
+    const data = await redis.get<Organization>(this.generateKey(orgId));
     if (data == null) {
       return data;
     }
-    return JSON.parse(data) as Organization;
+    return data;
   },
   async set(organization: Organization) {
-    await redis.set(
-      this.generateKey(organization.id),
-      JSON.stringify(organization)
-    );
+    await redis.set(this.generateKey(organization.id), organization);
   },
 };
 
@@ -117,7 +131,7 @@ export const ORG_STRIPE_CUSTOMER_ID_KV = {
     return await redis.get<string>(this.generateKey(orgId));
   },
   async set(orgId: string, stripeCustomerId: string) {
-    await redis.set(this.generateKey(orgId), JSON.stringify(stripeCustomerId));
+    await redis.set(this.generateKey(orgId), stripeCustomerId);
   },
 };
 
@@ -141,21 +155,20 @@ export const TOTAL_GEOCODE_REQUESTS_KV = {
   },
 };
 
-export const STRIPE_CUSTOMER_SUBSCRIPTION_KV = {
+export const STRIPE_CUSTOMER_SUBSCRIPTIONS_KV = {
   generateKey(stripeCustomerId: string) {
     return `stripe.customer.${stripeCustomerId}.subscription`;
   },
   async get(stripeCustomerId: string) {
-    const data = await redis.get<string>(this.generateKey(stripeCustomerId));
+    const data = await redis.get<Subscription[]>(
+      this.generateKey(stripeCustomerId)
+    );
     if (data == null) {
       return data;
     }
-    return JSON.parse(data) as Subscription;
+    return data;
   },
-  async set(stripeCustomerId: string, subscription: Subscription) {
-    await redis.set(
-      this.generateKey(stripeCustomerId),
-      JSON.stringify(subscription)
-    );
+  async set(stripeCustomerId: string, subscriptions: Subscription[]) {
+    await redis.set(this.generateKey(stripeCustomerId), subscriptions);
   },
 };

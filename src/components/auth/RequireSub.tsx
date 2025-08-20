@@ -1,14 +1,13 @@
+import { AuthState } from "@/backend/rpc/auth";
 import { useAuthState } from "@/hooks/use-auth-state";
 import { PropsWithChildren } from "react";
 
-export function MemberSubbed(props: PropsWithChildren & { tiers?: string[] }) {
-  const { authState } = useAuthState();
+export function MemberSubbed(
+  props: PropsWithChildren & { tiers?: string[]; initialAuthState?: AuthState }
+) {
+  const { data } = useAuthState({ initialData: props.initialAuthState });
 
-  const allow =
-    authState?.memberSubTier &&
-    (props.tiers
-      ? props.tiers.includes(authState.memberSubTier)
-      : authState.memberSubTier !== "Free");
+  const allow = data && data.isAuthed && data.memberSubTier !== "Free";
 
   if (allow) {
     return props.children;
@@ -17,12 +16,12 @@ export function MemberSubbed(props: PropsWithChildren & { tiers?: string[] }) {
   return null;
 }
 
-export function MemberNotSubbed(props: PropsWithChildren) {
-  const { authState } = useAuthState();
+export function MemberNotSubbed(
+  props: PropsWithChildren & { initialAuthState?: AuthState }
+) {
+  const { data } = useAuthState({ initialData: props.initialAuthState });
 
-  const allow =
-    authState?.memberSubTier === "Free" ||
-    authState?.memberSubTier === undefined;
+  const allow = data && data.isAuthed && data.memberSubTier === "Free";
 
   if (allow) {
     return props.children;
@@ -31,11 +30,12 @@ export function MemberNotSubbed(props: PropsWithChildren) {
   return null;
 }
 
-export function OrgNotSubbed(props: PropsWithChildren) {
-  const { authState } = useAuthState();
+export function OrgNotSubbed(
+  props: PropsWithChildren & { initialAuthState?: AuthState }
+) {
+  const { data } = useAuthState({ initialData: props.initialAuthState });
 
-  const allow =
-    authState?.orgSubTier === "Free" || authState?.orgSubTier === undefined;
+  const allow = data?.isAuthed && data.orgId && data.orgSubTier === "Free";
 
   if (allow) {
     return props.children;

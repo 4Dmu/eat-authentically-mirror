@@ -13,45 +13,22 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { Badge } from "../ui/badge";
-import { useAuthState } from "@/hooks/use-auth-state";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { AuthState } from "@/backend/rpc/auth";
 
-export function UserButton() {
-  const { authState } = useAuthState();
+export function UserButton({ authState }: { authState: AuthState }) {
   const pathname = usePathname();
 
   const isOrgMode = pathname.startsWith("/organization");
 
-  const { isLoaded: isUserLoaded, isSignedIn, user } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useAuth();
 
-  if (!isUserLoaded) {
-    const imageUrl = authState?.isAuthed
-      ? isOrgMode
-        ? authState.orgData?.imageUrl
-        : authState.userData?.imageUrl
-      : undefined;
-
-    if (!imageUrl) {
-      return null;
-    }
-
-    return (
-      <Image
-        className="rounded-full overflow-hidden w-7 h-7"
-        width={28}
-        height={28}
-        alt=""
-        src={imageUrl}
-      />
-    );
-  }
-
-  if (!isUserLoaded || !isSignedIn) {
+  if (!authState.isAuthed || (isLoaded && !isSignedIn)) {
     return null;
   }
 
@@ -64,11 +41,9 @@ export function UserButton() {
           height={28}
           alt=""
           src={
-            (authState?.isAuthed
-              ? isOrgMode
-                ? authState.orgData?.imageUrl
-                : authState.userData?.imageUrl
-              : undefined) ?? user.imageUrl
+            isOrgMode && authState.orgId
+              ? authState.orgData.imageUrl
+              : authState.userData.imageUrl
           }
         />
       </PopoverTrigger>
@@ -89,25 +64,23 @@ export function UserButton() {
               height={40}
               alt=""
               src={
-                (authState?.isAuthed
-                  ? isOrgMode
-                    ? authState.orgData?.imageUrl
-                    : authState.userData?.imageUrl
-                  : undefined) ?? user.imageUrl
+                isOrgMode && authState.orgId
+                  ? authState.orgData.imageUrl
+                  : authState.userData.imageUrl
               }
             />
             <div className="flex flex-col items-start">
-              {isOrgMode && authState?.orgId ? (
+              {isOrgMode && authState.orgId ? (
                 <>
                   <p className="text-sm font-bold items-start">
-                    {authState.orgData?.name}
+                    {authState.orgData.name}
                   </p>
                   <p className="text-sm text-muted-foreground">Organization</p>
                 </>
               ) : (
                 <>
                   <p className="text-sm font-bold items-start">
-                    {user.firstName ?? user.primaryEmailAddress?.emailAddress}
+                    {user?.firstName ?? user?.primaryEmailAddress?.emailAddress}
                   </p>
                   <p className="text-sm text-muted-foreground">Member</p>
                 </>
@@ -115,7 +88,7 @@ export function UserButton() {
             </div>
             <div className="ml-auto flex items-center gap-2">
               <Badge>
-                {isOrgMode ? authState?.orgSubTier : authState?.memberSubTier}
+                {isOrgMode ? authState.orgSubTier : authState.memberSubTier}
               </Badge>
               <ChevronDown className="invisible group-enabled:visible" />
             </div>
@@ -159,11 +132,12 @@ export function UserButton() {
                     height={40}
                     alt=""
                     className="w-10 h-10 rounded-full"
-                    src={user.imageUrl}
+                    src={user?.imageUrl ?? authState.userData.imageUrl}
                   />
                   <div className="flex flex-col items-start">
                     <p className="text-sm font-bold items-start">
-                      {user.firstName ?? user.primaryEmailAddress?.emailAddress}
+                      {user?.firstName ??
+                        user?.primaryEmailAddress?.emailAddress}
                     </p>
                     <p className="text-sm text-muted-foreground">Member</p>
                   </div>

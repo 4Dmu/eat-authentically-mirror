@@ -1,7 +1,7 @@
 import { getUsersOrganizationIdCached } from "@/backend/data/organization";
 import {
   ORG_STRIPE_CUSTOMER_ID_KV,
-  STRIPE_CUSTOMER_SUBSCRIPTION_KV,
+  STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "@/backend/kv";
 import { env } from "@/env";
@@ -21,13 +21,13 @@ export async function getMemberSubTier(providedUserId?: string) {
   if (!customerId) {
     return "Free";
   }
-  const sub = await STRIPE_CUSTOMER_SUBSCRIPTION_KV.get(customerId);
+  const subs = await STRIPE_CUSTOMER_SUBSCRIPTIONS_KV.get(customerId);
 
-  if (!sub || sub.status !== "active") {
-    return "Free";
+  if (subs?.some((sub) => sub.status === "active")) {
+    return "Pro";
   }
 
-  return "Pro";
+  return "Free";
 }
 
 export async function getOrgSubTier(
@@ -55,22 +55,31 @@ export async function getOrgSubTier(
   if (!customerId) {
     return "Free";
   }
-  const sub = await STRIPE_CUSTOMER_SUBSCRIPTION_KV.get(customerId);
+  const subs = await STRIPE_CUSTOMER_SUBSCRIPTIONS_KV.get(customerId);
+  const activeSubs = subs?.filter((s) => s.status === "active");
 
-  if (!sub || sub.status !== "active") {
+  if (!activeSubs || activeSubs.length === 0) {
     return "Free";
   }
 
   if (
-    sub.priceId === env.PRODUCER_PRO_MONTLY_PRICE_ID ||
-    sub.priceId === env.PRODUCER_PRO_YEARLY_PRICE_ID
+    activeSubs.some(
+      (sub) => sub.priceId === env.ORGANIZATION_PRO_MONTLY_PRICE_ID
+    ) ||
+    activeSubs.some(
+      (sub) => sub.priceId === env.ORGANIZATION_PRO_YEARLY_PRICE_ID
+    )
   ) {
     return "Pro";
   }
 
   if (
-    sub.priceId === env.PRODUCER_PREMIUM_MONTLY_PRICE_ID ||
-    sub.priceId === env.PRODUCER_PREMIUM_YEARLY_PRICE_ID
+    activeSubs.some(
+      (sub) => sub.priceId === env.ORGANIZATION_PREMIUM_MONTLY_PRICE_ID
+    ) ||
+    activeSubs.some(
+      (sub) => sub.priceId === env.ORGANIZATION_PREMIUM_YEARLY_PRICE_ID
+    )
   ) {
     return "Premium";
   }

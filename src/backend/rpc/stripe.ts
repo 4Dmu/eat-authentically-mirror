@@ -5,9 +5,8 @@ import {
   authenticatedWithUserActionClient,
   membeSubedActionClient,
 } from "./helpers/middleware";
-import { currentUser } from "@clerk/nextjs/server";
 import {
-  STRIPE_CUSTOMER_SUBSCRIPTION_KV,
+  STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "../kv";
 
@@ -15,11 +14,18 @@ export const createMemberCheckoutSession =
   authenticatedWithUserActionClient.action(
     async ({ ctx: { userId, user } }) => {
       let stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
-      const existingSub = stripeCustomerId
-        ? await STRIPE_CUSTOMER_SUBSCRIPTION_KV.get(stripeCustomerId)
+      const existingSubs = stripeCustomerId
+        ? await STRIPE_CUSTOMER_SUBSCRIPTIONS_KV.get(stripeCustomerId)
         : null;
 
-      if (existingSub?.status === "active") {
+      if (
+        existingSubs?.some(
+          (sub) =>
+            (sub.priceId === env.COMMUNITY_MEMBER_MONTLY_PRICE_ID ||
+              sub.priceId === env.COMMUNITY_MEMBER_YEARLY_PRICE_ID) &&
+            sub.status === "active"
+        )
+      ) {
         throw new Error("You already have an active subscription");
       }
 
@@ -34,13 +40,10 @@ export const createMemberCheckoutSession =
           stripeCustomerId
         );
 
-        const userData = await currentUser();
-
         const newCustomer = await stripe.customers.create({
           email:
-            user?.emailAddresses?.find(
-              (e) => e.id === user.primaryEmailAddressId
-            )?.emailAddress ?? userData?.emailAddresses?.[0]?.emailAddress,
+            user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)
+              ?.emailAddress ?? user.emailAddresses[0]?.emailAddress,
           metadata: {
             userId: userId,
           },

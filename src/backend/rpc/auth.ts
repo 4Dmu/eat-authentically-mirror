@@ -9,57 +9,75 @@ import {
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "../kv";
 
-export const getAuthState = actionClient.action(async () => {
-  const { userId, sessionClaims } = await auth();
-  if (!userId) {
-    return {
-      isAuthed: false,
-      userId: null,
-      userData: null,
-      memberSubTier: "Free",
-      orgId: null,
-      orgData: null,
-      orgSubTier: "Free",
-      canMangeBilling: false,
-    } as const;
-  }
+export type AuthState =
+  | {
+      isAuthed: false;
+    }
+  | {
+      isAuthed: true;
+      userId: string;
+      userData: {
+        imageUrl: string;
+      };
+      memberSubTier: "Free" | "Pro";
+      orgId: null;
+      orgData: null;
+      orgSubTier: "Free";
+      canMangeBilling: boolean;
+    }
+  | {
+      isAuthed: true;
+      userId: string;
+      userData: {
+        imageUrl: string;
+      };
+      memberSubTier: "Free" | "Pro";
+      orgId: string;
+      orgData: { imageUrl: string; name: string };
+      orgSubTier: "Free" | "Pro" | "Premium";
+      canMangeBilling: boolean;
+    };
 
-  const memberSubTier = await getMemberSubTier(userId);
-  const userStripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
-  const orgId = await getUsersOrganizationIdCached(userId);
+export const getAuthState = actionClient.action(
+  async (): Promise<AuthState> => {
+    const { userId, sessionClaims } = await auth();
+    if (!userId) {
+      return {
+        isAuthed: false,
+      } as const;
+    }
 
-  if (!orgId) {
+    const memberSubTier = await getMemberSubTier(userId);
+    const userStripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
+    const orgId = await getUsersOrganizationIdCached(userId);
+    const orgData = orgId ? await ORG_DATA_KV.get(orgId) : null;
+
+    if (!orgData || !orgId) {
+      return {
+        isAuthed: true,
+        userId: userId,
+        userData: { imageUrl: sessionClaims.imageUrl! },
+        memberSubTier: memberSubTier,
+        orgId: null,
+        orgData: null,
+        orgSubTier: "Free",
+        canMangeBilling: userStripeCustomerId !== null,
+      } as const;
+    }
+
+    const orgSubTier = await getOrgSubTier({ providedOrgId: orgId });
+    const orgStripeCustomerId = await ORG_STRIPE_CUSTOMER_ID_KV.get(orgId);
+
     return {
       isAuthed: true,
-      userId,
-      userData: sessionClaims.imageUrl
-        ? { imageUrl: sessionClaims.imageUrl }
-        : null,
-      memberSubTier: memberSubTier,
-      orgId: null,
-      orgData: null,
-      orgSubTier: "Free",
-      canMangeBilling: userStripeCustomerId !== null,
+      memberSubTier,
+      orgId,
+      userId: userId,
+      userData: { imageUrl: sessionClaims.imageUrl! },
+      orgData: { imageUrl: orgData.imageUrl, name: orgData.name },
+      orgSubTier,
+      canMangeBilling:
+        orgStripeCustomerId !== null || userStripeCustomerId != null,
     } as const;
   }
-
-  const orgData = await ORG_DATA_KV.get(orgId);
-  const orgSubTier = await getOrgSubTier({ providedOrgId: orgId });
-  const orgStripeCustomerId = await ORG_STRIPE_CUSTOMER_ID_KV.get(orgId);
-
-  return {
-    isAuthed: true,
-    userId,
-    userData: sessionClaims.imageUrl
-      ? { imageUrl: sessionClaims.imageUrl }
-      : null,
-    memberSubTier,
-    orgId,
-    orgData: orgData
-      ? { imageUrl: orgData.imageUrl, name: orgData.name }
-      : null,
-    orgSubTier,
-    canMangeBilling:
-      orgStripeCustomerId !== null || userStripeCustomerId != null,
-  } as const;
-});
+);

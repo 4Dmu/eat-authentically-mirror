@@ -1,13 +1,14 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { AppNavSheet } from "./AppNavSheet";
+import { AppNavSheet } from "./app-nav-sheet";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { MemberNotSubbed } from "./auth/RequireSub";
 import { UserButton } from "./auth/UserButton";
+import { AuthState } from "@/backend/rpc/auth";
 
-export function Header() {
+export function Header({ authState }: { authState: AuthState }) {
   const pathname = usePathname();
 
   return (
@@ -32,7 +33,7 @@ export function Header() {
               </Button>
             </MemberNotSubbed>
           </SignedIn>
-          <UserButton />
+          <UserButton authState={authState} />
           <SignedOut>
             <Button variant={"secondary"} asChild>
               <Link href="/sign-in">Sign In</Link>
