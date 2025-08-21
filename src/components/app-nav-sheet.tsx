@@ -14,7 +14,7 @@ import {
   MessageCircleIcon,
 } from "lucide-react";
 import { Separator } from "./ui/separator";
-import { MemberNotSubbed } from "./auth/RequireSub";
+import { NotSubbed } from "./auth/RequireSub";
 import { OrgSignedOut } from "./auth/RequireOrg";
 import Link from "next/link";
 import Image from "next/image";
@@ -92,12 +92,12 @@ export function AppNavSheet() {
             </Button>
           </SignedOut>
           <SignedIn>
-            <MemberNotSubbed>
+            <NotSubbed>
               <Separator />
               <Button asChild>
                 <Link href="/members/subscribe">Upgrade</Link>
               </Button>
-            </MemberNotSubbed>
+            </NotSubbed>
           </SignedIn>
         </div>
       </SheetContent>

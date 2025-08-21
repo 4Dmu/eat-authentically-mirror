@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { MemberNotSubbed } from "./auth/RequireSub";
+import { NotSubbed } from "./auth/RequireSub";
 import { UserButton } from "./auth/UserButton";
 import { AuthState } from "@/backend/rpc/auth";
 
@@ -36,11 +36,11 @@ export function Header({ authState }: { authState: AuthState }) {
         </Link>
         <div className="flex gap-2 justify-end items-center">
           <SignedIn>
-            <MemberNotSubbed>
+            <NotSubbed>
               <Button variant={"secondary"} asChild>
                 <Link href="/members/subscribe">Upgrade</Link>
               </Button>
-            </MemberNotSubbed>
+            </NotSubbed>
           </SignedIn>
           <UserButton authState={authState} />
           <SignedOut>

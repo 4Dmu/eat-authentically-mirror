@@ -1,37 +1,37 @@
 import { createEnv } from "@t3-oss/env-nextjs";
-import { type } from "arktype";
+import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    TURSO_DB_URL: type("string > 1"),
-    TURSO_DB_TOKEN: type("string > 1"),
+    TURSO_DB_URL: z.string().min(1),
+    TURSO_DB_TOKEN: z.string().min(1),
 
-    UPSTASH_REDIS_REST_URL: type("string > 1"),
-    UPSTASH_REDIS_REST_TOKEN: type("string > 1"),
+    UPSTASH_REDIS_REST_URL: z.string().min(1),
+    UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
 
-    SITE_URL: type("string.url"),
+    SITE_URL: z.url().min(1),
 
-    CLERK_SECRET_KEY: type("string > 1"),
-    CLERK_SIGNING_SECRET: type("string > 1"),
+    CLERK_SECRET_KEY: z.string().min(1),
+    CLERK_SIGNING_SECRET: z.string().min(1),
 
-    STRIPE_SECRET_KEY: type("string > 1"),
-    STRIPE_SIGNING_SECRET: type("string > 1"),
+    STRIPE_SECRET_KEY: z.string().min(1),
+    STRIPE_SIGNING_SECRET: z.string().min(1),
 
-    TOTAL_GEOCODE_REQUESTS_ALLOWED: type("string.numeric.parse"),
+    TOTAL_GEOCODE_REQUESTS_ALLOWED: z.coerce.number().min(0),
 
-    ORGANIZATION_PRO_MONTLY_PRICE_ID: type("string > 1"),
-    ORGANIZATION_PRO_YEARLY_PRICE_ID: type("string > 1"),
-    ORGANIZATION_PREMIUM_MONTLY_PRICE_ID: type("string > 1"),
-    ORGANIZATION_PREMIUM_YEARLY_PRICE_ID: type("string > 1"),
+    ORGANIZATION_PRO_MONTHLY_PRICE_ID: z.string().min(1),
+    ORGANIZATION_PRO_YEARLY_PRICE_ID: z.string().min(1),
+    ORGANIZATION_PREMIUM_MONTHLY_PRICE_ID: z.string().min(1),
+    ORGANIZATION_PREMIUM_YEARLY_PRICE_ID: z.string().min(1),
 
-    COMMUNITY_MEMBER_MONTLY_PRICE_ID: type("string > 1"),
-    COMMUNITY_MEMBER_YEARLY_PRICE_ID: type("string > 1"),
+    COMMUNITY_MEMBER_MONTHLY_PRICE_ID: z.string().min(1),
+    COMMUNITY_MEMBER_YEARLY_PRICE_ID: z.string().min(1),
   },
   client: {
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: type("string > 1"),
-    NEXT_PUBLIC_GOOGLE_MAPS_JS_PUBLIC_KEY: type("string > 1"),
-    NEXT_PUBLIC_CLERK_SIGN_IN_URL: type("string > 1"),
-    NEXT_PUBLIC_CLERK_SIGN_UP_URL: type("string > 1"),
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+    NEXT_PUBLIC_GOOGLE_MAPS_JS_PUBLIC_KEY: z.string().min(1),
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().min(1),
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(1),
   },
   // For Next.js >= 13.4.4, you only need to destructure client variables:
   experimental__runtimeEnv: {

@@ -1,4 +1,4 @@
-import { TiersCard } from "@/components/sub/MemberTiersCard";
+import { TiersCard } from "@/components/sub/member-tiers-card";
 
 export default function Page() {
   return (

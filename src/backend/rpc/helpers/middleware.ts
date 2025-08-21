@@ -1,7 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { actionClient } from "./safe-action";
 import { getUsersOrganizationIdCached } from "@/backend/data/organization";
-import { getMemberSubTier } from "../utils/get-sub-tier";
+import { getSubTier } from "../utils/get-sub-tier";
 
 export const authenticatedActionClient = actionClient.use(async ({ next }) => {
   const { userId } = await auth();
@@ -39,14 +39,14 @@ export const organizationActionClient = authenticatedActionClient.use(
   }
 );
 
-export const membeSubedActionClient = authenticatedActionClient.use(
+export const subscribedActionClient = authenticatedActionClient.use(
   async ({ next, ctx: { userId } }) => {
-    const memberSubTier = await getMemberSubTier(userId);
+    const subTier = await getSubTier(userId);
 
-    if (memberSubTier !== "Pro") {
+    if (subTier !== "Free") {
       throw new Error("Unauthorized");
     }
 
-    return next({ ctx: { memberSubTier } });
+    return next({ ctx: { subTier } });
   }
 );

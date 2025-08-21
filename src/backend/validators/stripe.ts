@@ -1,8 +1,12 @@
 import { type } from "arktype";
 
-export type CreateMemberCheckoutSessionArgs =
-  typeof CreateMemberCheckoutSessionArgsValidator.infer;
+export const TimeframeValidator = type("'month'|'year'");
+export const TierValidator = type("'community'|'pro'|'premium'");
 
-export const CreateMemberCheckoutSessionArgsValidator = type({
-  timeframe: "'monthly'|'yearly'",
+export const CreateCheckoutSessionArgsValidator = type({
+  timeframe: TimeframeValidator,
+  tier: TierValidator,
 });
+
+export type CreateCheckoutSessionArgs =
+  typeof CreateCheckoutSessionArgsValidator.infer;

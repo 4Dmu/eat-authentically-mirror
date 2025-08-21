@@ -1,20 +1,18 @@
 "use client";
-import { Star } from "lucide-react";
-import { SingleTierCard, TierCard } from "./TierCard";
-import { useState } from "react";
+import { SingleTierCard } from "./TierCard";
 import { Button } from "../ui/button";
-import { createMemberCheckoutSession } from "@/backend/rpc/stripe";
+import { createCheckoutSession } from "@/backend/rpc/stripe";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { throwErrors } from "@/utils/actions";
 import { Tabs, TabsTrigger, TabsContent, TabsList } from "../ui/tabs";
-import { CreateMemberCheckoutSessionArgs } from "@/backend/validators/stripe";
+import { CreateCheckoutSessionArgs } from "@/backend/validators/stripe";
 
 export function TiersCard() {
   const createMemeberCheckoutSessionMutation = useMutation({
     mutationKey: ["create-member-checkout-session"],
-    mutationFn: async (args: CreateMemberCheckoutSessionArgs) =>
-      await createMemberCheckoutSession(args).then((r) => throwErrors(r)),
+    mutationFn: async (args: CreateCheckoutSessionArgs) =>
+      await createCheckoutSession(args).then((r) => throwErrors(r)),
     onSuccess(url) {
       window.location.href = url;
     },
@@ -37,7 +35,8 @@ export function TiersCard() {
             onSubmit={(e) => {
               e.preventDefault();
               createMemeberCheckoutSessionMutation.mutate({
-                timeframe: "monthly",
+                tier: "community",
+                timeframe: "month",
               });
             }}
           >
@@ -53,7 +52,14 @@ export function TiersCard() {
                 "Support sustainable food producers.",
               ]}
               cons={[]}
-              submit={<Button className="w-full">Upgrade Now</Button>}
+              submit={
+                <Button
+                  disabled={createMemeberCheckoutSessionMutation.isPending}
+                  className="w-full"
+                >
+                  Upgrade Now
+                </Button>
+              }
             />
           </form>
         </TabsContent>
@@ -62,7 +68,8 @@ export function TiersCard() {
             onSubmit={(e) => {
               e.preventDefault();
               createMemeberCheckoutSessionMutation.mutate({
-                timeframe: "yearly",
+                tier: "community",
+                timeframe: "month",
               });
             }}
           >
@@ -78,7 +85,14 @@ export function TiersCard() {
                 "Support sustainable food producers.",
               ]}
               cons={[]}
-              submit={<Button className="w-full">Upgrade Now</Button>}
+              submit={
+                <Button
+                  disabled={createMemeberCheckoutSessionMutation.isPending}
+                  className="w-full"
+                >
+                  Upgrade Now
+                </Button>
+              }
             />
           </form>
         </TabsContent>

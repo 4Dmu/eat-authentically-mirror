@@ -1,13 +1,14 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
 import { actionClient } from "./helpers/safe-action";
-import { getMemberSubTier, getOrgSubTier } from "./utils/get-sub-tier";
 import { getUsersOrganizationIdCached } from "../data/organization";
 import {
   ORG_DATA_KV,
   ORG_STRIPE_CUSTOMER_ID_KV,
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "../kv";
+import { getSubTier } from "./utils/get-sub-tier";
+import { Plan } from "../stripe/subscription-plans";
 
 export type AuthState =
   | {
@@ -19,10 +20,9 @@ export type AuthState =
       userData: {
         imageUrl: string;
       };
-      memberSubTier: "Free" | "Pro";
+      subTier: Plan | "Free";
       orgId: null;
       orgData: null;
-      orgSubTier: "Free";
       canMangeBilling: boolean;
     }
   | {
@@ -31,10 +31,9 @@ export type AuthState =
       userData: {
         imageUrl: string;
       };
-      memberSubTier: "Free" | "Pro";
+      subTier: Plan | "Free";
       orgId: string;
       orgData: { imageUrl: string; name: string };
-      orgSubTier: "Free" | "Pro" | "Premium";
       canMangeBilling: boolean;
     };
 
@@ -47,7 +46,7 @@ export const getAuthState = actionClient.action(
       } as const;
     }
 
-    const memberSubTier = await getMemberSubTier(userId);
+    const subTier = await getSubTier(userId);
     const userStripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
     const orgId = await getUsersOrganizationIdCached(userId);
     const orgData = orgId ? await ORG_DATA_KV.get(orgId) : null;
@@ -57,25 +56,22 @@ export const getAuthState = actionClient.action(
         isAuthed: true,
         userId: userId,
         userData: { imageUrl: sessionClaims.imageUrl! },
-        memberSubTier: memberSubTier,
+        subTier: subTier,
         orgId: null,
         orgData: null,
-        orgSubTier: "Free",
         canMangeBilling: userStripeCustomerId !== null,
       } as const;
     }
 
-    const orgSubTier = await getOrgSubTier({ providedOrgId: orgId });
     const orgStripeCustomerId = await ORG_STRIPE_CUSTOMER_ID_KV.get(orgId);
 
     return {
       isAuthed: true,
-      memberSubTier,
+      subTier: subTier,
       orgId,
       userId: userId,
       userData: { imageUrl: sessionClaims.imageUrl! },
       orgData: { imageUrl: orgData.imageUrl, name: orgData.name },
-      orgSubTier,
       canMangeBilling:
         orgStripeCustomerId !== null || userStripeCustomerId != null,
     } as const;

@@ -23,7 +23,7 @@ export function OrgSignedOut(
 
   const allow = data && data.isAuthed && !data.orgId;
 
-  if (!allow) {
+  if (allow) {
     return <>{props.children}</>;
   }
 

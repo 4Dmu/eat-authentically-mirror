@@ -1,4 +1,4 @@
-import { triggerStripeSyncForUser } from "@/backend/rpc/stripe";
+import { triggerStripeSyncForOrganization } from "@/backend/rpc/stripe";
 import { tryCatch } from "@/utils/try-catch";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -10,9 +10,9 @@ async function ConfirmStripeSessionComponent() {
   const user = await auth();
   if (!user) return <div>No user</div>;
   console.log("user", user);
-  const { error } = await tryCatch(triggerStripeSyncForUser());
+  const { error } = await tryCatch(triggerStripeSyncForOrganization());
   if (error) return <div>Failed to sync with stripe: {error.message}</div>;
-  return redirect("/");
+  return redirect("/organization/profile");
 }
 
 export default async function SuccessPage({
@@ -23,7 +23,7 @@ export default async function SuccessPage({
   const params = await searchParams;
 
   console.log(
-    "[stripe/member/success] Checkout session id",
+    "[stripe/organization/success] Checkout session id",
     params.stripe_session_id
   );
 

@@ -5,98 +5,167 @@ import { env } from "@/env";
 import {
   authenticatedActionClient,
   authenticatedWithUserActionClient,
-  membeSubedActionClient,
 } from "./helpers/middleware";
 import {
+  ORG_STRIPE_CUSTOMER_ID_KV,
   STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "../kv";
 import { auth } from "@clerk/nextjs/server";
 import { updateKvWithLatestStripeData } from "../stripe/stripe-sync";
-import { type } from "arktype";
-import { CreateMemberCheckoutSessionArgsValidator } from "../validators/stripe";
+import { CreateCheckoutSessionArgsValidator } from "../validators/stripe";
+import { getUsersOrganizationIdCached } from "../data/organization";
+import * as plans from "../stripe/subscription-plans";
 
-export const createMemberCheckoutSession = authenticatedWithUserActionClient
-  .inputSchema(CreateMemberCheckoutSessionArgsValidator)
-  .action(async ({ ctx: { userId, user }, parsedInput: { timeframe } }) => {
-    let stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
-    const existingSubs = stripeCustomerId
-      ? await STRIPE_CUSTOMER_SUBSCRIPTIONS_KV.get(stripeCustomerId)
-      : null;
+export const createCheckoutSession = authenticatedWithUserActionClient
+  .inputSchema(CreateCheckoutSessionArgsValidator)
+  .action(
+    async ({ ctx: { userId, user }, parsedInput: { tier, timeframe } }) => {
+      let stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
 
-    if (
-      existingSubs?.some(
+      const existingSubs = stripeCustomerId
+        ? await STRIPE_CUSTOMER_SUBSCRIPTIONS_KV.get(stripeCustomerId)
+        : null;
+
+      const activeSub = existingSubs?.find(
         (sub) =>
-          (sub.priceId === env.COMMUNITY_MEMBER_MONTLY_PRICE_ID ||
-            sub.priceId === env.COMMUNITY_MEMBER_YEARLY_PRICE_ID) &&
-          sub.status === "active"
-      )
-    ) {
-      throw new Error("You already have an active subscription");
-    }
+          plans.isActive(sub.status) && !!plans.getPlanByPriceId(sub.priceId)
+      );
 
-    console.log(
-      "CREATE MEMBER CHECKOUT SESSION Here's the stripe id we got from kv:",
-      stripeCustomerId
-    );
-
-    if (!stripeCustomerId) {
       console.log(
-        "CREATE MEMBER CHECKOUT SESSION No stripe id found in kv, creatring new customer",
+        "CREATE ORG CHECKOUT SESSION Active org subscription (if any):",
+        activeSub
+      );
+
+      const targetPlan = plans.getPlanBySubscriptionTier(tier, timeframe);
+
+      if (!targetPlan) {
+        throw new Error("Invalid target subscription tier/interval.");
+      }
+
+      if (activeSub) {
+        throw new Error("You already have an active sub");
+      }
+
+      console.log(
+        "CREATE ORG CHECKOUT SESSION Here's the stripe id we got from kv:",
         stripeCustomerId
       );
 
-      const newCustomer = await stripe.customers.create({
-        email:
-          user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)
-            ?.emailAddress ?? user.emailAddresses[0]?.emailAddress,
-        metadata: {
-          userId: userId,
-        },
-      });
+      if (!stripeCustomerId) {
+        console.log(
+          "CREATE MEMBER CHECKOUT SESSION No stripe id found in kv, creatring new customer",
+          stripeCustomerId
+        );
 
-      await USER_STRIPE_CUSTOMER_ID_KV.set(userId, newCustomer.id);
-
-      console.log(
-        "CREATE MEMBER CHECKOUT SESSION Customer Created",
-        newCustomer
-      );
-
-      stripeCustomerId = newCustomer.id;
-    }
-
-    let session;
-    try {
-      session = await stripe.checkout.sessions.create({
-        line_items: [
-          {
-            price:
-              timeframe === "yearly"
-                ? env.COMMUNITY_MEMBER_YEARLY_PRICE_ID
-                : env.COMMUNITY_MEMBER_MONTLY_PRICE_ID,
-            quantity: 1,
-          },
-        ],
-        mode: "subscription",
-        success_url: `${env.SITE_URL}/members/subscribe/success`,
-        cancel_url: `${env.SITE_URL}/members/subscribe/cancel`,
-        subscription_data: {
+        const newCustomer = await stripe.customers.create({
+          email:
+            user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)
+              ?.emailAddress ?? user.emailAddresses[0]?.emailAddress,
           metadata: {
             userId: userId,
           },
-        },
-        customer: stripeCustomerId,
-        allow_promotion_codes: true,
-      });
-    } catch (err) {
-      console.error(err);
-      throw new Error(
-        "Failed to create checkout session. Pleae refresh and try again."
-      );
-    }
+        });
 
-    return session.url!;
-  });
+        await USER_STRIPE_CUSTOMER_ID_KV.set(userId, newCustomer.id);
+
+        console.log(
+          "CREATE MEMBER CHECKOUT SESSION Customer Created",
+          newCustomer
+        );
+
+        stripeCustomerId = newCustomer.id;
+      }
+
+      let session;
+      try {
+        session = await stripe.checkout.sessions.create({
+          line_items: [
+            {
+              price: targetPlan.priceId,
+              quantity: 1,
+            },
+          ],
+          mode: "subscription",
+          success_url: `${env.SITE_URL}/organization/subscribe/success?stripe_session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${env.SITE_URL}/organization/subscribe/cancel`,
+          subscription_data: {
+            metadata: {
+              userId: userId,
+            },
+          },
+          customer: stripeCustomerId,
+          allow_promotion_codes: true,
+        });
+      } catch (err) {
+        console.error(err);
+        throw new Error(
+          "Failed to create checkout session. Pleae refresh and try again."
+        );
+      }
+
+      return session.url!;
+
+      // async function handleActiveSubscription(
+      //   activeSub: SubscriptionJSON,
+      //   targetPlan: orgSubscriptionHelpers.Plan
+      // ) {
+      //   const currentPlan = orgSubscriptionHelpers.getPlanByPriceId(
+      //     activeSub.priceId
+      //   )!;
+      //   const decision = orgSubscriptionHelpers.comparePlans(
+      //     currentPlan,
+      //     targetPlan
+      //   );
+
+      //   if (decision === "same") {
+      //     throw new Error("You already have this subscription.");
+      //   }
+
+      //   if (currentPlan.interval === "month" && targetPlan.interval === "year") {
+      //     // Month → Year = UPGRADE (start annual today)
+      //     await upgradeSubscription({
+      //       subscriptionId: activeSub.subscriptionId,
+      //       newPriceId: targetPlan.priceId,
+      //       oldPriceId: currentPlan.priceId,
+      //       prorationBehavior: "create_prorations", // credit unused month
+      //       paymentBehavior: "default_incomplete", // handle SCA if needed
+      //       resetBillingAnchor: true, // <-- start yearly cycle now
+      //     });
+      //   } else if (
+      //     currentPlan.interval === "year" &&
+      //     targetPlan.interval === "month"
+      //   ) {
+      //     // Year → Month = DOWNGRADE (schedule for renewal)
+      //     await downgradeSubscription({
+      //       subscriptionId: activeSub.subscriptionId,
+      //       newPriceId: targetPlan.priceId,
+      //       oldPriceId: currentPlan.priceId,
+      //       atPeriodEnd: true, // use schedule phases with iterations: 1
+      //     });
+      //   } else {
+      //     // Interval unchanged; just rely on your rank-based upgrade/downgrade decision
+      //     if (decision === "upgrade") {
+      //       await upgradeSubscription({
+      //         subscriptionId: activeSub.subscriptionId,
+      //         newPriceId: targetPlan.priceId,
+      //         oldPriceId: currentPlan.priceId,
+      //         prorationBehavior: "create_prorations",
+      //         paymentBehavior: "default_incomplete",
+      //         resetBillingAnchor: false, // keep cycle when interval doesn't change
+      //       });
+      //     } else {
+      //       await downgradeSubscription({
+      //         subscriptionId: activeSub.subscriptionId,
+      //         newPriceId: targetPlan.priceId,
+      //         oldPriceId: currentPlan.priceId,
+      //         atPeriodEnd: true,
+      //       });
+      //     }
+      //   }
+      // }
+    }
+  );
 
 export const createBillingPortalSession = authenticatedActionClient.action(
   async ({ ctx: { userId } }) => {
@@ -119,6 +188,19 @@ export async function triggerStripeSyncForUser() {
   if (!user.userId) return;
 
   const stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(user.userId);
+  if (!stripeCustomerId) return;
+
+  return await updateKvWithLatestStripeData(stripeCustomerId);
+}
+
+export async function triggerStripeSyncForOrganization() {
+  const user = await auth();
+  if (!user.userId) return;
+
+  const orgId = await getUsersOrganizationIdCached(user.userId);
+  if (!orgId) return;
+
+  const stripeCustomerId = await ORG_STRIPE_CUSTOMER_ID_KV.get(orgId);
   if (!stripeCustomerId) return;
 
   return await updateKvWithLatestStripeData(stripeCustomerId);

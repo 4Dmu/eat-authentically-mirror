@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { getMemberSubTier } from "./backend/rpc/utils/get-sub-tier";
-import { redirect } from "next/navigation";
+import { getSubTier } from "./backend/rpc/utils/get-sub-tier";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
@@ -23,8 +22,8 @@ export default clerkMiddleware(async (auth, req) => {
     if (!userId) {
       return NextResponse.redirect(new URL("/sign-in", req.url));
     }
-    const tier = await getMemberSubTier(userId);
-    if (tier === "Pro") {
+    const tier = await getSubTier(userId);
+    if (tier !== "Free") {
       return NextResponse.redirect(new URL("/", req.url));
     }
   }

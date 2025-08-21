@@ -8,10 +8,6 @@ export const LISTING_TYPES = [
 
 export const ListingTypesValidator = type("'farm'|'ranch'|'eatery'");
 
-export const OrganizationSubscriptionTiersValidator = type(
-  "'Free'|'Pro'|'Premium'"
-);
-
 export const LatLangBoundsLiteralValidator = type({
   east: "number",
   north: "number",
@@ -155,9 +151,6 @@ export const PublicListingLightValidator = ListingValidator.pick(
   "contact",
   "address"
 );
-
-export type OrganizationSubscriptionTiers =
-  typeof OrganizationSubscriptionTiersValidator.infer;
 
 export type ListListingsArgs = typeof ListListingsArgsValidator.infer;
 

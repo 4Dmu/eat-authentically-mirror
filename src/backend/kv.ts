@@ -1,24 +1,7 @@
-import type stripe from "stripe";
 import type { UserJSON } from "@clerk/backend";
 import type { Organization } from "./db/schema";
 import { redis } from "./lib/redis";
-
-type Subscription = {
-  subscriptionId: string;
-  status: stripe.Subscription.Status;
-  priceId: string;
-  cancelAtPeriodEnd: boolean;
-  cancelAt: number | null;
-  canceledAt: number | null;
-  billingCycleAnchor: number;
-  billingCycleAnchorConfig: stripe.Subscription.BillingCycleAnchorConfig | null;
-  billingMode: stripe.Subscription.BillingMode;
-  billingThresholds: stripe.Subscription.BillingThresholds | null;
-  paymentMethod: {
-    brand: string | null;
-    last4: string | null;
-  } | null;
-};
+import { SubscriptionJSON } from "./stripe/stripe-sync";
 
 export const USER_DATA_KV = {
   generateKey(userId: string) {
@@ -160,7 +143,7 @@ export const STRIPE_CUSTOMER_SUBSCRIPTIONS_KV = {
     return `stripe.customer.${stripeCustomerId}.subscription`;
   },
   async get(stripeCustomerId: string) {
-    const data = await redis.get<Subscription[]>(
+    const data = await redis.get<SubscriptionJSON[]>(
       this.generateKey(stripeCustomerId)
     );
     if (data == null) {
@@ -168,7 +151,7 @@ export const STRIPE_CUSTOMER_SUBSCRIPTIONS_KV = {
     }
     return data;
   },
-  async set(stripeCustomerId: string, subscriptions: Subscription[]) {
+  async set(stripeCustomerId: string, subscriptions: SubscriptionJSON[]) {
     await redis.set(this.generateKey(stripeCustomerId), subscriptions);
   },
 };

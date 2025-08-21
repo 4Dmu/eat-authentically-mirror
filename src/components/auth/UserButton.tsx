@@ -88,7 +88,7 @@ export function UserButton({ authState }: { authState: AuthState }) {
             </div>
             <div className="ml-auto flex items-center gap-2">
               <Badge>
-                {isOrgMode ? authState.orgSubTier : authState.memberSubTier}
+                {authState.subTier === "Free" ? "Free" : authState.subTier.tier}
               </Badge>
               <ChevronDown className="invisible group-enabled:visible" />
             </div>

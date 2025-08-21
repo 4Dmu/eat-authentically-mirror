@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { OrgSignedIn } from "./auth/RequireOrg";
-import { OrgNotSubbed } from "./auth/RequireSub";
+import { NotSubbed } from "./auth/RequireSub";
 import { UserButton } from "./auth/UserButton";
 import { SignedOut } from "@clerk/nextjs";
 import { AuthState } from "@/backend/rpc/auth";
@@ -25,11 +25,11 @@ export function Header({ authState }: { authState: AuthState }) {
         </Link>
         <div className="flex gap-2 justify-end items-center">
           <OrgSignedIn initialAuthState={authState}>
-            <OrgNotSubbed initialAuthState={authState}>
+            <NotSubbed tiers={["premium", "pro"]} initialAuthState={authState}>
               <Button variant={"secondary"} asChild>
                 <Link href="/organization/subscribe">Upgrade</Link>
               </Button>
-            </OrgNotSubbed>
+            </NotSubbed>
           </OrgSignedIn>
           <UserButton authState={authState} />
           <SignedOut>

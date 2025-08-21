@@ -1,6 +1,24 @@
 import { env } from "@/env";
 import Stripe from "stripe";
 import { STRIPE_CUSTOMER_SUBSCRIPTIONS_KV } from "../kv";
+import stripe from "stripe";
+
+export type SubscriptionJSON = {
+  subscriptionId: string;
+  status: stripe.Subscription.Status;
+  priceId: string;
+  cancelAtPeriodEnd: boolean;
+  cancelAt: number | null;
+  canceledAt: number | null;
+  billingCycleAnchor: number;
+  billingCycleAnchorConfig: stripe.Subscription.BillingCycleAnchorConfig | null;
+  billingMode: stripe.Subscription.BillingMode;
+  billingThresholds: stripe.Subscription.BillingThresholds | null;
+  paymentMethod: {
+    brand: string | null;
+    last4: string | null;
+  } | null;
+};
 
 const allowedEvents: Stripe.Event.Type[] = [
   "checkout.session.completed",
@@ -57,7 +75,7 @@ export async function updateKvWithLatestStripeData(customerId: string) {
       return [];
     }
 
-    const subs = subscriptions.data.map((sub) => ({
+    const subs: SubscriptionJSON[] = subscriptions.data.map((sub) => ({
       subscriptionId: sub.id,
       status: sub.status,
       priceId: sub.items.data[0].price.id,
