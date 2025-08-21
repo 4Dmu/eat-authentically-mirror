@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import {
   Popover,
   PopoverContent,
@@ -15,9 +17,7 @@ import {
 import { Badge } from "../ui/badge";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { AuthState } from "@/backend/rpc/auth";
 
 export function UserButton({ authState }: { authState: AuthState }) {
