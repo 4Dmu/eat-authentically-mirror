@@ -7,7 +7,7 @@ import { createBillingPortalSession } from "@/backend/rpc/stripe";
 import { throwErrors } from "./actions";
 
 type GeocodeRegionMutationOpsType = WithRequired<
-  UseMutationOptions<string, Error, void, unknown>,
+  UseMutationOptions<string, Error, { redirectPath: string }, unknown>,
   "mutationKey"
 >;
 
@@ -17,8 +17,8 @@ export const billingPortableMutationOpts = (params?: {
 }) =>
   mutationOptions({
     mutationKey: ["create-billing-portal-session"],
-    mutationFn: async () =>
-      await createBillingPortalSession().then((t) => throwErrors(t)),
+    mutationFn: async (props: { redirectPath: string }) =>
+      await createBillingPortalSession(props).then((t) => throwErrors(t)),
     onSuccess: params?.onSuccess,
     onError: params?.onError,
   });

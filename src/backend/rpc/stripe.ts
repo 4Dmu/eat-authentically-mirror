@@ -7,15 +7,14 @@ import {
   authenticatedWithUserActionClient,
 } from "./helpers/middleware";
 import {
-  ORG_STRIPE_CUSTOMER_ID_KV,
   STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "../kv";
 import { auth } from "@clerk/nextjs/server";
 import { updateKvWithLatestStripeData } from "../stripe/stripe-sync";
 import { CreateCheckoutSessionArgsValidator } from "../validators/stripe";
-import { getUsersOrganizationIdCached } from "../data/organization";
 import * as plans from "../stripe/subscription-plans";
+import { type } from "arktype";
 
 export const createCheckoutSession = authenticatedWithUserActionClient
   .inputSchema(CreateCheckoutSessionArgsValidator)
@@ -167,8 +166,9 @@ export const createCheckoutSession = authenticatedWithUserActionClient
     }
   );
 
-export const createBillingPortalSession = authenticatedActionClient.action(
-  async ({ ctx: { userId } }) => {
+export const createBillingPortalSession = authenticatedActionClient
+  .inputSchema(type({ redirectPath: "string" }))
+  .action(async ({ ctx: { userId }, parsedInput: { redirectPath } }) => {
     const customerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
 
     if (!customerId) {
@@ -176,31 +176,17 @@ export const createBillingPortalSession = authenticatedActionClient.action(
     }
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: env.SITE_URL,
+      return_url: `${env.SITE_URL}/billing/success?redirect_path=${redirectPath}`,
     });
 
     return session.url;
-  }
-);
+  });
 
-export async function triggerStripeSyncForUser() {
+export async function triggerStripeSync() {
   const user = await auth();
   if (!user.userId) return;
 
   const stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(user.userId);
-  if (!stripeCustomerId) return;
-
-  return await updateKvWithLatestStripeData(stripeCustomerId);
-}
-
-export async function triggerStripeSyncForOrganization() {
-  const user = await auth();
-  if (!user.userId) return;
-
-  const orgId = await getUsersOrganizationIdCached(user.userId);
-  if (!orgId) return;
-
-  const stripeCustomerId = await ORG_STRIPE_CUSTOMER_ID_KV.get(orgId);
   if (!stripeCustomerId) return;
 
   return await updateKvWithLatestStripeData(stripeCustomerId);

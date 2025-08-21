@@ -1,4 +1,4 @@
-import { triggerStripeSyncForOrganization } from "@/backend/rpc/stripe";
+import { triggerStripeSync } from "@/backend/rpc/stripe";
 import { tryCatch } from "@/utils/try-catch";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -10,7 +10,7 @@ async function ConfirmStripeSessionComponent() {
   const user = await auth();
   if (!user) return <div>No user</div>;
   console.log("user", user);
-  const { error } = await tryCatch(triggerStripeSyncForOrganization());
+  const { error } = await tryCatch(triggerStripeSync());
   if (error) return <div>Failed to sync with stripe: {error.message}</div>;
   return redirect("/organization/profile");
 }

@@ -6,31 +6,34 @@ import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
-async function ConfirmStripeSessionComponent() {
+async function ConfirmStripeSessionComponent({
+  redirectPath,
+}: {
+  redirectPath: string;
+}) {
   const user = await auth();
   if (!user) return <div>No user</div>;
   console.log("user", user);
   const { error } = await tryCatch(triggerStripeSync());
   if (error) return <div>Failed to sync with stripe: {error.message}</div>;
-  return redirect("/");
+  return redirect(redirectPath);
 }
 
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ stripe_session_id: string | undefined }>;
+  searchParams: Promise<{ redirect_path: string | undefined }>;
 }) {
   const params = await searchParams;
 
-  console.log(
-    "[stripe/member/success] Checkout session id",
-    params.stripe_session_id
-  );
+  console.log("[stripe/billing/success] redirect_path", params.redirect_path);
 
   return (
     <div>
       <Suspense fallback={<div>{"One moment..."}</div>}>
-        <ConfirmStripeSessionComponent />
+        <ConfirmStripeSessionComponent
+          redirectPath={params.redirect_path ?? "/"}
+        />
       </Suspense>
     </div>
   );
