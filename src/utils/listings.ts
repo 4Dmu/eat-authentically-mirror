@@ -28,6 +28,18 @@ export function primaryImageUrl(
   );
 }
 
+/**
+ * Generates slug from listing name,
+ * to be used with self healing urls only
+ *
+ * Includes the trailing -
+ * @example
+ *  'Daves Ranch' returns 'daves-ranch-'
+ */
+export function listingSlug(name: string) {
+  return `${name.toLowerCase().trim().split(" ").join("-")}-`;
+}
+
 export const listingsQueryOptions = (
   args: ListListingsArgs,
   initialData?: { data: PublicListingLight[]; hasNextPage: boolean }

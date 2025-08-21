@@ -1,4 +1,4 @@
-import { primaryImageUrl } from "@/utils/listings";
+import { listingSlug, primaryImageUrl } from "@/utils/listings";
 import { PublicListingLight } from "@/backend/validators/listings";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import Image from "next/image";
 export function ListingCard({ listing }: { listing: PublicListingLight }) {
   return (
     <Link
-      href={`/listings/${listing.id}`}
+      href={`/listings/${listingSlug(listing.name)}${listing.id}`}
       className="border border-black rounded-lg overflow-hidden relative"
     >
       <Image

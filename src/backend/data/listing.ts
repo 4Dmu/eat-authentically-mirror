@@ -193,7 +193,7 @@ export async function getListingPublic(args: GetListingArgs) {
     });
 
     if (!listing) {
-      throw new Error("Listing not found");
+      return;
     }
 
     const {

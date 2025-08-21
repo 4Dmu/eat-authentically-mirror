@@ -16,7 +16,11 @@ export function ManageSubscriptionsButton() {
 
   return (
     <Button
-      onClick={() => createBillingPortalSessionMutation.mutate()}
+      onClick={() =>
+        createBillingPortalSessionMutation.mutate({
+          redirectPath: window.location.pathname,
+        })
+      }
       variant={"ghost"}
       className="w-full justify-start gap-5"
     >
