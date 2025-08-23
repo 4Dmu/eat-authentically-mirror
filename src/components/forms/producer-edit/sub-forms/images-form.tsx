@@ -202,8 +202,8 @@ export const ImagesForm = withForm({
                             src={value.cloudflareUrl}
                             alt={value.alt}
                             className="object-cover h-full w-full"
-                            width={120}
-                            height={120}
+                            width={200}
+                            height={200}
                           />
                         )}
                       </div>

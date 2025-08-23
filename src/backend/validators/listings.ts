@@ -138,50 +138,6 @@ export const ListingValidator = type({
   socialMedia: SocialMediaValidator,
 });
 
-export const listingEditFormFieldsValidators = {
-  name: type("string|undefined"),
-  type: ListingTypesValidator.or(type("undefined")),
-  about: type("string|undefined"),
-  contact: ContactValidator.or(type("undefined")),
-  contactFieldsValidators: {
-    email: type("string.email"),
-    phone: type("string"),
-    website: type("string.url"),
-  },
-  address: AddressValidator.or(type("undefined")),
-  addressFieldsValidators: {
-    city: type("string"),
-    state: type("string"),
-    street: type("string"),
-    zip: type("string"),
-    coordinate: {
-      latitude: type("number"),
-      longitude: type("number"),
-    },
-  },
-  images: type({
-    _type: "'upload'",
-    file: type("File"),
-    isPrimary: "boolean",
-  })
-    .or(ImageDataValidator)
-    .array()
-    .narrow((data, ctx) => {
-      if (!data.some((i) => i.isPrimary)) {
-        return ctx.reject({
-          expected: "one image must be marked isPrimary",
-          actual: "no images are marked isPrimary",
-        });
-      }
-      return true;
-    })
-    .or(type("undefined")),
-  video: type("File").or("undefined"),
-  certifications: CertificationValidator.array().or("undefined"),
-  products: type("string").array().or("undefined"),
-  socialMedia: SocialMediaValidator.or("undefined"),
-};
-
 export const editListingFormBasicInfoValidator = type({
   name: "string",
   type: ListingTypesValidator,
@@ -227,14 +183,27 @@ export const editListingFormImagesValidator = type({
 export const editListingFormVideoValidator = type({
   video: type("File"),
 });
+
 export const editListingFormCertificationsValidator = type({
   certifications: CertificationValidator.array(),
 });
+
 export const editListingFormProductsValidator = type({
   products: type("string").array(),
 });
+
 export const editListingFormSocialMediaValidator =
   SocialMediaValidator.or("undefined");
+
+export const editListingArgsValidator = type({
+  listingId: type("string"),
+  basicInfo: editListingFormBasicInfoValidator.optional(),
+  contact: editListingFormContactValidator.optional(),
+  address: editListingFormAddressValidator.optional(),
+  certifications: editListingFormCertificationsValidator.optional(),
+  products: editListingFormProductsValidator.optional(),
+  socialMedia: editListingFormSocialMediaValidator.optional(),
+});
 
 export const ListingFormBasicValidator = type({
   name: "string",
@@ -300,3 +269,5 @@ export type PublicListing = typeof PublicListingValidator.infer;
 export type PublicListingLight = typeof PublicListingLightValidator.infer;
 
 export type Certification = typeof CertificationValidator.infer;
+
+export type EditListingArgs = typeof editListingArgsValidator.infer;

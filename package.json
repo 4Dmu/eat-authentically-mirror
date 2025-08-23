@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@clerk/backend": "^2.9.2",
@@ -51,6 +52,7 @@
     "@vis.gl/react-google-maps": "^1.5.5",
     "arktype": "^2.1.20",
     "class-variance-authority": "^0.7.1",
+    "cloudflare": "^4.5.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",

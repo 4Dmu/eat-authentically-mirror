@@ -26,6 +26,9 @@ export const env = createEnv({
 
     COMMUNITY_MEMBER_MONTHLY_PRICE_ID: z.string().min(1),
     COMMUNITY_MEMBER_YEARLY_PRICE_ID: z.string().min(1),
+    SAFE_CLOUDFLARE_API_TOKEN: z.string().min(1),
+    SAFE_CLOUDFLARE_ACCOUNT_ID: z.string().min(1),
+    SAFE_CLOUDFLARE_ACCOUNT_HASH: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),

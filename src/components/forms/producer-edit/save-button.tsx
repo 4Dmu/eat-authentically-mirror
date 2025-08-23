@@ -6,12 +6,22 @@ import {
   useStore,
 } from "@tanstack/react-form";
 
-export function SaveButton(props: { forms: AnyFormApi[] }) {
+export function SaveButton(props: {
+  forms: AnyFormApi[];
+  onSubmit: () => void;
+  disableSubmit?: boolean;
+}) {
   const forms = props.forms.map((form) =>
-    useStore(form.store, ({ isDirty }) => ({ form, state: { isDirty } }))
+    useStore(form.store, ({ isDirty, isValid }) => ({
+      form,
+      state: { isDirty, isValid },
+    }))
   );
 
   const dirtyForms = forms.filter((f) => f.state.isDirty);
+  const submitableForms = forms.filter(
+    (f) => f.state.isDirty && f.state.isValid
+  );
 
   const isDirty = dirtyForms.length > 0;
 
@@ -31,9 +41,8 @@ export function SaveButton(props: { forms: AnyFormApi[] }) {
               Reset
             </Button>
             <Button
-              onClick={() =>
-                dirtyForms.forEach(({ form }) => form.handleSubmit())
-              }
+              disabled={submitableForms.length === 0 || props.disableSubmit}
+              onClick={props.onSubmit}
             >
               Save
             </Button>

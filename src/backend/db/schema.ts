@@ -64,6 +64,7 @@ export const listings = sqliteTable("listings", {
 
   about: text(),
   images: text({ mode: "json" }).$type<ImageData[]>().notNull(),
+  pendingImages: text({ mode: "json" }).$type<string[]>(),
   commodities: text({ mode: "json" }).$type<Commodity[]>().notNull(),
   socialMedia: text({ mode: "json" }).$type<SocialMedia>().notNull(),
   contact: text({ mode: "json" }).$type<Contact>(),
