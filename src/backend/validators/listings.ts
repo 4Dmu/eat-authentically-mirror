@@ -1,4 +1,5 @@
 import { type } from "arktype";
+import z from "zod";
 
 export const LISTING_TYPES = [
   "farm",
@@ -7,6 +8,8 @@ export const LISTING_TYPES = [
 ] as const satisfies ListingTypes[];
 
 export const ListingTypesValidator = type("'farm'|'ranch'|'eatery'");
+
+export const listingTypesValidator = z.enum(["farm", "ranch", "eatery"]);
 
 export const LatLangBoundsLiteralValidator = type({
   east: "number",
@@ -31,6 +34,18 @@ export const ContactValidator = type({
   website: "string.url",
 });
 
+export const contactValidator = z.object({
+  email: z.email(),
+  phone: z.string(),
+  website: z.url(),
+});
+
+export const EmptyContactValidator = type({
+  email: "undefined",
+  phone: "undefined",
+  website: "undefined",
+});
+
 export const AddressValidator = type({
   city: "string",
   state: "string",
@@ -42,15 +57,15 @@ export const AddressValidator = type({
   },
 });
 
-export const AddressFormValidator = type({
-  city: "string",
-  state: "string",
-  street: "string",
-  zip: "string",
-  coordinate: {
-    latitude: "string.numeric.parse",
-    longitude: "string.numeric.parse",
-  },
+export const addressValidator = z.object({
+  city: z.string(),
+  state: z.string(),
+  street: z.string(),
+  zip: z.string(),
+  coordinate: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+  }),
 });
 
 export const ImagesFormValidator = type({
@@ -60,6 +75,17 @@ export const ImagesFormValidator = type({
 export const CertificationValidator = type({
   name: "string",
   isVerified: "boolean",
+  id: "string",
+  createdAt: "Date",
+  updatedAt: "Date",
+});
+
+export const certificationValidator = z.object({
+  name: z.string(),
+  isVerified: z.boolean(),
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 export const ImageDataValidator = type({
@@ -70,12 +96,26 @@ export const ImageDataValidator = type({
   isPrimary: "boolean",
 });
 
+export const imageDataValidator = z.object({
+  _type: z.literal("cloudflare"),
+  cloudflareId: z.string(),
+  cloudflareUrl: z.url(),
+  alt: z.string(),
+  isPrimary: z.boolean(),
+});
+
 export const BusinessHoursValidator = type({});
 
 export const SocialMediaValidator = type({
   twitter: "string.url|null",
   facebook: "string.url|null",
   instagram: "string.url|null",
+});
+
+export const socialMediaValidator = z.object({
+  twitter: z.url().nullable(),
+  facebook: z.url().nullable(),
+  instagram: z.url().nullable(),
 });
 
 export const VideoValidator = type({ url: "string" });
@@ -88,28 +128,113 @@ export const ListingValidator = type({
   about: "string|null",
   contact: ContactValidator.or("null"),
   address: AddressValidator.or("null"),
-  certifications: CertificationValidator.array().or("null"),
+  certifications: CertificationValidator.array(),
   claimed: "boolean",
   verified: "boolean",
   images: ImageDataValidator.array(),
   video: VideoValidator.or(type("null")),
   createdAt: "Date",
   updatedAt: "Date",
-  socialmedia: SocialMediaValidator,
-  predictedLikeCount: "number|null",
+  socialMedia: SocialMediaValidator,
 });
 
-export const ListingFormValidator = type({
+export const listingEditFormFieldsValidators = {
+  name: type("string|undefined"),
+  type: ListingTypesValidator.or(type("undefined")),
+  about: type("string|undefined"),
+  contact: ContactValidator.or(type("undefined")),
+  contactFieldsValidators: {
+    email: type("string.email"),
+    phone: type("string"),
+    website: type("string.url"),
+  },
+  address: AddressValidator.or(type("undefined")),
+  addressFieldsValidators: {
+    city: type("string"),
+    state: type("string"),
+    street: type("string"),
+    zip: type("string"),
+    coordinate: {
+      latitude: type("number"),
+      longitude: type("number"),
+    },
+  },
+  images: type({
+    _type: "'upload'",
+    file: type("File"),
+    isPrimary: "boolean",
+  })
+    .or(ImageDataValidator)
+    .array()
+    .narrow((data, ctx) => {
+      if (!data.some((i) => i.isPrimary)) {
+        return ctx.reject({
+          expected: "one image must be marked isPrimary",
+          actual: "no images are marked isPrimary",
+        });
+      }
+      return true;
+    })
+    .or(type("undefined")),
+  video: type("File").or("undefined"),
+  certifications: CertificationValidator.array().or("undefined"),
+  products: type("string").array().or("undefined"),
+  socialMedia: SocialMediaValidator.or("undefined"),
+};
+
+export const editListingFormBasicInfoValidator = type({
   name: "string",
   type: ListingTypesValidator,
   about: "string|null",
-  contact: ContactValidator.or("null"),
-  address: AddressValidator.or("null"),
-  certifications: CertificationValidator.array().or("null"),
-  images: ImageDataValidator.array(),
-  video: VideoValidator.or(type("null")),
-  socialmedia: SocialMediaValidator,
 });
+
+export const editListingFormContactValidator = type({
+  email: "string.email",
+  phone: "string",
+  website: "string.url",
+});
+
+export const editListingFormAddressValidator = type({
+  city: "string",
+  state: "string",
+  street: "string",
+  zip: "string",
+  coordinate: {
+    latitude: "number",
+    longitude: "number",
+  },
+});
+
+export const editListingFormImagesValidator = type({
+  images: type({
+    _type: "'upload'",
+    file: "File",
+    isPrimary: "boolean",
+  })
+    .or(ImageDataValidator)
+    .array()
+    .narrow((data, ctx) => {
+      if (!data.some((i) => i.isPrimary)) {
+        return ctx.reject({
+          expected: "one image must be marked isPrimary",
+          actual: "no images are marked isPrimary",
+        });
+      }
+      return true;
+    }),
+});
+
+export const editListingFormVideoValidator = type({
+  video: type("File"),
+});
+export const editListingFormCertificationsValidator = type({
+  certifications: CertificationValidator.array(),
+});
+export const editListingFormProductsValidator = type({
+  products: type("string").array(),
+});
+export const editListingFormSocialMediaValidator =
+  SocialMediaValidator.or("undefined");
 
 export const ListingFormBasicValidator = type({
   name: "string",

@@ -170,3 +170,5 @@ export const uploadHistoryRelations = relations(uploadHistory, ({ one }) => ({
     references: [organizations.id],
   }),
 }));
+
+export type Certification = typeof certifications.$inferSelect;

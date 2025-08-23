@@ -1,0 +1,246 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import React from "react";
+import { useController } from "react-hook-form";
+import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import { FileInput, SingleFileInput } from "@/components/file-input";
+import { FileImage } from "@/components/file-image";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { useStore } from "@tanstack/react-form";
+import { FieldInfo } from "../../helpers/field-info";
+import Image from "next/image";
+import {
+  SelectFileButton,
+  TemporyFilesSelectButton,
+} from "@/components/select-file-button";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { CheckIcon, RotateCwIcon, XIcon } from "lucide-react";
+import { setProperty } from "@/utils/array";
+import { toast } from "sonner";
+import {
+  editListingFormBasicInfoValidator,
+  editListingFormImagesValidator,
+} from "@/backend/validators/listings";
+import {
+  createFormHook,
+  createFormHookContexts,
+  formOptions,
+} from "@tanstack/react-form";
+
+export const { fieldContext, useFieldContext, formContext, useFormContext } =
+  createFormHookContexts();
+
+export const { useAppForm, withForm } = createFormHook({
+  fieldComponents: {},
+  formComponents: {},
+  fieldContext,
+  formContext,
+});
+
+export const imagesOpts = formOptions({
+  defaultValues: {
+    images: [] as (typeof editListingFormImagesValidator.infer)["images"],
+  },
+});
+
+export const useImagesForm = useAppForm;
+
+export const ImagesForm = withForm({
+  ...imagesOpts,
+  props: {
+    tier: "Free" as SubTier,
+  },
+  render: function Render({ form, tier }) {
+    const images = useStore(form.store, (state) => state.values.images);
+
+    const maxFiles =
+      tier === "Free"
+        ? 1
+        : tier.tier === "community"
+        ? 1
+        : tier.tier === "pro"
+        ? 4
+        : tier.tier === "premium"
+        ? 5
+        : 1;
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Images ( {images?.length ?? 0}/{maxFiles})
+          </CardTitle>
+          <CardDescription>
+            <span className="capitalize">
+              {tier === "Free" ? "Free" : tier.tier} Plan:{" "}
+              {tier === "Free"
+                ? 1
+                : tier.tier === "community"
+                ? 1
+                : tier.tier === "pro"
+                ? 4
+                : tier.tier === "premium"
+                ? 5
+                : 1}{" "}
+              Image
+            </span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form.Field
+            name="images"
+            mode="array"
+            children={(field) => (
+              <div className="flex flex-col gap-3">
+                <Label>Add Images</Label>
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
+                  {field.state.value?.map((value, i) => (
+                    <div className="flex flex-col gap-1 relative" key={i}>
+                      <div className="p-2 flex gap-2 justify-end w-full absolute top-2 right-2">
+                        <form.Field
+                          name={`images[${i}].isPrimary`}
+                          children={(subField) => (
+                            // <Checkbox
+                            //   checked={subField.state.value}
+                            //   onCheckedChange={(r) => {
+                            //     if (r === true && field.state.value) {
+                            //       const newValue = setProperty(
+                            //         field.state.value,
+                            //         "isPrimary",
+                            //         false
+                            //       );
+                            //       newValue[i].isPrimary = true;
+                            //       field.handleChange([...newValue]);
+                            //     }
+                            //   }}
+                            // />
+                            <CheckboxPrimitive.Root
+                              checked={subField.state.value}
+                              onCheckedChange={(r) => {
+                                if (r === true && field.state.value) {
+                                  const newValue = setProperty(
+                                    field.state.value,
+                                    "isPrimary",
+                                    false
+                                  );
+                                  newValue[i].isPrimary = true;
+                                  field.handleChange([...newValue]);
+                                } else if (r === false && field.state.value) {
+                                  const newValue = setProperty(
+                                    field.state.value,
+                                    "isPrimary",
+                                    false
+                                  );
+                                  field.handleChange([...newValue]);
+                                }
+                              }}
+                              data-slot="checkbox"
+                              className={
+                                "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-9 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
+                              }
+                            >
+                              <CheckboxPrimitive.Indicator
+                                data-slot="checkbox-indicator"
+                                className="flex items-center justify-center text-current transition-none"
+                              >
+                                <CheckIcon className="size-3.5" />
+                              </CheckboxPrimitive.Indicator>
+                            </CheckboxPrimitive.Root>
+                          )}
+                        />
+                        {value._type === "upload" && (
+                          <form.Field
+                            name={`images[${i}].file`}
+                            children={(subField) => (
+                              <SelectFileButton
+                                size={"icon"}
+                                variant={"default"}
+                                mimeType="image/*"
+                                file={subField.state.value}
+                                onChange={(f) =>
+                                  subField.handleChange(f as File)
+                                }
+                              >
+                                <RotateCwIcon />
+                              </SelectFileButton>
+                            )}
+                          />
+                        )}
+                        <Button
+                          onClick={() => field.removeValue(i)}
+                          size={"icon"}
+                          variant={"destructive"}
+                        >
+                          <XIcon />
+                        </Button>
+                      </div>
+                      <div className="w-full h-[200px] rounded overflow-hidden border">
+                        {value._type === "upload" ? (
+                          value.file && (
+                            <FileImage
+                              className="object-cover h-full w-full"
+                              file={value.file}
+                            />
+                          )
+                        ) : (
+                          <Image
+                            src={value.cloudflareUrl}
+                            alt={value.alt}
+                            className="object-cover h-full w-full"
+                            width={120}
+                            height={120}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <TemporyFilesSelectButton
+                  maxFiles={maxFiles - (field.state.value?.length ?? 0)}
+                  mimeType="image/*"
+                  onSelectMoreFilesThanAllowed={() => {
+                    console.log("ok");
+                    toast.error(
+                      `Upgrade to select more than ${maxFiles} files.`
+                    );
+                  }}
+                  onSelect={(files) => {
+                    console.log(files);
+                    files.forEach((file) =>
+                      field.pushValue({
+                        _type: "upload",
+                        file: file,
+                        isPrimary:
+                          field.state.value === undefined
+                            ? true
+                            : field.state.value.length === 0,
+                      } as any)
+                    );
+                  }}
+                >
+                  Add Images
+                </TemporyFilesSelectButton>
+                <FieldInfo field={field} />
+              </div>
+            )}
+          />
+        </CardContent>
+      </Card>
+    );
+  },
+});

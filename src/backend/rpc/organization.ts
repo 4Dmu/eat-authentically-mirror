@@ -9,6 +9,7 @@ import { listings, organizations } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { ListingRegisterArgsValidator } from "../validators/listings";
 import { ORG_DATA_KV } from "../kv";
+import { withCertifications } from "../utils/transform-data";
 
 export const registerOrganization = authenticatedActionClient
   .inputSchema(ListingRegisterArgsValidator)
@@ -59,11 +60,21 @@ export const registerOrganization = authenticatedActionClient
 
 export const fetchLoggedInOrganizationListing = organizationActionClient.action(
   async ({ ctx: { orgId } }) => {
-    const listing = await db.query.listings.findFirst({
-      where: eq(listings.organizationId, orgId),
-    });
+    const results = await db.query.listings
+      .findMany({
+        where: eq(listings.organizationId, orgId),
+        with: {
+          certificationsToListings: {
+            with: {
+              certification: true,
+            },
+          },
+        },
+        limit: 1,
+      })
+      .then((r) => withCertifications(r));
 
-    return listing;
+    return results[0];
   }
 );
 

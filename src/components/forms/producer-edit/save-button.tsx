@@ -1,0 +1,45 @@
+import { Button } from "@/components/ui/button";
+import { InfoIcon } from "lucide-react";
+import {
+  AnyFormApi,
+  ReactFormExtendedApi,
+  useStore,
+} from "@tanstack/react-form";
+
+export function SaveButton(props: { forms: AnyFormApi[] }) {
+  const forms = props.forms.map((form) =>
+    useStore(form.store, ({ isDirty }) => ({ form, state: { isDirty } }))
+  );
+
+  const dirtyForms = forms.filter((f) => f.state.isDirty);
+
+  const isDirty = dirtyForms.length > 0;
+
+  return (
+    <>
+      {isDirty && (
+        <div className="fixed left-1/2 -translate-x-1/2 bottom-10 max-sm:flex-col items-center p-2 bg-card shadow-lg rounded-lg border sm:w-full sm:max-w-sm flex gap-2">
+          <div className="flex gap-2 text-muted-foreground items-center">
+            <InfoIcon size={20} />
+            <p>Unsaved changes</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:ml-auto">
+            <Button
+              onClick={() => dirtyForms.forEach(({ form }) => form.reset())}
+              variant={"destructive"}
+            >
+              Reset
+            </Button>
+            <Button
+              onClick={() =>
+                dirtyForms.forEach(({ form }) => form.handleSubmit())
+              }
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

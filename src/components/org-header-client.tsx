@@ -16,7 +16,7 @@ export function Header({ authState }: { authState: AuthState }) {
       <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">
         <div />
         <Link
-          className="font-bold justify-self-center text-lg self-center"
+          className="font-bold font-fraunces justify-self-center text-lg self-center"
           href={
             pathname == "/organization/register" ? "/" : "/organization/profile"
           }
