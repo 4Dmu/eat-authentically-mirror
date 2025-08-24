@@ -7,10 +7,7 @@ import {
   ListListingsArgsValidator,
 } from "../validators/listings";
 import { actionClient } from "./helpers/safe-action";
-import {
-  authenticatedActionClient,
-  organizationActionClient,
-} from "./helpers/middleware";
+import { organizationActionClient } from "./helpers/middleware";
 import { db } from "../db";
 import {
   certifications,
@@ -21,38 +18,30 @@ import { and, eq, inArray, or } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
-import { cloudflare } from "../lib/cloudflare";
 import { env } from "@/env";
 
 export const listListingsPublic = actionClient
-  .inputSchema(ListListingsArgsValidator)
-  .action(
-    async ({ parsedInput }) => await listing.listListingsPublic(parsedInput)
-  );
+  .input(ListListingsArgsValidator)
+  .action(async ({ input }) => await listing.listListingsPublic(input));
 
 export const listListingsPublicLight = actionClient
-  .inputSchema(ListListingsArgsValidator)
-  .action(
-    async ({ parsedInput }) =>
-      await listing.listListingsPublicLight(parsedInput)
-  );
+  .input(ListListingsArgsValidator)
+  .action(async ({ input }) => await listing.listListingsPublicLight(input));
 
 export const listCertificationTypesPublic = actionClient.action(
   async () => await listing.listCertificationTypesPublic()
 );
 
 export const getListingPublic = actionClient
-  .inputSchema(GetListingArgsValidator)
-  .action(
-    async ({ parsedInput }) => await listing.getListingPublic(parsedInput)
-  );
+  .input(GetListingArgsValidator)
+  .action(async ({ input }) => await listing.getListingPublic(input));
 
 export const editUserListing = organizationActionClient
-  .inputSchema(editListingArgsValidator)
-  .action(async ({ parsedInput, ctx: { orgId } }) => {
+  .input(editListingArgsValidator)
+  .action(async ({ input, ctx: { orgId } }) => {
     const listing = await db.query.listings.findFirst({
       where: and(
-        eq(listings.id, parsedInput.listingId),
+        eq(listings.id, input.listingId),
         eq(listings.organizationId, orgId)
       ),
     });
@@ -63,33 +52,30 @@ export const editUserListing = organizationActionClient
 
     const toUpdate: Partial<Listing> = {};
 
-    if (parsedInput.basicInfo) {
-      toUpdate.name = parsedInput.basicInfo.name;
-      toUpdate.type = parsedInput.basicInfo.type;
-      toUpdate.about = parsedInput.basicInfo.about;
+    if (input.basicInfo) {
+      toUpdate.name = input.basicInfo.name;
+      toUpdate.type = input.basicInfo.type;
+      toUpdate.about = input.basicInfo.about;
     }
 
-    if (parsedInput.address) {
-      toUpdate.address = parsedInput.address;
+    if (input.address) {
+      toUpdate.address = input.address;
     }
 
-    if (parsedInput.contact) {
-      toUpdate.contact = parsedInput.contact;
+    if (input.contact) {
+      toUpdate.contact = input.contact;
     }
 
-    if (parsedInput.socialMedia) {
-      toUpdate.socialMedia = parsedInput.socialMedia;
+    if (input.socialMedia) {
+      toUpdate.socialMedia = input.socialMedia;
     }
 
-    if (
-      parsedInput.certifications &&
-      parsedInput.certifications.certifications
-    ) {
-      const updatedCertifications = parsedInput.certifications.certifications;
+    if (input.certifications && input.certifications.certifications) {
+      const updatedCertifications = input.certifications.certifications;
       const currentCertifications = await db.query.listings
         .findFirst({
           where: and(
-            eq(listings.id, parsedInput.listingId),
+            eq(listings.id, input.listingId),
             eq(listings.organizationId, orgId)
           ),
           columns: {},
@@ -133,7 +119,7 @@ export const editUserListing = organizationActionClient
       } else {
         try {
           await db.insert(certificationsToListings).values(
-            parsedInput.certifications.certifications.map((cert) => ({
+            input.certifications.certifications.map((cert) => ({
               listingId: listing.id,
               certificationId: cert.id,
             }))
@@ -144,7 +130,7 @@ export const editUserListing = organizationActionClient
       }
     }
 
-    if (parsedInput.products) {
+    if (input.products) {
       console.warn("implement product saving");
     }
 
@@ -159,14 +145,9 @@ export const editUserListing = organizationActionClient
   });
 
 export const requestUploadUrls = organizationActionClient
-  .inputSchema(
-    type({ numberOfUrlsToGenerate: type.number.moreThan(0).atMost(10) })
-  )
+  .input(type({ numberOfUrlsToGenerate: type.number.moreThan(0).atMost(10) }))
   .action(
-    async ({
-      ctx: { orgId, userId },
-      parsedInput: { numberOfUrlsToGenerate },
-    }) => {
+    async ({ ctx: { orgId, userId }, input: { numberOfUrlsToGenerate } }) => {
       const listing = await db.query.listings.findFirst({
         columns: {
           id: true,
@@ -241,7 +222,7 @@ export const requestUploadUrls = organizationActionClient
   );
 
 export const confirmPengingUpload = organizationActionClient.action(
-  async ({ ctx: { orgId } }) => {
+  async ({ orgId }) => {
     const listing = await db.query.listings.findFirst({
       columns: {
         id: true,
@@ -263,33 +244,59 @@ export const confirmPengingUpload = organizationActionClient.action(
     const images = listing.images;
 
     try {
-      for (const imageId of listing.pendingImages) {
-        const image = await cloudflare.images.v1.get(imageId, {
-          account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-        });
+      const imageListResponse = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${env.SAFE_CLOUDFLARE_ACCOUNT_ID}/images/v2?creator=${orgId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
+          },
+        }
+      );
+
+      const imagesListBody = (await imageListResponse.json()) as {
+        success: boolean;
+        result: { images: { id: string }[] };
+      };
+
+      if (imagesListBody.success) {
+      } else {
+        throw new Error("Error listing images");
+      }
+
+      const pendingImagesThatExist = imagesListBody.result.images.filter((ri) =>
+        listing.pendingImages?.some((pi) => pi === ri.id)
+      );
+
+      for (const image of pendingImagesThatExist) {
+        // const image = await cloudflare.images.v1.get(imageId, {
+        //   account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+        // });
         if (Object.hasOwn(image, "draft")) {
-          pending.push(imageId);
+          pending.push(image.id);
           continue;
         }
 
         images.push({
           _type: "cloudflare",
-          cloudflareId: imageId,
-          cloudflareUrl: `https://imagedelivery.net/${env.SAFE_CLOUDFLARE_ACCOUNT_HASH}/${imageId}/public`,
+          cloudflareId: image.id,
+          cloudflareUrl: `https://imagedelivery.net/${env.SAFE_CLOUDFLARE_ACCOUNT_HASH}/${image.id}/public`,
           alt: "",
           isPrimary: false,
         });
 
         listing.pendingImages;
       }
-    } catch (err) {}
 
-    await db
-      .update(listings)
-      .set({
-        images: images,
-        pendingImages: pending,
-      })
-      .where(eq(listings.id, listing.id));
+      await db
+        .update(listings)
+        .set({
+          images: images,
+          pendingImages: pending,
+        })
+        .where(eq(listings.id, listing.id));
+    } catch (err) {
+      console.error(err);
+      throw new Error("Error generating urls");
+    }
   }
 );

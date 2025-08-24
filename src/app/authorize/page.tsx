@@ -12,7 +12,7 @@ export default function AthorizePage() {
     if (isLoaded) {
       router.push("/");
     }
-  }, [isLoaded]);
+  }, [isLoaded, router]);
 
   return (
     <div className="bg-primary h-screen flex justify-center items-center w-full">

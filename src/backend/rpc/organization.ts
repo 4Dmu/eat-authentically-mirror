@@ -12,8 +12,8 @@ import { ORG_DATA_KV } from "../kv";
 import { withCertifications } from "../utils/transform-data";
 
 export const registerOrganization = authenticatedActionClient
-  .inputSchema(ListingRegisterArgsValidator)
-  .action(async ({ ctx: { userId, orgId }, parsedInput }) => {
+  .input(ListingRegisterArgsValidator)
+  .action(async ({ ctx: { userId, orgId }, input }) => {
     if (orgId) {
       throw new Error("Already logged in as listing");
     }
@@ -28,7 +28,7 @@ export const registerOrganization = authenticatedActionClient
         .values({
           id: newOrganizationId,
           ownerUserId: userId,
-          name: parsedInput.name,
+          name: input.name,
           imageUrl: profileUrl,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -38,11 +38,11 @@ export const registerOrganization = authenticatedActionClient
       await tx.insert(listings).values({
         id: crypto.randomUUID(),
         organizationId: newOrganizationId,
-        name: parsedInput.name,
-        type: parsedInput.type,
+        name: input.name,
+        type: input.type,
         claimed: true,
         verified: false,
-        about: parsedInput.about,
+        about: input.about,
         commodities: [],
         socialMedia: { twitter: null, facebook: null, instagram: null },
         images: [],

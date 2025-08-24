@@ -8,12 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  editListingFormBasicInfoValidator,
-  editListingFormImagesValidator,
-  editListingFormProductsValidator,
-  editListingFormVideoValidator,
-} from "@/backend/validators/listings";
+import { editListingFormVideoValidator } from "@/backend/validators/listings";
 import {
   createFormHook,
   createFormHookContexts,

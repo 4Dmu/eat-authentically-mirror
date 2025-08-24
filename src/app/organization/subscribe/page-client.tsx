@@ -5,7 +5,6 @@ import { CreateCheckoutSessionArgs } from "@/backend/validators/stripe";
 import { TierCard } from "@/components/sub/TierCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { throwErrors } from "@/utils/actions";
 import { useMutation } from "@tanstack/react-query";
 import { Crown, Star } from "lucide-react";
 import { useState } from "react";
@@ -18,7 +17,7 @@ export function ClientPage({ listing }: { listing: { name: string } }) {
   const createOrgCheckoutSessionMutation = useMutation({
     mutationKey: ["create-org-checkout-session"],
     mutationFn: async (props: CreateCheckoutSessionArgs) =>
-      await createCheckoutSession(props).then((r) => throwErrors(r)),
+      await createCheckoutSession(props),
     onSuccess(url) {
       window.location.href = url;
     },

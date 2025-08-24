@@ -11,8 +11,8 @@ import {
 import { getMonth, getYear } from "date-fns";
 
 export const geocodeRegion = authenticatedActionClient
-  .inputSchema(GeocodeRegionProps)
-  .action(async ({ parsedInput: { center }, ctx: { userId } }) => {
+  .input(GeocodeRegionProps)
+  .action(async ({ input: { center }, ctx: { userId } }) => {
     const date = new Date();
     const month = getMonth(date);
     const year = getYear(date);

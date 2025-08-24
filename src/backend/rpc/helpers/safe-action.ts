@@ -1,3 +1,3 @@
-import { createSafeActionClient } from "next-safe-action";
+import { ActionClient } from "@/backend/lib/action-client";
 
-export const actionClient = createSafeActionClient();
+export const actionClient = new ActionClient();

@@ -1,4 +1,4 @@
-import React, { ComponentProps, RefAttributes, useEffect, useRef } from "react";
+import React, { ComponentProps, useEffect } from "react";
 import { Input } from "./ui/input";
 
 export type FileInputProps = {
@@ -28,7 +28,7 @@ export function FileInput({
       files.slice(0, maxFiles).forEach((file) => dataTransfer.items.add(file));
       ref.current.files = dataTransfer.files;
     }
-  }, [files, maxFiles]);
+  }, [files, maxFiles, ref]);
 
   return (
     <Input
@@ -88,7 +88,7 @@ export function SingleFileInput({
       }
       ref.current.files = dataTransfer.files;
     }
-  }, [file]);
+  }, [file, ref]);
 
   return (
     <Input

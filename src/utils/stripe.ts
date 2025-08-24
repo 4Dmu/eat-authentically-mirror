@@ -4,7 +4,6 @@ import {
   WithRequired,
 } from "@tanstack/react-query";
 import { createBillingPortalSession } from "@/backend/rpc/stripe";
-import { throwErrors } from "./actions";
 
 type GeocodeRegionMutationOpsType = WithRequired<
   UseMutationOptions<string, Error, { redirectPath: string }, unknown>,
@@ -18,7 +17,7 @@ export const billingPortableMutationOpts = (params?: {
   mutationOptions({
     mutationKey: ["create-billing-portal-session"],
     mutationFn: async (props: { redirectPath: string }) =>
-      await createBillingPortalSession(props).then((t) => throwErrors(t)),
+      await createBillingPortalSession(props),
     onSuccess: params?.onSuccess,
     onError: params?.onError,
   });

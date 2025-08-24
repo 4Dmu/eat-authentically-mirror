@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { createCheckoutSession } from "@/backend/rpc/stripe";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { throwErrors } from "@/utils/actions";
 import { Tabs, TabsTrigger, TabsContent, TabsList } from "../ui/tabs";
 import { CreateCheckoutSessionArgs } from "@/backend/validators/stripe";
 
@@ -12,7 +11,7 @@ export function TiersCard() {
   const createMemeberCheckoutSessionMutation = useMutation({
     mutationKey: ["create-member-checkout-session"],
     mutationFn: async (args: CreateCheckoutSessionArgs) =>
-      await createCheckoutSession(args).then((r) => throwErrors(r)),
+      await createCheckoutSession(args),
     onSuccess(url) {
       window.location.href = url;
     },

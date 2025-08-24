@@ -20,7 +20,6 @@ import {
   EditListingArgs,
   editListingFormImagesValidator,
 } from "@/backend/validators/listings";
-import { throwErrors } from "./actions";
 import { fetchLoggedInOrganizationListing } from "@/backend/rpc/organization";
 
 /**
@@ -58,7 +57,7 @@ export const listingsQueryOptions = (
 ) =>
   queryOptions({
     queryKey: ["listings", args],
-    queryFn: () => listListingsPublicLight(args).then((c) => throwErrors(c)),
+    queryFn: () => listListingsPublicLight(args),
     placeholderData: keepPreviousData,
     initialData: initialData,
   });
@@ -66,7 +65,7 @@ export const listingsQueryOptions = (
 export const certificationTypesOptions = () =>
   queryOptions({
     queryKey: ["certification-types"],
-    queryFn: () => listCertificationTypesPublic().then((c) => throwErrors(c)),
+    queryFn: () => listCertificationTypesPublic(),
     staleTime: 24 * 60 * 60 * 1000, // 24h
     gcTime: 7 * 24 * 60 * 60 * 1000,
   });
@@ -93,8 +92,7 @@ export const loggedInOrganizationListingOptions = (
   queryOptions({
     ...opts,
     queryKey: ["logged-in-organization-listing"],
-    queryFn: () =>
-      fetchLoggedInOrganizationListing().then((r) => throwErrors(r)),
+    queryFn: () => fetchLoggedInOrganizationListing(),
   });
 
 type EditUserListingOpts = MutationOptions<
@@ -123,12 +121,7 @@ export const editUserListingOpts = (
     ...opts,
     mutationKey: ["edit-user-listing"],
     mutationFn: async (args: EditListingArgs) => {
-      const result = await editUserListing(args);
-      if (result.serverError) {
-        throw new Error(result.serverError);
-      } else if (result.validationErrors) {
-        throw new Error(JSON.stringify(result.validationErrors));
-      }
+      await editUserListing(args);
     },
   });
 
@@ -140,7 +133,7 @@ export const uploadImagesOpts = () =>
 
       const uploadUrls = await requestUploadUrls({
         numberOfUrlsToGenerate: toUpload.length,
-      }).then((r) => throwErrors(r));
+      });
 
       for (let i = 0; i < toUpload.length; i++) {
         const url = uploadUrls[i];

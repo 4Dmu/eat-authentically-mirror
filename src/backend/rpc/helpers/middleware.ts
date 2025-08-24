@@ -3,7 +3,7 @@ import { actionClient } from "./safe-action";
 import { getUsersOrganizationIdCached } from "@/backend/data/organization";
 import { getSubTier } from "../utils/get-sub-tier";
 
-export const authenticatedActionClient = actionClient.use(async ({ next }) => {
+export const authenticatedActionClient = actionClient.use(async () => {
   const { userId } = await auth();
 
   if (!userId) {
@@ -12,41 +12,39 @@ export const authenticatedActionClient = actionClient.use(async ({ next }) => {
 
   const orgId = await getUsersOrganizationIdCached(userId);
 
-  return next({ ctx: { userId, orgId } });
+  return { userId, orgId };
 });
 
-export const authenticatedWithUserActionClient = actionClient.use(
-  async ({ next }) => {
-    const user = await currentUser();
+export const authenticatedWithUserActionClient = actionClient.use(async () => {
+  const user = await currentUser();
 
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    const orgId = await getUsersOrganizationIdCached(user.id);
-
-    return next({ ctx: { user: user, userId: user.id, orgId } });
+  if (!user) {
+    throw new Error("Unauthorized");
   }
-);
+
+  const orgId = await getUsersOrganizationIdCached(user.id);
+
+  return { user: user, userId: user.id, orgId };
+});
 
 export const organizationActionClient = authenticatedActionClient.use(
-  async ({ next, ctx: { orgId } }) => {
+  async ({ orgId }) => {
     if (!orgId) {
       throw new Error("Unauthorized");
     }
 
-    return next({ ctx: { orgId } });
+    return { orgId };
   }
 );
 
 export const subscribedActionClient = authenticatedActionClient.use(
-  async ({ next, ctx: { userId } }) => {
+  async ({ userId }) => {
     const subTier = await getSubTier(userId);
 
     if (subTier !== "Free") {
       throw new Error("Unauthorized");
     }
 
-    return next({ ctx: { subTier } });
+    return { subTier };
   }
 );

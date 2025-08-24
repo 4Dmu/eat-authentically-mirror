@@ -14,7 +14,7 @@ async function ConfirmStripeSessionComponent({
   const user = await auth();
   if (!user) return <div>No user</div>;
   console.log("user", user);
-  const { error } = await tryCatch(triggerStripeSync());
+  const { error } = await tryCatch(triggerStripeSync)();
   if (error) return <div>Failed to sync with stripe: {error.message}</div>;
   return redirect(redirectPath);
 }

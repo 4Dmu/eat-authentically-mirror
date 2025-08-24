@@ -5,21 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import React from "react";
-import { useController } from "react-hook-form";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import { FileInput, SingleFileInput } from "@/components/file-input";
 import { FileImage } from "@/components/file-image";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useStore } from "@tanstack/react-form";
 import { FieldInfo } from "../../helpers/field-info";
@@ -32,10 +21,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon, RotateCwIcon, XIcon } from "lucide-react";
 import { setProperty } from "@/utils/array";
 import { toast } from "sonner";
-import {
-  editListingFormBasicInfoValidator,
-  editListingFormImagesValidator,
-} from "@/backend/validators/listings";
+import { editListingFormImagesValidator } from "@/backend/validators/listings";
 import {
   createFormHook,
   createFormHookContexts,

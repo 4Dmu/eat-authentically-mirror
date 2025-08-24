@@ -30,7 +30,7 @@ export const useProductsForm = useAppForm;
 
 export const ProductsForm = withForm({
   ...productsOpts,
-  render: function ({ form }) {
+  render: function ({}) {
     return (
       <Card>
         <CardHeader>
