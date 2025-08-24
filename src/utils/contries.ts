@@ -237,54 +237,26 @@ export const COUNTRIES = [
   { id: 887, alpha2: "ye", alpha3: "yem", name: "Yemen" },
   { id: 894, alpha2: "zm", alpha3: "zmb", name: "Zambia" },
   { id: 716, alpha2: "zw", alpha3: "zwe", name: "Zimbabwe" },
-] as const;
+];
 
-export type Alpha3CountryCode = (typeof COUNTRIES)[number]["alpha3"];
-export type Alpha2CountryCode = (typeof COUNTRIES)[number]["alpha2"];
-export type CountryId = (typeof COUNTRIES)[number]["id"];
-export type CountryName = (typeof COUNTRIES)[number]["name"];
-export type Country = (typeof COUNTRIES)[number];
-
-type CountryByAlpha3<T extends Alpha3CountryCode> = Extract<
-  Country,
-  { alpha3: T }
->;
-
-type CountryByAlpha2<T extends Alpha2CountryCode> = Extract<
-  Country,
-  { alpha2: T }
->;
-
-type CountryByName<T extends CountryName> = Extract<Country, { name: T }>;
-
-export function countryByAlpha3Code<T extends Alpha3CountryCode>(
-  code: T
-): CountryByAlpha3<T> {
-  const country = COUNTRIES.find(
-    (c): c is CountryByAlpha3<T> => c.alpha3 === code
-  );
+export function countryByAlpha3Code(code: string) {
+  const country = COUNTRIES.find((c) => c.alpha3 === code);
   if (!country) {
     throw new Error(`Country with alpha3 code ${code} not found.`);
   }
   return country;
 }
 
-export function countryByAlpha2Code<T extends Alpha2CountryCode>(
-  code: T
-): CountryByAlpha2<T> {
-  const country = COUNTRIES.find(
-    (c): c is CountryByAlpha2<T> => c.alpha2 === code
-  );
+export function countryByAlpha2Code(code: string) {
+  const country = COUNTRIES.find((c) => c.alpha2 === code);
   if (!country) {
     throw new Error(`Country with alpha2 code ${code} not found.`);
   }
   return country;
 }
 
-export function countryByName<T extends CountryName>(
-  name: T
-): CountryByName<T> {
-  const country = COUNTRIES.find((c): c is CountryByName<T> => c.name === name);
+export function countryByName(name: string) {
+  const country = COUNTRIES.find((c) => c.name === name);
   if (!country) {
     throw new Error(`Country with name ${name} not found.`);
   }

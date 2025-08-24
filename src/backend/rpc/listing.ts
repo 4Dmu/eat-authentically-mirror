@@ -21,6 +21,7 @@ import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
 import { cloudflare } from "../lib/cloudflare";
+import { normalizeAddress } from "../utils/normalize-data";
 
 export const listListingsPublic = actionClient
   .input(ListListingsArgsValidator)
@@ -61,7 +62,7 @@ export const editUserListing = organizationActionClient
     }
 
     if (input.address) {
-      toUpdate.address = input.address;
+      toUpdate.address = normalizeAddress(input.address);
     }
 
     if (input.contact) {

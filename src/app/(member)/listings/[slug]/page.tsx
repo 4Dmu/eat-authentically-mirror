@@ -16,6 +16,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { countryByAlpha3Code } from "@/utils/contries";
 
 export default async function ListingPage({
   params,
@@ -123,7 +124,9 @@ export default async function ListingPage({
                   {listing?.address && (
                     <div>
                       {listing.address.street}, {listing.address.city},{" "}
-                      {listing.address.state}, {listing.address.zip}
+                      {listing.address.state}, {listing.address.zip},{" "}
+                      {listing.address.country &&
+                        countryByAlpha3Code(listing.address.country).name}
                     </div>
                   )}
                 </div>

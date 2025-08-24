@@ -48,15 +48,15 @@ export const EmptyContactValidator = type({
 });
 
 export const AddressValidator = type({
-  city: "string",
-  state: "string",
-  street: "string",
-  country: alpha3CountryCodeValidator,
-  zip: "string",
-  coordinate: {
+  "street?": "string|undefined",
+  "city?": type("string|undefined"),
+  "state?": "string|undefined",
+  "country?": alpha3CountryCodeValidator.or(type.undefined),
+  "zip?": "string|undefined",
+  "coordinate?": type({
     latitude: "number",
     longitude: "number",
-  },
+  }).or(type.undefined),
 });
 
 export const ImagesFormValidator = type({
@@ -127,16 +127,10 @@ export const editListingFormContactValidator = type({
   website: "string.url",
 });
 
-export const editListingFormAddressValidator = type({
-  city: "string",
-  state: "string",
-  street: "string",
-  zip: "string",
-  coordinate: {
-    latitude: "number",
-    longitude: "number",
-  },
-});
+export const editListingFormAddressValidator = AddressValidator;
+
+export type EditListingFormAddress =
+  typeof editListingFormAddressValidator.infer;
 
 export const editListingFormImagesValidator = type({
   images: type({
