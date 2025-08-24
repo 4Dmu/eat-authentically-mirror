@@ -11,6 +11,7 @@ import {
   listCertificationTypesPublic,
   listListingsPublicLight,
   requestUploadUrls,
+  updateExistingImages,
 } from "@/backend/rpc/listing";
 import {
   ListListingsArgs,
@@ -18,9 +19,9 @@ import {
   PublicListingLight,
   PublicListing,
   EditListingArgs,
-  editListingFormImagesValidator,
 } from "@/backend/validators/listings";
 import { fetchLoggedInOrganizationListing } from "@/backend/rpc/organization";
+import { ImageData } from "@/backend/validators/listings";
 
 /**
  * Gets the image url of the primary image.
@@ -128,11 +129,23 @@ export const editUserListingOpts = (
 export const uploadImagesOpts = () =>
   mutationOptions({
     mutationKey: ["upload-images"],
-    mutationFn: async (args: typeof editListingFormImagesValidator.infer) => {
-      const toUpload = args.images.filter((i) => i._type === "upload");
+    mutationFn: async (
+      toUpload: {
+        _type: "upload";
+        file: File;
+        isPrimary: boolean;
+      }[]
+    ) => {
+      if (toUpload.length === 0) {
+        return;
+      }
 
       const uploadUrls = await requestUploadUrls({
-        numberOfUrlsToGenerate: toUpload.length,
+        imageItemParams: toUpload.map(({ isPrimary, file }) => ({
+          isPrimary,
+          type: file.type,
+          name: file.name,
+        })),
       });
 
       for (let i = 0; i < toUpload.length; i++) {
@@ -144,5 +157,13 @@ export const uploadImagesOpts = () =>
       }
 
       await confirmPengingUpload();
+    },
+  });
+
+export const updateExistingImagesOpts = () =>
+  mutationOptions({
+    mutationKey: ["update-existing-images"],
+    mutationFn: async (args: ImageData[]) => {
+      await updateExistingImages({ images: args });
     },
   });

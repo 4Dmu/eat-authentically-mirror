@@ -26,6 +26,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   editUserListingOpts,
   loggedInOrganizationListingOptions,
+  updateExistingImagesOpts,
   uploadImagesOpts,
 } from "@/utils/listings";
 import { toast } from "sonner";
@@ -45,14 +46,11 @@ export function ProducerEditForm(props: {
       onError(err) {
         toast.error(err.message);
       },
-      onSuccess() {
-        listingQuery.refetch();
-        toast.success("Updated listing successfully");
-      },
     })
   );
 
   const uploadImagesMutation = useMutation(uploadImagesOpts());
+  const updateExisingImagesMutation = useMutation(updateExistingImagesOpts());
 
   const basicInfoForm = useBasicInfoForm({
     defaultValues: {
@@ -138,7 +136,42 @@ export function ProducerEditForm(props: {
     const toReset = [];
 
     if (imagesForm.state.isValid && imagesForm.state.isDirty) {
-      await uploadImagesMutation.mutateAsync(imagesForm.state.values);
+      const existingImages = imagesForm.state.values.images.filter(
+        (x) => x._type === "cloudflare"
+      );
+      const toUpload = imagesForm.state.values.images.filter(
+        (x) => x._type === "upload"
+      );
+
+      if (toUpload.length > 0) {
+        const uploadPromise = uploadImagesMutation.mutateAsync(toUpload);
+        toast.promise(uploadPromise, {
+          loading: "Uploading images...",
+          success: () => "Images uploaded successfully.",
+          error: () => `Error uploading images.`,
+        });
+        await uploadPromise;
+      }
+
+      if (
+        !R.isDeepEqual(
+          existingImages,
+          listingQuery.data?.images ?? props.currentListing.images
+        )
+      ) {
+        console.log("changed");
+        const updateExisingImagesPromise =
+          updateExisingImagesMutation.mutateAsync(existingImages);
+        toast.promise(updateExisingImagesPromise, {
+          loading: "Updating images...",
+          success: () => "Images updated successfully.",
+          error: () => `Error updating images.`,
+        });
+        await updateExisingImagesPromise;
+      } else {
+        console.log("not changed");
+      }
+
       toReset.push(imagesForm);
     }
 
@@ -168,8 +201,15 @@ export function ProducerEditForm(props: {
     }
 
     if (R.keys(args).length > 1) {
-      await editUserListingMutation.mutateAsync(args);
+      const submitPromise = editUserListingMutation.mutateAsync(args);
+      toast.promise(submitPromise, {
+        loading: "Submiting data...",
+        success: () => "Updated successfully",
+        error: () => `Error updating.`,
+      });
+      await submitPromise;
     }
+    await listingQuery.refetch();
     toReset.forEach((f) => f.reset());
   }
 

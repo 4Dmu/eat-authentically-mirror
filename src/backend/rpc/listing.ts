@@ -3,6 +3,7 @@ import * as listing from "@/backend/data/listing";
 import {
   editListingArgsValidator,
   GetListingArgsValidator,
+  ImageDataValidator,
   Listing,
   ListListingsArgsValidator,
 } from "../validators/listings";
@@ -19,6 +20,7 @@ import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
+import { cloudflare } from "../lib/cloudflare";
 
 export const listListingsPublic = actionClient
   .input(ListListingsArgsValidator)
@@ -145,81 +147,95 @@ export const editUserListing = organizationActionClient
   });
 
 export const requestUploadUrls = organizationActionClient
-  .input(type({ numberOfUrlsToGenerate: type.number.moreThan(0).atMost(10) }))
-  .action(
-    async ({ ctx: { orgId, userId }, input: { numberOfUrlsToGenerate } }) => {
-      const listing = await db.query.listings.findFirst({
-        columns: {
-          id: true,
-          images: true,
-          pendingImages: true,
-        },
-        where: eq(listings.organizationId, orgId),
-      });
+  .input(
+    type({
+      imageItemParams: type({
+        isPrimary: "boolean",
+        type: "string",
+        name: "string",
+      })
+        .array()
+        .atLeastLength(1)
+        .atMostLength(10),
+    })
+  )
+  .action(async ({ ctx: { orgId, userId }, input: { imageItemParams } }) => {
+    const listing = await db.query.listings.findFirst({
+      columns: {
+        id: true,
+        images: true,
+        pendingImages: true,
+      },
+      where: eq(listings.organizationId, orgId),
+    });
 
-      if (!listing) {
-        throw new Error("Unauthorized");
-      }
-
-      const tier = await getSubTier(userId);
-
-      const maxFiles =
-        tier === "Free"
-          ? 1
-          : tier.tier === "community"
-          ? 1
-          : tier.tier === "pro"
-          ? 4
-          : tier.tier === "premium"
-          ? 5
-          : 1;
-
-      const remainingFiles = maxFiles - listing.images.length;
-
-      if (numberOfUrlsToGenerate > remainingFiles) {
-        throw new Error("Number of files exceeds your plan");
-      }
-
-      const urls: { id: string; uploadURL: string }[] = [];
-
-      for (let i = 0; i < numberOfUrlsToGenerate; i++) {
-        const form = new FormData();
-
-        form.set("creator", orgId);
-        form.set("metadata", JSON.stringify({ orgId: orgId, userId: userId }));
-
-        const uploadUrlGeneratorCloudflareResponse = await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${env.SAFE_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
-            },
-            body: form,
-          }
-        );
-
-        const uploadUrlGeneratorCloudflareResponseBody =
-          await uploadUrlGeneratorCloudflareResponse.json();
-
-        if (uploadUrlGeneratorCloudflareResponseBody.success === true) {
-          urls.push(uploadUrlGeneratorCloudflareResponseBody.result);
-        } else {
-          console.error(uploadUrlGeneratorCloudflareResponseBody);
-          throw new Error("Error generating urls");
-        }
-      }
-
-      await db
-        .update(listings)
-        .set({
-          pendingImages: urls.map((url) => url.id),
-        })
-        .where(eq(listings.id, listing.id));
-
-      return urls;
+    if (!listing) {
+      throw new Error("Unauthorized");
     }
-  );
+
+    const tier = await getSubTier(userId);
+
+    const maxFiles =
+      tier === "Free"
+        ? 1
+        : tier.tier === "community"
+        ? 1
+        : tier.tier === "pro"
+        ? 4
+        : tier.tier === "premium"
+        ? 5
+        : 1;
+
+    const remainingFiles = maxFiles - listing.images.length;
+
+    if (imageItemParams.length > remainingFiles) {
+      throw new Error("Number of files exceeds your plan");
+    }
+
+    const urls: { id: string; uploadURL: string }[] = [];
+    const pending: { id: string; isPrimary: boolean }[] = [];
+
+    for (let i = 0; i < imageItemParams.length; i++) {
+      const form = new FormData();
+
+      form.set("creator", orgId);
+      form.set("metadata", JSON.stringify({ orgId: orgId, userId: userId }));
+
+      const uploadUrlGeneratorCloudflareResponse = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${env.SAFE_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
+          },
+          body: form,
+        }
+      );
+
+      const uploadUrlGeneratorCloudflareResponseBody =
+        await uploadUrlGeneratorCloudflareResponse.json();
+
+      if (uploadUrlGeneratorCloudflareResponseBody.success === true) {
+        urls.push(uploadUrlGeneratorCloudflareResponseBody.result);
+        pending.push({
+          id: uploadUrlGeneratorCloudflareResponseBody.result.id,
+          isPrimary: imageItemParams[i].isPrimary,
+        });
+      } else {
+        console.error(uploadUrlGeneratorCloudflareResponseBody);
+        throw new Error("Error generating urls");
+      }
+    }
+
+    await db
+      .update(listings)
+      .set({
+        pendingImages: pending,
+      })
+      .where(eq(listings.id, listing.id));
+
+    return urls;
+  });
 
 export const confirmPengingUpload = organizationActionClient.action(
   async ({ orgId }) => {
@@ -263,16 +279,19 @@ export const confirmPengingUpload = organizationActionClient.action(
         throw new Error("Error listing images");
       }
 
-      const pendingImagesThatExist = imagesListBody.result.images.filter((ri) =>
-        listing.pendingImages?.some((pi) => pi === ri.id)
-      );
+      const pendingImagesThatExist = imagesListBody.result.images
+        .filter((ri) => listing.pendingImages?.some((pi) => pi.id === ri.id))
+        .map((i) => ({
+          image: i,
+          pendingData: listing.pendingImages?.find((f) => f.id === i.id),
+        }));
 
-      for (const image of pendingImagesThatExist) {
+      for (const { image, pendingData } of pendingImagesThatExist) {
         // const image = await cloudflare.images.v1.get(imageId, {
         //   account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
         // });
         if (Object.hasOwn(image, "draft")) {
-          pending.push(image.id);
+          pending.push(pendingData ?? { id: image.id, isPrimary: false });
           continue;
         }
 
@@ -281,7 +300,7 @@ export const confirmPengingUpload = organizationActionClient.action(
           cloudflareId: image.id,
           cloudflareUrl: `https://imagedelivery.net/${env.SAFE_CLOUDFLARE_ACCOUNT_HASH}/${image.id}/public`,
           alt: "",
-          isPrimary: false,
+          isPrimary: pendingData?.isPrimary ?? false,
         });
       }
 
@@ -298,3 +317,59 @@ export const confirmPengingUpload = organizationActionClient.action(
     }
   }
 );
+
+export const updateExistingImages = organizationActionClient
+  .input(type({ images: ImageDataValidator.array() }))
+  .action(async ({ ctx: { orgId, userId }, input }) => {
+    const listing = await db.query.listings.findFirst({
+      columns: {
+        id: true,
+        images: true,
+        pendingImages: true,
+      },
+      where: eq(listings.organizationId, orgId),
+    });
+
+    if (!listing) {
+      throw new Error("Unauthorized");
+    }
+
+    const imagesToKeep = listing.images
+      .filter((i) =>
+        input.images.some((i2) => i.cloudflareId === i2.cloudflareId)
+      )
+      .map((i) => ({
+        ...i,
+        isPrimary:
+          input.images.find((j) => i.cloudflareId === j.cloudflareId)
+            ?.isPrimary ?? i.isPrimary,
+      }));
+
+    console.log(imagesToKeep);
+
+    const imagesToDelete = listing.images.filter(
+      (i) => !input.images.some((i2) => i.cloudflareId === i2.cloudflareId)
+    );
+
+    await db
+      .update(listings)
+      .set({
+        images: imagesToKeep,
+      })
+      .where(eq(listings.id, listing.id));
+
+    for (const image of imagesToDelete) {
+      console.log(
+        `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by org(${orgId}) user(${userId})`
+      );
+
+      const response = await cloudflare.images.v1.delete(image.cloudflareId, {
+        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+      });
+
+      console.log(
+        `action [updateExistingImages] - Cloudflare delete image response`,
+        response
+      );
+    }
+  });
