@@ -14,7 +14,7 @@ import {
   certificationsToListings,
   listings,
 } from "../db/schema";
-import { and, eq, inArray, or } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
@@ -283,8 +283,6 @@ export const confirmPengingUpload = organizationActionClient.action(
           alt: "",
           isPrimary: false,
         });
-
-        listing.pendingImages;
       }
 
       await db

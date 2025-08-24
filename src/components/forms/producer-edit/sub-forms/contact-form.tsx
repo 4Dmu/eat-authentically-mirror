@@ -3,10 +3,7 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { FieldInfo } from "../../helpers/field-info";
-import {
-  editListingFormBasicInfoValidator,
-  editListingFormContactValidator,
-} from "@/backend/validators/listings";
+import { editListingFormContactValidator } from "@/backend/validators/listings";
 import {
   createFormHook,
   createFormHookContexts,
@@ -46,9 +43,8 @@ export const ContactForm = withForm({
         </CardHeader>
         <CardContent className="gap-5 flex flex-col">
           <div className="grid grid-cols-2 gap-3">
-            <form.Field
-              name="phone"
-              children={(subField) => (
+            <form.Field name="phone">
+              {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Phone</Label>
                   <Input
@@ -66,10 +62,9 @@ export const ContactForm = withForm({
                   <FieldInfo field={subField} />
                 </div>
               )}
-            />
-            <form.Field
-              name="email"
-              children={(subField) => (
+            </form.Field>
+            <form.Field name="email">
+              {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Business Email</Label>
                   <Input
@@ -87,11 +82,10 @@ export const ContactForm = withForm({
                   <FieldInfo field={subField} />
                 </div>
               )}
-            />
+            </form.Field>
           </div>
-          <form.Field
-            name="website"
-            children={(subField) => (
+          <form.Field name="website">
+            {(subField) => (
               <div className="flex flex-col gap-3">
                 <Label>Website</Label>
                 <Input
@@ -109,7 +103,7 @@ export const ContactForm = withForm({
                 <FieldInfo field={subField} />
               </div>
             )}
-          />
+          </form.Field>
         </CardContent>
       </Card>
     );

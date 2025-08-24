@@ -88,33 +88,16 @@ export const ImagesForm = withForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form.Field
-            name="images"
-            mode="array"
-            children={(field) => (
+          <form.Field name="images" mode="array">
+            {(field) => (
               <div className="flex flex-col gap-3">
                 <Label>Add Images</Label>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
                   {field.state.value?.map((value, i) => (
                     <div className="flex flex-col gap-1 relative" key={i}>
                       <div className="p-2 flex gap-2 justify-end w-full absolute top-2 right-2">
-                        <form.Field
-                          name={`images[${i}].isPrimary`}
-                          children={(subField) => (
-                            // <Checkbox
-                            //   checked={subField.state.value}
-                            //   onCheckedChange={(r) => {
-                            //     if (r === true && field.state.value) {
-                            //       const newValue = setProperty(
-                            //         field.state.value,
-                            //         "isPrimary",
-                            //         false
-                            //       );
-                            //       newValue[i].isPrimary = true;
-                            //       field.handleChange([...newValue]);
-                            //     }
-                            //   }}
-                            // />
+                        <form.Field name={`images[${i}].isPrimary`}>
+                          {(subField) => (
                             <CheckboxPrimitive.Root
                               checked={subField.state.value}
                               onCheckedChange={(r) => {
@@ -148,11 +131,10 @@ export const ImagesForm = withForm({
                               </CheckboxPrimitive.Indicator>
                             </CheckboxPrimitive.Root>
                           )}
-                        />
+                        </form.Field>
                         {value._type === "upload" && (
-                          <form.Field
-                            name={`images[${i}].file`}
-                            children={(subField) => (
+                          <form.Field name={`images[${i}].file`}>
+                            {(subField) => (
                               <SelectFileButton
                                 size={"icon"}
                                 variant={"default"}
@@ -165,7 +147,7 @@ export const ImagesForm = withForm({
                                 <RotateCwIcon />
                               </SelectFileButton>
                             )}
-                          />
+                          </form.Field>
                         )}
                         <Button
                           onClick={() => field.removeValue(i)}
@@ -215,7 +197,7 @@ export const ImagesForm = withForm({
                           field.state.value === undefined
                             ? true
                             : field.state.value.length === 0,
-                      } as any)
+                      })
                     );
                   }}
                 >
@@ -224,7 +206,7 @@ export const ImagesForm = withForm({
                 <FieldInfo field={field} />
               </div>
             )}
-          />
+          </form.Field>
         </CardContent>
       </Card>
     );

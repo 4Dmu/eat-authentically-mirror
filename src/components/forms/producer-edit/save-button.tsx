@@ -1,10 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { InfoIcon } from "lucide-react";
-import {
-  AnyFormApi,
-  ReactFormExtendedApi,
-  useStore,
-} from "@tanstack/react-form";
+import { AnyFormApi, useStore } from "@tanstack/react-form";
 
 export function SaveButton(props: {
   forms: AnyFormApi[];
@@ -12,6 +8,7 @@ export function SaveButton(props: {
   disableSubmit?: boolean;
 }) {
   const forms = props.forms.map((form) =>
+    //eslint-disable-next-line react-hooks/rules-of-hooks
     useStore(form.store, ({ isDirty, isValid }) => ({
       form,
       state: { isDirty, isValid },

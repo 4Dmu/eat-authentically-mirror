@@ -29,7 +29,6 @@ import {
   uploadImagesOpts,
 } from "@/utils/listings";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import * as R from "remeda";
 
 export function ProducerEditForm(props: {
@@ -37,7 +36,6 @@ export function ProducerEditForm(props: {
   tier: SubTier;
   certifications: Certification[];
 }) {
-  const router = useRouter();
   const listingQuery = useQuery(
     loggedInOrganizationListingOptions({ initialData: props.currentListing })
   );

@@ -51,9 +51,8 @@ export const AddressForm = withForm({
           <CardTitle>Contact Information</CardTitle>
         </CardHeader>
         <CardContent className="gap-5 flex flex-col">
-          <form.Field
-            name="street"
-            children={(subField) => (
+          <form.Field name="street">
+            {(subField) => (
               <div className="flex flex-col gap-3">
                 <Label>Street Address</Label>
                 <Input
@@ -64,12 +63,11 @@ export const AddressForm = withForm({
                 <FieldInfo field={subField} />
               </div>
             )}
-          />
+          </form.Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <form.Field
-              name="city"
-              children={(subField) => (
+            <form.Field name="city">
+              {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>City</Label>
                   <Input
@@ -83,10 +81,9 @@ export const AddressForm = withForm({
                   <FieldInfo field={subField} />
                 </div>
               )}
-            />
-            <form.Field
-              name="zip"
-              children={(subField) => (
+            </form.Field>
+            <form.Field name="zip">
+              {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Postal Code</Label>
                   <Input
@@ -100,12 +97,11 @@ export const AddressForm = withForm({
                   <FieldInfo field={subField} />
                 </div>
               )}
-            />
+            </form.Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <form.Field
-              name="state"
-              children={(subField) => (
+            <form.Field name="state">
+              {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>State</Label>
                   <Input
@@ -119,7 +115,7 @@ export const AddressForm = withForm({
                   <FieldInfo field={subField} />
                 </div>
               )}
-            />
+            </form.Field>
 
             <div className="flex flex-col gap-3">
               <Label>Country</Label>
@@ -135,13 +131,11 @@ export const AddressForm = withForm({
               </Select>
             </div>
           </div>
-          <form.Field
-            name="coordinate"
-            children={(field) => (
+          <form.Field name="coordinate">
+            {(field) => (
               <div className="grid grid-cols-2 gap-3">
-                <form.Field
-                  name="coordinate.latitude"
-                  children={(subField) => (
+                <form.Field name="coordinate.latitude">
+                  {(subField) => (
                     <div className="flex flex-col gap-3">
                       <Label>Lattitude</Label>
                       <Input
@@ -164,10 +158,9 @@ export const AddressForm = withForm({
                       <FieldInfo field={subField} />
                     </div>
                   )}
-                />
-                <form.Field
-                  name="coordinate.longitude"
-                  children={(subField) => (
+                </form.Field>
+                <form.Field name="coordinate.longitude">
+                  {(subField) => (
                     <div className="flex flex-col gap-3">
                       <Label>Longitude</Label>
                       <Input
@@ -190,12 +183,12 @@ export const AddressForm = withForm({
                       <FieldInfo field={subField} />
                     </div>
                   )}
-                />
+                </form.Field>
                 {JSON.stringify(field.state.value)}
                 <FieldInfo field={field} />
               </div>
             )}
-          />
+          </form.Field>
         </CardContent>
       </Card>
     );

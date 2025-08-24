@@ -1,11 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -55,9 +48,8 @@ export const BasicInfoForm = withForm({
         </CardHeader>
         <CardContent className="flex flex-col gap-5">
           <div className="grid grid-cols-2 gap-5">
-            <form.Field
-              name="name"
-              children={(field) => (
+            <form.Field name="name">
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label>Producer Name</Label>
                   <Input
@@ -68,10 +60,9 @@ export const BasicInfoForm = withForm({
                   <FieldInfo field={field} />
                 </div>
               )}
-            />
-            <form.Field
-              name="type"
-              children={(field) => (
+            </form.Field>
+            <form.Field name="type">
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label>Producer Type</Label>
                   <Select
@@ -90,11 +81,10 @@ export const BasicInfoForm = withForm({
                   <FieldInfo field={field} />
                 </div>
               )}
-            />
+            </form.Field>
           </div>
-          <form.Field
-            name="about"
-            children={(field) => (
+          <form.Field name="about">
+            {(field) => (
               <div className="flex flex-col gap-3">
                 <Label>About</Label>
                 <Textarea
@@ -105,7 +95,7 @@ export const BasicInfoForm = withForm({
                 <FieldInfo field={field} />
               </div>
             )}
-          />
+          </form.Field>
         </CardContent>
       </Card>
     );

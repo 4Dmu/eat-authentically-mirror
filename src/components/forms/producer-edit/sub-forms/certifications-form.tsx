@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { match } from "ts-pattern";
@@ -15,10 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { Certification } from "@/backend/validators/listings";
 import { useStore } from "@tanstack/react-form";
-import {
-  editListingFormBasicInfoValidator,
-  editListingFormCertificationsValidator,
-} from "@/backend/validators/listings";
+import { editListingFormCertificationsValidator } from "@/backend/validators/listings";
 import {
   createFormHook,
   createFormHookContexts,
@@ -49,7 +45,7 @@ export const CertificationsForm = withForm({
     tier: "Free" as SubTier,
     certifications: [] as Certification[],
   },
-  render: function ({ form, tier, certifications }) {
+  render: function Render({ form, tier, certifications }) {
     const certificationsFieldValue = useStore(
       form.store,
       (state) => state.values.certifications
@@ -87,7 +83,7 @@ export const CertificationsForm = withForm({
               <Label>Your Certifications</Label>
               <div>
                 {certificationsFieldValue?.map((cert) => (
-                  <Badge>{cert.name}</Badge>
+                  <Badge key={cert.id}>{cert.name}</Badge>
                 ))}
               </div>
             </div>

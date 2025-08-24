@@ -38,7 +38,7 @@ export const VideoForm = withForm({
   props: {
     tier: "Free" as SubTier,
   },
-  render: function ({ form, tier }) {
+  render: function ({ tier }) {
     if (tier !== "Free" && tier.tier === "premium") {
       return <Card></Card>;
     }

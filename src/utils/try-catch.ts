@@ -1,5 +1,6 @@
 type Result<T, E = Error> = { data: T | null; error: E | null };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function tryCatch<TArgs extends any[], TResult, E = Error>(
   fn: (...args: TArgs) => TResult | Promise<TResult>
 ): (...args: TArgs) => Promise<Result<TResult, E>> {
@@ -26,7 +27,9 @@ export function withTry<T, TResult extends T | Promise<T>, TInput, E = Error>(
   try: (input: TInput) => Promise<{ data: T | null; error: E | null }>;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withTry(fn: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tryFn = async (input?: any) => {
     try {
       const data = await fn(input);
@@ -35,7 +38,7 @@ export function withTry(fn: any) {
       return { data: null, error: error as Error };
     }
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const wrapped = ((input?: any) => fn(input)) as typeof fn & {
     try: typeof tryFn;
   };
