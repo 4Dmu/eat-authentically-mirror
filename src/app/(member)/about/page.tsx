@@ -11,9 +11,9 @@ export default function AboutPage() {
       <div>
         <h3>Are You Tired of the Guesswork?</h3>
         <p>
-          You want to feed yourself and your family the best. Food that’s free
-          of chemicals, raised with respect, and grown with care. But finding it
-          can feel like a full-time job.
+          You want to feed yourself and your family the best. Food that&apos;s
+          free of chemicals, raised with respect, and grown with care. But
+          finding it can feel like a full-time job.
         </p>
         <p>
           What if you had a map? A map that leads you past the confusing labels
@@ -45,9 +45,9 @@ export default function AboutPage() {
       <div>
         <h3>Our Vision: Building a Community on Trust</h3>
         <p>
-          EatAuthentically begins as the world's largest directory of conscious
-          food producers, with nearly 50,000 listings compiled from a wide
-          variety of public sources. This is our foundation.
+          EatAuthentically begins as the world&apos;s largest directory of
+          conscious food producers, with nearly 50,000 listings compiled from a
+          wide variety of public sources. This is our foundation.
         </p>
         <p>
           Our true mission is to transform this directory into a living,
@@ -56,10 +56,10 @@ export default function AboutPage() {
           practices directly with you.
         </p>
         <p>
-          As a user, you are part of this process. When you see a "Claimed by
-          Producer" badge, it's your signal that the information is verified and
-          comes straight from the source. It’s the first step in building a food
-          system where transparency is the main ingredient.
+          As a user, you are part of this process. When you see a &quot;Claimed
+          by Producer&quot; badge, it&apos;s your signal that the information is
+          verified and comes straight from the source. It&apos;s the first step
+          in building a food system where transparency is the main ingredient.
         </p>
         <p>We champion producers and eateries who are passionate about:</p>
         <ul>
@@ -79,10 +79,10 @@ export default function AboutPage() {
         </ul>
         <p>Ready to Eat Authentically?</p>
         <p>
-          It’s simple. Search your location and unlock a world of incredible,
-          wholesome food right in your backyard. As you explore, look for
-          claimed listings for the most detailed, direct-from-the-source
-          information.
+          It&apos;s simple. Search your location and unlock a world of
+          incredible, wholesome food right in your backyard. As you explore,
+          look for claimed listings for the most detailed,
+          direct-from-the-source information.
         </p>
         <p>
           By choosing to eat authentically, you are supporting a food ecosystem
