@@ -65,7 +65,7 @@ export function AppNavSheet() {
             asChild
             className="flex font-bold items-center justify-start text-sm gap-5"
           >
-            <Link href="/">
+            <Link href="/about">
               <InfoIcon size={20} />
               <span>About</span>
             </Link>

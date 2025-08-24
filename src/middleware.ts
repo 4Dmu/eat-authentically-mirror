@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhook(.*)",
+  "/about",
 ]);
 
 const isMemberSubRoute = createRouteMatcher(["/members/subscribe"]);
