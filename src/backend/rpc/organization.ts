@@ -59,7 +59,7 @@ export const registerOrganization = authenticatedActionClient
   });
 
 export const fetchLoggedInOrganizationListing = organizationActionClient.action(
-  async ({ ctx: { orgId } }) => {
+  async ({ orgId }) => {
     const results = await db.query.listings
       .findMany({
         where: eq(listings.organizationId, orgId),
@@ -79,7 +79,7 @@ export const fetchLoggedInOrganizationListing = organizationActionClient.action(
 );
 
 export const fetchLoggedInOrganizationListingLight =
-  organizationActionClient.action(async ({ ctx: { orgId } }) => {
+  organizationActionClient.action(async ({ orgId }) => {
     const listing = await db
       .select({ name: listings.name })
       .from(listings)
