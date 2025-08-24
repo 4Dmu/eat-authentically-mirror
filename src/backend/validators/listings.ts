@@ -1,5 +1,6 @@
 import { type } from "arktype";
 import z from "zod";
+import { alpha3CountryCodeValidator } from "./country";
 
 export const LISTING_TYPES = [
   "farm",
@@ -50,22 +51,12 @@ export const AddressValidator = type({
   city: "string",
   state: "string",
   street: "string",
+  country: alpha3CountryCodeValidator,
   zip: "string",
   coordinate: {
     latitude: "number",
     longitude: "number",
   },
-});
-
-export const addressValidator = z.object({
-  city: z.string(),
-  state: z.string(),
-  street: z.string(),
-  zip: z.string(),
-  coordinate: z.object({
-    latitude: z.number(),
-    longitude: z.number(),
-  }),
 });
 
 export const ImagesFormValidator = type({
@@ -96,26 +87,12 @@ export const ImageDataValidator = type({
   isPrimary: "boolean",
 });
 
-export const imageDataValidator = z.object({
-  _type: z.literal("cloudflare"),
-  cloudflareId: z.string(),
-  cloudflareUrl: z.url(),
-  alt: z.string(),
-  isPrimary: z.boolean(),
-});
-
 export const BusinessHoursValidator = type({});
 
 export const SocialMediaValidator = type({
   twitter: "string.url|null",
   facebook: "string.url|null",
   instagram: "string.url|null",
-});
-
-export const socialMediaValidator = z.object({
-  twitter: z.url().nullable(),
-  facebook: z.url().nullable(),
-  instagram: z.url().nullable(),
 });
 
 export const VideoValidator = type({ url: "string" });
