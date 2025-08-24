@@ -7,23 +7,10 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import {
-  CheckIcon,
-  ChevronDown,
-  FactoryIcon,
-  LogOutIcon,
-  UserIcon,
-} from "lucide-react";
+import { FactoryIcon, LogOutIcon, UserIcon } from "lucide-react";
 import { ManageSubscriptionsButton } from "./ManageSubscriptionsButton";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
 import { Badge } from "../ui/badge";
-import { usePathname } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { cn } from "@/lib/utils";
 import { AuthState } from "@/backend/rpc/auth";
 
 export function UserButton({ authState }: { authState: AuthState }) {

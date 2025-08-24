@@ -1,5 +1,4 @@
 import { Address } from "../validators/listings";
-import * as R from "remeda";
 
 export function normalizeAddress(address: Address) {
   const normalized: Address = {};

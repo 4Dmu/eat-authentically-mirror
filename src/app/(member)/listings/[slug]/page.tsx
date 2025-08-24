@@ -4,7 +4,7 @@ import { AddToPinboardButton } from "@/components/pinboard";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { listingSlug, primaryImageUrl } from "@/utils/listings";
+import { listingSlug } from "@/utils/listings";
 import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";

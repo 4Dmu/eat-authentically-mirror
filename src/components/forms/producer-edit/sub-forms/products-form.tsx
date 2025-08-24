@@ -38,7 +38,7 @@ export const useProductsForm = useAppForm;
 
 export const ProductsForm = withForm({
   ...productsOpts,
-  render: function ({ form }) {
+  render: function Render({ form }) {
     const [name, setName] = useState("");
     return (
       <Card>
