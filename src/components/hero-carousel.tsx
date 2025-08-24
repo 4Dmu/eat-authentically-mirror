@@ -105,10 +105,14 @@ export function HeroCarousel() {
   }, [api, handler]);
 
   return (
-    <Carousel setApi={setApi} className="h-screen flex" opts={{ loop: true }}>
-      <CarouselContent className="h-full">
+    <Carousel
+      setApi={setApi}
+      className="h-screen flex w-full"
+      opts={{ loop: true }}
+    >
+      <CarouselContent className="h-full w-full">
         {slides.map((slide) => (
-          <CarouselItem className="h-full relative" key={slide.id}>
+          <CarouselItem className="h-full w-full relative" key={slide.id}>
             <Image
               width={1920}
               height={1080}
