@@ -9,6 +9,13 @@ import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import { ClaimListingCard } from "@/components/claim-listing-card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export default async function ListingPage({
   params,
@@ -39,12 +46,28 @@ export default async function ListingPage({
         </div>
         <div className="flex flex-col md:flex-row gap-5">
           <Card className="pt-0 overflow-hidden flex-5/8">
-            <Image
-              alt=""
-              width={1920}
-              height={1080}
-              src={primaryImageUrl(listing)}
-            />
+            <Carousel>
+              <CarouselContent>
+                {listing.images
+                  .toSorted((a, b) =>
+                    a.isPrimary && b.isPrimary ? 0 : a.isPrimary ? -1 : 1
+                  )
+                  .map((img) => (
+                    <CarouselItem key={img.cloudflareId}>
+                      <Image
+                        priority
+                        alt=""
+                        className="w-full h-full object-cover aspect-video"
+                        width={1920}
+                        height={1080}
+                        src={img.cloudflareUrl}
+                      />
+                    </CarouselItem>
+                  ))}
+              </CarouselContent>
+              <CarouselNext />
+              <CarouselPrevious />
+            </Carousel>
             <CardHeader>
               <h1 className="font-bold text-4xl">{listing.name}</h1>
               <Badge>{listing.type}</Badge>
