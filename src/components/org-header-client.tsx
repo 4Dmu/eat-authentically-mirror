@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { OrgSignedIn } from "./auth/RequireOrg";
 import { NotSubbed } from "./auth/RequireSub";
@@ -9,17 +8,13 @@ import { SignedOut } from "@clerk/nextjs";
 import { AuthState } from "@/backend/rpc/auth";
 
 export function Header({ authState }: { authState: AuthState }) {
-  const pathname = usePathname();
-
   return (
     <div className={` bg-primary text-primary-foreground w-full`}>
       <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">
         <div />
         <Link
           className="font-bold font-fraunces justify-self-center text-lg self-center"
-          href={
-            pathname == "/organization/register" ? "/" : "/organization/profile"
-          }
+          href={"/"}
         >
           FindRealFood
         </Link>

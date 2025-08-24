@@ -25,7 +25,7 @@ export function ManageSubscriptionsButton() {
       className="w-full justify-start gap-5"
     >
       <Landmark />
-      <span>Upgrade or manage subscriptions</span>
+      <span>Change subscriptions</span>
     </Button>
   );
 }
