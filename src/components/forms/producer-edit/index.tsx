@@ -122,7 +122,7 @@ export function ProducerEditForm(props: {
 
   const productsForm = useCertificationsForm({
     defaultValues: {
-      products: undefined as unknown as string[],
+      commodities: listingQuery.data?.commodities ?? [],
     },
     validators: {
       onChange: ({ formApi }) =>
@@ -154,10 +154,8 @@ export function ProducerEditForm(props: {
       }
 
       if (
-        !R.isDeepEqual(
-          existingImages,
-          listingQuery.data?.images ?? props.currentListing.images
-        )
+        JSON.stringify(existingImages) !==
+        JSON.stringify(listingQuery.data?.images ?? props.currentListing.images)
       ) {
         console.log("changed");
         const updateExisingImagesPromise =
@@ -196,7 +194,7 @@ export function ProducerEditForm(props: {
     }
 
     if (productsForm.state.isValid && productsForm.state.isDirty) {
-      args.products = productsForm.state.values;
+      args.commodities = productsForm.state.values;
       toReset.push(productsForm);
     }
 
@@ -244,6 +242,7 @@ export function ProducerEditForm(props: {
           contactForm,
           addressForm,
           certificationsForm,
+          productsForm,
         ]}
       />
     </div>

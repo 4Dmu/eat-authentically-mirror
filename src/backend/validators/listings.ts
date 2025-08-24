@@ -106,6 +106,10 @@ export const ListingValidator = type({
   contact: ContactValidator.or("null"),
   address: AddressValidator.or("null"),
   certifications: CertificationValidator.array(),
+  commodities: type({
+    name: "string",
+    varieties: type.string.array(),
+  }).array(),
   claimed: "boolean",
   verified: "boolean",
   images: ImageDataValidator.array(),
@@ -160,7 +164,10 @@ export const editListingFormCertificationsValidator = type({
 });
 
 export const editListingFormProductsValidator = type({
-  products: type("string").array(),
+  commodities: type({
+    name: "string",
+    varieties: type.string.array(),
+  }).array(),
 });
 
 export const editListingFormSocialMediaValidator =
@@ -172,7 +179,7 @@ export const editListingArgsValidator = type({
   contact: editListingFormContactValidator.optional(),
   address: editListingFormAddressValidator.optional(),
   certifications: editListingFormCertificationsValidator.optional(),
-  products: editListingFormProductsValidator.optional(),
+  commodities: editListingFormProductsValidator.optional(),
   socialMedia: editListingFormSocialMediaValidator.optional(),
 });
 

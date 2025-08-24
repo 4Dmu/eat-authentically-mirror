@@ -133,18 +133,20 @@ export const editUserListing = organizationActionClient
       }
     }
 
-    if (input.products) {
-      console.warn("implement product saving");
+    if (input.commodities) {
+      toUpdate.commodities = input.commodities.commodities;
     }
 
-    await db
-      .update(listings)
-      .set({
-        ...toUpdate,
-      })
-      .where(
-        and(eq(listings.id, listing.id), eq(listings.organizationId, orgId))
-      );
+    if (Object.keys(toUpdate).length > 0) {
+      await db
+        .update(listings)
+        .set({
+          ...toUpdate,
+        })
+        .where(
+          and(eq(listings.id, listing.id), eq(listings.organizationId, orgId))
+        );
+    }
   });
 
 export const requestUploadUrls = organizationActionClient

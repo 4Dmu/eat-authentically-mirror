@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { match } from "ts-pattern";
 import { Badge } from "@/components/ui/badge";
-import { PlusIcon, SearchIcon } from "lucide-react";
+import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { Certification } from "@/backend/validators/listings";
 import { useStore } from "@tanstack/react-form";
 import { editListingFormCertificationsValidator } from "@/backend/validators/listings";
@@ -50,6 +50,12 @@ export const CertificationsForm = withForm({
       form.store,
       (state) => state.values.certifications
     );
+    const maxCerts = match(tier)
+      .with("Free", () => 3)
+      .with({ tier: "community" }, () => 3)
+      .with({ tier: "pro" }, () => 5)
+      .with({ tier: "premium" }, () => 10)
+      .exhaustive();
 
     return (
       <Card>
@@ -61,51 +67,61 @@ export const CertificationsForm = withForm({
             </CardDescription>
           </div>
           <div>
-            {match(tier)
-              .with("Free", () => (
-                <span>{certificationsFieldValue?.length ?? 0}/3</span>
-              ))
-              .with({ tier: "community" }, () => (
-                <span>{certificationsFieldValue?.length ?? 0}/3</span>
-              ))
-              .with({ tier: "pro" }, () => (
-                <span>{certificationsFieldValue?.length ?? 0}/5</span>
-              ))
-              .with({ tier: "premium" }, () => (
-                <span>{certificationsFieldValue?.length ?? 0}/10</span>
-              ))
-              .exhaustive()}
+            <span>
+              {certificationsFieldValue?.length ?? 0}/{maxCerts}
+            </span>
           </div>
         </CardHeader>
         <CardContent>
-          {(certificationsFieldValue?.length ?? 0) > 0 && (
-            <div>
-              <Label>Your Certifications</Label>
-              <div>
-                {certificationsFieldValue?.map((cert) => (
-                  <Badge key={cert.id}>{cert.name}</Badge>
-                ))}
+          <form.Field name="certifications" mode="array">
+            {(field) => (
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-2">
+                  <Label>Your Certifications</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {field.state.value.map((v, i) => (
+                      <div className="relative" key={i}>
+                        <Badge>{v.name}</Badge>
+                        <Button
+                          onClick={() => field.removeValue(i)}
+                          className="absolute -top-1 -right-2 size-4 rounded-full"
+                          variant={"destructive"}
+                          size={"icon"}
+                        >
+                          <XIcon size={3} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Label>Add Certifications</Label>
+                  <div className="relative">
+                    <SearchIcon
+                      className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
+                      size={20}
+                    />
+                    <Input
+                      className="pl-10"
+                      placeholder="Search certifications..."
+                    />
+                  </div>
+                  <div className="flex flex-wrap">
+                    {certifications.map((cert) => (
+                      <Button
+                        onClick={() => field.pushValue(cert)}
+                        key={cert.id}
+                        variant={"ghost"}
+                      >
+                        {cert.name}
+                        <PlusIcon />
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-          <div className="flex flex-col gap-3">
-            <Label>Add Certifications</Label>
-            <div className="relative">
-              <SearchIcon
-                className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
-                size={20}
-              />
-              <Input className="pl-10" placeholder="Search certifications..." />
-            </div>
-            <div className="flex flex-wrap">
-              {certifications.map((cert) => (
-                <Button key={cert.id} variant={"ghost"}>
-                  {cert.name}
-                  <PlusIcon />
-                </Button>
-              ))}
-            </div>
-          </div>
+            )}
+          </form.Field>
         </CardContent>
       </Card>
     );

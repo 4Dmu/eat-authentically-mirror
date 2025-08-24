@@ -8,14 +8,14 @@ export function SaveButton(props: {
   disableSubmit?: boolean;
 }) {
   const forms = props.forms.map((form) =>
-    //eslint-disable-next-line react-hooks/rules-of-hooks
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useStore(form.store, ({ isDirty, isValid, isDefaultValue }) => ({
       form,
       state: { isDirty, isValid, isDefaultValue },
     }))
   );
 
-  const dirtyForms = forms.filter((f) => !f.state.isDefaultValue);
+  const dirtyForms = forms.filter((f) => f.state.isDirty);
   const submitableForms = forms.filter(
     (f) => f.state.isDirty && f.state.isValid
   );
