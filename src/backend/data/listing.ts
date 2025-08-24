@@ -8,15 +8,20 @@ import { and, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
 import { certificationsToListings, listings } from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
 
-const orderListingsByScrapedMetadata = sql`CASE json_extract(scrapeMeta, '$.status')
-        WHEN 'Registered' THEN 0
-        ELSE 1
-      END,
-    CAST(json_extract(scrapeMeta, '$.numFavorites') AS INTEGER) DESC,
-    CASE json_array_length(images) > 0
-      WHEN true THEN 0
-        ELSE 1
-      END`;
+const orderListingsByScrapedMetadata = sql`
+  CASE
+    WHEN scrapeMeta IS NOT NULL THEN 1
+    ELSE 0
+  END,
+  CASE json_extract(scrapeMeta, '$.status')
+      WHEN 'Registered' THEN 0
+      ELSE 1
+    END,
+  CAST(json_extract(scrapeMeta, '$.numFavorites') AS INTEGER) DESC,
+  CASE json_array_length(images) > 0
+    WHEN true THEN 0
+      ELSE 1
+    END`;
 
 export async function listListingsPublic(args: ListListingsArgs) {
   try {
