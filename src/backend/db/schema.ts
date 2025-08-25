@@ -13,7 +13,12 @@ import {
   LISTING_TYPES,
 } from "@/backend/validators/listings";
 
-export type Video = { url: string };
+export type Video = {
+  url: string;
+  _type: "cloudflare";
+  uid: string;
+  status: "ready" | "pending";
+};
 
 export type BusinessHours = {
   open: string;
@@ -68,6 +73,7 @@ export const listings = sqliteTable("listings", {
     { id: string; isPrimary: boolean }[]
   >(),
   commodities: text({ mode: "json" }).$type<Commodity[]>().notNull(),
+  pendingVideos: text({ mode: "json" }).$type<string[]>(),
   socialMedia: text({ mode: "json" }).$type<SocialMedia>().notNull(),
   contact: text({ mode: "json" }).$type<Contact>(),
   address: text({ mode: "json" }).$type<Address>(),

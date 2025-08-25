@@ -24,10 +24,12 @@ import { AddressForm, useAddressForm } from "./sub-forms/address-form";
 import { SaveButton } from "./save-button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  deleteVideoOpts,
   editUserListingOpts,
   loggedInOrganizationListingOptions,
   updateExistingImagesOpts,
   uploadImagesOpts,
+  uploadVideoOpts,
 } from "@/utils/listings";
 import { toast } from "sonner";
 import * as R from "remeda";
@@ -50,6 +52,8 @@ export function ProducerEditForm(props: {
   );
 
   const uploadImagesMutation = useMutation(uploadImagesOpts());
+  const uploadVideoMutation = useMutation(uploadVideoOpts());
+  const deleteVideoMutation = useMutation(deleteVideoOpts());
   const updateExisingImagesMutation = useMutation(updateExistingImagesOpts());
 
   const basicInfoForm = useBasicInfoForm({
@@ -78,8 +82,8 @@ export function ProducerEditForm(props: {
 
   const videoForm = useVideoForm({
     defaultValues: {
-      video: undefined as unknown as File,
-    },
+      video: listingQuery.data?.video,
+    } as typeof editListingFormVideoValidator.infer,
     validators: {
       onChange: ({ formApi }) =>
         formApi.parseValuesWithSchema(editListingFormVideoValidator),
@@ -173,6 +177,29 @@ export function ProducerEditForm(props: {
       toReset.push(imagesForm);
     }
 
+    if (videoForm.state.isValid && videoForm.state.isDirty) {
+      if (videoForm.state.values.video === null) {
+        const deletePromise = deleteVideoMutation.mutateAsync();
+        toast.promise(deletePromise, {
+          loading: "Deleting video...",
+          success: () => "Video deleted successfully.",
+          error: () => `Error deleting video.`,
+        });
+        await deletePromise;
+      } else if (videoForm.state.values.video._type === "upload") {
+        const videoUploadPromise = uploadVideoMutation.mutateAsync(
+          videoForm.state.values.video
+        );
+        toast.promise(videoUploadPromise, {
+          loading: "Uploading video...",
+          success: () => "Video uploaded successfully.",
+          error: () => `Error uploading video.`,
+        });
+        await videoUploadPromise;
+      }
+      toReset.push(videoForm);
+    }
+
     if (basicInfoForm.state.isValid && basicInfoForm.state.isDirty) {
       args.basicInfo = basicInfoForm.state.values;
       toReset.push(basicInfoForm);
@@ -233,7 +260,10 @@ export function ProducerEditForm(props: {
       <SaveButton
         onSubmit={handleMultiSubmit}
         disableSubmit={
-          editUserListingMutation.isPending || uploadImagesMutation.isPending
+          editUserListingMutation.isPending ||
+          uploadImagesMutation.isPending ||
+          uploadVideoMutation.isPending ||
+          deleteVideoMutation.isPending
         }
         forms={[
           basicInfoForm,

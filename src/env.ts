@@ -29,6 +29,8 @@ export const env = createEnv({
     SAFE_CLOUDFLARE_API_TOKEN: z.string().min(1),
     SAFE_CLOUDFLARE_ACCOUNT_ID: z.string().min(1),
     SAFE_CLOUDFLARE_ACCOUNT_HASH: z.string().min(1),
+
+    STREAM_WEBHOOK_SECRET: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),

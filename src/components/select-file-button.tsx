@@ -15,8 +15,13 @@ export function SelectFileButton({
   variant,
   size,
   className,
+  onSelectFileToLarge,
+  maxFileSize,
 }: Pick<SingleFileInputProps, "file" | "onChange" | "mimeType" | "children"> &
-  Pick<ComponentProps<typeof Button>, "variant" | "className" | "size">) {
+  Pick<ComponentProps<typeof Button>, "variant" | "className" | "size"> & {
+    onSelectFileToLarge?: () => void;
+    maxFileSize: number;
+  }) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div>
@@ -25,7 +30,15 @@ export function SelectFileButton({
         className="hidden"
         mimeType={mimeType}
         file={file}
-        onChange={onChange}
+        onChange={(e) => {
+          if (e && e.size < maxFileSize) {
+            onChange(e);
+          } else if (e) {
+            onSelectFileToLarge?.();
+          } else {
+            onChange(e);
+          }
+        }}
       />
       <Button
         variant={variant}
@@ -66,6 +79,40 @@ export function TemporyFilesSelectButton({
         className="hidden"
         mimeType={mimeType}
         maxFiles={maxFiles}
+      />
+      <Button onClick={() => inputRef.current?.click()}>{children}</Button>
+    </div>
+  );
+}
+
+export function TemporyFileSelectButton({
+  children,
+  mimeType,
+  onSelect,
+  onSelectFileToLarge,
+  maxFileSize,
+}: {
+  onSelect: (files: File) => void;
+  onSelectFileToLarge?: () => void;
+  maxFileSize: number;
+} & Pick<SingleFileInputProps, "mimeType" | "children"> &
+  Pick<ComponentProps<typeof Button>, "variant" | "className" | "size">) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div>
+      <SingleFileInput
+        ref={inputRef}
+        file={undefined}
+        onChange={(e) => {
+          if (e && e.size < maxFileSize) {
+            onSelect(e);
+          } else if (e) {
+            onSelectFileToLarge?.();
+          }
+        }}
+        className="hidden"
+        mimeType={mimeType}
       />
       <Button onClick={() => inputRef.current?.click()}>{children}</Button>
     </div>

@@ -7,11 +7,14 @@ import {
 } from "@tanstack/react-query";
 import {
   confirmPengingUpload,
+  confirmPendingVideoUpload,
   editUserListing,
   listCertificationTypesPublic,
   listListingsPublicLight,
   requestUploadUrls,
+  requestVideoUploadUrl,
   updateExistingImages,
+  deleteVideo,
 } from "@/backend/rpc/listing";
 import {
   ListListingsArgs,
@@ -157,6 +160,29 @@ export const uploadImagesOpts = () =>
       }
 
       await confirmPengingUpload();
+    },
+  });
+
+export const uploadVideoOpts = () =>
+  mutationOptions({
+    mutationKey: ["upload-video"],
+    mutationFn: async (toUpload: { _type: "upload"; file: File }) => {
+      const uploadUrl = await requestVideoUploadUrl();
+
+      const file = toUpload.file;
+      const form = new FormData();
+      form.set("file", file);
+      await fetch(uploadUrl, { method: "POST", body: form });
+
+      await confirmPendingVideoUpload();
+    },
+  });
+
+export const deleteVideoOpts = () =>
+  mutationOptions({
+    mutationKey: ["delete-video"],
+    mutationFn: async () => {
+      await deleteVideo();
     },
   });
 

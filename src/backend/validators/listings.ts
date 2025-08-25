@@ -95,7 +95,12 @@ export const SocialMediaValidator = type({
   instagram: "string.url|null",
 });
 
-export const VideoValidator = type({ url: "string" });
+export const VideoValidator = type({
+  url: "string",
+  _type: "'cloudflare'",
+  uid: "string",
+  status: "'ready'|'pending'",
+});
 
 export const ListingValidator = type({
   id: "string.uuid",
@@ -156,7 +161,9 @@ export const editListingFormImagesValidator = type({
 });
 
 export const editListingFormVideoValidator = type({
-  video: type("File"),
+  video: VideoValidator.or(type({ _type: "'upload'", file: "File" })).or(
+    type.null
+  ),
 });
 
 export const editListingFormCertificationsValidator = type({

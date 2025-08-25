@@ -136,6 +136,7 @@ export const ImagesForm = withForm({
                           <form.Field name={`images[${i}].file`}>
                             {(subField) => (
                               <SelectFileButton
+                                maxFileSize={200000000}
                                 size={"icon"}
                                 variant={"default"}
                                 mimeType="image/*"

@@ -14,6 +14,7 @@ import {
   certifications,
   certificationsToListings,
   listings,
+  Video,
 } from "../db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
@@ -22,6 +23,7 @@ import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
 import { cloudflare } from "../lib/cloudflare";
 import { normalizeAddress } from "../utils/normalize-data";
+import { videoRatelimit } from "../lib/rate-limit";
 
 export const listListingsPublic = actionClient
   .input(ListListingsArgsValidator)
@@ -240,6 +242,100 @@ export const requestUploadUrls = organizationActionClient
     return urls;
   });
 
+export const requestVideoUploadUrl = organizationActionClient.action(
+  async ({ orgId, userId }) => {
+    const { success } = await videoRatelimit.limit(orgId);
+
+    if (!success) {
+      throw new Error("Rate limit exceded");
+    }
+
+    const listing = await db.query.listings.findFirst({
+      columns: {
+        id: true,
+        pendingVideos: true,
+        video: true,
+      },
+      where: eq(listings.organizationId, orgId),
+    });
+
+    if (!listing) {
+      throw new Error("Unauthorized");
+    }
+
+    const tier = await getSubTier(userId);
+
+    if (tier == "Free" || tier.tier !== "premium") {
+      throw new Error("Must be premium to upload video");
+    }
+
+    if (listing.video) {
+      await cloudflare.stream.delete(listing.video.uid, {
+        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+      });
+      await db
+        .update(listings)
+        .set({
+          video: null,
+        })
+        .where(eq(listings.id, listing.id));
+    }
+
+    const form = new FormData();
+
+    form.set("creator", orgId);
+    form.set("maxDurationSeconds", "120");
+    form.set("meta", JSON.stringify({ orgId: orgId, userId: userId }));
+
+    const uploadUrlGeneratorCloudflareResponse = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${env.SAFE_CLOUDFLARE_ACCOUNT_ID}/stream/direct_upload`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          creator: orgId,
+          maxDurationSeconds: 120,
+          allowedOrigins: [
+            "localhost:3000",
+            "*.vercel.app",
+            "eatauthentically.app",
+            "*.eatauthentically.app",
+          ],
+          meta: {
+            orgId: orgId,
+            userId: userId,
+          },
+        }),
+      }
+    );
+
+    const uploadUrlGeneratorCloudflareResponseBody =
+      await uploadUrlGeneratorCloudflareResponse.json();
+
+    if (uploadUrlGeneratorCloudflareResponseBody.success === true) {
+      console.log(uploadUrlGeneratorCloudflareResponseBody);
+
+      await db
+        .update(listings)
+        .set({
+          pendingVideos: [
+            ...(listing.pendingVideos ?? []),
+            uploadUrlGeneratorCloudflareResponseBody.result.uid,
+          ],
+        })
+        .where(eq(listings.id, listing.id));
+
+      return uploadUrlGeneratorCloudflareResponseBody.result.uploadURL;
+    } else {
+      console.error(uploadUrlGeneratorCloudflareResponseBody);
+      throw new Error("Error generating video url");
+    }
+  }
+);
+
 export const confirmPengingUpload = organizationActionClient.action(
   async ({ orgId }) => {
     const listing = await db.query.listings.findFirst({
@@ -318,6 +414,97 @@ export const confirmPengingUpload = organizationActionClient.action(
       console.error(err);
       throw new Error("Error generating urls");
     }
+  }
+);
+
+export const confirmPendingVideoUpload = organizationActionClient.action(
+  async ({ orgId }) => {
+    const listing = await db.query.listings.findFirst({
+      columns: {
+        id: true,
+        pendingVideos: true,
+      },
+      where: eq(listings.organizationId, orgId),
+    });
+
+    if (!listing) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!listing.pendingVideos || listing.pendingVideos.length === 0) {
+      throw new Error("No video uploads to confirm");
+    }
+
+    try {
+      const pending = [];
+      let videoData: Video | undefined = undefined;
+
+      const videosPage = await cloudflare.stream.list({
+        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+        creator: orgId,
+      });
+
+      const pendingVideosThatExists = videosPage.result.filter((v) =>
+        listing.pendingVideos?.some((v2) => v.uid === v2)
+      );
+
+      for (const video of pendingVideosThatExists) {
+        console.log(video);
+        if (
+          !video.status ||
+          video.status.state === "error" ||
+          video.status.state === "pendingupload"
+        ) {
+          pending.push(video.uid!);
+          continue;
+        }
+
+        videoData = {
+          uid: video.uid!,
+          status: video.status.state === "ready" ? "ready" : "pending",
+          url: `https://customer-a80gdw9axz7eg3xk.cloudflarestream.com/${video.uid!}/manifest/video.m3u8`,
+          _type: "cloudflare",
+        };
+      }
+
+      await db
+        .update(listings)
+        .set({
+          pendingVideos: pending,
+          video: videoData,
+        })
+        .where(eq(listings.id, listing.id));
+    } catch (err) {
+      console.error(err);
+      throw new Error("Error generating urls");
+    }
+  }
+);
+
+export const deleteVideo = organizationActionClient.action(
+  async ({ orgId }) => {
+    const listing = await db.query.listings.findFirst({
+      columns: {
+        id: true,
+        video: true,
+      },
+      where: eq(listings.organizationId, orgId),
+    });
+
+    if (!listing || !listing.video) {
+      throw new Error("Unauthorized");
+    }
+
+    await cloudflare.stream.delete(listing.video.uid, {
+      account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+    });
+
+    await db
+      .update(listings)
+      .set({
+        video: null,
+      })
+      .where(eq(listings.id, listing.id));
   }
 );
 

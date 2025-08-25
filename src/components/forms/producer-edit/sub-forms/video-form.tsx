@@ -14,6 +14,12 @@ import {
   createFormHookContexts,
   formOptions,
 } from "@tanstack/react-form";
+import { match } from "ts-pattern";
+import { TemporyFileSelectButton } from "@/components/select-file-button";
+import { FileVideo } from "@/components/file-video";
+import { toast } from "sonner";
+import { RotateCwIcon, XIcon } from "lucide-react";
+import { Stream } from "@cloudflare/stream-react";
 
 export const { fieldContext, useFieldContext, formContext, useFormContext } =
   createFormHookContexts();
@@ -27,8 +33,8 @@ export const { useAppForm, withForm } = createFormHook({
 
 export const videoOpts = formOptions({
   defaultValues: {
-    video: undefined as unknown as File,
-  } satisfies typeof editListingFormVideoValidator.infer as typeof editListingFormVideoValidator.infer,
+    video: null,
+  } as typeof editListingFormVideoValidator.infer,
 });
 
 export const useVideoForm = useAppForm;
@@ -38,9 +44,121 @@ export const VideoForm = withForm({
   props: {
     tier: "Free" as SubTier,
   },
-  render: function ({ tier }) {
+  render: function ({ tier, form }) {
     if (tier !== "Free" && tier.tier === "premium") {
-      return <Card></Card>;
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Video</CardTitle>
+            <CardDescription>
+              Upload a video with a maximum length of 2 minutes and maximum file
+              size of 200mb.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form.Field name="video">
+              {(field) => (
+                <div>
+                  {!field.state.value ? (
+                    <div>
+                      <TemporyFileSelectButton
+                        maxFileSize={200000000}
+                        onSelectFileToLarge={() =>
+                          toast.error("File must be less than 200mb")
+                        }
+                        mimeType="video/*"
+                        onSelect={(v) =>
+                          field.handleChange({ _type: "upload", file: v })
+                        }
+                      >
+                        Add Video
+                      </TemporyFileSelectButton>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <div className="p-2 flex gap-2 z-10 justify-end w-full absolute top-2 right-2">
+                        <TemporyFileSelectButton
+                          maxFileSize={200000000}
+                          size={"icon"}
+                          variant={"default"}
+                          onSelectFileToLarge={() =>
+                            toast.error("File must be less than 200mb")
+                          }
+                          mimeType="video/*"
+                          onSelect={(v) =>
+                            field.handleChange({ _type: "upload", file: v })
+                          }
+                        >
+                          <RotateCwIcon />
+                        </TemporyFileSelectButton>
+                        {/* <SelectFileButton
+                          maxFileSize={200000000}
+                          size={"icon"}
+                          variant={"default"}
+                          mimeType="video/*"
+                          onSelectFileToLarge={() =>
+                            toast.error("Video must be less than 200mb")
+                          }
+                          file={subField.state.value}
+                          onChange={(f) => subField.handleChange(f as File)}
+                        >
+                          <RotateCwIcon />
+                        </SelectFileButton> */}
+                        <Button
+                          onClick={() => field.handleChange(null)}
+                          size={"icon"}
+                          variant={"destructive"}
+                        >
+                          <XIcon />
+                        </Button>
+                      </div>
+                      {match(field.state.value)
+                        .with({ _type: "upload" }, (val) => (
+                          <div className="w-full rounded overflow-hidden border aspect-video">
+                            <FileVideo
+                              controls
+                              className="object-cover h-full w-full"
+                              file={val.file}
+                            />
+                          </div>
+                        ))
+                        .with({ _type: "cloudflare" }, (val) => (
+                          <div className="w-full rounded overflow-hidden border aspect-video">
+                            {val.status === "ready" ? (
+                              <Stream
+                                responsive={false}
+                                width="100%"
+                                height="100%"
+                                className="object-cover h-full w-full"
+                                controls
+                                src={val.uid}
+                              />
+                            ) : (
+                              <div className="p-20 flex flex-col gap-2 w-full h-full justify-center">
+                                <p>
+                                  Video is processing. Please wait a few
+                                  seconds.
+                                </p>
+                                <Button
+                                  onClick={() => {
+                                    window.location.reload();
+                                  }}
+                                >
+                                  Reload
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                        .exhaustive()}
+                    </div>
+                  )}
+                </div>
+              )}
+            </form.Field>
+          </CardContent>
+        </Card>
+      );
     }
 
     return (
