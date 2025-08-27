@@ -152,7 +152,7 @@ export function ProducerEditForm(props: {
           if (
             !R.isDeepEqual(form.state.values[key], listingQuery.data?.[key])
           ) {
-            args[key] = form.state.values[key] as any;
+            (args[key] as EditListingArgs[typeof key]) = form.state.values[key];
           }
           break;
       }
