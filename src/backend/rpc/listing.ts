@@ -111,16 +111,17 @@ export const editUserListing = organizationActionClient
         );
 
         try {
-          await db.insert(certificationsToListings).values(
-            addedCerts.map((cert) => ({
-              listingId: listing.id,
-              certificationId: cert.id,
-            }))
-          );
-
-          await db.delete(certifications).where(
+          if (addedCerts.length > 0) {
+            await db.insert(certificationsToListings).values(
+              addedCerts.map((cert) => ({
+                listingId: listing.id,
+                certificationId: cert.id,
+              }))
+            );
+          }
+          await db.delete(certificationsToListings).where(
             inArray(
-              certifications.id,
+              certificationsToListings.certificationId,
               removedCerts.map((c) => c.id)
             )
           );
