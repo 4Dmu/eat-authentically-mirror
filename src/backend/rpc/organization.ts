@@ -45,7 +45,10 @@ export const registerOrganization = authenticatedActionClient
         about: input.about,
         commodities: [],
         socialMedia: { twitter: null, facebook: null, instagram: null },
-        images: [],
+        images: {
+          items: [],
+          primaryImgId: null,
+        },
         createdAt: new Date(),
         updatedAt: new Date(),
       });

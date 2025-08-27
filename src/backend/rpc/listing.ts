@@ -57,10 +57,16 @@ export const editUserListing = organizationActionClient
 
     const toUpdate: Partial<Listing> = {};
 
-    if (input.basicInfo) {
-      toUpdate.name = input.basicInfo.name;
-      toUpdate.type = input.basicInfo.type;
-      toUpdate.about = input.basicInfo.about;
+    if (input.name) {
+      toUpdate.name = input.name;
+    }
+
+    if (input.type) {
+      toUpdate.type = input.type;
+    }
+
+    if (input.about !== undefined) {
+      toUpdate.about = input.about;
     }
 
     if (input.address) {
@@ -75,8 +81,8 @@ export const editUserListing = organizationActionClient
       toUpdate.socialMedia = input.socialMedia;
     }
 
-    if (input.certifications && input.certifications.certifications) {
-      const updatedCertifications = input.certifications.certifications;
+    if (input.certifications && input.certifications) {
+      const updatedCertifications = input.certifications;
       const currentCertifications = await db.query.listings
         .findFirst({
           where: and(
@@ -124,7 +130,7 @@ export const editUserListing = organizationActionClient
       } else {
         try {
           await db.insert(certificationsToListings).values(
-            input.certifications.certifications.map((cert) => ({
+            input.certifications.map((cert) => ({
               listingId: listing.id,
               certificationId: cert.id,
             }))
@@ -136,7 +142,7 @@ export const editUserListing = organizationActionClient
     }
 
     if (input.commodities) {
-      toUpdate.commodities = input.commodities.commodities;
+      toUpdate.commodities = input.commodities;
     }
 
     if (Object.keys(toUpdate).length > 0) {
