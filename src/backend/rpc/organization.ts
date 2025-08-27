@@ -7,12 +7,12 @@ import {
 import { db } from "../db";
 import { listings, organizations } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { ListingRegisterArgsValidator } from "../validators/listings";
+import { registerListingArgsValidator } from "../validators/listings";
 import { ORG_DATA_KV } from "../kv";
 import { withCertifications } from "../utils/transform-data";
 
 export const registerOrganization = authenticatedActionClient
-  .input(ListingRegisterArgsValidator)
+  .input(registerListingArgsValidator)
   .action(async ({ ctx: { userId, orgId }, input }) => {
     if (orgId) {
       throw new Error("Already logged in as listing");

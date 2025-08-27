@@ -2,10 +2,10 @@
 import * as listing from "@/backend/data/listing";
 import {
   editListingArgsValidator,
-  GetListingArgsValidator,
+  getListingArgsValidator,
   Listing,
   listingImagesValidator,
-  ListListingsArgsValidator,
+  listListingsArgsValidator,
 } from "../validators/listings";
 import { actionClient } from "./helpers/safe-action";
 import { organizationActionClient } from "./helpers/middleware";
@@ -26,11 +26,11 @@ import { normalizeAddress } from "../utils/normalize-data";
 import { videoRatelimit } from "../lib/rate-limit";
 
 export const listListingsPublic = actionClient
-  .input(ListListingsArgsValidator)
+  .input(listListingsArgsValidator)
   .action(async ({ input }) => await listing.listListingsPublic(input));
 
 export const listListingsPublicLight = actionClient
-  .input(ListListingsArgsValidator)
+  .input(listListingsArgsValidator)
   .action(async ({ input }) => await listing.listListingsPublicLight(input));
 
 export const listCertificationTypesPublic = actionClient.action(
@@ -38,7 +38,7 @@ export const listCertificationTypesPublic = actionClient.action(
 );
 
 export const getListingPublic = actionClient
-  .input(GetListingArgsValidator)
+  .input(getListingArgsValidator)
   .action(async ({ input }) => await listing.getListingPublic(input));
 
 export const editUserListing = organizationActionClient

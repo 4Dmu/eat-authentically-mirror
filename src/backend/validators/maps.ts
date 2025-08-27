@@ -1,5 +1,12 @@
 import { type } from "arktype";
 
+export const LatLangBoundsLiteralValidator = type({
+  east: "number",
+  north: "number",
+  south: "number",
+  west: "number",
+});
+
 export const GeocodeRegionProps = type({
   zoom: "number",
   center: {

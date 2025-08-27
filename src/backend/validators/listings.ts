@@ -1,6 +1,6 @@
 import { type } from "arktype";
-import z from "zod";
 import { alpha3CountryCodeValidator } from "./country";
+import { LatLangBoundsLiteralValidator } from "./maps";
 
 export const LISTING_TYPES = [
   "farm",
@@ -8,40 +8,15 @@ export const LISTING_TYPES = [
   "eatery",
 ] as const satisfies ListingTypes[];
 
-export const ListingTypesValidator = type("'farm'|'ranch'|'eatery'");
+export const listingTypesValidator = type("'farm'|'ranch'|'eatery'");
 
-export const listingTypesValidator = z.enum(["farm", "ranch", "eatery"]);
-
-export const LatLangBoundsLiteralValidator = type({
-  east: "number",
-  north: "number",
-  south: "number",
-  west: "number",
-});
-
-export const ListListingsArgsValidator = type({
-  "type?": ListingTypesValidator,
-  page: "number",
-  "query?": "string",
-  certs: type("string").array(),
-  "locationSearchArea?": LatLangBoundsLiteralValidator,
-});
-
-export const GetListingArgsValidator = type({ id: "string.uuid" });
-
-export const ContactValidator = type({
+export const contactValidator = type({
   "email?": "string.email|null",
   "phone?": "string|null",
   "website?": "string.url|null",
 });
 
-export const EmptyContactValidator = type({
-  email: "undefined",
-  phone: "undefined",
-  website: "undefined",
-});
-
-export const AddressValidator = type({
+export const addressValidator = type({
   "street?": "string|undefined",
   "city?": type("string|undefined"),
   "state?": "string|undefined",
@@ -53,11 +28,7 @@ export const AddressValidator = type({
   }).or(type.undefined),
 });
 
-export const ImagesFormValidator = type({
-  files: type.instanceOf(File).array(),
-});
-
-export const CertificationValidator = type({
+export const certificationValidator = type({
   name: "string",
   isVerified: "boolean",
   id: "string",
@@ -65,30 +36,22 @@ export const CertificationValidator = type({
   updatedAt: "Date",
 });
 
-export const certificationValidator = z.object({
-  name: z.string(),
-  isVerified: z.boolean(),
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-export const ImageDataValidator = type({
+export const imageDataValidator = type({
   _type: "'cloudflare'",
   cloudflareId: "string",
   cloudflareUrl: "string.url",
   alt: "string",
 });
 
-export const BusinessHoursValidator = type({});
+export const businessHoursValidator = type({});
 
-export const SocialMediaValidator = type({
+export const socialMediaValidator = type({
   twitter: "string.url|null",
   facebook: "string.url|null",
   instagram: "string.url|null",
 });
 
-export const VideoValidator = type({
+export const videoValidator = type({
   url: "string",
   _type: "'cloudflare'",
   uid: "string",
@@ -96,19 +59,19 @@ export const VideoValidator = type({
 });
 
 export const listingImagesValidator = type({
-  items: ImageDataValidator.array(),
+  items: imageDataValidator.array(),
   primaryImgId: "string|null",
 });
 
-export const ListingValidator = type({
+export const listingValidator = type({
   id: "string.uuid",
   organizationId: "string|null",
   name: "string",
-  type: ListingTypesValidator,
+  type: listingTypesValidator,
   about: "string|null",
-  contact: ContactValidator.or("null"),
-  address: AddressValidator.or("null"),
-  certifications: CertificationValidator.array(),
+  contact: contactValidator.or("null"),
+  address: addressValidator.or("null"),
+  certifications: certificationValidator.array(),
   commodities: type({
     name: "string",
     varieties: type.string.array(),
@@ -116,17 +79,17 @@ export const ListingValidator = type({
   claimed: "boolean",
   verified: "boolean",
   images: listingImagesValidator,
-  video: VideoValidator.or(type("null")),
+  video: videoValidator.or(type("null")),
   createdAt: "Date",
   updatedAt: "Date",
-  socialMedia: SocialMediaValidator,
+  socialMedia: socialMediaValidator,
 });
 
 export const editListingFormValidator = type({
   name: "string",
-  type: ListingTypesValidator,
+  type: listingTypesValidator,
   about: "string|null",
-  address: AddressValidator,
+  address: addressValidator,
   contact: {
     "email?": "string.email|null",
     "phone?": "string|null",
@@ -139,7 +102,7 @@ export const editListingFormValidator = type({
       file: "File",
       isPrimary: "boolean",
     })
-      .or(ImageDataValidator)
+      .or(imageDataValidator)
       .array(),
   }).narrow((data, ctx) => {
     if (
@@ -157,118 +120,24 @@ export const editListingFormValidator = type({
     }
     return true;
   }),
-  video: VideoValidator.or(type({ _type: "'upload'", file: "File" })).or(
-    type.null
-  ),
-  certifications: CertificationValidator.array(),
+  video: videoValidator
+    .or(type({ _type: "'upload'", file: "File" }))
+    .or(type.null),
+  certifications: certificationValidator.array(),
   commodities: type({
     name: "string",
     varieties: type.string.array(),
   }).array(),
-  socialMedia: SocialMediaValidator.or("null"),
+  socialMedia: socialMediaValidator.or("null"),
 });
 
-export const editListingFormBasicInfoValidator = type({
+export const listingFormBasicValidator = type({
   name: "string",
-  type: ListingTypesValidator,
+  type: listingTypesValidator,
   about: "string|null",
 });
 
-export const editListingFormContactValidator = type({
-  "email?": "string.email|null",
-  "phone?": "string|null|null",
-  "website?": "string.url|null",
-});
-
-export const editListingFormAddressValidator = AddressValidator;
-
-export type EditListingFormAddress =
-  typeof editListingFormAddressValidator.infer;
-
-export const editListingFormImagesValidator = type({
-  images: type({
-    primaryImgId: "string|null",
-    items: type({
-      _type: "'upload'",
-      file: "File",
-      isPrimary: "boolean",
-    })
-      .or(ImageDataValidator)
-      .array(),
-  }).narrow((data, ctx) => {
-    if (
-      (data.primaryImgId && data.items.length === 0) ||
-      (data.primaryImgId &&
-        data.items.length > 0 &&
-        !data.items.some(
-          (i) =>
-            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId
-        ))
-    ) {
-      return ctx.reject({
-        message: "Invalid primary image id",
-      });
-    }
-    return true;
-  }),
-});
-
-export const editListingFormVideoValidator = type({
-  video: VideoValidator.or(type({ _type: "'upload'", file: "File" })).or(
-    type.null
-  ),
-});
-
-export const editListingFormCertificationsValidator = type({
-  certifications: CertificationValidator.array(),
-});
-
-export const editListingFormProductsValidator = type({
-  commodities: type({
-    name: "string",
-    varieties: type.string.array(),
-  }).array(),
-});
-
-export const editListingFormSocialMediaValidator =
-  SocialMediaValidator.or("undefined");
-
-export const editListingArgsValidator = type({
-  listingId: type("string"),
-  "name?": "string",
-  "type?": ListingTypesValidator,
-  "about?": "string|null",
-  contact: editListingFormContactValidator.optional(),
-  address: editListingFormAddressValidator.optional(),
-  certifications: CertificationValidator.array().optional(),
-  commodities: type({
-    name: "string",
-    varieties: type.string.array(),
-  })
-    .array()
-    .optional(),
-  socialMedia: editListingFormSocialMediaValidator.optional(),
-});
-
-export const ListingFormBasicValidator = type({
-  name: "string",
-  type: ListingTypesValidator,
-  about: "string|null",
-});
-
-export const ListingRegisterArgsValidator = type({
-  name: "string >= 3",
-  type: ListingTypesValidator,
-  about: "string >= 20",
-});
-
-export const OptionalListingRegisterArgsValidator = type({
-  name: "string | undefined",
-  type: ListingTypesValidator.optional(),
-  about: "string >= 20 | undefined",
-});
-
-export const PublicListingValidator = ListingValidator.pick(
+export const publicListingValidator = listingValidator.pick(
   "id",
   "name",
   "type",
@@ -281,7 +150,7 @@ export const PublicListingValidator = ListingValidator.pick(
   "video"
 );
 
-export const PublicListingLightValidator = ListingValidator.pick(
+export const publicListingLightValidator = listingValidator.pick(
   "id",
   "name",
   "type",
@@ -292,28 +161,56 @@ export const PublicListingLightValidator = ListingValidator.pick(
   "address"
 );
 
-export type ListListingsArgs = typeof ListListingsArgsValidator.infer;
+export const listListingsArgsValidator = type({
+  "type?": listingTypesValidator,
+  page: "number",
+  "query?": "string",
+  certs: type("string").array(),
+  "locationSearchArea?": LatLangBoundsLiteralValidator,
+});
 
-export type GetListingArgs = typeof GetListingArgsValidator.infer;
+export const getListingArgsValidator = type({ id: "string.uuid" });
 
-export type ListingRegisterArgs = typeof ListingRegisterArgsValidator.infer;
+export const editListingArgsValidator = type({
+  listingId: type("string"),
+  "name?": "string",
+  "type?": listingTypesValidator,
+  "about?": "string|null",
+  contact: editListingFormValidator.pick("contact").optional(),
+  address: editListingFormValidator.pick("address").optional(),
+  certifications: editListingFormValidator.pick("certifications").optional(),
+  commodities: editListingFormValidator.pick("commodities").optional(),
+  socialMedia: editListingFormValidator.pick("socialMedia").optional(),
+});
 
-export type ListingTypes = typeof ListingTypesValidator.infer;
+export const registerListingArgsValidator = type({
+  name: "string >= 3",
+  type: listingTypesValidator,
+  about: "string >= 20",
+});
 
-export type SocialMedia = typeof SocialMediaValidator.infer;
+export type ListListingsArgs = typeof listListingsArgsValidator.infer;
 
-export type Contact = typeof ContactValidator.infer;
+export type GetListingArgs = typeof getListingArgsValidator.infer;
 
-export type Address = typeof AddressValidator.infer;
+export type RegisterListingArgs = typeof registerListingArgsValidator.infer;
 
-export type ImageData = typeof ImageDataValidator.infer;
+export type ListingTypes = typeof listingTypesValidator.infer;
 
-export type Listing = typeof ListingValidator.infer;
+export type SocialMedia = typeof socialMediaValidator.infer;
 
-export type PublicListing = typeof PublicListingValidator.infer;
+export type Contact = typeof contactValidator.infer;
 
-export type PublicListingLight = typeof PublicListingLightValidator.infer;
+export type Address = typeof addressValidator.infer;
 
-export type Certification = typeof CertificationValidator.infer;
+export type ImageData = typeof imageDataValidator.infer;
+
+export type Listing = typeof listingValidator.infer;
+
+export type PublicListing = typeof publicListingValidator.infer;
+
+export type PublicListingLight = typeof publicListingLightValidator.infer;
+
+export type Certification = typeof certificationValidator.infer;
 
 export type EditListingArgs = typeof editListingArgsValidator.infer;

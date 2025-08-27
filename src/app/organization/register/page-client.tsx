@@ -19,8 +19,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   LISTING_TYPES,
-  ListingRegisterArgsValidator,
-  ListingRegisterArgs,
+  registerListingArgsValidator,
+  RegisterListingArgs,
 } from "@/backend/validators/listings";
 import {
   Form,
@@ -40,7 +40,7 @@ export function ClientPage() {
   const router = useRouter();
   const registerOrganizationMutation = useMutation({
     mutationKey: ["register-organization"],
-    mutationFn: async (data: ListingRegisterArgs) => {
+    mutationFn: async (data: RegisterListingArgs) => {
       return await registerOrganization(data);
     },
     onSuccess: () => {
@@ -48,15 +48,15 @@ export function ClientPage() {
     },
   });
 
-  const form = useForm<typeof ListingRegisterArgsValidator.infer>({
-    resolver: arktypeResolver(ListingRegisterArgsValidator),
+  const form = useForm<typeof registerListingArgsValidator.infer>({
+    resolver: arktypeResolver(registerListingArgsValidator),
     defaultValues: {
       name: "",
       about: "",
     },
   });
 
-  function onSubmit(values: typeof ListingRegisterArgsValidator.infer) {
+  function onSubmit(values: typeof registerListingArgsValidator.infer) {
     registerOrganizationMutation.mutate(values);
   }
   return (
