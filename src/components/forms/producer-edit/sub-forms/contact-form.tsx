@@ -53,9 +53,9 @@ export const ContactForm = withForm({
                     value={subField.state.value ?? ""}
                     onChange={(e) =>
                       subField.handleChange(
-                        (e.target.value.length === 0
-                          ? undefined
-                          : e.currentTarget.value) as string
+                        e.target.value.length === 0
+                          ? null
+                          : e.currentTarget.value
                       )
                     }
                   />
@@ -73,9 +73,9 @@ export const ContactForm = withForm({
                     value={subField.state.value ?? ""}
                     onChange={(e) =>
                       subField.handleChange(
-                        (e.target.value.length === 0
-                          ? undefined
-                          : e.currentTarget.value) as string
+                        e.target.value.length === 0
+                          ? null
+                          : e.currentTarget.value
                       )
                     }
                   />
@@ -94,9 +94,7 @@ export const ContactForm = withForm({
                   value={subField.state.value ?? ""}
                   onChange={(e) =>
                     subField.handleChange(
-                      (e.target.value.length === 0
-                        ? undefined
-                        : e.currentTarget.value) as string
+                      e.target.value.length === 0 ? null : e.currentTarget.value
                     )
                   }
                 />

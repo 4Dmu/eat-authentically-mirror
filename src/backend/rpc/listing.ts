@@ -3,8 +3,8 @@ import * as listing from "@/backend/data/listing";
 import {
   editListingArgsValidator,
   GetListingArgsValidator,
-  ImageDataValidator,
   Listing,
+  listingImagesValidator,
   ListListingsArgsValidator,
 } from "../validators/listings";
 import { actionClient } from "./helpers/safe-action";
@@ -512,7 +512,7 @@ export const deleteVideo = organizationActionClient.action(
 );
 
 export const updateExistingImages = organizationActionClient
-  .input(type({ images: ImageDataValidator.array() }))
+  .input(listingImagesValidator)
   .action(async ({ ctx: { orgId, userId }, input }) => {
     const listing = await db.query.listings.findFirst({
       columns: {
@@ -528,13 +528,11 @@ export const updateExistingImages = organizationActionClient
     }
 
     const imagesToKeep = listing.images.items.filter((i) =>
-      input.images.some((i2) => i.cloudflareId === i2.cloudflareId)
+      input.items.some((i2) => i.cloudflareId === i2.cloudflareId)
     );
 
-    console.log(imagesToKeep);
-
     const imagesToDelete = listing.images.items.filter(
-      (i) => !input.images.some((i2) => i.cloudflareId === i2.cloudflareId)
+      (i) => !input.items.some((i2) => i.cloudflareId === i2.cloudflareId)
     );
 
     await db
@@ -543,9 +541,11 @@ export const updateExistingImages = organizationActionClient
         images: {
           items: imagesToKeep,
           primaryImgId:
+            input.primaryImgId ??
             imagesToKeep.find(
               (i) => i.cloudflareId === listing.images.primaryImgId
-            )?.cloudflareId ?? null,
+            )?.cloudflareId ??
+            null,
         },
       })
       .where(eq(listings.id, listing.id));

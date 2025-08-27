@@ -191,7 +191,10 @@ export const deleteVideoOpts = () =>
 export const updateExistingImagesOpts = () =>
   mutationOptions({
     mutationKey: ["update-existing-images"],
-    mutationFn: async (args: ImageData[]) => {
-      await updateExistingImages({ images: args });
+    mutationFn: async (args: {
+      items: ImageData[];
+      primaryImgId: string | null;
+    }) => {
+      await updateExistingImages(args);
     },
   });

@@ -30,9 +30,9 @@ export const ListListingsArgsValidator = type({
 export const GetListingArgsValidator = type({ id: "string.uuid" });
 
 export const ContactValidator = type({
-  email: "string.email",
-  phone: "string",
-  website: "string.url",
+  email: "string.email|null",
+  phone: "string|null",
+  website: "string.url|null",
 });
 
 export const contactValidator = z.object({
@@ -101,6 +101,11 @@ export const VideoValidator = type({
   status: "'ready'|'pending'",
 });
 
+export const listingImagesValidator = type({
+  items: ImageDataValidator.array(),
+  primaryImgId: "string|null",
+});
+
 export const ListingValidator = type({
   id: "string.uuid",
   organizationId: "string|null",
@@ -116,10 +121,7 @@ export const ListingValidator = type({
   }).array(),
   claimed: "boolean",
   verified: "boolean",
-  images: {
-    items: ImageDataValidator.array(),
-    primaryImgId: "string|null",
-  },
+  images: listingImagesValidator,
   video: VideoValidator.or(type("null")),
   createdAt: "Date",
   updatedAt: "Date",
@@ -133,9 +135,9 @@ export const editListingFormBasicInfoValidator = type({
 });
 
 export const editListingFormContactValidator = type({
-  email: "string.email",
-  phone: "string",
-  website: "string.url",
+  email: "string.email|null",
+  phone: "string|null",
+  website: "string.url|null",
 });
 
 export const editListingFormAddressValidator = AddressValidator;

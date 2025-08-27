@@ -163,7 +163,10 @@ export function ProducerEditForm(props: {
       ) {
         console.log("changed");
         const updateExisingImagesPromise =
-          updateExisingImagesMutation.mutateAsync(existingImages);
+          updateExisingImagesMutation.mutateAsync({
+            items: existingImages,
+            primaryImgId: imagesForm.state.values.images.primaryImgId,
+          });
         toast.promise(updateExisingImagesPromise, {
           loading: "Updating images...",
           success: () => "Images updated successfully.",
