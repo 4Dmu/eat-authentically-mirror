@@ -53,9 +53,9 @@ export default async function ListingPage({
                 {listing.images.items
                   .toSorted((a, b) =>
                     listing.images.primaryImgId === a.cloudflareId
-                      ? 1
-                      : listing.images.primaryImgId === b.cloudflareId
                       ? -1
+                      : listing.images.primaryImgId === b.cloudflareId
+                      ? 1
                       : 0
                   )
                   .map((img) => (
