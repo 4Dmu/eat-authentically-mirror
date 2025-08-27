@@ -151,13 +151,17 @@ export const ImagesForm = withForm({
                             )}
                           </form.Field>
                         )}
-                        <Button
-                          onClick={() => field.removeValue(i)}
-                          size={"icon"}
-                          variant={"destructive"}
-                        >
-                          <XIcon />
-                        </Button>
+                        <form.Field name="images.items" mode="array">
+                          {(subField) => (
+                            <Button
+                              onClick={() => subField.removeValue(i)}
+                              size={"icon"}
+                              variant={"destructive"}
+                            >
+                              <XIcon />
+                            </Button>
+                          )}
+                        </form.Field>
                       </div>
                       <div className="w-full h-[200px] rounded overflow-hidden border">
                         {value._type === "upload" ? (
