@@ -100,39 +100,45 @@ export default async function ListingPage({
                 <CardTitle>Contact</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-5">
-                <div className="flex flex-col gap-2">
-                  <Label>
-                    <MailIcon size={20} />
-                    Email
-                  </Label>
-                  <a
-                    className="underline"
-                    href={`mailto:${listing.contact?.email}`}
-                  >
-                    {listing.contact?.email}
-                  </a>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label>
-                    <PhoneIcon size={20} />
-                    Phone
-                  </Label>
-                  <a
-                    className="underline"
-                    href={`tel:${listing.contact?.phone}`}
-                  >
-                    {listing.contact?.phone}
-                  </a>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label>
-                    <GlobeIcon size={20} />
-                    Website
-                  </Label>
-                  <a className="underline" href={listing.contact?.website}>
-                    {listing.contact?.website}
-                  </a>
-                </div>
+                {listing.contact?.email && (
+                  <div className="flex flex-col gap-2">
+                    <Label>
+                      <MailIcon size={20} />
+                      Email
+                    </Label>
+                    <a
+                      className="underline"
+                      href={`mailto:${listing.contact?.email}`}
+                    >
+                      {listing.contact?.email}
+                    </a>
+                  </div>
+                )}
+                {listing.contact?.phone && (
+                  <div className="flex flex-col gap-2">
+                    <Label>
+                      <PhoneIcon size={20} />
+                      Phone
+                    </Label>
+                    <a
+                      className="underline"
+                      href={`tel:${listing.contact?.phone}`}
+                    >
+                      {listing.contact?.phone}
+                    </a>
+                  </div>
+                )}
+                {listing.contact?.website && (
+                  <div className="flex flex-col gap-2">
+                    <Label>
+                      <GlobeIcon size={20} />
+                      Website
+                    </Label>
+                    <a className="underline" href={listing.contact?.website}>
+                      {listing.contact?.website}
+                    </a>
+                  </div>
+                )}
                 <div className="flex flex-col gap-2">
                   <Label>
                     <MapPin size={20} />
