@@ -6,10 +6,12 @@ export function SaveButton({
   form,
   onSubmit,
   disableSubmit,
+  disableReset,
 }: {
   form: AnyFormApi;
   onSubmit: () => void;
   disableSubmit?: boolean;
+  disableReset?: boolean;
 }) {
   const formState = useStore(
     form.store,
@@ -29,7 +31,11 @@ export function SaveButton({
             <p>Unsaved changes</p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:ml-auto">
-            <Button onClick={() => form.reset()} variant={"destructive"}>
+            <Button
+              disabled={disableReset}
+              onClick={() => form.reset()}
+              variant={"destructive"}
+            >
               Reset
             </Button>
             <Button

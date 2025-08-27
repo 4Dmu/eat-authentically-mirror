@@ -71,115 +71,20 @@ export function ProducerEditForm(props: {
     onSubmit: (props) => console.log(props),
   });
 
-  async function handleMultiSubmit() {
+  const disableSaveButton =
+    editUserListingMutation.isPending ||
+    uploadImagesMutation.isPending ||
+    updateExisingImagesMutation.isPending ||
+    uploadVideoMutation.isPending ||
+    deleteVideoMutation.isPending;
+
+  async function submit() {
     const args: EditListingArgs = { listingId: props.currentListing.id };
-
-    // if (!R.isDeepEqual(form.state.values.images, listingQuery.data?.images)) {
-    //   console.log(" images");
-    //   const existingImages = form.state.values.images.items.filter(
-    //     (x) => x._type === "cloudflare"
-    //   );
-    //   const toUpload = form.state.values.images.items.filter(
-    //     (x) => x._type === "upload"
-    //   );
-
-    //   const promises: Promise<unknown>[] = [];
-
-    //   if (
-    //     JSON.stringify(existingImages) !==
-    //       JSON.stringify(listingQuery.data?.images.items) ||
-    //     listingQuery.data?.images.primaryImgId !==
-    //       form.state.values.images.primaryImgId
-    //   ) {
-    //     console.log("changed");
-    //     const updateExisingImagesPromise =
-    //       updateExisingImagesMutation.mutateAsync({
-    //         items: existingImages,
-    //         primaryImgId: form.state.values.images.primaryImgId,
-    //       });
-    //     toast.promise(updateExisingImagesPromise, {
-    //       loading: "Updating images...",
-    //       success: () => "Images updated successfully.",
-    //       error: () => `Error updating images.`,
-    //     });
-    //     promises.push(updateExisingImagesPromise);
-    //     await updateExisingImagesPromise;
-    //   } else {
-    //     console.log("not changed");
-    //   }
-
-    //   if (toUpload.length > 0) {
-    //     const uploadPromise = uploadImagesMutation.mutateAsync(toUpload);
-    //     toast.promise(uploadPromise, {
-    //       loading: "Uploading images...",
-    //       success: () => "Images uploaded successfully.",
-    //       error: () => `Error uploading images.`,
-    //     });
-    //     await uploadPromise;
-    //   }
-    // }
-
-    // if (form.state.values.video !== listingQuery.data?.video) {
-    //   if (form.state.values.video === null) {
-    //     const deletePromise = deleteVideoMutation.mutateAsync();
-    //     toast.promise(deletePromise, {
-    //       loading: "Deleting video...",
-    //       success: () => "Video deleted successfully.",
-    //       error: () => `Error deleting video.`,
-    //     });
-    //     await deletePromise;
-    //   } else if (form.state.values.video._type === "upload") {
-    //     const videoUploadPromise = uploadVideoMutation.mutateAsync(
-    //       form.state.values.video
-    //     );
-    //     toast.promise(videoUploadPromise, {
-    //       loading: "Uploading video...",
-    //       success: () => "Video uploaded successfully.",
-    //       error: () => `Error uploading video.`,
-    //     });
-    //     await videoUploadPromise;
-    //   }
-    // }
-
-    // if (form.state.values.name !== listingQuery.data?.name) {
-    //   args.name = form.state.values.name;
-    // }
-
-    // if (form.state.values.type !== listingQuery.data?.type) {
-    //   args.type = form.state.values.type;
-    // }
-
-    // if (form.state.values.about !== listingQuery.data?.about) {
-    //   args.about = form.state.values.about;
-    // }
-
-    // if (form.state.values.address !== listingQuery.data?.address) {
-    //   args.address = form.state.values.address;
-    // }
-
-    // if (form.state.values.contact !== listingQuery.data?.contact) {
-    //   args.contact = form.state.values.contact;
-    // }
-
-    // if (
-    //   JSON.stringify(form.state.values.certifications) !==
-    //   JSON.stringify(listingQuery.data?.certifications)
-    // ) {
-    //   args.certifications = form.state.values.certifications;
-    // }
-
-    // if (
-    //   JSON.stringify(form.state.values.commodities) !==
-    //   JSON.stringify(listingQuery.data?.commodities)
-    // ) {
-    //   args.commodities = form.state.values.commodities;
-    // }
 
     for (const [key, value] of R.entries(form.state.values)) {
       switch (key) {
         case "images":
           if (!R.isDeepEqual(value, listingQuery.data?.images)) {
-            console.log(" images");
             const existingImages = form.state.values.images.items.filter(
               (x) => x._type === "cloudflare"
             );
@@ -187,39 +92,38 @@ export function ProducerEditForm(props: {
               (x) => x._type === "upload"
             );
 
-            const promises: Promise<unknown>[] = [];
-
-            if (
-              JSON.stringify(existingImages) !==
-                JSON.stringify(listingQuery.data?.images.items) ||
+            const hasExistingImageChanges =
+              !R.isDeepEqual(existingImages, listingQuery.data?.images.items) ||
               listingQuery.data?.images.primaryImgId !==
-                form.state.values.images.primaryImgId
-            ) {
-              console.log("changed");
-              const updateExisingImagesPromise =
-                updateExisingImagesMutation.mutateAsync({
+                form.state.values.images.primaryImgId;
+
+            const hasImagesToUpload = toUpload.length > 0;
+
+            async function handleImageUpdates() {
+              if (hasExistingImageChanges)
+                await updateExisingImagesMutation.mutateAsync({
                   items: existingImages,
                   primaryImgId: form.state.values.images.primaryImgId,
                 });
-              toast.promise(updateExisingImagesPromise, {
-                loading: "Updating images...",
-                success: () => "Images updated successfully.",
-                error: () => `Error updating images.`,
-              });
-              promises.push(updateExisingImagesPromise);
-              await updateExisingImagesPromise;
-            } else {
-              console.log("not changed");
+
+              if (hasImagesToUpload)
+                await uploadImagesMutation.mutateAsync(toUpload);
             }
 
-            if (toUpload.length > 0) {
-              const uploadPromise = uploadImagesMutation.mutateAsync(toUpload);
-              toast.promise(uploadPromise, {
-                loading: "Uploading images...",
-                success: () => "Images uploaded successfully.",
-                error: () => `Error uploading images.`,
+            if (hasExistingImageChanges || hasImagesToUpload) {
+              const promise = handleImageUpdates();
+              toast.promise(promise, {
+                loading: hasImagesToUpload
+                  ? "Uploading images..."
+                  : "Updating images...",
+                success: hasImagesToUpload
+                  ? "Uploaded images successfully"
+                  : "Updating images successfully",
+                error: hasImagesToUpload
+                  ? "Error uploaded images"
+                  : "Error updating images",
               });
-              await uploadPromise;
+              await promise;
             }
           }
           break;
@@ -288,13 +192,9 @@ export function ProducerEditForm(props: {
       />
       <ProductsForm form={form} />
       <SaveButton
-        onSubmit={handleMultiSubmit}
-        disableSubmit={
-          editUserListingMutation.isPending ||
-          uploadImagesMutation.isPending ||
-          uploadVideoMutation.isPending ||
-          deleteVideoMutation.isPending
-        }
+        onSubmit={submit}
+        disableSubmit={disableSaveButton}
+        disableReset={disableSaveButton}
         form={form}
       />
     </div>
