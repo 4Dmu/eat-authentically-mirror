@@ -176,11 +176,11 @@ export const editListingArgsValidator = type({
   "name?": "string",
   "type?": listingTypesValidator,
   "about?": "string|null",
-  contact: editListingFormValidator.pick("contact").optional(),
-  address: editListingFormValidator.pick("address").optional(),
-  certifications: editListingFormValidator.pick("certifications").optional(),
-  commodities: editListingFormValidator.pick("commodities").optional(),
-  socialMedia: editListingFormValidator.pick("socialMedia").optional(),
+  contact: editListingFormValidator.get("contact").optional(),
+  address: editListingFormValidator.get("address").optional(),
+  certifications: editListingFormValidator.get("certifications").optional(),
+  commodities: editListingFormValidator.get("commodities").optional(),
+  socialMedia: editListingFormValidator.get("socialMedia").optional(),
 });
 
 export const registerListingArgsValidator = type({
