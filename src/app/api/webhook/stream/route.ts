@@ -84,12 +84,15 @@ export async function POST(req: NextRequest) {
 
   const result = await db.run(sql`
         UPDATE listings
-        SET video = json_set(video, '$.status', ${sql.param(
-          canStream ? "ready" : "pending"
-        )})
-        WHERE video IS NOT NULL AND json_extract(video, '$.uid') = ${sql.param(
-          body.uid
-        )}
+        SET 
+          video = json_set(video, '$.status', ${sql.param(
+            canStream ? "ready" : "pending"
+          )}),
+          updatedAt = CURRENT_TIMESTAMP
+        WHERE 
+          video IS NOT NULL AND json_extract(video, '$.uid') = ${sql.param(
+            body.uid
+          )}
         RETURNING id
         `);
 

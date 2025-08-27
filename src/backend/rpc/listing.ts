@@ -151,6 +151,7 @@ export const editUserListing = organizationActionClient
         .update(listings)
         .set({
           ...toUpdate,
+          updatedAt: new Date(),
         })
         .where(
           and(eq(listings.id, listing.id), eq(listings.organizationId, orgId))
@@ -243,6 +244,7 @@ export const requestUploadUrls = organizationActionClient
       .update(listings)
       .set({
         pendingImages: pending,
+        updatedAt: new Date(),
       })
       .where(eq(listings.id, listing.id));
 
@@ -284,6 +286,7 @@ export const requestVideoUploadUrl = organizationActionClient.action(
         .update(listings)
         .set({
           video: null,
+          updatedAt: new Date(),
         })
         .where(eq(listings.id, listing.id));
     }
@@ -332,6 +335,7 @@ export const requestVideoUploadUrl = organizationActionClient.action(
             ...(listing.pendingVideos ?? []),
             uploadUrlGeneratorCloudflareResponseBody.result.uid,
           ],
+          updatedAt: new Date(),
         })
         .where(eq(listings.id, listing.id));
 
@@ -418,6 +422,7 @@ export const confirmPengingUpload = organizationActionClient.action(
         .set({
           images: images,
           pendingImages: pending,
+          updatedAt: new Date(),
         })
         .where(eq(listings.id, listing.id));
     } catch (err) {
@@ -482,6 +487,7 @@ export const confirmPendingVideoUpload = organizationActionClient.action(
         .set({
           pendingVideos: pending,
           video: videoData,
+          updatedAt: new Date(),
         })
         .where(eq(listings.id, listing.id));
     } catch (err) {
@@ -513,6 +519,7 @@ export const deleteVideo = organizationActionClient.action(
       .update(listings)
       .set({
         video: null,
+        updatedAt: new Date(),
       })
       .where(eq(listings.id, listing.id));
   }
@@ -554,6 +561,7 @@ export const updateExistingImages = organizationActionClient
             )?.cloudflareId ??
             null,
         },
+        updatedAt: new Date(),
       })
       .where(eq(listings.id, listing.id));
 
