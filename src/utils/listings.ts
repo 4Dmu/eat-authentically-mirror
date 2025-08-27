@@ -37,8 +37,10 @@ export function primaryImageUrl(
   listing: Listing | PublicListing | PublicListingLight
 ) {
   return (
-    listing.images?.filter((i) => i.isPrimary)[0]?.cloudflareUrl ??
-    listing.images?.[0]?.cloudflareUrl ??
+    listing.images?.items.find(
+      (i) => i.cloudflareId === listing.images.primaryImgId
+    )?.cloudflareUrl ??
+    listing.images?.items[0]?.cloudflareUrl ??
     "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"
   );
 }

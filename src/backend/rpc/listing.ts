@@ -191,7 +191,7 @@ export const requestUploadUrls = organizationActionClient
         ? 5
         : 1;
 
-    const remainingFiles = maxFiles - listing.images.length;
+    const remainingFiles = maxFiles - listing.images.items.length;
 
     if (imageItemParams.length > remainingFiles) {
       throw new Error("Number of files exceeds your plan");
@@ -394,12 +394,15 @@ export const confirmPengingUpload = organizationActionClient.action(
           continue;
         }
 
-        images.push({
+        if (pendingData?.isPrimary === true) {
+          images.primaryImgId === pendingData.id;
+        }
+
+        images.items.push({
           _type: "cloudflare",
           cloudflareId: image.id,
           cloudflareUrl: `https://imagedelivery.net/${env.SAFE_CLOUDFLARE_ACCOUNT_HASH}/${image.id}/public`,
           alt: "",
-          isPrimary: pendingData?.isPrimary ?? false,
         });
       }
 
@@ -524,27 +527,26 @@ export const updateExistingImages = organizationActionClient
       throw new Error("Unauthorized");
     }
 
-    const imagesToKeep = listing.images
-      .filter((i) =>
-        input.images.some((i2) => i.cloudflareId === i2.cloudflareId)
-      )
-      .map((i) => ({
-        ...i,
-        isPrimary:
-          input.images.find((j) => i.cloudflareId === j.cloudflareId)
-            ?.isPrimary ?? i.isPrimary,
-      }));
+    const imagesToKeep = listing.images.items.filter((i) =>
+      input.images.some((i2) => i.cloudflareId === i2.cloudflareId)
+    );
 
     console.log(imagesToKeep);
 
-    const imagesToDelete = listing.images.filter(
+    const imagesToDelete = listing.images.items.filter(
       (i) => !input.images.some((i2) => i.cloudflareId === i2.cloudflareId)
     );
 
     await db
       .update(listings)
       .set({
-        images: imagesToKeep,
+        images: {
+          items: imagesToKeep,
+          primaryImgId:
+            imagesToKeep.find(
+              (i) => i.cloudflareId === listing.images.primaryImgId
+            )?.cloudflareId ?? null,
+        },
       })
       .where(eq(listings.id, listing.id));
 

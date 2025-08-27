@@ -84,7 +84,6 @@ export const ImageDataValidator = type({
   cloudflareId: "string",
   cloudflareUrl: "string.url",
   alt: "string",
-  isPrimary: "boolean",
 });
 
 export const BusinessHoursValidator = type({});
@@ -117,7 +116,10 @@ export const ListingValidator = type({
   }).array(),
   claimed: "boolean",
   verified: "boolean",
-  images: ImageDataValidator.array(),
+  images: {
+    items: ImageDataValidator.array(),
+    primaryImgId: "string|null",
+  },
   video: VideoValidator.or(type("null")),
   createdAt: "Date",
   updatedAt: "Date",
@@ -143,21 +145,30 @@ export type EditListingFormAddress =
 
 export const editListingFormImagesValidator = type({
   images: type({
-    _type: "'upload'",
-    file: "File",
-    isPrimary: "boolean",
-  })
-    .or(ImageDataValidator)
-    .array()
-    .narrow((data, ctx) => {
-      if (!data.some((i) => i.isPrimary)) {
-        return ctx.reject({
-          expected: "one image must be marked isPrimary",
-          actual: "no images are marked isPrimary",
-        });
-      }
-      return true;
-    }),
+    primaryImgId: "string|null",
+    items: type({
+      _type: "'upload'",
+      file: "File",
+      isPrimary: "boolean",
+    })
+      .or(ImageDataValidator)
+      .array(),
+  }).narrow((data, ctx) => {
+    if (
+      (data.primaryImgId && data.items.length === 0) ||
+      (data.primaryImgId &&
+        data.items.length > 0 &&
+        !data.items.some(
+          (i) =>
+            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId
+        ))
+    ) {
+      return ctx.reject({
+        message: "Invalid primary image id",
+      });
+    }
+    return true;
+  }),
 });
 
 export const editListingFormVideoValidator = type({
@@ -217,7 +228,8 @@ export const PublicListingValidator = ListingValidator.pick(
   "claimed",
   "certifications",
   "contact",
-  "address"
+  "address",
+  "video"
 );
 
 export const PublicListingLightValidator = ListingValidator.pick(

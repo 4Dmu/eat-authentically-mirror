@@ -68,7 +68,10 @@ export const listings = sqliteTable("listings", {
   verified: integer({ mode: "boolean" }).notNull(),
 
   about: text(),
-  images: text({ mode: "json" }).$type<ImageData[]>().notNull(),
+  images: text({ mode: "json" })
+    .$type<{ primaryImgId: string | null; items: ImageData[] }>()
+    .notNull(),
+  primaryImageIdx: integer(),
   pendingImages: text({ mode: "json" }).$type<
     { id: string; isPrimary: boolean }[]
   >(),

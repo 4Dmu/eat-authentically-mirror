@@ -70,6 +70,7 @@ export async function listListingsPublic(args: ListListingsArgs) {
         about: true,
         contact: true,
         address: true,
+        video: true,
       },
       with: {
         certificationsToListings: {
@@ -211,6 +212,7 @@ export async function getListingPublic(args: GetListingArgs) {
       contact,
       certificationsToListings,
       address,
+      video,
     } = listing;
 
     return {
@@ -223,6 +225,7 @@ export async function getListingPublic(args: GetListingArgs) {
       certifications: certificationsToListings.map((c) => c.certification),
       address,
       contact,
+      video,
     } satisfies PublicListing;
   } catch (err) {
     console.error(err);

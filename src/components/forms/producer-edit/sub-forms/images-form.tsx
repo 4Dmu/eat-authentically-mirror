@@ -10,7 +10,7 @@ import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { FileImage } from "@/components/file-image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useStore } from "@tanstack/react-form";
+import { Field, useStore } from "@tanstack/react-form";
 import { FieldInfo } from "../../helpers/field-info";
 import Image from "next/image";
 import {
@@ -40,7 +40,10 @@ export const { useAppForm, withForm } = createFormHook({
 
 export const imagesOpts = formOptions({
   defaultValues: {
-    images: [] as (typeof editListingFormImagesValidator.infer)["images"],
+    images: {
+      items: [],
+      primaryImgId: null,
+    } as (typeof editListingFormImagesValidator.infer)["images"],
   },
 });
 
@@ -69,7 +72,7 @@ export const ImagesForm = withForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            Images ( {images?.length ?? 0}/{maxFiles})
+            Images ( {images?.items.length ?? 0}/{maxFiles})
           </CardTitle>
           <CardDescription>
             <span className="capitalize">
@@ -88,34 +91,59 @@ export const ImagesForm = withForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form.Field name="images" mode="array">
+          <form.Field name="images">
             {(field) => (
               <div className="flex flex-col gap-3">
                 <Label>Add Images</Label>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
-                  {field.state.value?.map((value, i) => (
+                  {field.state.value?.items.map((value, i) => (
                     <div className="flex flex-col gap-1 relative" key={i}>
                       <div className="p-2 flex gap-2 justify-end w-full absolute top-2 right-2">
-                        <form.Field name={`images[${i}].isPrimary`}>
+                        <form.Field name={`images.items[${i}]`}>
                           {(subField) => (
                             <CheckboxPrimitive.Root
-                              checked={subField.state.value}
+                              checked={
+                                (subField.state.value._type === "upload" &&
+                                  subField.state.value.isPrimary) ||
+                                (subField.state.value._type == "cloudflare" &&
+                                  field.state.value.primaryImgId ===
+                                    subField.state.value.cloudflareId)
+                              }
                               onCheckedChange={(r) => {
                                 if (r === true && field.state.value) {
-                                  const newValue = setProperty(
-                                    field.state.value,
-                                    "isPrimary",
-                                    false
+                                  const newValue = field.state.value.items.map(
+                                    (f) =>
+                                      f._type == "cloudflare"
+                                        ? { ...f }
+                                        : { ...f, isPrimary: false }
                                   );
-                                  newValue[i].isPrimary = true;
-                                  field.handleChange([...newValue]);
+
+                                  const item = newValue[i];
+
+                                  if (item._type === "upload") {
+                                    item.isPrimary = true;
+                                    newValue[i] = item;
+                                  }
+
+                                  field.handleChange({
+                                    items: [...newValue],
+                                    primaryImgId:
+                                      item._type === "cloudflare"
+                                        ? item.cloudflareId
+                                        : null,
+                                  });
                                 } else if (r === false && field.state.value) {
-                                  const newValue = setProperty(
-                                    field.state.value,
-                                    "isPrimary",
-                                    false
+                                  const newValue = field.state.value.items.map(
+                                    (f) =>
+                                      f._type == "cloudflare"
+                                        ? { ...f }
+                                        : { ...f, isPrimary: false }
                                   );
-                                  field.handleChange([...newValue]);
+
+                                  field.handleChange({
+                                    items: [...newValue],
+                                    primaryImgId: null,
+                                  });
                                 }
                               }}
                               data-slot="checkbox"
@@ -133,7 +161,7 @@ export const ImagesForm = withForm({
                           )}
                         </form.Field>
                         {value._type === "upload" && (
-                          <form.Field name={`images[${i}].file`}>
+                          <form.Field name={`images.items[${i}].file`}>
                             {(subField) => (
                               <SelectFileButton
                                 maxFileSize={200000000}
@@ -179,31 +207,37 @@ export const ImagesForm = withForm({
                     </div>
                   ))}
                 </div>
-                <TemporyFilesSelectButton
-                  maxFiles={maxFiles - (field.state.value?.length ?? 0)}
-                  mimeType="image/*"
-                  onSelectMoreFilesThanAllowed={() => {
-                    console.log("ok");
-                    toast.error(
-                      `Upgrade to select more than ${maxFiles} files.`
-                    );
-                  }}
-                  onSelect={(files) => {
-                    console.log(files);
-                    files.forEach((file) =>
-                      field.pushValue({
-                        _type: "upload",
-                        file: file,
-                        isPrimary:
-                          field.state.value === undefined
-                            ? true
-                            : field.state.value.length === 0,
-                      })
-                    );
-                  }}
-                >
-                  Add Images
-                </TemporyFilesSelectButton>
+                <form.Field name="images.items" mode="array">
+                  {(subField) => (
+                    <TemporyFilesSelectButton
+                      maxFiles={
+                        maxFiles - (field.state.value?.items.length ?? 0)
+                      }
+                      mimeType="image/*"
+                      onSelectMoreFilesThanAllowed={() => {
+                        console.log("ok");
+                        toast.error(
+                          `Upgrade to select more than ${maxFiles} files.`
+                        );
+                      }}
+                      onSelect={(files) => {
+                        console.log(files);
+                        files.forEach((file) =>
+                          subField.pushValue({
+                            _type: "upload",
+                            file: file,
+                            isPrimary:
+                              field.state.value === undefined
+                                ? true
+                                : subField.state.value.length === 0,
+                          })
+                        );
+                      }}
+                    >
+                      Add Images
+                    </TemporyFilesSelectButton>
+                  )}
+                </form.Field>
                 <FieldInfo field={field} />
               </div>
             )}

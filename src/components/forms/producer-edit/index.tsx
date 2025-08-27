@@ -71,7 +71,7 @@ export function ProducerEditForm(props: {
 
   const imagesForm = useImagesForm({
     defaultValues: {
-      images: listingQuery.data?.images ?? [],
+      images: listingQuery.data?.images ?? { items: [], primaryImgId: null },
     } satisfies typeof editListingFormImagesValidator.infer as typeof editListingFormImagesValidator.infer,
     validators: {
       onChange: ({ formApi }) =>
@@ -140,10 +140,10 @@ export function ProducerEditForm(props: {
     const toReset = [];
 
     if (imagesForm.state.isValid && imagesForm.state.isDirty) {
-      const existingImages = imagesForm.state.values.images.filter(
+      const existingImages = imagesForm.state.values.images.items.filter(
         (x) => x._type === "cloudflare"
       );
-      const toUpload = imagesForm.state.values.images.filter(
+      const toUpload = imagesForm.state.values.images.items.filter(
         (x) => x._type === "upload"
       );
 

@@ -17,6 +17,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { countryByAlpha3Code } from "@/utils/contries";
+import { Stream } from "@/components/stream";
 
 export default async function ListingPage({
   params,
@@ -49,9 +50,13 @@ export default async function ListingPage({
           <Card className="pt-0 overflow-hidden flex-5/8">
             <Carousel>
               <CarouselContent>
-                {listing.images
+                {listing.images.items
                   .toSorted((a, b) =>
-                    a.isPrimary && b.isPrimary ? 0 : a.isPrimary ? -1 : 1
+                    listing.images.primaryImgId === a.cloudflareId
+                      ? 1
+                      : listing.images.primaryImgId === b.cloudflareId
+                      ? -1
+                      : 0
                   )
                   .map((img) => (
                     <CarouselItem key={img.cloudflareId}>
@@ -65,6 +70,18 @@ export default async function ListingPage({
                       />
                     </CarouselItem>
                   ))}
+                {listing.video && listing.video.status === "ready" && (
+                  <CarouselItem>
+                    <Stream
+                      responsive={false}
+                      width="100%"
+                      height="100%"
+                      className="object-cover h-full w-full"
+                      controls
+                      src={listing.video.uid}
+                    />
+                  </CarouselItem>
+                )}
               </CarouselContent>
               <CarouselNext />
               <CarouselPrevious />
