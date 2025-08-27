@@ -14,33 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { Certification } from "@/backend/validators/listings";
 import { useStore } from "@tanstack/react-form";
-import { editListingFormCertificationsValidator } from "@/backend/validators/listings";
-import {
-  createFormHook,
-  createFormHookContexts,
-  formOptions,
-} from "@tanstack/react-form";
-
-export const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
-
-export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {},
-  formComponents: {},
-  fieldContext,
-  formContext,
-});
-
-export const certificationsOpts = formOptions({
-  defaultValues: {
-    certifications: [],
-  } satisfies typeof editListingFormCertificationsValidator.infer as typeof editListingFormCertificationsValidator.infer,
-});
-
-export const useCertificationsForm = useAppForm;
+import { emptyOptions, withForm } from "../form";
 
 export const CertificationsForm = withForm({
-  ...certificationsOpts,
+  ...emptyOptions,
   props: {
     tier: "Free" as SubTier,
     certifications: [] as Certification[],

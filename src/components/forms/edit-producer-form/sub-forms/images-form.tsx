@@ -19,38 +19,11 @@ import {
 } from "@/components/select-file-button";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon, RotateCwIcon, XIcon } from "lucide-react";
-import { setProperty } from "@/utils/array";
 import { toast } from "sonner";
-import { editListingFormImagesValidator } from "@/backend/validators/listings";
-import {
-  createFormHook,
-  createFormHookContexts,
-  formOptions,
-} from "@tanstack/react-form";
-
-export const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
-
-export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {},
-  formComponents: {},
-  fieldContext,
-  formContext,
-});
-
-export const imagesOpts = formOptions({
-  defaultValues: {
-    images: {
-      items: [],
-      primaryImgId: null,
-    } as (typeof editListingFormImagesValidator.infer)["images"],
-  },
-});
-
-export const useImagesForm = useAppForm;
+import { emptyOptions, withForm } from "../form";
 
 export const ImagesForm = withForm({
-  ...imagesOpts,
+  ...emptyOptions,
   props: {
     tier: "Free" as SubTier,
   },

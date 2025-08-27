@@ -8,39 +8,16 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { editListingFormVideoValidator } from "@/backend/validators/listings";
-import {
-  createFormHook,
-  createFormHookContexts,
-  formOptions,
-} from "@tanstack/react-form";
 import { match } from "ts-pattern";
 import { TemporyFileSelectButton } from "@/components/select-file-button";
 import { FileVideo } from "@/components/file-video";
 import { toast } from "sonner";
 import { RotateCwIcon, XIcon } from "lucide-react";
 import { Stream } from "@cloudflare/stream-react";
-
-export const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
-
-export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {},
-  formComponents: {},
-  fieldContext,
-  formContext,
-});
-
-export const videoOpts = formOptions({
-  defaultValues: {
-    video: null,
-  } as typeof editListingFormVideoValidator.infer,
-});
-
-export const useVideoForm = useAppForm;
+import { emptyOptions, withForm } from "../form";
 
 export const VideoForm = withForm({
-  ...videoOpts,
+  ...emptyOptions,
   props: {
     tier: "Free" as SubTier,
   },

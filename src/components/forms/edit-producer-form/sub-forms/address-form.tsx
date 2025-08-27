@@ -23,25 +23,10 @@ import {
   formOptions,
 } from "@tanstack/react-form";
 import { COUNTRIES } from "@/utils/contries";
-
-export const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
-
-export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {},
-  formComponents: {},
-  fieldContext,
-  formContext,
-});
-
-export const addressOpts = formOptions({
-  defaultValues: {} as typeof editListingFormAddressValidator.infer,
-});
-
-export const useAddressForm = useAppForm;
+import { emptyOptions, withForm } from "../form";
 
 export const AddressForm = withForm({
-  ...addressOpts,
+  ...emptyOptions,
   render: function ({ form }) {
     return (
       <>
@@ -54,7 +39,7 @@ export const AddressForm = withForm({
             </CardDescription>
           </CardHeader>
           <CardContent className="gap-5 flex flex-col">
-            <form.Field name="street">
+            <form.Field name="address.street">
               {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Street Address</Label>
@@ -72,7 +57,7 @@ export const AddressForm = withForm({
             </form.Field>
 
             <div className="grid grid-cols-2 gap-3">
-              <form.Field name="city">
+              <form.Field name="address.city">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>City</Label>
@@ -88,7 +73,7 @@ export const AddressForm = withForm({
                   </div>
                 )}
               </form.Field>
-              <form.Field name="zip">
+              <form.Field name="address.zip">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>Postal Code</Label>
@@ -107,7 +92,7 @@ export const AddressForm = withForm({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <form.Field name="state">
+              <form.Field name="address.state">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>State</Label>
@@ -124,7 +109,7 @@ export const AddressForm = withForm({
                 )}
               </form.Field>
 
-              <form.Field name="country">
+              <form.Field name="address.country">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>Country</Label>
@@ -162,10 +147,10 @@ export const AddressForm = withForm({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form.Field name="coordinate">
+            <form.Field name="address.coordinate">
               {(field) => (
                 <div className="grid grid-cols-2 gap-3">
-                  <form.Field name="coordinate.latitude">
+                  <form.Field name="address.coordinate.latitude">
                     {(subField) => (
                       <div className="flex flex-col gap-3">
                         <Label>Lattitude</Label>
@@ -204,7 +189,7 @@ export const AddressForm = withForm({
                       </div>
                     )}
                   </form.Field>
-                  <form.Field name="coordinate.longitude">
+                  <form.Field name="address.coordinate.longitude">
                     {(subField) => (
                       <div className="flex flex-col gap-3">
                         <Label>Longitude</Label>

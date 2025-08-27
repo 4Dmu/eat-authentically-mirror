@@ -30,15 +30,9 @@ export const ListListingsArgsValidator = type({
 export const GetListingArgsValidator = type({ id: "string.uuid" });
 
 export const ContactValidator = type({
-  email: "string.email|null",
-  phone: "string|null",
-  website: "string.url|null",
-});
-
-export const contactValidator = z.object({
-  email: z.email(),
-  phone: z.string(),
-  website: z.url(),
+  "email?": "string.email|null",
+  "phone?": "string|null",
+  "website?": "string.url|null",
 });
 
 export const EmptyContactValidator = type({
@@ -128,6 +122,52 @@ export const ListingValidator = type({
   socialMedia: SocialMediaValidator,
 });
 
+export const editListingFormValidator = type({
+  name: "string",
+  type: ListingTypesValidator,
+  about: "string|null",
+  address: AddressValidator,
+  contact: {
+    "email?": "string.email|null",
+    "phone?": "string|null",
+    "website?": "string.url|null",
+  },
+  images: type({
+    primaryImgId: "string|null",
+    items: type({
+      _type: "'upload'",
+      file: "File",
+      isPrimary: "boolean",
+    })
+      .or(ImageDataValidator)
+      .array(),
+  }).narrow((data, ctx) => {
+    if (
+      (data.primaryImgId && data.items.length === 0) ||
+      (data.primaryImgId &&
+        data.items.length > 0 &&
+        !data.items.some(
+          (i) =>
+            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId
+        ))
+    ) {
+      return ctx.reject({
+        message: "Invalid primary image id",
+      });
+    }
+    return true;
+  }),
+  video: VideoValidator.or(type({ _type: "'upload'", file: "File" })).or(
+    type.null
+  ),
+  certifications: CertificationValidator.array(),
+  commodities: type({
+    name: "string",
+    varieties: type.string.array(),
+  }).array(),
+  socialMedia: SocialMediaValidator.or("null"),
+});
+
 export const editListingFormBasicInfoValidator = type({
   name: "string",
   type: ListingTypesValidator,
@@ -135,9 +175,9 @@ export const editListingFormBasicInfoValidator = type({
 });
 
 export const editListingFormContactValidator = type({
-  email: "string.email|null",
-  phone: "string|null",
-  website: "string.url|null",
+  "email?": "string.email|null",
+  "phone?": "string|null|null",
+  "website?": "string.url|null",
 });
 
 export const editListingFormAddressValidator = AddressValidator;
@@ -195,11 +235,18 @@ export const editListingFormSocialMediaValidator =
 
 export const editListingArgsValidator = type({
   listingId: type("string"),
-  basicInfo: editListingFormBasicInfoValidator.optional(),
+  "name?": "string",
+  "type?": ListingTypesValidator,
+  "about?": "string|null",
   contact: editListingFormContactValidator.optional(),
   address: editListingFormAddressValidator.optional(),
-  certifications: editListingFormCertificationsValidator.optional(),
-  commodities: editListingFormProductsValidator.optional(),
+  certifications: CertificationValidator.array().optional(),
+  commodities: type({
+    name: "string",
+    varieties: type.string.array(),
+  })
+    .array()
+    .optional(),
   socialMedia: editListingFormSocialMediaValidator.optional(),
 });
 

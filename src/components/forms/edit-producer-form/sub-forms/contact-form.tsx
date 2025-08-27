@@ -3,38 +3,10 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { FieldInfo } from "../../helpers/field-info";
-import { editListingFormContactValidator } from "@/backend/validators/listings";
-import {
-  createFormHook,
-  createFormHookContexts,
-  formOptions,
-} from "@tanstack/react-form";
-
-export const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
-
-export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {},
-  formComponents: {},
-  fieldContext,
-  formContext,
-});
-
-export const contactOpts = formOptions({
-  defaultValues: {
-    email:
-      undefined as unknown as (typeof editListingFormContactValidator.infer)["email"],
-    phone:
-      undefined as unknown as (typeof editListingFormContactValidator.infer)["phone"],
-    website:
-      undefined as unknown as (typeof editListingFormContactValidator.infer)["website"],
-  },
-});
-
-export const useContactForm = useAppForm;
+import { emptyOptions, withForm } from "../form";
 
 export const ContactForm = withForm({
-  ...contactOpts,
+  ...emptyOptions,
   render: function ({ form }) {
     return (
       <Card>
@@ -43,7 +15,7 @@ export const ContactForm = withForm({
         </CardHeader>
         <CardContent className="gap-5 flex flex-col">
           <div className="grid grid-cols-2 gap-3">
-            <form.Field name="phone">
+            <form.Field name="contact.phone">
               {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Phone</Label>
@@ -63,7 +35,7 @@ export const ContactForm = withForm({
                 </div>
               )}
             </form.Field>
-            <form.Field name="email">
+            <form.Field name="contact.email">
               {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Business Email</Label>
@@ -84,7 +56,7 @@ export const ContactForm = withForm({
               )}
             </form.Field>
           </div>
-          <form.Field name="website">
+          <form.Field name="contact.website">
             {(subField) => (
               <div className="flex flex-col gap-3">
                 <Label>Website</Label>

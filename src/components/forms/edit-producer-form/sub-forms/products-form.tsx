@@ -8,36 +8,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PlusIcon, XIcon } from "lucide-react";
-
-import { editListingFormProductsValidator } from "@/backend/validators/listings";
-import {
-  createFormHook,
-  createFormHookContexts,
-  formOptions,
-} from "@tanstack/react-form";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-
-export const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
-
-export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {},
-  formComponents: {},
-  fieldContext,
-  formContext,
-});
-
-export const productsOpts = formOptions({
-  defaultValues: {
-    commodities: [],
-  } satisfies typeof editListingFormProductsValidator.infer as typeof editListingFormProductsValidator.infer,
-});
-
-export const useProductsForm = useAppForm;
+import { emptyOptions, withForm } from "../form";
 
 export const ProductsForm = withForm({
-  ...productsOpts,
+  ...emptyOptions,
   render: function Render({ form }) {
     const [name, setName] = useState("");
     return (

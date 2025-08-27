@@ -11,35 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { FieldInfo } from "../../helpers/field-info";
-import { editListingFormBasicInfoValidator } from "@/backend/validators/listings";
-import {
-  createFormHook,
-  createFormHookContexts,
-  formOptions,
-} from "@tanstack/react-form";
-
-export const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
-
-export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {},
-  formComponents: {},
-  fieldContext,
-  formContext,
-});
-
-export const basicInfoOpts = formOptions({
-  defaultValues: {
-    name: "" as (typeof editListingFormBasicInfoValidator.infer)["name"],
-    type: "farm" as (typeof editListingFormBasicInfoValidator.infer)["type"],
-    about: null as (typeof editListingFormBasicInfoValidator.infer)["about"],
-  },
-});
-
-export const useBasicInfoForm = useAppForm;
+import { emptyOptions, withForm } from "../form";
 
 export const BasicInfoForm = withForm({
-  ...basicInfoOpts,
+  ...emptyOptions,
   render: function Render({ form }) {
     return (
       <Card>

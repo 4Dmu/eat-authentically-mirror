@@ -4,7 +4,7 @@ import { Certification } from "@/backend/db/schema";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Listing } from "@/backend/validators/listings";
 import { BackButton } from "@/components/back-button";
-import { ProducerEditForm } from "@/components/forms/producer-edit";
+import { ProducerEditForm } from "@/components/forms/edit-producer-form";
 
 export function ListingPageClient({
   listing,
