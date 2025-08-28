@@ -178,7 +178,7 @@ export const createBillingPortalSession = authenticatedActionClient
     }
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${env.SITE_URL}/billing/success?redirect_path=${redirectPath}`,
+      return_url: `${env.SITE_URL}/dashboard/billing/success?redirect_path=${redirectPath}`,
     });
 
     return session.url;

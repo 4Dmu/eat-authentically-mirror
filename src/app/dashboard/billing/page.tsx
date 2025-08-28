@@ -21,7 +21,7 @@ export default async function Page() {
   }
 
   const url = await createBillingPortalSession({
-    redirectPath: `${env.SITE_URL}/dashboard`,
+    redirectPath: `/dashboard`,
   });
 
   redirect(url);

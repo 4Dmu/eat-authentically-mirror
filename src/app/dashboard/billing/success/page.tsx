@@ -1,7 +1,7 @@
 import { triggerStripeSync } from "@/backend/rpc/stripe";
+import ClientRedirect from "@/components/client-redirect";
 import { tryCatch } from "@/utils/try-catch";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ async function ConfirmStripeSessionComponent({
   console.log("user", user);
   const { error } = await tryCatch(triggerStripeSync)();
   if (error) return <div>Failed to sync with stripe: {error.message}</div>;
-  return redirect(redirectPath);
+  return <ClientRedirect to={redirectPath} />;
 }
 
 export default async function SuccessPage({
