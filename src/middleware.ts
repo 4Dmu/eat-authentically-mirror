@@ -3,7 +3,7 @@ import { getSubTier } from "./backend/rpc/utils/get-sub-tier";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
-  "/listing(.*)",
+  "/producers(.*)",
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",

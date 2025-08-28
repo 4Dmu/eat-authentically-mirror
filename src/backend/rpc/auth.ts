@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server";
 import { actionClient } from "./helpers/safe-action";
 import { USER_DATA_KV } from "../kv";
 import { getSubTier, SubTier } from "./utils/get-sub-tier";
-import { Plan } from "../stripe/subscription-plans";
 import { getUsersProducerIdsCached } from "../data/producer";
 
 export const fetchSubTier = actionClient.action(async (): Promise<SubTier> => {

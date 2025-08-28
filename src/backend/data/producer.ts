@@ -2,10 +2,10 @@ import type {
   GetProducerArgs,
   ListProducerArgs,
   PublicProducer,
-} from "@/backend/validators/listings";
+} from "@/backend/validators/producers";
 import { db } from "../db";
 import { and, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
-import { certificationsToListings, producers } from "../db/schema";
+import { certificationsToProducers, producers } from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 
@@ -23,7 +23,7 @@ export async function getUsersProducerIdsCached(userId: string) {
     .then((r) => r.map((i) => i.id));
 }
 
-const orderListingsByScrapedMetadata = sql`
+const orderProducersByScrapedMetadata = sql`
   CASE
     WHEN scrapeMeta IS NOT NULL THEN 1
     ELSE 0
@@ -38,7 +38,7 @@ const orderListingsByScrapedMetadata = sql`
       ELSE 1
     END`;
 
-export async function listListingsPublic(args: ListProducerArgs) {
+export async function listProducersPublic(args: ListProducerArgs) {
   try {
     const limit = 100;
     const offest = args.page * limit;
@@ -54,10 +54,10 @@ export async function listListingsPublic(args: ListProducerArgs) {
         inArray(
           producers.id,
           db
-            .select({ listingId: certificationsToListings.listingId })
-            .from(certificationsToListings)
+            .select({ listingId: certificationsToProducers.listingId })
+            .from(certificationsToProducers)
             .where(
-              inArray(certificationsToListings.certificationId, args.certs)
+              inArray(certificationsToProducers.certificationId, args.certs)
             )
         )
       );
@@ -74,8 +74,8 @@ export async function listListingsPublic(args: ListProducerArgs) {
       );
     }
 
-    const listingsQuery = await db.query.producers.findMany({
-      orderBy: [orderListingsByScrapedMetadata, desc(producers.createdAt)],
+    const producersQuery = await db.query.producers.findMany({
+      orderBy: [orderProducersByScrapedMetadata, desc(producers.createdAt)],
       columns: {
         id: true,
         name: true,
@@ -88,7 +88,7 @@ export async function listListingsPublic(args: ListProducerArgs) {
         video: true,
       },
       with: {
-        certificationsToListings: {
+        certificationsToProducers: {
           columns: {},
           with: {
             certification: true,
@@ -100,12 +100,12 @@ export async function listListingsPublic(args: ListProducerArgs) {
       where: queries.length > 0 ? and(...queries) : undefined,
     });
 
-    const hasNextPage = listingsQuery.length > limit;
-    const paginatedListings = hasNextPage
-      ? listingsQuery.slice(0, limit)
-      : listingsQuery;
+    const hasNextPage = producersQuery.length > limit;
+    const paginatedProducers = hasNextPage
+      ? producersQuery.slice(0, limit)
+      : producersQuery;
 
-    const result = transformers.withCertifications(paginatedListings);
+    const result = transformers.withCertifications(paginatedProducers);
 
     return {
       data: result satisfies PublicProducer[],
@@ -113,11 +113,11 @@ export async function listListingsPublic(args: ListProducerArgs) {
     };
   } catch (err) {
     console.error(err);
-    throw new Error("Error loading listings");
+    throw new Error("Error loading producers");
   }
 }
 
-export async function listListingsPublicLight(args: ListProducerArgs) {
+export async function listProducersPublicLight(args: ListProducerArgs) {
   try {
     const limit = 100;
     const offest = args.page * limit;
@@ -133,10 +133,10 @@ export async function listListingsPublicLight(args: ListProducerArgs) {
         inArray(
           producers.id,
           db
-            .select({ listingId: certificationsToListings.listingId })
-            .from(certificationsToListings)
+            .select({ listingId: certificationsToProducers.listingId })
+            .from(certificationsToProducers)
             .where(
-              inArray(certificationsToListings.certificationId, args.certs)
+              inArray(certificationsToProducers.certificationId, args.certs)
             )
         )
       );
@@ -158,8 +158,8 @@ export async function listListingsPublicLight(args: ListProducerArgs) {
       queries.push(like(producers.name, `%${args.query.toLowerCase()}%`));
     }
 
-    const listingsQuery = await db.query.producers.findMany({
-      orderBy: [orderListingsByScrapedMetadata, desc(producers.createdAt)],
+    const producersQuery = await db.query.producers.findMany({
+      orderBy: [orderProducersByScrapedMetadata, desc(producers.createdAt)],
       columns: {
         id: true,
         name: true,
@@ -170,7 +170,7 @@ export async function listListingsPublicLight(args: ListProducerArgs) {
         address: true,
       },
       with: {
-        certificationsToListings: {
+        certificationsToProducers: {
           columns: {},
           with: {
             certification: true,
@@ -182,12 +182,12 @@ export async function listListingsPublicLight(args: ListProducerArgs) {
       offset: offest,
     });
 
-    const hasNextPage = listingsQuery.length > limit;
-    const paginatedListings = hasNextPage
-      ? listingsQuery.slice(0, limit)
-      : listingsQuery;
+    const hasNextPage = producersQuery.length > limit;
+    const paginatedProducers = hasNextPage
+      ? producersQuery.slice(0, limit)
+      : producersQuery;
 
-    const result = transformers.withCertifications(paginatedListings);
+    const result = transformers.withCertifications(paginatedProducers);
 
     return {
       data: result,
@@ -195,16 +195,16 @@ export async function listListingsPublicLight(args: ListProducerArgs) {
     };
   } catch (err) {
     console.error(err);
-    throw new Error("Error loading listings");
+    throw new Error("Error loading producers");
   }
 }
 
-export async function getListingPublic(args: GetProducerArgs) {
+export async function getProducerPublic(args: GetProducerArgs) {
   try {
     const listing = await db.query.producers.findFirst({
       where: eq(producers.id, args.id),
       with: {
-        certificationsToListings: {
+        certificationsToProducers: {
           columns: {},
           with: {
             certification: true,
@@ -225,7 +225,7 @@ export async function getListingPublic(args: GetProducerArgs) {
       claimed,
       images,
       contact,
-      certificationsToListings,
+      certificationsToProducers,
       address,
       video,
     } = listing;
@@ -237,7 +237,7 @@ export async function getListingPublic(args: GetProducerArgs) {
       about,
       claimed,
       images,
-      certifications: certificationsToListings.map((c) => c.certification),
+      certifications: certificationsToProducers.map((c) => c.certification),
       address,
       contact,
       video,

@@ -24,6 +24,9 @@ export const env = createEnv({
     ORGANIZATION_PREMIUM_MONTHLY_PRICE_ID: z.string().min(1),
     ORGANIZATION_PREMIUM_YEARLY_PRICE_ID: z.string().min(1),
 
+    PRODUCER_ENTERPRISE_MONTHLY_PRICE_ID: z.string().min(1),
+    PRODUCER_ENTERPRISE_YEARLY_PRICE_ID: z.string().min(1),
+
     COMMUNITY_MEMBER_MONTHLY_PRICE_ID: z.string().min(1),
     COMMUNITY_MEMBER_YEARLY_PRICE_ID: z.string().min(1),
     SAFE_CLOUDFLARE_API_TOKEN: z.string().min(1),

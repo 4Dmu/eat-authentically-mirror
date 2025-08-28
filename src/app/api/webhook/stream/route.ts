@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
   const canStream = body.readyToStream && body.status.state === "ready";
 
   const result = await db.run(sql`
-        UPDATE listings
+        UPDATE producers
         SET 
           video = json_set(video, '$.status', ${sql.param(
             canStream ? "ready" : "pending"

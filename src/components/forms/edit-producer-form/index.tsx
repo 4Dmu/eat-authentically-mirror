@@ -23,7 +23,7 @@ import {
   EditProducerArgs,
   editProducerFormValidator,
   Producer,
-} from "@/backend/validators/listings";
+} from "@/backend/validators/producers";
 import { useAppForm } from "./form";
 
 export function ProducerEditForm(props: {

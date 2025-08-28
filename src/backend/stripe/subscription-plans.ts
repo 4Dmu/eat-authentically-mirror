@@ -1,7 +1,7 @@
 import { env } from "@/env";
 
 export type Interval = "month" | "year";
-export type Tier = "community" | "pro" | "premium";
+export type Tier = "community" | "pro" | "premium" | "enterprise";
 
 export type Plan = {
   priceId: string;
@@ -49,6 +49,18 @@ export const PLANS: Record<string, Plan> = {
     tier: "premium",
     interval: "year",
     rank: 6,
+  },
+  [env.PRODUCER_ENTERPRISE_MONTHLY_PRICE_ID]: {
+    priceId: env.PRODUCER_ENTERPRISE_MONTHLY_PRICE_ID,
+    tier: "enterprise",
+    interval: "month",
+    rank: 7,
+  },
+  [env.PRODUCER_ENTERPRISE_YEARLY_PRICE_ID]: {
+    priceId: env.PRODUCER_ENTERPRISE_YEARLY_PRICE_ID,
+    tier: "enterprise",
+    interval: "year",
+    rank: 8,
   },
 };
 

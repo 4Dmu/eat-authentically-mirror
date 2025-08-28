@@ -1,4 +1,4 @@
-import { Address } from "../validators/listings";
+import { Address } from "../validators/producers";
 
 export function normalizeAddress(address: Address) {
   const normalized: Address = {};

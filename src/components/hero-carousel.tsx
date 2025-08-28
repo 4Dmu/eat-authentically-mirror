@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Input } from "./ui/input";
 import { CompassIcon } from "lucide-react";
-import { PRODUCER_TYPES } from "@/backend/validators/listings";
+import { PRODUCER_TYPES } from "@/backend/validators/producers";
 import {
   ChangeEvent,
   KeyboardEvent,

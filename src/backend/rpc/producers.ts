@@ -6,11 +6,11 @@ import {
   Producer,
   producerImagesValidator,
   listProducersArgsValidator,
-} from "../validators/listings";
+} from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
 import { db } from "../db";
-import { certificationsToListings, producers, Video } from "../db/schema";
+import { certificationsToProducers, producers, Video } from "../db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
@@ -23,14 +23,21 @@ import { authenticatedActionClient } from "./helpers/middleware";
 import {
   PublicProducerLight,
   registerProducerArgsValidator,
-} from "../validators/listings";
+} from "../validators/producers";
 import { withCertificationsSingle } from "../utils/transform-data";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
-  .action(async ({ ctx: { userId, orgId }, input }) => {
-    if (orgId) {
-      throw new Error("Already logged in as listing");
+  .action(async ({ ctx: { userId, producerIds }, input }) => {
+    const subTier = await getSubTier(userId);
+    if (
+      subTier !== "Free" &&
+      subTier.tier === "enterprise" &&
+      producerIds.length < 3
+    ) {
+      console.log("multiple");
+    } else if (producerIds.length > 0) {
+      throw new Error("Upgrade to make more then one profile.");
     }
 
     const producerProfileId = crypto.randomUUID();
@@ -67,7 +74,7 @@ export const fetchUserProducer = producerActionClient
           eq(producers.userId, userId)
         ),
         with: {
-          certificationsToListings: {
+          certificationsToProducers: {
             with: {
               certification: true,
             },
@@ -88,7 +95,7 @@ export const fetchUserProducers = producerActionClient.action(
           eq(producers.userId, userId)
         ),
         with: {
-          certificationsToListings: {
+          certificationsToProducers: {
             with: {
               certification: true,
             },
@@ -112,7 +119,7 @@ export const fetchUserProducerLight = producerActionClient
           eq(producers.userId, userId)
         ),
         with: {
-          certificationsToListings: {
+          certificationsToProducers: {
             with: {
               certification: true,
             },
@@ -126,11 +133,11 @@ export const fetchUserProducerLight = producerActionClient
 
 export const listProducersPublic = actionClient
   .input(listProducersArgsValidator)
-  .action(async ({ input }) => await listing.listListingsPublic(input));
+  .action(async ({ input }) => await listing.listProducersPublic(input));
 
 export const listProducersPublicLight = actionClient
   .input(listProducersArgsValidator)
-  .action(async ({ input }) => await listing.listListingsPublicLight(input));
+  .action(async ({ input }) => await listing.listProducersPublicLight(input));
 
 export const listCertificationTypesPublic = actionClient.action(
   async () => await listing.listCertificationTypesPublic()
@@ -138,7 +145,7 @@ export const listCertificationTypesPublic = actionClient.action(
 
 export const getProducerPublic = actionClient
   .input(getProducersArgsValidator)
-  .action(async ({ input }) => await listing.getListingPublic(input));
+  .action(async ({ input }) => await listing.getProducerPublic(input));
 
 export const editProducer = producerActionClient
   .input(editProducerArgsValidator)
@@ -190,7 +197,7 @@ export const editProducer = producerActionClient
           ),
           columns: {},
           with: {
-            certificationsToListings: {
+            certificationsToProducers: {
               columns: {},
               with: {
                 certification: true,
@@ -211,16 +218,16 @@ export const editProducer = producerActionClient
 
         try {
           if (addedCerts.length > 0) {
-            await db.insert(certificationsToListings).values(
+            await db.insert(certificationsToProducers).values(
               addedCerts.map((cert) => ({
                 listingId: producer.id,
                 certificationId: cert.id,
               }))
             );
           }
-          await db.delete(certificationsToListings).where(
+          await db.delete(certificationsToProducers).where(
             inArray(
-              certificationsToListings.certificationId,
+              certificationsToProducers.certificationId,
               removedCerts.map((c) => c.id)
             )
           );
@@ -229,7 +236,7 @@ export const editProducer = producerActionClient
         }
       } else {
         try {
-          await db.insert(certificationsToListings).values(
+          await db.insert(certificationsToProducers).values(
             input.certifications.map((cert) => ({
               listingId: producer.id,
               certificationId: cert.id,
@@ -515,7 +522,7 @@ export const confirmPengingUpload = producerActionClient
         }
 
         if (pendingData?.isPrimary === true) {
-          images.primaryImgId === pendingData.id;
+          images.primaryImgId = pendingData.id;
         }
 
         images.items.push({

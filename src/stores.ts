@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import {
   RegisterProducerArgs,
-  ListingTypes,
-} from "@/backend/validators/listings";
+  ProducerTypes,
+} from "@/backend/validators/producers";
 
 type CertificationFilter = {
   id: string;
@@ -12,12 +12,12 @@ type CertificationFilter = {
 
 export type HomePageState = {
   page: number;
-  typeFilter: ListingTypes | undefined;
+  typeFilter: ProducerTypes | undefined;
   query: string | undefined;
   certs: CertificationFilter[];
   locationSearchArea: google.maps.LatLngBounds | undefined;
   setPage: (page: number | ((current: number) => number)) => void;
-  setTypeFilter: (type: ListingTypes | undefined) => void;
+  setTypeFilter: (type: ProducerTypes | undefined) => void;
   setQuery: (query: string | undefined) => void;
   setCerts: (certs: CertificationFilter[]) => void;
   setLocationSearchArea: (

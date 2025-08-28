@@ -2,26 +2,26 @@ import type * as schema from "../db/schema";
 
 export function withCertifications<
   T extends {
-    certificationsToListings: {
+    certificationsToProducers: {
       certification: typeof schema.certifications.$inferSelect;
     }[];
   }
 >(data: T[]) {
-  return data.map(({ certificationsToListings, ...l }) => ({
+  return data.map(({ certificationsToProducers, ...l }) => ({
     ...l,
-    certifications: certificationsToListings.map((cl) => cl.certification),
+    certifications: certificationsToProducers.map((cl) => cl.certification),
   }));
 }
 
 export function withCertificationsSingle<
   T extends {
-    certificationsToListings: {
+    certificationsToProducers: {
       certification: typeof schema.certifications.$inferSelect;
     }[];
   }
->({ certificationsToListings, ...rest }: T) {
+>({ certificationsToProducers, ...rest }: T) {
   return {
     ...rest,
-    certifications: certificationsToListings.map((cl) => cl.certification),
+    certifications: certificationsToProducers.map((cl) => cl.certification),
   };
 }

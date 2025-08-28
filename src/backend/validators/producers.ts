@@ -6,7 +6,7 @@ export const PRODUCER_TYPES = [
   "farm",
   "ranch",
   "eatery",
-] as const satisfies ListingTypes[];
+] as const satisfies ProducerTypes[];
 
 export const producerTypesValidator = type("'farm'|'ranch'|'eatery'");
 
@@ -195,7 +195,7 @@ export type GetProducerArgs = typeof getProducersArgsValidator.infer;
 
 export type RegisterProducerArgs = typeof registerProducerArgsValidator.infer;
 
-export type ListingTypes = typeof producerTypesValidator.infer;
+export type ProducerTypes = typeof producerTypesValidator.infer;
 
 export type SocialMedia = typeof socialMediaValidator.infer;
 

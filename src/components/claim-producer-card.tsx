@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "./ui/button";
 
-export function ClaimListingCard({ name }: { name: string }) {
+export function ClaimProducerCard({ name }: { name: string }) {
   return (
     <Card className="bg-amber-300">
       <CardHeader>

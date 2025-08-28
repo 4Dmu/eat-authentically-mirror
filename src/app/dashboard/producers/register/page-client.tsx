@@ -21,7 +21,7 @@ import {
   PRODUCER_TYPES,
   registerProducerArgsValidator,
   RegisterProducerArgs,
-} from "@/backend/validators/listings";
+} from "@/backend/validators/producers";
 import {
   Form,
   FormControl,

@@ -1,14 +1,14 @@
-import { getListingPublic } from "@/backend/data/producer";
+import { getProducerPublic } from "@/backend/data/producer";
 import { BackButton } from "@/components/back-button";
 import { AddToPinboardButton } from "@/components/pinboard";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { listingSlug } from "@/utils/producers";
+import { producerSlug } from "@/utils/producers";
 import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
-import { ClaimListingCard } from "@/components/claim-listing-card";
+import { ClaimProducerCard } from "@/components/claim-producer-card";
 import {
   Carousel,
   CarouselContent,
@@ -19,7 +19,7 @@ import {
 import { countryByAlpha3Code } from "@/utils/contries";
 import { Stream } from "@/components/stream";
 
-export default async function ListingPage({
+export default async function ProducerPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -28,15 +28,15 @@ export default async function ListingPage({
   const id = slug.substring(slug.length - 36);
   const receivedSlug = slug.substring(0, slug.length - 36);
 
-  const listing = await getListingPublic({ id: id });
+  const producer = await getProducerPublic({ id: id });
 
-  if (!listing) {
+  if (!producer) {
     notFound();
   }
 
-  const correctSlug = listingSlug(listing.name);
+  const correctSlug = producerSlug(producer.name);
   if (receivedSlug !== correctSlug) {
-    redirect(`${correctSlug}${listing.id}`);
+    redirect(`${correctSlug}${producer.id}`);
   }
 
   return (
@@ -50,11 +50,11 @@ export default async function ListingPage({
           <Card className="pt-0 overflow-hidden flex-5/8">
             <Carousel>
               <CarouselContent>
-                {listing.images.items
+                {producer.images.items
                   .toSorted((a, b) =>
-                    listing.images.primaryImgId === a.cloudflareId
+                    producer.images.primaryImgId === a.cloudflareId
                       ? -1
-                      : listing.images.primaryImgId === b.cloudflareId
+                      : producer.images.primaryImgId === b.cloudflareId
                       ? 1
                       : 0
                   )
@@ -70,7 +70,7 @@ export default async function ListingPage({
                       />
                     </CarouselItem>
                   ))}
-                {listing.video && listing.video.status === "ready" && (
+                {producer.video && producer.video.status === "ready" && (
                   <CarouselItem>
                     <Stream
                       responsive={false}
@@ -78,7 +78,7 @@ export default async function ListingPage({
                       height="100%"
                       className="object-cover h-full w-full"
                       controls
-                      src={listing.video.uid}
+                      src={producer.video.uid}
                     />
                   </CarouselItem>
                 )}
@@ -87,11 +87,11 @@ export default async function ListingPage({
               <CarouselPrevious />
             </Carousel>
             <CardHeader>
-              <h1 className="font-bold text-4xl">{listing.name}</h1>
-              <Badge>{listing.type}</Badge>
+              <h1 className="font-bold text-4xl">{producer.name}</h1>
+              <Badge>{producer.type}</Badge>
             </CardHeader>
             <CardContent className="whitespace-break-spaces">
-              {listing.about}
+              {producer.about}
             </CardContent>
           </Card>
           <div className="flex-3/8 flex flex-col gap-5">
@@ -100,7 +100,7 @@ export default async function ListingPage({
                 <CardTitle>Contact</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-5">
-                {listing.contact?.email && (
+                {producer.contact?.email && (
                   <div className="flex flex-col gap-2">
                     <Label>
                       <MailIcon size={20} />
@@ -108,13 +108,13 @@ export default async function ListingPage({
                     </Label>
                     <a
                       className="underline"
-                      href={`mailto:${listing.contact?.email}`}
+                      href={`mailto:${producer.contact?.email}`}
                     >
-                      {listing.contact?.email}
+                      {producer.contact?.email}
                     </a>
                   </div>
                 )}
-                {listing.contact?.phone && (
+                {producer.contact?.phone && (
                   <div className="flex flex-col gap-2">
                     <Label>
                       <PhoneIcon size={20} />
@@ -122,20 +122,20 @@ export default async function ListingPage({
                     </Label>
                     <a
                       className="underline"
-                      href={`tel:${listing.contact?.phone}`}
+                      href={`tel:${producer.contact?.phone}`}
                     >
-                      {listing.contact?.phone}
+                      {producer.contact?.phone}
                     </a>
                   </div>
                 )}
-                {listing.contact?.website && (
+                {producer.contact?.website && (
                   <div className="flex flex-col gap-2">
                     <Label>
                       <GlobeIcon size={20} />
                       Website
                     </Label>
-                    <a className="underline" href={listing.contact?.website}>
-                      {listing.contact?.website}
+                    <a className="underline" href={producer.contact?.website}>
+                      {producer.contact?.website}
                     </a>
                   </div>
                 )}
@@ -144,18 +144,18 @@ export default async function ListingPage({
                     <MapPin size={20} />
                     Map
                   </Label>
-                  {listing?.address && (
+                  {producer?.address && (
                     <div>
-                      {listing.address.street}, {listing.address.city},{" "}
-                      {listing.address.state}, {listing.address.zip},{" "}
-                      {listing.address.country &&
-                        countryByAlpha3Code(listing.address.country).name}
+                      {producer.address.street}, {producer.address.city},{" "}
+                      {producer.address.state}, {producer.address.zip},{" "}
+                      {producer.address.country &&
+                        countryByAlpha3Code(producer.address.country).name}
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
-            {!listing.claimed && <ClaimListingCard name={listing.name} />}
+            {!producer.claimed && <ClaimProducerCard name={producer.name} />}
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ import {
   type ImageData,
   type Address,
   PRODUCER_TYPES,
-} from "@/backend/validators/listings";
+} from "@/backend/validators/producers";
 
 export type Video = {
   url: string;
@@ -72,8 +72,8 @@ export const producers = sqliteTable("producers", {
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
 
-export const listingsRelations = relations(producers, ({ many }) => ({
-  certificationsToListings: many(certificationsToListings),
+export const producersRelations = relations(producers, ({ many }) => ({
+  certificationsToProducers: many(certificationsToProducers),
 }));
 
 export const certifications = sqliteTable("certifications", {
@@ -87,12 +87,12 @@ export const certifications = sqliteTable("certifications", {
 export const certificationsRelations = relations(
   certifications,
   ({ many }) => ({
-    certificationsToListings: many(certificationsToListings),
+    certificationsToProducers: many(certificationsToProducers),
   })
 );
 
-export const certificationsToListings = sqliteTable(
-  "certifications_to_listings",
+export const certificationsToProducers = sqliteTable(
+  "certifications_to_producers",
   {
     certificationId: text()
       .notNull()
@@ -104,15 +104,15 @@ export const certificationsToListings = sqliteTable(
   (t) => [primaryKey({ columns: [t.certificationId, t.listingId] })]
 );
 
-export const certificationsToListingsRelations = relations(
-  certificationsToListings,
+export const certificationsToProducersRelations = relations(
+  certificationsToProducers,
   ({ one }) => ({
     certification: one(certifications, {
-      fields: [certificationsToListings.certificationId],
+      fields: [certificationsToProducers.certificationId],
       references: [certifications.id],
     }),
     listing: one(producers, {
-      fields: [certificationsToListings.listingId],
+      fields: [certificationsToProducers.listingId],
       references: [producers.id],
     }),
   })

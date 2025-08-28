@@ -2,7 +2,7 @@
 
 import { FilterMenu } from "@/components/filter-menu";
 import { HeroCarousel } from "@/components/hero-carousel";
-import { ListingCard } from "@/components/listing-card";
+import { ProducerCard } from "@/components/producer-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useHomePageStore } from "@/stores";
@@ -90,8 +90,8 @@ export function Page() {
             </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {data?.data.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
+            {data?.data.map((producer) => (
+              <ProducerCard key={producer.id} producer={producer} />
             ))}
           </div>
         </div>

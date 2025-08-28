@@ -1,13 +1,13 @@
-import { listingSlug, primaryImageUrl } from "@/utils/producers";
-import { PublicProducerLight } from "@/backend/validators/listings";
+import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
+import { PublicProducerLight } from "@/backend/validators/producers";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 
-export function ListingCard({ listing }: { listing: PublicProducerLight }) {
+export function ProducerCard({ producer }: { producer: PublicProducerLight }) {
   return (
     <Link
-      href={`/listings/${listingSlug(listing.name)}${listing.id}`}
+      href={`/producers/${producerSlugFull(producer)}`}
       className="border rounded-lg overflow-hidden relative shadow-lg"
     >
       <Image
@@ -15,12 +15,12 @@ export function ListingCard({ listing }: { listing: PublicProducerLight }) {
         height={1080}
         alt=""
         className="w-full grow object-cover aspect-video border-b"
-        src={primaryImageUrl(listing)}
+        src={primaryImageUrl(producer)}
       />
       <div className="p-5">
-        <p className="font-bold">{listing.name}</p>
+        <p className="font-bold">{producer.name}</p>
       </div>
-      {!listing.claimed && (
+      {!producer.claimed && (
         <Badge className="absolute top-2 left-2">Unclaimed</Badge>
       )}
     </Link>

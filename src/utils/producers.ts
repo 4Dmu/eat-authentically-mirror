@@ -22,9 +22,9 @@ import {
   PublicProducerLight,
   PublicProducer,
   EditProducerArgs,
-} from "@/backend/validators/listings";
+} from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
-import { ImageData } from "@/backend/validators/listings";
+import { ImageData } from "@/backend/validators/producers";
 
 /**
  * Gets the image url of the primary image.
@@ -53,8 +53,24 @@ export function primaryImageUrl(
  * @example
  *  'Daves Ranch' returns 'daves-ranch-'
  */
-export function listingSlug(name: string) {
+export function producerSlug(name: string) {
   return `${name.toLowerCase().trim().split(" ").join("-")}-`;
+}
+
+/**
+ * Generates slug from listing name,
+ * to be used with self healing urls only
+ *
+ * Includes the trailing -
+ * @example
+ *  'Daves Ranch' returns 'daves-ranch-id'
+ */
+export function producerSlugFull(
+  producer: Producer | PublicProducer | PublicProducerLight
+) {
+  return `${producer.name.toLowerCase().trim().split(" ").join("-")}-${
+    producer.id
+  }`;
 }
 
 export const producersQueryOptions = (

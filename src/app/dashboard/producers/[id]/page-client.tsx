@@ -2,7 +2,7 @@
 
 import { Certification } from "@/backend/db/schema";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import { Producer } from "@/backend/validators/listings";
+import { Producer } from "@/backend/validators/producers";
 import { BackButton } from "@/components/back-button";
 import { ProducerEditForm } from "@/components/forms/edit-producer-form";
 

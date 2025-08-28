@@ -13,6 +13,7 @@ import {
   CardAction,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,10 +21,13 @@ import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { BuildingIcon } from "lucide-react";
+import { BuildingIcon, EditIcon, EyeIcon, TrashIcon } from "lucide-react";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Badge } from "@/components/ui/badge";
-import { NotSubbed, Subbed } from "@/components/auth/RequireSub";
+import { NotSubbed } from "@/components/auth/RequireSub";
+import { AddProducerDialog } from "@/components/add-producer-dialog";
+import { fetchUserProducers } from "@/backend/rpc/producers";
+import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -31,6 +35,7 @@ export default async function DashboardPage() {
   if (!user) {
     redirect("/login");
   }
+  const producers = await fetchUserProducers();
   const subTier = await getSubTier(user.id);
 
   return (
@@ -87,10 +92,52 @@ export default async function DashboardPage() {
               My Producer Profiles
             </CardTitle>
             <CardAction className="flex gap-2">
-              <Button>Add New</Button>
+              <AddProducerDialog />
               <Button variant={"outline"}>Claim</Button>
             </CardAction>
           </CardHeader>
+          {producers.length > 0 && (
+            <CardContent className="grid grid-cols-2">
+              {producers.map((p) => (
+                <Card
+                  key={p.id}
+                  className="rounded-lg overflow-hidden pt-0 gap-0"
+                >
+                  <Image
+                    src={primaryImageUrl(p)}
+                    alt=""
+                    className="w-full object-cover"
+                    width={600}
+                    height={600}
+                  />
+                  <CardContent className="p-5 flex flex-col gap-2">
+                    <p className="font-fraunces text-lg">{p.name}</p>
+                    <Badge>{p.type}</Badge>
+                    <p>{p.about}</p>
+                  </CardContent>
+                  <CardFooter className="grid grid-cols-3 gap-2">
+                    <Button variant={"outline"} asChild>
+                      <Link href={`/producers/${producerSlugFull(p)}`}>
+                        <EyeIcon />
+                        View
+                      </Link>
+                    </Button>
+                    <Button variant={"outline"} asChild>
+                      <Link href={`/dashboard/producers/${p.id}`}>
+                        <EditIcon />
+                        Edit
+                      </Link>
+                    </Button>
+                    <div>
+                      <Button size={"icon"} variant={"destructive"}>
+                        <TrashIcon />
+                      </Button>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </CardContent>
+          )}
         </Card>
         <Card className="bg-yellow-200">
           <CardHeader>

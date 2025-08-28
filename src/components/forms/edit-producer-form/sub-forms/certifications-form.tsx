@@ -9,10 +9,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { Badge } from "@/components/ui/badge";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
-import { Certification } from "@/backend/validators/listings";
+import { Certification } from "@/backend/validators/producers";
 import { useStore } from "@tanstack/react-form";
 import { emptyOptions, withForm } from "../form";
 
@@ -31,7 +31,7 @@ export const CertificationsForm = withForm({
       .with("Free", () => 3)
       .with({ tier: "community" }, () => 3)
       .with({ tier: "pro" }, () => 5)
-      .with({ tier: "premium" }, () => 10)
+      .with({ tier: P.union("premium", "enterprise") }, () => 10)
       .exhaustive();
 
     return (

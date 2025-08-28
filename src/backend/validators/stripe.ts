@@ -1,7 +1,7 @@
 import { type } from "arktype";
 
 export const TimeframeValidator = type("'month'|'year'");
-export const TierValidator = type("'community'|'pro'|'premium'");
+export const TierValidator = type("'community'|'pro'|'premium'|'enterprise'");
 
 export const CreateCheckoutSessionArgsValidator = type({
   timeframe: TimeframeValidator,
