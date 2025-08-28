@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { toast } from "sonner";
 
 export function AddProducerDialog() {
   const router = useRouter();
@@ -38,7 +39,11 @@ export function AddProducerDialog() {
       return await registerProducer(data);
     },
     onSuccess: () => {
+      toast.success("Producer created successfully.");
       router.refresh();
+    },
+    onError(e) {
+      toast.error(e.message);
     },
   });
 
@@ -58,7 +63,13 @@ export function AddProducerDialog() {
   });
 
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={(e) => {
+        if (e === false) {
+          form.reset();
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button>Add New</Button>
       </DialogTrigger>
@@ -140,8 +151,8 @@ export function AddProducerDialog() {
               className="w-40"
               disabled={
                 registerProducerMutation.isPending ||
-                !form.state.isDirty ||
-                !form.state.isValid
+                form.state.isDirty === false ||
+                form.state.isValid === false
               }
             >
               Create
