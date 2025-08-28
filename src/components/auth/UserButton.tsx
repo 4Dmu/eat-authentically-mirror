@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import { LogOutIcon, UserIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { useAuth } from "@clerk/nextjs";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
@@ -66,15 +66,14 @@ export function UserButton({
           </div>
         </div>
         <Separator />
-
         <Button
           asChild
           variant={"ghost"}
           className="w-full justify-start gap-5"
         >
-          <Link href="/account">
-            <UserIcon />
-            <p>Account</p>
+          <Link href="/dashboard">
+            <LayoutDashboardIcon />
+            <p>Dashboard</p>
           </Link>
         </Button>
         {/* {authState?.orgId && (

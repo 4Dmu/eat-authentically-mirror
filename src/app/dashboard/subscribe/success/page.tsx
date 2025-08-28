@@ -12,7 +12,7 @@ async function ConfirmStripeSessionComponent() {
   console.log("user", user);
   const { error } = await tryCatch(triggerStripeSync)();
   if (error) return <div>Failed to sync with stripe: {error.message}</div>;
-  return redirect("/organization/profile");
+  return redirect("/dashboard");
 }
 
 export default async function SuccessPage({
@@ -22,10 +22,7 @@ export default async function SuccessPage({
 }) {
   const params = await searchParams;
 
-  console.log(
-    "[stripe/organization/success] Checkout session id",
-    params.stripe_session_id
-  );
+  console.log("[stripe/success] Checkout session id", params.stripe_session_id);
 
   return (
     <div>

@@ -48,7 +48,7 @@ export function Header({
           <SignedIn userFromServer={userFromServer}>
             <NotSubbed initialSubTier={subTier}>
               <Button variant={"secondary"} asChild>
-                <Link href="/members/subscribe">Upgrade</Link>
+                <Link href="/dashboard/subscribe">Upgrade</Link>
               </Button>
             </NotSubbed>
           </SignedIn>

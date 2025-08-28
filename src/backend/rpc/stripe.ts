@@ -31,28 +31,35 @@ export const createCheckoutSession = authenticatedWithUserActionClient
     );
 
     console.log(
-      "CREATE ORG CHECKOUT SESSION Active org subscription (if any):",
+      "[createCheckoutSession] Active user subscription (if any):",
       activeSub
     );
 
     const targetPlan = plans.getPlanBySubscriptionTier(tier, timeframe);
 
     if (!targetPlan) {
+      console.error(
+        "[createCheckoutSession] Error invalid target plan:",
+        targetPlan
+      );
       throw new Error("Invalid target subscription tier/interval.");
     }
 
     if (activeSub) {
+      console.error(
+        "[createCheckoutSession] Error user already has active sub"
+      );
       throw new Error("You already have an active sub");
     }
 
     console.log(
-      "CREATE ORG CHECKOUT SESSION Here's the stripe id we got from kv:",
+      "[createCheckoutSession] Here's the stripe id we got from kv:",
       stripeCustomerId
     );
 
     if (!stripeCustomerId) {
       console.log(
-        "CREATE MEMBER CHECKOUT SESSION No stripe id found in kv, creatring new customer",
+        "[createCheckoutSession] No stripe id found in kv, creatring new customer",
         stripeCustomerId
       );
 
@@ -67,10 +74,7 @@ export const createCheckoutSession = authenticatedWithUserActionClient
 
       await USER_STRIPE_CUSTOMER_ID_KV.set(userId, newCustomer.id);
 
-      console.log(
-        "CREATE MEMBER CHECKOUT SESSION Customer Created",
-        newCustomer
-      );
+      console.log("[createCheckoutSession] Customer Created", newCustomer);
 
       stripeCustomerId = newCustomer.id;
     }
@@ -85,8 +89,8 @@ export const createCheckoutSession = authenticatedWithUserActionClient
           },
         ],
         mode: "subscription",
-        success_url: `${env.SITE_URL}/organization/subscribe/success?stripe_session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${env.SITE_URL}/organization/subscribe/cancel`,
+        success_url: `${env.SITE_URL}/dashboard/subscribe/success?stripe_session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${env.SITE_URL}/dashboard/subscribe/cancel`,
         subscription_data: {
           metadata: {
             userId: userId,

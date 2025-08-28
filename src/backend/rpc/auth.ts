@@ -19,8 +19,6 @@ export const fetchUser = actionClient.action(async () => {
 
   const userData = await USER_DATA_KV.get(userId);
 
-  console.log(userData);
-
   return userData;
 });
 

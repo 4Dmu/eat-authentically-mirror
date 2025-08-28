@@ -51,7 +51,7 @@ export default function RootLayout({
       <ReactQueryProvider>
         <html lang="en">
           <body
-            className={`${interSans.variable} ${fraunces.variable} antialiased`}
+            className={`${interSans.variable} ${fraunces.variable} antialiased bg-gray-50`}
           >
             <Header />
             {children}

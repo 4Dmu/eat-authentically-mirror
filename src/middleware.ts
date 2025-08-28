@@ -11,21 +11,21 @@ const isPublicRoute = createRouteMatcher([
   "/about",
 ]);
 
-const isMemberSubRoute = createRouteMatcher(["/members/subscribe"]);
+const isSubRoute = createRouteMatcher(["/dashboard/subscribe"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect();
   }
 
-  if (isMemberSubRoute(req)) {
+  if (isSubRoute(req)) {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.redirect(new URL("/sign-in", req.url));
     }
     const tier = await getSubTier(userId);
     if (tier !== "Free") {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
 });

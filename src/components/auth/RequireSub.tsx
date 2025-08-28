@@ -1,3 +1,4 @@
+"use client";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Tier } from "@/backend/stripe/subscription-plans";
 import { useSubTier } from "@/hooks/use-sub-tier";
