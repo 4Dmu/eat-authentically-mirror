@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { certificationTypesOptions } from "@/utils/listings";
+import { certificationTypesOptions } from "@/utils/producers";
 import {
   Accordion,
   AccordionContent,

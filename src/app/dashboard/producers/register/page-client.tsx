@@ -18,9 +18,9 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  LISTING_TYPES,
-  registerListingArgsValidator,
-  RegisterListingArgs,
+  PRODUCER_TYPES,
+  registerProducerArgsValidator,
+  RegisterProducerArgs,
 } from "@/backend/validators/listings";
 import {
   Form,
@@ -32,32 +32,32 @@ import {
 } from "@/components/ui/form";
 import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { useMutation } from "@tanstack/react-query";
-import { registerOrganization } from "@/backend/rpc/organization";
+import { registerProducer } from "@/backend/rpc/producers";
 import { BackButton } from "@/components/back-button";
 import { useRouter } from "next/navigation";
 
 export function ClientPage() {
   const router = useRouter();
-  const registerOrganizationMutation = useMutation({
-    mutationKey: ["register-organization"],
-    mutationFn: async (data: RegisterListingArgs) => {
-      return await registerOrganization(data);
+  const registerProducerMutation = useMutation({
+    mutationKey: ["register-producer"],
+    mutationFn: async (data: RegisterProducerArgs) => {
+      return await registerProducer(data);
     },
     onSuccess: () => {
       router.push("/organization/subscribe");
     },
   });
 
-  const form = useForm<typeof registerListingArgsValidator.infer>({
-    resolver: arktypeResolver(registerListingArgsValidator),
+  const form = useForm<typeof registerProducerArgsValidator.infer>({
+    resolver: arktypeResolver(registerProducerArgsValidator),
     defaultValues: {
       name: "",
       about: "",
     },
   });
 
-  function onSubmit(values: typeof registerListingArgsValidator.infer) {
-    registerOrganizationMutation.mutate(values);
+  function onSubmit(values: typeof registerProducerArgsValidator.infer) {
+    registerProducerMutation.mutate(values);
   }
   return (
     <div className="p-10 flex flex-col gap-5 mx-auto max-w-7xl">
@@ -113,7 +113,7 @@ export function ClientPage() {
                           <SelectValue placeholder="Select your business type" />
                         </SelectTrigger>
                         <SelectContent className="w-full">
-                          {LISTING_TYPES.map((p) => (
+                          {PRODUCER_TYPES.map((p) => (
                             <SelectItem
                               key={p}
                               value={p}
@@ -155,7 +155,7 @@ export function ClientPage() {
             <Button
               className="w-40"
               disabled={
-                registerOrganizationMutation.isPending ||
+                registerProducerMutation.isPending ||
                 form.formState.isSubmitting
               }
             >

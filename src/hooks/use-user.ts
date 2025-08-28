@@ -1,5 +1,4 @@
-import { fetchSubTier, fetchUser } from "@/backend/rpc/auth";
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import { fetchUser } from "@/backend/rpc/auth";
 import { UserJSON } from "@clerk/backend";
 import { useQuery } from "@tanstack/react-query";
 

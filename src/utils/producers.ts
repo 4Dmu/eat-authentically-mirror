@@ -8,22 +8,22 @@ import {
 import {
   confirmPengingUpload,
   confirmPendingVideoUpload,
-  editUserListing,
+  editProducer,
   listCertificationTypesPublic,
-  listListingsPublicLight,
+  listProducersPublicLight,
   requestUploadUrls,
   requestVideoUploadUrl,
   updateExistingImages,
   deleteVideo,
-} from "@/backend/rpc/listing";
+} from "@/backend/rpc/producers";
 import {
-  ListListingsArgs,
-  Listing,
-  PublicListingLight,
-  PublicListing,
-  EditListingArgs,
+  ListProducerArgs,
+  Producer,
+  PublicProducerLight,
+  PublicProducer,
+  EditProducerArgs,
 } from "@/backend/validators/listings";
-import { fetchLoggedInOrganizationListing } from "@/backend/rpc/organization";
+import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import { ImageData } from "@/backend/validators/listings";
 
 /**
@@ -34,7 +34,7 @@ import { ImageData } from "@/backend/validators/listings";
  *  - placeholder unsplash url
  */
 export function primaryImageUrl(
-  listing: Listing | PublicListing | PublicListingLight
+  listing: Producer | PublicProducer | PublicProducerLight
 ) {
   return (
     listing.images?.items.find(
@@ -57,13 +57,13 @@ export function listingSlug(name: string) {
   return `${name.toLowerCase().trim().split(" ").join("-")}-`;
 }
 
-export const listingsQueryOptions = (
-  args: ListListingsArgs,
-  initialData?: { data: PublicListingLight[]; hasNextPage: boolean }
+export const producersQueryOptions = (
+  args: ListProducerArgs,
+  initialData?: { data: PublicProducerLight[]; hasNextPage: boolean }
 ) =>
   queryOptions({
-    queryKey: ["listings", args],
-    queryFn: () => listListingsPublicLight(args),
+    queryKey: ["producers", args],
+    queryFn: () => listProducersPublicLight(args),
     placeholderData: keepPreviousData,
     initialData: initialData,
   });
@@ -76,15 +76,15 @@ export const certificationTypesOptions = () =>
     gcTime: 7 * 24 * 60 * 60 * 1000,
   });
 
-type LoggedInOrganizationListingOptions = QueryOptions<
-  Listing,
+type LoggedInUserProducersOptions = QueryOptions<
+  Producer[],
   Error,
-  Listing,
+  Producer[],
   string[]
 >;
-export const loggedInOrganizationListingOptions = (
+export const loggedInUserProducersOptions = (
   opts?: Pick<
-    LoggedInOrganizationListingOptions,
+    LoggedInUserProducersOptions,
     | "initialData"
     | "networkMode"
     | "persister"
@@ -97,20 +97,42 @@ export const loggedInOrganizationListingOptions = (
 ) =>
   queryOptions({
     ...opts,
-    queryKey: ["logged-in-organization-listing"],
-    queryFn: () => fetchLoggedInOrganizationListing(),
+    queryKey: ["logged-in-user-producers"],
+    queryFn: () => fetchUserProducers(),
   });
 
-type EditUserListingOpts = MutationOptions<
-  void,
+type LoggedInUserProducerOptions = QueryOptions<
+  Producer | undefined,
   Error,
-  EditListingArgs,
-  unknown
+  Producer | undefined,
+  string[]
 >;
 
-export const editUserListingOpts = (
+export const loggedInUserProducerOptions = (
+  producerId: string,
   opts?: Pick<
-    EditUserListingOpts,
+    LoggedInUserProducerOptions,
+    | "initialData"
+    | "networkMode"
+    | "persister"
+    | "behavior"
+    | "gcTime"
+    | "meta"
+    | "retry"
+    | "retryDelay"
+  >
+) =>
+  queryOptions({
+    ...opts,
+    queryKey: ["logged-in-user-producers"],
+    queryFn: () => fetchUserProducer(producerId),
+  });
+
+type EditProducerOpts = MutationOptions<void, Error, EditProducerArgs, unknown>;
+
+export const editUserProducerOpts = (
+  opts?: Pick<
+    EditProducerOpts,
     | "onSuccess"
     | "onError"
     | "onSettled"
@@ -125,27 +147,32 @@ export const editUserListingOpts = (
 ) =>
   mutationOptions({
     ...opts,
-    mutationKey: ["edit-user-listing"],
-    mutationFn: async (args: EditListingArgs) => {
-      await editUserListing(args);
+    mutationKey: ["edit-producer"],
+    mutationFn: async (args: EditProducerArgs) => {
+      await editProducer(args);
     },
   });
 
 export const uploadImagesOpts = () =>
   mutationOptions({
     mutationKey: ["upload-images"],
-    mutationFn: async (
+    mutationFn: async ({
+      toUpload,
+      producerId,
+    }: {
       toUpload: {
         _type: "upload";
         file: File;
         isPrimary: boolean;
-      }[]
-    ) => {
+      }[];
+      producerId: string;
+    }) => {
       if (toUpload.length === 0) {
         return;
       }
 
       const uploadUrls = await requestUploadUrls({
+        producerId,
         imageItemParams: toUpload.map(({ isPrimary, file }) => ({
           isPrimary,
           type: file.type,
@@ -161,40 +188,49 @@ export const uploadImagesOpts = () =>
         await fetch(url.uploadURL, { method: "POST", body: form });
       }
 
-      await confirmPengingUpload();
+      await confirmPengingUpload({ producerId: producerId });
     },
   });
 
 export const uploadVideoOpts = () =>
   mutationOptions({
     mutationKey: ["upload-video"],
-    mutationFn: async (toUpload: { _type: "upload"; file: File }) => {
-      const uploadUrl = await requestVideoUploadUrl();
+    mutationFn: async ({
+      producerId,
+      toUpload,
+    }: {
+      producerId: string;
+      toUpload: { _type: "upload"; file: File };
+    }) => {
+      const uploadUrl = await requestVideoUploadUrl({ producerId });
 
       const file = toUpload.file;
       const form = new FormData();
       form.set("file", file);
       await fetch(uploadUrl, { method: "POST", body: form });
 
-      await confirmPendingVideoUpload();
+      await confirmPendingVideoUpload({ producerId });
     },
   });
 
 export const deleteVideoOpts = () =>
   mutationOptions({
     mutationKey: ["delete-video"],
-    mutationFn: async () => {
-      await deleteVideo();
+    mutationFn: async ({ producerId }: { producerId: string }) => {
+      await deleteVideo({ producerId });
     },
   });
 
 export const updateExistingImagesOpts = () =>
   mutationOptions({
     mutationKey: ["update-existing-images"],
-    mutationFn: async (args: {
-      items: ImageData[];
-      primaryImgId: string | null;
+    mutationFn: async (data: {
+      data: {
+        items: ImageData[];
+        primaryImgId: string | null;
+      };
+      producerId: string;
     }) => {
-      await updateExistingImages(args);
+      await updateExistingImages(data);
     },
   });

@@ -2,13 +2,13 @@ import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { LatLangBoundsLiteralValidator } from "./maps";
 
-export const LISTING_TYPES = [
+export const PRODUCER_TYPES = [
   "farm",
   "ranch",
   "eatery",
 ] as const satisfies ListingTypes[];
 
-export const listingTypesValidator = type("'farm'|'ranch'|'eatery'");
+export const producerTypesValidator = type("'farm'|'ranch'|'eatery'");
 
 export const contactValidator = type({
   "email?": "string.email|null",
@@ -58,16 +58,16 @@ export const videoValidator = type({
   status: "'ready'|'pending'",
 });
 
-export const listingImagesValidator = type({
+export const producerImagesValidator = type({
   items: imageDataValidator.array(),
   primaryImgId: "string|null",
 });
 
-export const listingValidator = type({
+export const producerValidator = type({
   id: "string.uuid",
-  organizationId: "string|null",
+  userId: "string|null",
   name: "string",
-  type: listingTypesValidator,
+  type: producerTypesValidator,
   about: "string|null",
   contact: contactValidator.or("null"),
   address: addressValidator.or("null"),
@@ -78,16 +78,16 @@ export const listingValidator = type({
   }).array(),
   claimed: "boolean",
   verified: "boolean",
-  images: listingImagesValidator,
+  images: producerImagesValidator,
   video: videoValidator.or(type("null")),
   createdAt: "Date",
   updatedAt: "Date",
   socialMedia: socialMediaValidator,
 });
 
-export const editListingFormValidator = type({
+export const editProducerFormValidator = type({
   name: "string",
-  type: listingTypesValidator,
+  type: producerTypesValidator,
   about: "string|null",
   address: addressValidator,
   contact: {
@@ -131,13 +131,13 @@ export const editListingFormValidator = type({
   socialMedia: socialMediaValidator.or("null"),
 });
 
-export const listingFormBasicValidator = type({
+export const producerFormBasicValidator = type({
   name: "string",
-  type: listingTypesValidator,
+  type: producerTypesValidator,
   about: "string|null",
 });
 
-export const publicListingValidator = listingValidator.pick(
+export const publicProducerValidator = producerValidator.pick(
   "id",
   "name",
   "type",
@@ -150,7 +150,7 @@ export const publicListingValidator = listingValidator.pick(
   "video"
 );
 
-export const publicListingLightValidator = listingValidator.pick(
+export const publicProducerLightValidator = producerValidator.pick(
   "id",
   "name",
   "type",
@@ -161,41 +161,41 @@ export const publicListingLightValidator = listingValidator.pick(
   "address"
 );
 
-export const listListingsArgsValidator = type({
-  "type?": listingTypesValidator,
+export const listProducersArgsValidator = type({
+  "type?": producerTypesValidator,
   page: "number",
   "query?": "string",
   certs: type("string").array(),
   "locationSearchArea?": LatLangBoundsLiteralValidator,
 });
 
-export const getListingArgsValidator = type({ id: "string.uuid" });
+export const getProducersArgsValidator = type({ id: "string.uuid" });
 
-export const editListingArgsValidator = type({
-  listingId: type("string"),
+export const editProducerArgsValidator = type({
+  producerId: type("string"),
   "name?": "string",
-  "type?": listingTypesValidator,
+  "type?": producerTypesValidator,
   "about?": "string|null",
-  contact: editListingFormValidator.get("contact").optional(),
-  address: editListingFormValidator.get("address").optional(),
-  certifications: editListingFormValidator.get("certifications").optional(),
-  commodities: editListingFormValidator.get("commodities").optional(),
-  socialMedia: editListingFormValidator.get("socialMedia").optional(),
+  contact: editProducerFormValidator.get("contact").optional(),
+  address: editProducerFormValidator.get("address").optional(),
+  certifications: editProducerFormValidator.get("certifications").optional(),
+  commodities: editProducerFormValidator.get("commodities").optional(),
+  socialMedia: editProducerFormValidator.get("socialMedia").optional(),
 });
 
-export const registerListingArgsValidator = type({
+export const registerProducerArgsValidator = type({
   name: "string >= 3",
-  type: listingTypesValidator,
+  type: producerTypesValidator,
   about: "string >= 20",
 });
 
-export type ListListingsArgs = typeof listListingsArgsValidator.infer;
+export type ListProducerArgs = typeof listProducersArgsValidator.infer;
 
-export type GetListingArgs = typeof getListingArgsValidator.infer;
+export type GetProducerArgs = typeof getProducersArgsValidator.infer;
 
-export type RegisterListingArgs = typeof registerListingArgsValidator.infer;
+export type RegisterProducerArgs = typeof registerProducerArgsValidator.infer;
 
-export type ListingTypes = typeof listingTypesValidator.infer;
+export type ListingTypes = typeof producerTypesValidator.infer;
 
 export type SocialMedia = typeof socialMediaValidator.infer;
 
@@ -205,12 +205,12 @@ export type Address = typeof addressValidator.infer;
 
 export type ImageData = typeof imageDataValidator.infer;
 
-export type Listing = typeof listingValidator.infer;
+export type Producer = typeof producerValidator.infer;
 
-export type PublicListing = typeof publicListingValidator.infer;
+export type PublicProducer = typeof publicProducerValidator.infer;
 
-export type PublicListingLight = typeof publicListingLightValidator.infer;
+export type PublicProducerLight = typeof publicProducerLightValidator.infer;
 
 export type Certification = typeof certificationValidator.infer;
 
-export type EditListingArgs = typeof editListingArgsValidator.infer;
+export type EditProducerArgs = typeof editProducerArgsValidator.infer;

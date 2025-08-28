@@ -1,10 +1,10 @@
-import { listingSlug, primaryImageUrl } from "@/utils/listings";
-import { PublicListingLight } from "@/backend/validators/listings";
+import { listingSlug, primaryImageUrl } from "@/utils/producers";
+import { PublicProducerLight } from "@/backend/validators/listings";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 
-export function ListingCard({ listing }: { listing: PublicListingLight }) {
+export function ListingCard({ listing }: { listing: PublicProducerLight }) {
   return (
     <Link
       href={`/listings/${listingSlug(listing.name)}${listing.id}`}

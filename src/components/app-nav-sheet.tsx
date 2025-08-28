@@ -15,13 +15,19 @@ import {
 } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { NotSubbed } from "./auth/RequireSub";
-import { OrgSignedOut } from "./auth/RequireOrg";
+import { IsNotProducer } from "./auth/RequireOrg";
 import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 
-export function AppNavSheet({ subTier }: { subTier: SubTier }) {
+export function AppNavSheet({
+  subTier,
+  producerIds,
+}: {
+  subTier: SubTier;
+  producerIds: string[];
+}) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -81,11 +87,11 @@ export function AppNavSheet({ subTier }: { subTier: SubTier }) {
               <span>Messages</span>
             </Link>
           </Button>
-          <OrgSignedOut>
+          <IsNotProducer producerIds={producerIds}>
             <Button variant={"secondary"} asChild>
-              <Link href="/organization/register">Become a producer</Link>
+              <Link href="/dashboard">Become a producer</Link>
             </Button>
-          </OrgSignedOut>
+          </IsNotProducer>
           <SignedOut>
             <Separator />
             <Button asChild>

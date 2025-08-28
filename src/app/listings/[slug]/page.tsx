@@ -1,10 +1,10 @@
-import { getListingPublic } from "@/backend/data/listing";
+import { getListingPublic } from "@/backend/data/producer";
 import { BackButton } from "@/components/back-button";
 import { AddToPinboardButton } from "@/components/pinboard";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { listingSlug } from "@/utils/listings";
+import { listingSlug } from "@/utils/producers";
 import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";

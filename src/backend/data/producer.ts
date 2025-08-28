@@ -1,12 +1,27 @@
 import type {
-  GetListingArgs,
-  ListListingsArgs,
-  PublicListing,
+  GetProducerArgs,
+  ListProducerArgs,
+  PublicProducer,
 } from "@/backend/validators/listings";
 import { db } from "../db";
 import { and, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
-import { certificationsToListings, listings } from "../db/schema";
+import { certificationsToListings, producers } from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
+import { USER_PRODUCER_IDS_KV } from "../kv";
+
+export async function getUsersProducerIdsCached(userId: string) {
+  const profileIds = await USER_PRODUCER_IDS_KV.get(userId);
+
+  if (profileIds) {
+    return profileIds;
+  }
+
+  return await db
+    .select({ id: producers.id })
+    .from(producers)
+    .where(eq(producers.userId, userId))
+    .then((r) => r.map((i) => i.id));
+}
 
 const orderListingsByScrapedMetadata = sql`
   CASE
@@ -23,7 +38,7 @@ const orderListingsByScrapedMetadata = sql`
       ELSE 1
     END`;
 
-export async function listListingsPublic(args: ListListingsArgs) {
+export async function listListingsPublic(args: ListProducerArgs) {
   try {
     const limit = 100;
     const offest = args.page * limit;
@@ -31,13 +46,13 @@ export async function listListingsPublic(args: ListListingsArgs) {
     const queries: (SQL | undefined)[] = [];
 
     if (args.type) {
-      queries.push(eq(listings.type, args.type));
+      queries.push(eq(producers.type, args.type));
     }
 
     if (args.certs.length > 0) {
       queries.push(
         inArray(
-          listings.id,
+          producers.id,
           db
             .select({ listingId: certificationsToListings.listingId })
             .from(certificationsToListings)
@@ -59,8 +74,8 @@ export async function listListingsPublic(args: ListListingsArgs) {
       );
     }
 
-    const listingsQuery = await db.query.listings.findMany({
-      orderBy: [orderListingsByScrapedMetadata, desc(listings.createdAt)],
+    const listingsQuery = await db.query.producers.findMany({
+      orderBy: [orderListingsByScrapedMetadata, desc(producers.createdAt)],
       columns: {
         id: true,
         name: true,
@@ -93,7 +108,7 @@ export async function listListingsPublic(args: ListListingsArgs) {
     const result = transformers.withCertifications(paginatedListings);
 
     return {
-      data: result satisfies PublicListing[],
+      data: result satisfies PublicProducer[],
       hasNextPage,
     };
   } catch (err) {
@@ -102,7 +117,7 @@ export async function listListingsPublic(args: ListListingsArgs) {
   }
 }
 
-export async function listListingsPublicLight(args: ListListingsArgs) {
+export async function listListingsPublicLight(args: ListProducerArgs) {
   try {
     const limit = 100;
     const offest = args.page * limit;
@@ -110,13 +125,13 @@ export async function listListingsPublicLight(args: ListListingsArgs) {
     const queries: (SQL | undefined)[] = [];
 
     if (args.type) {
-      queries.push(eq(listings.type, args.type));
+      queries.push(eq(producers.type, args.type));
     }
 
     if (args.certs.length > 0) {
       queries.push(
         inArray(
-          listings.id,
+          producers.id,
           db
             .select({ listingId: certificationsToListings.listingId })
             .from(certificationsToListings)
@@ -140,11 +155,11 @@ export async function listListingsPublicLight(args: ListListingsArgs) {
 
     if (args.query) {
       console.log(args.query);
-      queries.push(like(listings.name, `%${args.query.toLowerCase()}%`));
+      queries.push(like(producers.name, `%${args.query.toLowerCase()}%`));
     }
 
-    const listingsQuery = await db.query.listings.findMany({
-      orderBy: [orderListingsByScrapedMetadata, desc(listings.createdAt)],
+    const listingsQuery = await db.query.producers.findMany({
+      orderBy: [orderListingsByScrapedMetadata, desc(producers.createdAt)],
       columns: {
         id: true,
         name: true,
@@ -184,10 +199,10 @@ export async function listListingsPublicLight(args: ListListingsArgs) {
   }
 }
 
-export async function getListingPublic(args: GetListingArgs) {
+export async function getListingPublic(args: GetProducerArgs) {
   try {
-    const listing = await db.query.listings.findFirst({
-      where: eq(listings.id, args.id),
+    const listing = await db.query.producers.findFirst({
+      where: eq(producers.id, args.id),
       with: {
         certificationsToListings: {
           columns: {},
@@ -226,7 +241,7 @@ export async function getListingPublic(args: GetListingArgs) {
       address,
       contact,
       video,
-    } satisfies PublicListing;
+    } satisfies PublicProducer;
   } catch (err) {
     console.error(err);
     throw new Error("Error loading listing");

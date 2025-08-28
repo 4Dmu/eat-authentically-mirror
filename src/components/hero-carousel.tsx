@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Input } from "./ui/input";
 import { CompassIcon } from "lucide-react";
-import { LISTING_TYPES } from "@/backend/validators/listings";
+import { PRODUCER_TYPES } from "@/backend/validators/listings";
 import {
   ChangeEvent,
   KeyboardEvent,
@@ -88,7 +88,7 @@ export function HeroCarousel() {
   const handler = useCallback(() => {
     if (!api) return;
     const index = api.selectedScrollSnap();
-    const type = index == 0 ? undefined : LISTING_TYPES[index - 1];
+    const type = index == 0 ? undefined : PRODUCER_TYPES[index - 1];
     console.log(type);
     setTypeFilter(type);
   }, [api, setTypeFilter]);

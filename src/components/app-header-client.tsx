@@ -7,19 +7,18 @@ import Image from "next/image";
 import { SignedOut } from "@clerk/nextjs";
 import { NotSubbed } from "./auth/RequireSub";
 import { UserButton } from "./auth/UserButton";
-import { AuthState } from "@/backend/rpc/auth";
 import { UserJSON } from "@clerk/backend";
 import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import SignedIn from "./auth/SignedIn";
 
 export function Header({
-  authState,
   userFromServer,
   subTier,
+  producerIds,
 }: {
-  authState: AuthState;
   userFromServer: UserJSON | null;
   subTier: SubTier;
+  producerIds: string[];
 }) {
   const pathname = usePathname();
 
@@ -32,7 +31,7 @@ export function Header({
       } text-primary-foreground w-full`}
     >
       <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">
-        <AppNavSheet subTier={subTier} />
+        <AppNavSheet producerIds={producerIds} subTier={subTier} />
         <Link
           className="font-bold justify-self-center text-lg self-center"
           href={"/"}

@@ -1,7 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { actionClient } from "./safe-action";
-import { getUsersOrganizationIdCached } from "@/backend/data/organization";
 import { getSubTier } from "../utils/get-sub-tier";
+import { getUsersProducerIdsCached } from "@/backend/data/producer";
 
 export const authenticatedActionClient = actionClient.use(async () => {
   const { userId } = await auth();
@@ -10,9 +10,9 @@ export const authenticatedActionClient = actionClient.use(async () => {
     throw new Error("Unauthorized");
   }
 
-  const orgId = await getUsersOrganizationIdCached(userId);
+  const producerIds = await getUsersProducerIdsCached(userId);
 
-  return { userId, orgId };
+  return { userId, producerIds };
 });
 
 export const authenticatedWithUserActionClient = actionClient.use(async () => {
@@ -22,18 +22,17 @@ export const authenticatedWithUserActionClient = actionClient.use(async () => {
     throw new Error("Unauthorized");
   }
 
-  const orgId = await getUsersOrganizationIdCached(user.id);
+  const producerIds = await getUsersProducerIdsCached(user.id);
 
-  return { user: user, userId: user.id, orgId };
+  return { user: user, userId: user.id, producerIds };
 });
 
-export const organizationActionClient = authenticatedActionClient.use(
-  async ({ orgId }) => {
-    if (!orgId) {
+export const producerActionClient = authenticatedActionClient.use(
+  async ({ producerIds }) => {
+    if (producerIds.length < 1) {
       throw new Error("Unauthorized");
     }
-
-    return { orgId };
+    return {};
   }
 );
 

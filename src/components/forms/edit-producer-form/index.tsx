@@ -11,32 +11,34 @@ import { SaveButton } from "./save-button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   deleteVideoOpts,
-  editUserListingOpts,
-  loggedInOrganizationListingOptions,
+  editUserProducerOpts,
+  loggedInUserProducerOptions,
   updateExistingImagesOpts,
   uploadImagesOpts,
   uploadVideoOpts,
-} from "@/utils/listings";
+} from "@/utils/producers";
 import { toast } from "sonner";
 import * as R from "remeda";
 import {
-  EditListingArgs,
-  editListingFormValidator,
-  Listing,
+  EditProducerArgs,
+  editProducerFormValidator,
+  Producer,
 } from "@/backend/validators/listings";
 import { useAppForm } from "./form";
 
 export function ProducerEditForm(props: {
-  currentListing: Listing;
+  producer: Producer;
   tier: SubTier;
   certifications: Certification[];
 }) {
-  const listingQuery = useQuery(
-    loggedInOrganizationListingOptions({ initialData: props.currentListing })
+  const producerQuery = useQuery(
+    loggedInUserProducerOptions(props.producer.id, {
+      initialData: props.producer,
+    })
   );
 
   const editUserListingMutation = useMutation(
-    editUserListingOpts({
+    editUserProducerOpts({
       onError(err) {
         toast.error(err.message);
       },
@@ -50,23 +52,23 @@ export function ProducerEditForm(props: {
 
   const form = useAppForm({
     defaultValues: {
-      name: listingQuery.data?.name ?? "",
-      type: listingQuery.data?.type ?? "ranch",
-      about: listingQuery.data?.about ?? null,
-      address: listingQuery.data?.address ?? {},
-      contact: listingQuery.data?.contact ?? {},
-      images: listingQuery.data?.images ?? {
+      name: producerQuery.data?.name ?? "",
+      type: producerQuery.data?.type ?? "ranch",
+      about: producerQuery.data?.about ?? null,
+      address: producerQuery.data?.address ?? {},
+      contact: producerQuery.data?.contact ?? {},
+      images: producerQuery.data?.images ?? {
         primaryImgId: null,
         items: [],
       },
-      commodities: listingQuery.data?.commodities ?? [],
-      certifications: listingQuery.data?.certifications ?? [],
-      video: listingQuery.data?.video ?? null,
-      socialMedia: listingQuery.data?.socialMedia ?? null,
-    } satisfies typeof editListingFormValidator.infer as typeof editListingFormValidator.infer,
+      commodities: producerQuery.data?.commodities ?? [],
+      certifications: producerQuery.data?.certifications ?? [],
+      video: producerQuery.data?.video ?? null,
+      socialMedia: producerQuery.data?.socialMedia ?? null,
+    } satisfies typeof editProducerFormValidator.infer as typeof editProducerFormValidator.infer,
     validators: {
       onChange: ({ formApi }) =>
-        formApi.parseValuesWithSchema(editListingFormValidator),
+        formApi.parseValuesWithSchema(editProducerFormValidator),
     },
     onSubmit: (props) => console.log(props),
   });
@@ -79,12 +81,12 @@ export function ProducerEditForm(props: {
     deleteVideoMutation.isPending;
 
   async function submit() {
-    const args: EditListingArgs = { listingId: props.currentListing.id };
+    const args: EditProducerArgs = { producerId: props.producer.id };
 
     for (const [key, value] of R.entries(form.state.values)) {
       switch (key) {
         case "images":
-          if (!R.isDeepEqual(value, listingQuery.data?.images)) {
+          if (!R.isDeepEqual(value, producerQuery.data?.images)) {
             const existingImages = form.state.values.images.items.filter(
               (x) => x._type === "cloudflare"
             );
@@ -93,8 +95,11 @@ export function ProducerEditForm(props: {
             );
 
             const hasExistingImageChanges =
-              !R.isDeepEqual(existingImages, listingQuery.data?.images.items) ||
-              listingQuery.data?.images.primaryImgId !==
+              !R.isDeepEqual(
+                existingImages,
+                producerQuery.data?.images.items
+              ) ||
+              producerQuery.data?.images.primaryImgId !==
                 form.state.values.images.primaryImgId;
 
             const hasImagesToUpload = toUpload.length > 0;
@@ -102,12 +107,18 @@ export function ProducerEditForm(props: {
             async function handleImageUpdates() {
               if (hasExistingImageChanges)
                 await updateExisingImagesMutation.mutateAsync({
-                  items: existingImages,
-                  primaryImgId: form.state.values.images.primaryImgId,
+                  producerId: props.producer.id,
+                  data: {
+                    items: existingImages,
+                    primaryImgId: form.state.values.images.primaryImgId,
+                  },
                 });
 
               if (hasImagesToUpload)
-                await uploadImagesMutation.mutateAsync(toUpload);
+                await uploadImagesMutation.mutateAsync({
+                  producerId: props.producer.id,
+                  toUpload,
+                });
             }
 
             if (hasExistingImageChanges || hasImagesToUpload) {
@@ -128,9 +139,11 @@ export function ProducerEditForm(props: {
           }
           break;
         case "video":
-          if (value !== listingQuery.data?.video) {
+          if (value !== producerQuery.data?.video) {
             if (value === null) {
-              const deletePromise = deleteVideoMutation.mutateAsync();
+              const deletePromise = deleteVideoMutation.mutateAsync({
+                producerId: props.producer.id,
+              });
               toast.promise(deletePromise, {
                 loading: "Deleting video...",
                 success: () => "Video deleted successfully.",
@@ -138,7 +151,10 @@ export function ProducerEditForm(props: {
               });
               await deletePromise;
             } else if (value._type === "upload") {
-              const videoUploadPromise = uploadVideoMutation.mutateAsync(value);
+              const videoUploadPromise = uploadVideoMutation.mutateAsync({
+                producerId: props.producer.id,
+                toUpload: value,
+              });
               toast.promise(videoUploadPromise, {
                 loading: "Uploading video...",
                 success: () => "Video uploaded successfully.",
@@ -150,9 +166,10 @@ export function ProducerEditForm(props: {
           break;
         default:
           if (
-            !R.isDeepEqual(form.state.values[key], listingQuery.data?.[key])
+            !R.isDeepEqual(form.state.values[key], producerQuery.data?.[key])
           ) {
-            (args[key] as EditListingArgs[typeof key]) = form.state.values[key];
+            (args[key] as EditProducerArgs[typeof key]) =
+              form.state.values[key];
           }
           break;
       }
@@ -168,7 +185,7 @@ export function ProducerEditForm(props: {
       await submitPromise;
     }
 
-    await listingQuery.refetch();
+    await producerQuery.refetch();
     form.reset();
   }
 

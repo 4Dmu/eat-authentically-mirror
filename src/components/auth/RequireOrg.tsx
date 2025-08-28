@@ -1,13 +1,13 @@
-import { AuthState } from "@/backend/rpc/auth";
-import { useAuthState } from "@/hooks/use-auth-state";
+import { useLoggedInUserProducerIds } from "@/hooks/use-logged-in-user-producer-ids";
 import { PropsWithChildren } from "react";
 
-export function OrgSignedIn(
-  props: PropsWithChildren & { initialAuthState?: AuthState }
+export function IsProducer(
+  props: PropsWithChildren & { producerIds: string[] }
 ) {
-  const { data } = useAuthState({ initialData: props.initialAuthState });
-
-  const allow = data && data.isAuthed && data.orgId;
+  const { ids } = useLoggedInUserProducerIds({
+    producerIds: props.producerIds,
+  });
+  const allow = ids.length > 0;
 
   if (allow) {
     return <>{props.children}</>;
@@ -16,12 +16,13 @@ export function OrgSignedIn(
   return null;
 }
 
-export function OrgSignedOut(
-  props: PropsWithChildren & { initialAuthState?: AuthState }
+export function IsNotProducer(
+  props: PropsWithChildren & { producerIds: string[] }
 ) {
-  const { data } = useAuthState({ initialData: props.initialAuthState });
-
-  const allow = data && data.isAuthed && !data.orgId;
+  const { ids } = useLoggedInUserProducerIds({
+    producerIds: props.producerIds,
+  });
+  const allow = ids.length === 0;
 
   if (allow) {
     return <>{props.children}</>;

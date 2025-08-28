@@ -1,4 +1,4 @@
-import { editListingFormValidator } from "@/backend/validators/listings";
+import { editProducerFormValidator } from "@/backend/validators/listings";
 import {
   createFormHook,
   createFormHookContexts,
@@ -30,5 +30,5 @@ export const emptyOptions = formOptions({
     certifications: [],
     video: null,
     socialMedia: null,
-  } satisfies typeof editListingFormValidator.infer as typeof editListingFormValidator.infer,
+  } satisfies typeof editProducerFormValidator.infer as typeof editProducerFormValidator.infer,
 });

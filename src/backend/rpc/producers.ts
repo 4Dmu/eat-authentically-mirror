@@ -1,0 +1,690 @@
+"use server";
+import * as listing from "@/backend/data/producer";
+import {
+  editProducerArgsValidator,
+  getProducersArgsValidator,
+  Producer,
+  producerImagesValidator,
+  listProducersArgsValidator,
+} from "../validators/listings";
+import { actionClient } from "./helpers/safe-action";
+import { producerActionClient } from "./helpers/middleware";
+import { db } from "../db";
+import { certificationsToListings, producers, Video } from "../db/schema";
+import { and, eq, inArray } from "drizzle-orm";
+import { withCertifications } from "../utils/transform-data";
+import { type } from "arktype";
+import { getSubTier } from "./utils/get-sub-tier";
+import { env } from "@/env";
+import { cloudflare } from "../lib/cloudflare";
+import { normalizeAddress } from "../utils/normalize-data";
+import { videoRatelimit } from "../lib/rate-limit";
+import { authenticatedActionClient } from "./helpers/middleware";
+import {
+  PublicProducerLight,
+  registerProducerArgsValidator,
+} from "../validators/listings";
+import { withCertificationsSingle } from "../utils/transform-data";
+
+export const registerProducer = authenticatedActionClient
+  .input(registerProducerArgsValidator)
+  .action(async ({ ctx: { userId, orgId }, input }) => {
+    if (orgId) {
+      throw new Error("Already logged in as listing");
+    }
+
+    const producerProfileId = crypto.randomUUID();
+
+    await db.insert(producers).values({
+      id: producerProfileId,
+      userId: userId,
+      name: input.name,
+      type: input.type,
+      claimed: true,
+      verified: false,
+      about: input.about,
+      commodities: [],
+      socialMedia: { twitter: null, facebook: null, instagram: null },
+      images: {
+        items: [],
+        primaryImgId: null,
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return producerProfileId;
+  });
+
+export const fetchUserProducer = producerActionClient
+  .input(type("string"))
+  .action(async ({ input, ctx: { producerIds, userId } }) => {
+    const result = await db.query.producers
+      .findFirst({
+        where: and(
+          eq(producers.id, input),
+          inArray(producers.id, producerIds),
+          eq(producers.userId, userId)
+        ),
+        with: {
+          certificationsToListings: {
+            with: {
+              certification: true,
+            },
+          },
+        },
+      })
+      .then((r) => (r ? withCertificationsSingle(r) : r));
+
+    return result;
+  });
+
+export const fetchUserProducers = producerActionClient.action(
+  async ({ producerIds, userId }) => {
+    const result = await db.query.producers
+      .findMany({
+        where: and(
+          inArray(producers.id, producerIds),
+          eq(producers.userId, userId)
+        ),
+        with: {
+          certificationsToListings: {
+            with: {
+              certification: true,
+            },
+          },
+        },
+      })
+      .then((r) => (r ? withCertifications(r) : r));
+
+    return result;
+  }
+);
+
+export const fetchUserProducerLight = producerActionClient
+  .input(type("string"))
+  .action(async ({ input, ctx: { producerIds, userId } }) => {
+    const result = await db.query.producers
+      .findFirst({
+        where: and(
+          eq(producers.id, input),
+          inArray(producers.id, producerIds),
+          eq(producers.userId, userId)
+        ),
+        with: {
+          certificationsToListings: {
+            with: {
+              certification: true,
+            },
+          },
+        },
+      })
+      .then((r) => (r ? withCertificationsSingle(r) : r));
+
+    return result satisfies PublicProducerLight | undefined;
+  });
+
+export const listProducersPublic = actionClient
+  .input(listProducersArgsValidator)
+  .action(async ({ input }) => await listing.listListingsPublic(input));
+
+export const listProducersPublicLight = actionClient
+  .input(listProducersArgsValidator)
+  .action(async ({ input }) => await listing.listListingsPublicLight(input));
+
+export const listCertificationTypesPublic = actionClient.action(
+  async () => await listing.listCertificationTypesPublic()
+);
+
+export const getProducerPublic = actionClient
+  .input(getProducersArgsValidator)
+  .action(async ({ input }) => await listing.getListingPublic(input));
+
+export const editProducer = producerActionClient
+  .input(editProducerArgsValidator)
+  .action(async ({ input, ctx: { userId } }) => {
+    const producer = await db.query.producers.findFirst({
+      where: and(
+        eq(producers.id, input.producerId),
+        eq(producers.userId, userId)
+      ),
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    const toUpdate: Partial<Producer> = {};
+
+    if (input.name) {
+      toUpdate.name = input.name;
+    }
+
+    if (input.type) {
+      toUpdate.type = input.type;
+    }
+
+    if (input.about !== undefined) {
+      toUpdate.about = input.about;
+    }
+
+    if (input.address) {
+      toUpdate.address = normalizeAddress(input.address);
+    }
+
+    if (input.contact) {
+      toUpdate.contact = input.contact;
+    }
+
+    if (input.socialMedia) {
+      toUpdate.socialMedia = input.socialMedia;
+    }
+
+    if (input.certifications && input.certifications) {
+      const updatedCertifications = input.certifications;
+      const currentCertifications = await db.query.producers
+        .findFirst({
+          where: and(
+            eq(producers.id, input.producerId),
+            eq(producers.userId, userId)
+          ),
+          columns: {},
+          with: {
+            certificationsToListings: {
+              columns: {},
+              with: {
+                certification: true,
+              },
+            },
+          },
+        })
+        .then((r) => withCertifications(r ? [r] : [])[0]?.certifications ?? []);
+
+      if (currentCertifications && currentCertifications.length > 0) {
+        const addedCerts = updatedCertifications.filter(
+          (cert) =>
+            !currentCertifications.some((oldCert) => oldCert.id === cert.id)
+        );
+        const removedCerts = currentCertifications.filter(
+          (cert) => !updatedCertifications.some((c) => c.id === cert.id)
+        );
+
+        try {
+          if (addedCerts.length > 0) {
+            await db.insert(certificationsToListings).values(
+              addedCerts.map((cert) => ({
+                listingId: producer.id,
+                certificationId: cert.id,
+              }))
+            );
+          }
+          await db.delete(certificationsToListings).where(
+            inArray(
+              certificationsToListings.certificationId,
+              removedCerts.map((c) => c.id)
+            )
+          );
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        try {
+          await db.insert(certificationsToListings).values(
+            input.certifications.map((cert) => ({
+              listingId: producer.id,
+              certificationId: cert.id,
+            }))
+          );
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+
+    if (input.commodities) {
+      toUpdate.commodities = input.commodities;
+    }
+
+    if (Object.keys(toUpdate).length > 0) {
+      await db
+        .update(producers)
+        .set({
+          ...toUpdate,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(eq(producers.id, producer.id), eq(producers.userId, userId))
+        );
+    }
+  });
+
+export const requestUploadUrls = producerActionClient
+  .input(
+    type({
+      producerId: "string",
+      imageItemParams: type({
+        isPrimary: "boolean",
+        type: "string",
+        name: "string",
+      })
+        .array()
+        .atLeastLength(1)
+        .atMostLength(10),
+    })
+  )
+  .action(
+    async ({ ctx: { userId }, input: { imageItemParams, producerId } }) => {
+      const producer = await db.query.producers.findFirst({
+        columns: {
+          id: true,
+          images: true,
+          pendingImages: true,
+        },
+        where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+      });
+
+      if (!producer) {
+        throw new Error("Unauthorized");
+      }
+
+      const tier = await getSubTier(userId);
+
+      const maxFiles =
+        tier === "Free"
+          ? 1
+          : tier.tier === "community"
+          ? 1
+          : tier.tier === "pro"
+          ? 4
+          : tier.tier === "premium"
+          ? 5
+          : 1;
+
+      const remainingFiles = maxFiles - producer.images.items.length;
+
+      if (imageItemParams.length > remainingFiles) {
+        throw new Error("Number of files exceeds your plan");
+      }
+
+      const urls: { id: string; uploadURL: string }[] = [];
+      const pending: { id: string; isPrimary: boolean }[] = [];
+
+      for (let i = 0; i < imageItemParams.length; i++) {
+        const form = new FormData();
+
+        form.set("creator", userId);
+        form.set(
+          "metadata",
+          JSON.stringify({ producerId: producer.id, userId: userId })
+        );
+
+        const uploadUrlGeneratorCloudflareResponse = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${env.SAFE_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
+            },
+            body: form,
+          }
+        );
+
+        const uploadUrlGeneratorCloudflareResponseBody =
+          await uploadUrlGeneratorCloudflareResponse.json();
+
+        if (uploadUrlGeneratorCloudflareResponseBody.success === true) {
+          urls.push(uploadUrlGeneratorCloudflareResponseBody.result);
+          pending.push({
+            id: uploadUrlGeneratorCloudflareResponseBody.result.id,
+            isPrimary: imageItemParams[i].isPrimary,
+          });
+        } else {
+          console.error(uploadUrlGeneratorCloudflareResponseBody);
+          throw new Error("Error generating urls");
+        }
+      }
+
+      await db
+        .update(producers)
+        .set({
+          pendingImages: pending,
+          updatedAt: new Date(),
+        })
+        .where(eq(producers.id, producer.id));
+
+      return urls;
+    }
+  );
+
+export const requestVideoUploadUrl = producerActionClient
+  .input(type({ producerId: "string" }))
+  .action(async ({ ctx: { userId }, input: { producerId } }) => {
+    const { success } = await videoRatelimit.limit(userId);
+
+    if (!success) {
+      throw new Error("Rate limit exceded");
+    }
+
+    const producer = await db.query.producers.findFirst({
+      columns: {
+        id: true,
+        pendingVideos: true,
+        video: true,
+      },
+      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    const tier = await getSubTier(userId);
+
+    if (tier == "Free" || tier.tier !== "premium") {
+      throw new Error("Must be premium to upload video");
+    }
+
+    if (producer.video) {
+      await cloudflare.stream.delete(producer.video.uid, {
+        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+      });
+      await db
+        .update(producers)
+        .set({
+          video: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(producers.id, producer.id));
+    }
+
+    const form = new FormData();
+
+    form.set("creator", userId);
+    form.set("maxDurationSeconds", "120");
+    form.set(
+      "meta",
+      JSON.stringify({ producerId: producer.id, userId: userId })
+    );
+
+    const uploadUrlGeneratorCloudflareResponse = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${env.SAFE_CLOUDFLARE_ACCOUNT_ID}/stream/direct_upload`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          creator: userId,
+          maxDurationSeconds: 120,
+          allowedOrigins: [
+            "localhost:3000",
+            "*.vercel.app",
+            "eatauthentically.app",
+            "*.eatauthentically.app",
+          ],
+          meta: {
+            producerId: userId,
+            userId: userId,
+          },
+        }),
+      }
+    );
+
+    const uploadUrlGeneratorCloudflareResponseBody =
+      await uploadUrlGeneratorCloudflareResponse.json();
+
+    if (uploadUrlGeneratorCloudflareResponseBody.success === true) {
+      console.log(uploadUrlGeneratorCloudflareResponseBody);
+
+      await db
+        .update(producers)
+        .set({
+          pendingVideos: [
+            ...(producer.pendingVideos ?? []),
+            uploadUrlGeneratorCloudflareResponseBody.result.uid,
+          ],
+          updatedAt: new Date(),
+        })
+        .where(eq(producers.id, producer.id));
+
+      return uploadUrlGeneratorCloudflareResponseBody.result.uploadURL;
+    } else {
+      console.error(uploadUrlGeneratorCloudflareResponseBody);
+      throw new Error("Error generating video url");
+    }
+  });
+
+export const confirmPengingUpload = producerActionClient
+  .input(type({ producerId: "string" }))
+  .action(async ({ ctx: { userId }, input: { producerId } }) => {
+    const producer = await db.query.producers.findFirst({
+      columns: {
+        id: true,
+        images: true,
+        pendingImages: true,
+      },
+      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!producer.pendingImages || producer.pendingImages.length === 0) {
+      throw new Error("No uploads to confirm");
+    }
+
+    const pending = [];
+    const images = producer.images;
+
+    try {
+      const imageListResponse = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${env.SAFE_CLOUDFLARE_ACCOUNT_ID}/images/v2?creator=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
+          },
+        }
+      );
+
+      const imagesListBody = (await imageListResponse.json()) as {
+        success: boolean;
+        result: { images: { id: string }[] };
+      };
+
+      if (imagesListBody.success) {
+      } else {
+        throw new Error("Error listing images");
+      }
+
+      const pendingImagesThatExist = imagesListBody.result.images
+        .filter((ri) => producer.pendingImages?.some((pi) => pi.id === ri.id))
+        .map((i) => ({
+          image: i,
+          pendingData: producer.pendingImages?.find((f) => f.id === i.id),
+        }));
+
+      for (const { image, pendingData } of pendingImagesThatExist) {
+        // const image = await cloudflare.images.v1.get(imageId, {
+        //   account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+        // });
+        if (Object.hasOwn(image, "draft")) {
+          pending.push(pendingData ?? { id: image.id, isPrimary: false });
+          continue;
+        }
+
+        if (pendingData?.isPrimary === true) {
+          images.primaryImgId === pendingData.id;
+        }
+
+        images.items.push({
+          _type: "cloudflare",
+          cloudflareId: image.id,
+          cloudflareUrl: `https://imagedelivery.net/${env.SAFE_CLOUDFLARE_ACCOUNT_HASH}/${image.id}/public`,
+          alt: "",
+        });
+      }
+
+      await db
+        .update(producers)
+        .set({
+          images: images,
+          pendingImages: pending,
+          updatedAt: new Date(),
+        })
+        .where(eq(producers.id, producer.id));
+    } catch (err) {
+      console.error(err);
+      throw new Error("Error generating urls");
+    }
+  });
+
+export const confirmPendingVideoUpload = producerActionClient
+  .input(type({ producerId: "string" }))
+  .action(async ({ ctx: { userId }, input: { producerId } }) => {
+    const producer = await db.query.producers.findFirst({
+      columns: {
+        id: true,
+        pendingVideos: true,
+      },
+      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!producer.pendingVideos || producer.pendingVideos.length === 0) {
+      throw new Error("No video uploads to confirm");
+    }
+
+    try {
+      const pending = [];
+      let videoData: Video | undefined = undefined;
+
+      const videosPage = await cloudflare.stream.list({
+        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+        creator: userId,
+      });
+
+      const pendingVideosThatExists = videosPage.result.filter((v) =>
+        producer.pendingVideos?.some((v2) => v.uid === v2)
+      );
+
+      for (const video of pendingVideosThatExists) {
+        console.log(video);
+        if (
+          !video.status ||
+          video.status.state === "error" ||
+          video.status.state === "pendingupload"
+        ) {
+          pending.push(video.uid!);
+          continue;
+        }
+
+        videoData = {
+          uid: video.uid!,
+          status: video.status.state === "ready" ? "ready" : "pending",
+          url: `https://customer-a80gdw9axz7eg3xk.cloudflarestream.com/${video.uid!}/manifest/video.m3u8`,
+          _type: "cloudflare",
+        };
+      }
+
+      await db
+        .update(producers)
+        .set({
+          pendingVideos: pending,
+          video: videoData,
+          updatedAt: new Date(),
+        })
+        .where(eq(producers.id, producer.id));
+    } catch (err) {
+      console.error(err);
+      throw new Error("Error generating urls");
+    }
+  });
+
+export const deleteVideo = producerActionClient
+  .input(type({ producerId: "string" }))
+  .action(async ({ ctx: { userId }, input: { producerId } }) => {
+    const producer = await db.query.producers.findFirst({
+      columns: {
+        id: true,
+        video: true,
+      },
+      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+    });
+
+    if (!producer || !producer.video) {
+      throw new Error("Unauthorized");
+    }
+
+    await cloudflare.stream.delete(producer.video.uid, {
+      account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+    });
+
+    await db
+      .update(producers)
+      .set({
+        video: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(producers.id, producer.id));
+  });
+
+export const updateExistingImages = producerActionClient
+  .input(type({ producerId: "string", data: producerImagesValidator }))
+  .action(async ({ ctx: { userId }, input: { producerId, data } }) => {
+    const producer = await db.query.producers.findFirst({
+      columns: {
+        id: true,
+        images: true,
+        pendingImages: true,
+      },
+      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    const imagesToKeep = producer.images.items.filter((i) =>
+      data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
+    );
+
+    const imagesToDelete = producer.images.items.filter(
+      (i) => !data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
+    );
+
+    await db
+      .update(producers)
+      .set({
+        images: {
+          items: imagesToKeep,
+          primaryImgId:
+            data.primaryImgId ??
+            imagesToKeep.find(
+              (i) => i.cloudflareId === producer.images.primaryImgId
+            )?.cloudflareId ??
+            null,
+        },
+        updatedAt: new Date(),
+      })
+      .where(eq(producers.id, producer.id));
+
+    for (const image of imagesToDelete) {
+      console.log(
+        `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by user(${userId})`
+      );
+
+      const response = await cloudflare.images.v1.delete(image.cloudflareId, {
+        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+      });
+
+      console.log(
+        `action [updateExistingImages] - Cloudflare delete image response`,
+        response
+      );
+    }
+  });

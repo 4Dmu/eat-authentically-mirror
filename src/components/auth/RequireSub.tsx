@@ -22,7 +22,6 @@ export function Subbed({
 
 export function NotSubbed({
   children,
-  tiers,
   initialSubTier = "Free",
 }: PropsWithChildren & { initialSubTier?: SubTier; tiers?: Tier[] }) {
   const { subTier } = useSubTier({ initialData: initialSubTier });

@@ -2,16 +2,16 @@
 
 import { Certification } from "@/backend/db/schema";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import { Listing } from "@/backend/validators/listings";
+import { Producer } from "@/backend/validators/listings";
 import { BackButton } from "@/components/back-button";
 import { ProducerEditForm } from "@/components/forms/edit-producer-form";
 
-export function ListingPageClient({
-  listing,
+export function ProducersPageClient({
+  producer,
   tier,
   allCertifications,
 }: {
-  listing: Listing;
+  producer: Producer;
   allCertifications: Certification[];
   tier: SubTier;
 }) {
@@ -21,7 +21,7 @@ export function ListingPageClient({
         <BackButton text="Back home" href={"/"} />
       </div>
       <ProducerEditForm
-        currentListing={listing}
+        producer={producer}
         certifications={allCertifications}
         tier={tier}
       />

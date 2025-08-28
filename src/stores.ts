@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import {
-  RegisterListingArgs,
+  RegisterProducerArgs,
   ListingTypes,
 } from "@/backend/validators/listings";
 
@@ -45,8 +45,8 @@ export const useHomePageStore = create<HomePageState>((set, get) => ({
 }));
 
 export const useProducerRegisterStore = create<{
-  args: RegisterListingArgs | undefined;
-  setArgs: (args: RegisterListingArgs | undefined) => void;
+  args: RegisterProducerArgs | undefined;
+  setArgs: (args: RegisterProducerArgs | undefined) => void;
 }>((set) => ({
   args: undefined,
   setArgs: (args) => set({ args }),

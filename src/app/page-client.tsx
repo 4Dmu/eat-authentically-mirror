@@ -6,7 +6,7 @@ import { ListingCard } from "@/components/listing-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useHomePageStore } from "@/stores";
-import { listingsQueryOptions } from "@/utils/listings";
+import { producersQueryOptions } from "@/utils/producers";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
@@ -18,7 +18,7 @@ export function Page() {
   const debouncedQuery = useDebounce(query, 500);
 
   const { data, isPlaceholderData } = useQuery(
-    listingsQueryOptions({
+    producersQueryOptions({
       type: typeFilter,
       page: page,
       certs: certs.map((cert) => cert.id),
