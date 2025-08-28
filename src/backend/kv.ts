@@ -104,6 +104,9 @@ export const ORG_DATA_KV = {
   async set(organization: Organization) {
     await redis.set(this.generateKey(organization.id), organization);
   },
+  async delete(organizationId: string) {
+    await redis.del(this.generateKey(organizationId));
+  },
 };
 
 export const ORG_STRIPE_CUSTOMER_ID_KV = {
