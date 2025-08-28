@@ -149,7 +149,7 @@ export const VideoForm = withForm({
         </CardHeader>
         <CardContent>
           <Button asChild>
-            <Link href={"/"}>Upgrade to Premium</Link>
+            <Link href={"/dashboard/billing/maybe"}>Upgrade to Premium</Link>
           </Button>
         </CardContent>
       </Card>
