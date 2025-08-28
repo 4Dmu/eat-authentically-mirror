@@ -8,7 +8,7 @@ export function ListingCard({ listing }: { listing: PublicListingLight }) {
   return (
     <Link
       href={`/listings/${listingSlug(listing.name)}${listing.id}`}
-      className="border border-black rounded-lg overflow-hidden relative"
+      className="border rounded-lg overflow-hidden relative shadow-lg"
     >
       <Image
         width={1920}

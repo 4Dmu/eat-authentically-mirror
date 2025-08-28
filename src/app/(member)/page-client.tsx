@@ -32,10 +32,10 @@ export function Page() {
   return (
     <div className="flex flex-col gap-10">
       <HeroCarousel />
-      <div className="p-10 md:p-20">
-        <div className="max-w-5xl mx-auto flex flex-col gap-5">
+      <div className="p-5">
+        <div className="max-w-7xl mx-auto flex flex-col gap-5">
           <div className="flex gap-5 justify-between">
-            <h2 className="font-bold text-4xl">Find Real Food Listings</h2>
+            <h2 className="font-bold text-4xl">Find Real Food Producers</h2>
             <FilterMenu />
           </div>
           <p>

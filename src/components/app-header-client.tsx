@@ -16,7 +16,7 @@ export function Header({ authState }: { authState: AuthState }) {
     <div
       className={`${
         pathname === "/"
-          ? "fixed top-0 left-0 z-10 bg-primary/75"
+          ? "fixed top-0 left-0 z-10 bg-primary/50"
           : "bg-primary"
       } text-primary-foreground w-full`}
     >
