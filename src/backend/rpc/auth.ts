@@ -1,13 +1,14 @@
 "use server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { actionClient } from "./helpers/safe-action";
 import { getUsersOrganizationIdCached } from "../data/organization";
 import {
   ORG_DATA_KV,
   ORG_STRIPE_CUSTOMER_ID_KV,
+  USER_DATA_KV,
   USER_STRIPE_CUSTOMER_ID_KV,
 } from "../kv";
-import { getSubTier } from "./utils/get-sub-tier";
+import { getSubTier, SubTier } from "./utils/get-sub-tier";
 import { Plan } from "../stripe/subscription-plans";
 
 export type AuthState =
@@ -77,3 +78,19 @@ export const getAuthState = actionClient.action(
     } as const;
   }
 );
+
+export const fetchSubTier = actionClient.action(async (): Promise<SubTier> => {
+  return await getSubTier();
+});
+
+export const fetchUser = actionClient.action(async () => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return null;
+  }
+
+  const userData = await USER_DATA_KV.get(userId);
+
+  return userData;
+});

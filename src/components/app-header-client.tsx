@@ -4,12 +4,23 @@ import { AppNavSheet } from "./app-nav-sheet";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignedOut } from "@clerk/nextjs";
 import { NotSubbed } from "./auth/RequireSub";
 import { UserButton } from "./auth/UserButton";
 import { AuthState } from "@/backend/rpc/auth";
+import { UserJSON } from "@clerk/backend";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import SignedIn from "./auth/SignedIn";
 
-export function Header({ authState }: { authState: AuthState }) {
+export function Header({
+  authState,
+  userFromServer,
+  subTier,
+}: {
+  authState: AuthState;
+  userFromServer: UserJSON | null;
+  subTier: SubTier;
+}) {
   const pathname = usePathname();
 
   return (
@@ -21,7 +32,7 @@ export function Header({ authState }: { authState: AuthState }) {
       } text-primary-foreground w-full`}
     >
       <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">
-        <AppNavSheet />
+        <AppNavSheet subTier={subTier} />
         <Link
           className="font-bold justify-self-center text-lg self-center"
           href={"/"}
@@ -35,14 +46,17 @@ export function Header({ authState }: { authState: AuthState }) {
           />
         </Link>
         <div className="flex gap-2 justify-end items-center">
-          <SignedIn>
-            <NotSubbed>
+          <SignedIn userFromServer={userFromServer}>
+            <NotSubbed initialSubTier={subTier}>
               <Button variant={"secondary"} asChild>
                 <Link href="/members/subscribe">Upgrade</Link>
               </Button>
             </NotSubbed>
           </SignedIn>
-          <UserButton authState={authState} />
+          <UserButton
+            userFromServer={userFromServer}
+            subTierFromServer={subTier}
+          />
           <SignedOut>
             <Button variant={"secondary"} asChild>
               <Link href="/sign-in">Sign In</Link>

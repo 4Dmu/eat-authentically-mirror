@@ -30,36 +30,40 @@ export function Page() {
   );
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10  bg-gray-50">
       <HeroCarousel />
       <div className="p-5">
-        <div className="max-w-7xl mx-auto flex flex-col gap-5">
+        <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
           <div className="flex gap-5 justify-between">
-            <h2 className="font-bold text-4xl">Find Real Food Producers</h2>
+            <h2 className="font-bold text-4xl text-gray-900">
+              Find Real Food Producers
+            </h2>
             <FilterMenu />
           </div>
-          <p>
+          <p className="font-inter text-lg text-gray-600 max-w-2xl">
             Find sustainable farms, ranches, and eateries committed to real food
           </p>
-          <div className="flex flex-wrap gap-3 border border-black p-5 rounded-lg">
-            <p>Active filters:</p>
-            {typeFilter && <Badge>Type: {typeFilter}</Badge>}
-            {query && <Badge>Name Search: {query}</Badge>}
-            {locationSearchArea && (
-              <Badge>Location Filter: Your Selected Area</Badge>
-            )}
-            {certs.length > 0 && (
-              <Badge className="flex-wrap">
-                Cert:{" "}
-                {certs.map((cert) => (
-                  <span key={cert.name}>{cert.name}</span>
-                ))}
-              </Badge>
-            )}
-            <p className="text-muted-foreground ml-auto">
-              ({data?.data.length} results)
-            </p>
-          </div>
+          {(certs.length > 0 || typeFilter || query || locationSearchArea) && (
+            <div className="flex flex-wrap bg-white gap-3 border p-5 rounded-lg">
+              <p>Active filters:</p>
+              {typeFilter && <Badge>Type: {typeFilter}</Badge>}
+              {query && <Badge>Name Search: {query}</Badge>}
+              {locationSearchArea && (
+                <Badge>Location Filter: Your Selected Area</Badge>
+              )}
+              {certs.length > 0 && (
+                <Badge className="flex-wrap">
+                  Cert:{" "}
+                  {certs.map((cert) => (
+                    <span key={cert.name}>{cert.name}</span>
+                  ))}
+                </Badge>
+              )}
+              <p className="text-muted-foreground ml-auto">
+                ({data?.data.length} results)
+              </p>
+            </div>
+          )}
           <div className="flex justify-between gap-5">
             <span>Current Page: {page + 1}</span>
             <div className="flex gap-2">

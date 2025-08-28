@@ -7,17 +7,26 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import { FactoryIcon, LogOutIcon, UserIcon } from "lucide-react";
-import { ManageSubscriptionsButton } from "./ManageSubscriptionsButton";
+import { LogOutIcon, UserIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { useAuth, useUser } from "@clerk/nextjs";
-import { AuthState } from "@/backend/rpc/auth";
+import { useAuth } from "@clerk/nextjs";
+import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import { UserJSON } from "@clerk/backend";
+import { useUser } from "@/hooks/use-user";
+import { useSubTier } from "@/hooks/use-sub-tier";
 
-export function UserButton({ authState }: { authState: AuthState }) {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { signOut } = useAuth();
+export function UserButton({
+  subTierFromServer,
+  userFromServer,
+}: {
+  subTierFromServer: SubTier;
+  userFromServer: UserJSON | null;
+}) {
+  const { subTier } = useSubTier({ initialData: subTierFromServer });
+  const { signOut, userId } = useAuth();
+  const { user } = useUser({ initialData: userFromServer, userId });
 
-  if (!authState.isAuthed || (isLoaded && !isSignedIn)) {
+  if (!user) {
     return null;
   }
 
@@ -29,7 +38,7 @@ export function UserButton({ authState }: { authState: AuthState }) {
           width={28}
           height={28}
           alt=""
-          src={isLoaded ? user.imageUrl : authState.userData.imageUrl}
+          src={user.image_url}
         />
       </PopoverTrigger>
       <PopoverContent
@@ -42,17 +51,18 @@ export function UserButton({ authState }: { authState: AuthState }) {
             width={40}
             height={40}
             alt=""
-            src={isLoaded ? user.imageUrl : authState.userData.imageUrl}
+            src={user.image_url}
           />
           <div className="flex flex-col items-start">
             <p className="text-sm font-bold items-start">
-              {user?.firstName ?? user?.primaryEmailAddress?.emailAddress}
+              {user?.first_name ??
+                user?.email_addresses?.find(
+                  (e) => e.id === user.primary_email_address_id
+                )?.email_address}
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Badge>
-              {authState.subTier === "Free" ? "Free" : authState.subTier.tier}
-            </Badge>
+            <Badge>{subTier === "Free" ? "Free" : subTier.tier}</Badge>
           </div>
         </div>
         <Separator />
@@ -67,7 +77,7 @@ export function UserButton({ authState }: { authState: AuthState }) {
             <p>Account</p>
           </Link>
         </Button>
-        {authState?.orgId && (
+        {/* {authState?.orgId && (
           <Button
             asChild
             variant={"ghost"}
@@ -83,7 +93,7 @@ export function UserButton({ authState }: { authState: AuthState }) {
           <div className="flex gap-2">
             <ManageSubscriptionsButton />
           </div>
-        )}
+        )} */}
         <div className="flex gap-2">
           <Button
             variant={"ghost"}

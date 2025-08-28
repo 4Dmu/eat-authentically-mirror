@@ -19,8 +19,9 @@ import { OrgSignedOut } from "./auth/RequireOrg";
 import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 
-export function AppNavSheet() {
+export function AppNavSheet({ subTier }: { subTier: SubTier }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -92,7 +93,7 @@ export function AppNavSheet() {
             </Button>
           </SignedOut>
           <SignedIn>
-            <NotSubbed>
+            <NotSubbed initialSubTier={subTier}>
               <Separator />
               <Button asChild>
                 <Link href="/members/subscribe">Upgrade</Link>

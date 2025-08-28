@@ -154,7 +154,16 @@ export const ImagesForm = withForm({
                         <form.Field name="images.items" mode="array">
                           {(subField) => (
                             <Button
-                              onClick={() => subField.removeValue(i)}
+                              onClick={() => {
+                                if (field.state.value.items.length == 1) {
+                                  field.handleChange({
+                                    items: [],
+                                    primaryImgId: null,
+                                  });
+                                } else {
+                                  subField.removeValue(i);
+                                }
+                              }}
                               size={"icon"}
                               variant={"destructive"}
                             >

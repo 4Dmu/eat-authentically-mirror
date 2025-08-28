@@ -1,35 +1,36 @@
-import { AuthState } from "@/backend/rpc/auth";
+import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Tier } from "@/backend/stripe/subscription-plans";
-import { useAuthState } from "@/hooks/use-auth-state";
+import { useSubTier } from "@/hooks/use-sub-tier";
 import { PropsWithChildren } from "react";
 
-export function Subbed(
-  props: PropsWithChildren & { tiers?: Tier[]; initialAuthState?: AuthState }
-) {
-  const { data } = useAuthState({ initialData: props.initialAuthState });
+export function Subbed({
+  children,
+  tiers,
+  initialSubTier = "Free",
+}: PropsWithChildren & { tiers?: Tier[]; initialSubTier?: SubTier }) {
+  const { subTier } = useSubTier({ initialData: initialSubTier });
 
   const allow =
-    data &&
-    data.isAuthed &&
-    data.subTier !== "Free" &&
-    (props.tiers ? props.tiers.includes(data.subTier.tier) : true);
+    subTier !== "Free" && (tiers ? tiers.includes(subTier.tier) : true);
 
   if (allow) {
-    return props.children;
+    return children;
   }
 
   return null;
 }
 
-export function NotSubbed(
-  props: PropsWithChildren & { initialAuthState?: AuthState; tiers?: Tier[] }
-) {
-  const { data } = useAuthState({ initialData: props.initialAuthState });
+export function NotSubbed({
+  children,
+  tiers,
+  initialSubTier = "Free",
+}: PropsWithChildren & { initialSubTier?: SubTier; tiers?: Tier[] }) {
+  const { subTier } = useSubTier({ initialData: initialSubTier });
 
-  const allow = data !== undefined && data.isAuthed && data.subTier === "Free";
+  const allow = subTier === "Free";
 
   if (allow) {
-    return props.children;
+    return children;
   }
 
   return null;

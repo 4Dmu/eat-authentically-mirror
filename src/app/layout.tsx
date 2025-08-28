@@ -6,6 +6,8 @@ import ReactQueryProvider from "@/components/react-query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import { Header } from "@/components/app-header";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
@@ -51,10 +53,12 @@ export default function RootLayout({
           <body
             className={`${interSans.variable} ${fraunces.variable} antialiased`}
           >
+            <Header />
             {children}
             <Toaster />
             <SpeedInsights />
             <Analytics />
+            <ReactQueryDevtools />
           </body>
         </html>
       </ReactQueryProvider>
