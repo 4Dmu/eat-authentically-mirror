@@ -5,6 +5,15 @@ import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Producer } from "@/backend/validators/producers";
 import { BackButton } from "@/components/back-button";
 import { ProducerEditForm } from "@/components/forms/edit-producer-form";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 export function ProducersPageClient({
   producer,
@@ -17,8 +26,34 @@ export function ProducersPageClient({
 }) {
   return (
     <main className="p-10 overflow-auto flex flex-col gap-10 h-[calc(100vh_-_68px)] bg-muted">
-      <div className="w-full self-center max-w-7xl">
-        <BackButton text="Back home" href={"/"} />
+      <div className="flex items-center justify-between">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                asChild
+                className="cursor-pointer hover:text-primary"
+              >
+                <Link href={"/"}>Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                asChild
+                className="cursor-pointer hover:text-primary"
+              >
+                <Link href={"/dashboard"}>My Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{producer.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        <BackButton href={"/"} text="Back to Home" />
       </div>
       <ProducerEditForm
         producer={producer}
