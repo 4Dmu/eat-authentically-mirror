@@ -8,6 +8,15 @@ export const PRODUCER_TYPES = [
   "eatery",
 ] as const satisfies ProducerTypes[];
 
+export const PRODUCER_CLAIM_METHODS = [
+  "contact-email-link",
+  "domain-email-link",
+  "domain-dns",
+  "contact-phone-link",
+  "social-post",
+  "manual",
+] as const satisfies ProducerClaimVerificationMethods[];
+
 export const producerTypesValidator = type("'farm'|'ranch'|'eatery'");
 
 export const producerClaimContactEmailLinkMethod = type("'contact-email-link'");
@@ -24,6 +33,37 @@ export const producerClaimVerificationMethods =
     .or(producerClaimContactPhoneLinkMethod)
     .or(producerClaimSocialPostMethod)
     .or(producerClaimManualMethod);
+
+export const claimProducerVerification = type({
+  method: producerClaimContactEmailLinkMethod,
+})
+  .or(
+    type({
+      method: producerClaimContactPhoneLinkMethod,
+    })
+  )
+  .or(
+    type({
+      method: producerClaimDomainDNSLinkMethod,
+    })
+  )
+  .or(
+    type({
+      method: producerClaimManualMethod,
+    })
+  )
+  .or(
+    type({
+      method: producerClaimDomainEmailLinkMethod,
+      domainDomainEmailPart: "string",
+    })
+  )
+  .or(
+    type({
+      method: producerClaimSocialPostMethod,
+      socialHandle: "string",
+    })
+  );
 
 export const contactValidator = type({
   "email?": "string.email|null",
@@ -208,24 +248,7 @@ export const registerProducerArgsValidator = type({
 
 export const claimProducerArgs = type({
   producerId: "string",
-  verification: type({
-    method: producerClaimContactEmailLinkMethod
-      .or(producerClaimContactPhoneLinkMethod)
-      .or(producerClaimDomainDNSLinkMethod)
-      .or(producerClaimManualMethod),
-  })
-    .or(
-      type({
-        method: producerClaimDomainEmailLinkMethod,
-        domainDomainEmailPart: "string",
-      })
-    )
-    .or(
-      type({
-        method: producerClaimSocialPostMethod,
-        socialHandle: "string",
-      })
-    ),
+  verification: claimProducerVerification,
 });
 
 export type ListProducerArgs = typeof listProducersArgsValidator.infer;
@@ -256,5 +279,7 @@ export type EditProducerArgs = typeof editProducerArgsValidator.infer;
 
 export type ProducerClaimVerificationMethods =
   typeof producerClaimVerificationMethods.infer;
+
+export type ClaimProducerVerification = typeof claimProducerVerification.infer;
 
 export type ClaimProducerArgs = typeof claimProducerArgs.infer;

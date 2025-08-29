@@ -22,7 +22,10 @@ export const VideoForm = withForm({
     tier: "Free" as SubTier,
   },
   render: function ({ tier, form }) {
-    if (tier !== "Free" && tier.tier === "premium") {
+    if (
+      tier !== "Free" &&
+      (tier.tier === "premium" || tier.tier === "enterprise")
+    ) {
       return (
         <Card>
           <CardHeader>

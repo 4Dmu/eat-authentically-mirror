@@ -11,7 +11,10 @@ import {
   type ImageData,
   type Address,
   PRODUCER_TYPES,
+  PRODUCER_CLAIM_METHODS,
+  ClaimProducerVerification,
 } from "@/backend/validators/producers";
+import { te } from "date-fns/locale";
 
 export type Video = {
   url: string;
@@ -46,6 +49,17 @@ type Commodity = {
   varieties: string[];
 };
 
+export type ClaimRequestStatus =
+  | {
+      type: "waiting";
+    }
+  | {
+      type: "claimed";
+    }
+  | {
+      type: "expired";
+    };
+
 export const producers = sqliteTable("producers", {
   id: text().primaryKey(),
   userId: text(),
@@ -72,8 +86,33 @@ export const producers = sqliteTable("producers", {
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
 
+export const claimRequests = sqliteTable("claim_requests", {
+  id: text().primaryKey(),
+  userId: text().notNull(),
+  producerId: text()
+    .notNull()
+    .references(() => producers.id),
+  requestedVerification: text({ mode: "json" })
+    .$type<ClaimProducerVerification>()
+    .notNull(),
+  status: text({ mode: "json" }).$type<ClaimRequestStatus>().notNull(),
+  claimToken: text().notNull(),
+  claimedAt: integer({ mode: "timestamp" }),
+  expiredAt: integer({ mode: "timestamp" }),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  updatedAt: integer({ mode: "timestamp" }).notNull(),
+});
+
 export const producersRelations = relations(producers, ({ many }) => ({
   certificationsToProducers: many(certificationsToProducers),
+  claimRequests: many(claimRequests),
+}));
+
+export const claimRequestsRelations = relations(claimRequests, ({ one }) => ({
+  producer: one(producers, {
+    fields: [claimRequests.producerId],
+    references: [producers.id],
+  }),
 }));
 
 export const certifications = sqliteTable("certifications", {

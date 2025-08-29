@@ -26,7 +26,7 @@ import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Badge } from "@/components/ui/badge";
 import { NotSubbed } from "@/components/auth/RequireSub";
 import { AddProducerDialog } from "@/components/add-producer-dialog";
-import { fetchUserProducers } from "@/backend/rpc/producers";
+import { fetchUserProducers, listClaimRequests } from "@/backend/rpc/producers";
 import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 
@@ -38,6 +38,7 @@ export default async function DashboardPage() {
   }
   const producers = await fetchUserProducers();
   const subTier = await getSubTier(user.id);
+  const claims = await listClaimRequests();
 
   return (
     <div className="p-10">
@@ -98,7 +99,7 @@ export default async function DashboardPage() {
             </CardAction>
           </CardHeader>
           {producers.length > 0 && (
-            <CardContent className="grid grid-cols-2">
+            <CardContent className="grid grid-cols-2 gap-10">
               {producers.map((p) => (
                 <Card
                   key={p.id}
@@ -107,7 +108,7 @@ export default async function DashboardPage() {
                   <Image
                     src={primaryImageUrl(p)}
                     alt=""
-                    className="w-full object-cover"
+                    className="w-full object-cover aspect-video"
                     width={600}
                     height={600}
                   />
@@ -116,7 +117,7 @@ export default async function DashboardPage() {
                     <Badge>{p.type}</Badge>
                     <p>{p.about}</p>
                   </CardContent>
-                  <CardFooter className="grid grid-cols-3 gap-2">
+                  <CardFooter className="grid grid-cols-3 gap-2 mt-auto">
                     <Button variant={"outline"} asChild>
                       <Link href={`/producers/${producerSlugFull(p)}`}>
                         <EyeIcon />
@@ -136,6 +137,30 @@ export default async function DashboardPage() {
                     </div>
                   </CardFooter>
                 </Card>
+              ))}
+            </CardContent>
+          )}
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BuildingIcon />
+              Claim Requests
+            </CardTitle>
+            <CardAction className="flex gap-2">
+              <AddProducerDialog />
+              <ClaimProducerDialog />
+            </CardAction>
+          </CardHeader>
+          {claims.length > 0 && (
+            <CardContent className="grid grid-cols-4">
+              {claims.map((p) => (
+                <div key={p.id} className="rounded-lg border p-5 shadow">
+                  <p className="font-bold">
+                    Claim Request For "{p.producer.name}"
+                  </p>
+                  <Badge>{p.status.type}</Badge>
+                </div>
               ))}
             </CardContent>
           )}

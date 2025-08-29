@@ -37,7 +37,7 @@ export const ImagesForm = withForm({
         ? 1
         : tier.tier === "pro"
         ? 4
-        : tier.tier === "premium"
+        : tier.tier === "premium" || tier.tier === "enterprise"
         ? 5
         : 1;
 
@@ -56,7 +56,7 @@ export const ImagesForm = withForm({
                 ? 1
                 : tier.tier === "pro"
                 ? 4
-                : tier.tier === "premium"
+                : tier.tier === "premium" || tier.tier === "enterprise"
                 ? 5
                 : 1}{" "}
               Image

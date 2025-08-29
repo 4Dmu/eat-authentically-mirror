@@ -12,7 +12,12 @@ import {
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
 import { db } from "../db";
-import { certificationsToProducers, producers, Video } from "../db/schema";
+import {
+  certificationsToProducers,
+  claimRequests,
+  producers,
+  Video,
+} from "../db/schema";
 import { and, eq, inArray, isNull, not } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
@@ -28,6 +33,9 @@ import {
 } from "../validators/producers";
 import { withCertificationsSingle } from "../utils/transform-data";
 import isURL from "validator/es/lib/isURL";
+import { resend } from "../lib/resend";
+import ClaimListingEmail from "@/components/emails/claim-listing-email";
+import { generateToken } from "../utils/generate-tokens";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -306,7 +314,7 @@ export const requestUploadUrls = producerActionClient
           ? 1
           : tier.tier === "pro"
           ? 4
-          : tier.tier === "premium"
+          : tier.tier === "premium" || tier.tier === "enterprise"
           ? 5
           : 1;
 
@@ -390,7 +398,10 @@ export const requestVideoUploadUrl = producerActionClient
 
     const tier = await getSubTier(userId);
 
-    if (tier == "Free" || tier.tier !== "premium") {
+    if (
+      tier == "Free" ||
+      !(tier.tier === "enterprise" || tier.tier === "premium")
+    ) {
       throw new Error("Must be premium to upload video");
     }
 
@@ -730,6 +741,17 @@ export const claimProducer = authenticatedActionClient
         throw new Error("This listing cannot be claimed");
       }
 
+      const existingClaim = await db.query.claimRequests.findFirst({
+        where: and(
+          eq(claimRequests.producerId, producer.id),
+          eq(claimRequests.userId, userId)
+        ),
+      });
+
+      if (existingClaim) {
+        throw new Error("You already have a claim attempt");
+      }
+
       switch (verification.method) {
         case "contact-email-link":
           const email = type("string.email")(producer.contact?.email?.trim());
@@ -738,7 +760,33 @@ export const claimProducer = authenticatedActionClient
             throw new Error("Method invalid: Missing or invalid contact email");
           }
 
-          console.warn("Implement producer claim contact-email-link method");
+          const token = generateToken();
+          const claimUrl = `${env.SITE_URL}/claim?token=${token}`;
+
+          await db.insert(claimRequests).values({
+            id: crypto.randomUUID(),
+            producerId: producer.id,
+            userId: userId,
+            status: {
+              type: "waiting",
+            },
+            requestedVerification: {
+              method: verification.method,
+            },
+            claimToken: token,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          await resend.emails.send({
+            from: env.RESEND_FROM_EMAIL,
+            to: [email],
+            subject: "Claim Producer",
+            react: ClaimListingEmail({
+              producer: { name: producer.name },
+              url: claimUrl,
+            }),
+          });
 
           break;
         case "domain-dns":
@@ -764,9 +812,41 @@ export const claimProducer = authenticatedActionClient
             );
           }
 
-          console.warn(
-            "Implement producer claim domain-dns and domain-email-link methods"
-          );
+          if (verification.method === "domain-email-link") {
+            const token = generateToken();
+            const claimUrl = `${env.SITE_URL}/claim?token=${token}`;
+            const email = `${verification.domainDomainEmailPart}@${domain}`;
+
+            await db.insert(claimRequests).values({
+              id: crypto.randomUUID(),
+              producerId: producer.id,
+              userId: userId,
+              status: {
+                type: "waiting",
+              },
+              requestedVerification: {
+                method: verification.method,
+                domainDomainEmailPart: verification.domainDomainEmailPart,
+              },
+              claimToken: token,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+
+            await resend.emails.send({
+              from: env.RESEND_FROM_EMAIL,
+              to: [email],
+              subject: "Claim Producer",
+              react: ClaimListingEmail({
+                producer: { name: producer.name },
+                url: claimUrl,
+              }),
+            });
+          } else {
+            console.warn(
+              "Implement producer claim domain-dns and domain-email-link methods"
+            );
+          }
 
           break;
         case "contact-phone-link":
@@ -808,3 +888,16 @@ export const claimProducer = authenticatedActionClient
       }
     }
   );
+
+export const listClaimRequests = authenticatedActionClient.action(
+  async ({ userId }) => {
+    return await db.query.claimRequests.findMany({
+      where: eq(claimRequests.userId, userId),
+      with: {
+        producer: {
+          columns: { name: true, id: true },
+        },
+      },
+    });
+  }
+);
