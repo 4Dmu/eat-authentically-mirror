@@ -28,6 +28,7 @@ import { NotSubbed } from "@/components/auth/RequireSub";
 import { AddProducerDialog } from "@/components/add-producer-dialog";
 import { fetchUserProducers } from "@/backend/rpc/producers";
 import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
+import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -93,7 +94,7 @@ export default async function DashboardPage() {
             </CardTitle>
             <CardAction className="flex gap-2">
               <AddProducerDialog />
-              <Button variant={"outline"}>Claim</Button>
+              <ClaimProducerDialog />
             </CardAction>
           </CardHeader>
           {producers.length > 0 && (

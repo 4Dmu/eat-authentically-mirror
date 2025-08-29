@@ -190,7 +190,7 @@ export function ProducerEditForm(props: {
   }
 
   return (
-    <div className="max-w-4xl w-full self-center flex flex-col gap-10 pb-20">
+    <div className="w-full flex flex-col gap-10">
       <div className="flex flex-col gap-2">
         <h1 className="font-bold text-3xl">Edit Producer Profile</h1>
         <p className="text-muted-foreground">

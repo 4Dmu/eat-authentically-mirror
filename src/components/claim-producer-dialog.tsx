@@ -1,0 +1,683 @@
+"use client";
+import React, { ReactNode, useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Button } from "./ui/button";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  claimProducerOpts,
+  primaryImageUrl,
+  producersFullQueryOptions,
+} from "@/utils/producers";
+import { useDebounce } from "@uidotdev/usehooks";
+import { Input } from "./ui/input";
+import { ScrollArea } from "./ui/scroll-area";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import {
+  ProducerClaimVerificationMethods,
+  PublicProducer,
+} from "@/backend/validators/producers";
+import Image from "next/image";
+import { match } from "ts-pattern";
+import { Label } from "./ui/label";
+import { countryByAlpha3Code } from "@/utils/contries";
+import { type } from "arktype";
+import { Card } from "./ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { toast } from "sonner";
+
+type Mode = "select" | "review" | "verify" | "submit";
+
+type InputStep =
+  | { mode: "select" }
+  | { mode: "review"; producer: PublicProducer }
+  | { mode: "verify"; producer: PublicProducer }
+  | {
+      mode: "submit";
+      producer: PublicProducer;
+      verification: ProducerClaimVerificationMethods;
+    };
+
+type Step =
+  | { mode: "select" }
+  | { mode: "review"; producer: PublicProducer }
+  | { mode: "verify"; producer: PublicProducer }
+  | {
+      mode: "submit";
+      producer: PublicProducer;
+      verification:
+        | {
+            method: Extract<
+              ProducerClaimVerificationMethods,
+              "contact-email-link"
+            >;
+            email: string;
+          }
+        | {
+            method: Extract<
+              ProducerClaimVerificationMethods,
+              "domain-email-link"
+            >;
+            domain: string;
+          }
+        | {
+            method: Extract<ProducerClaimVerificationMethods, "domain-dns">;
+            domain: string;
+          }
+        | {
+            method: Extract<
+              ProducerClaimVerificationMethods,
+              "contact-phone-link"
+            >;
+            phone: string;
+          }
+        | {
+            method: Extract<ProducerClaimVerificationMethods, "social-post">;
+            socialProfiles: string[];
+          }
+        | { method: Extract<ProducerClaimVerificationMethods, "manual"> };
+    };
+
+type StepSetter = (step: InputStep) =>
+  | "success"
+  | {
+      error: string;
+    };
+
+function useClaimProducerSteps() {
+  const [currentStep, setCurrentStep] = useState<Step>({ mode: "select" });
+  const [choosenSocialHandle, setChoosenSocialHandle] = useState<
+    string | undefined
+  >(undefined);
+  const [userSpecifiedAddress, setUserSpecifiedAddress] = useState<
+    string | undefined
+  >(undefined);
+
+  function setStep(step: InputStep): "success" | { error: string } {
+    if (currentStep.mode === "submit") {
+      setChoosenSocialHandle(undefined);
+      setUserSpecifiedAddress(undefined);
+    }
+
+    switch (step.mode) {
+      case "select":
+        setCurrentStep(step);
+        return "success";
+      case "review":
+        setCurrentStep(step);
+        return "success";
+      case "verify":
+        setCurrentStep(step);
+        return "success";
+      case "submit":
+        switch (step.verification) {
+          case "contact-email-link":
+            const email = type("string.email")(
+              step.producer.contact?.email?.trim()
+            );
+
+            if (email instanceof type.errors) {
+              return { error: "Missing or invalid contact email" };
+            }
+
+            setCurrentStep({
+              mode: "submit",
+              producer: step.producer,
+              verification: {
+                method: step.verification,
+                email: email,
+              },
+            });
+            return "success";
+          case "domain-dns":
+          case "domain-email-link":
+            const website = step.producer.contact?.website;
+            if (!website) {
+              return { error: "Missing or invalid website" };
+            }
+
+            const url = new URL(website);
+            let host = url.hostname;
+            console.log(host);
+            if (/\..*\./.test(host)) {
+              console.log("match");
+              host = host.substring(host.indexOf(".") + 1);
+            }
+
+            setCurrentStep({
+              mode: "submit",
+              producer: step.producer,
+              verification: {
+                method: step.verification,
+                domain: host,
+              },
+            });
+
+            return "success";
+          case "contact-phone-link":
+            const phone = step.producer.contact?.phone;
+
+            if (!phone) {
+              return { error: "Missing or invalid contact phone" };
+            }
+
+            setCurrentStep({
+              mode: "submit",
+              producer: step.producer,
+              verification: {
+                method: step.verification,
+                phone: phone,
+              },
+            });
+            return "success";
+          case "social-post":
+            const profiles: string[] = [];
+
+            if (step.producer.socialMedia.facebook) {
+              profiles.push(step.producer.socialMedia.facebook);
+            }
+            if (step.producer.socialMedia.instagram) {
+              profiles.push(step.producer.socialMedia.instagram);
+            }
+            if (step.producer.socialMedia.twitter) {
+              profiles.push(step.producer.socialMedia.twitter);
+            }
+
+            if (profiles.length === 0) {
+              return { error: "Must have at least 1 social profile." };
+            }
+
+            setCurrentStep({
+              mode: "submit",
+              producer: step.producer,
+              verification: {
+                method: step.verification,
+                socialProfiles: profiles,
+              },
+            });
+            return "success";
+          case "manual":
+            setCurrentStep({
+              mode: "submit",
+              producer: step.producer,
+              verification: {
+                method: step.verification,
+              },
+            });
+            return "success";
+        }
+    }
+  }
+
+  const submissionRequiresData =
+    currentStep.mode === "submit" &&
+    ((currentStep.verification.method === "domain-email-link" &&
+      userSpecifiedAddress === undefined) ||
+      (currentStep.verification.method === "social-post" &&
+        choosenSocialHandle === undefined));
+
+  return {
+    step: currentStep,
+    setStep: setStep,
+    submitState: {
+      submissionRequiresData,
+      userSpecifiedAddress,
+      setUserSpecifiedAddress,
+      choosenSocialHandle,
+      setChoosenSocialHandle,
+    },
+  };
+}
+
+function useProducers() {
+  const [page, setPage] = useState(0);
+  const [query, setQuery] = useState<string | undefined>(undefined);
+
+  const debouncedQuery = useDebounce(query, 500);
+
+  const { data, isPlaceholderData } = useQuery(
+    producersFullQueryOptions({
+      page,
+      certs: [],
+      query: debouncedQuery,
+      claimed: false,
+    })
+  );
+
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedQuery]);
+
+  return { page, setPage, query, setQuery, data, isPlaceholderData };
+}
+
+export function ClaimProducerDialog() {
+  const [open, setOpen] = useState(false);
+  const { step, setStep, submitState } = useClaimProducerSteps();
+  const { query, setQuery, page, setPage, data, isPlaceholderData } =
+    useProducers();
+
+  const closeDialog = () => {
+    setStep({ mode: "select" });
+    setPage(0);
+    setQuery(undefined);
+    setOpen(false);
+  };
+
+  const claimProducerMutation = useMutation(
+    claimProducerOpts({
+      onSuccess() {
+        closeDialog();
+        toast.success("Producer claim proccess started");
+      },
+      onError(e) {
+        toast.error(e.message);
+      },
+    })
+  );
+
+  function submit() {
+    if (step.mode !== "submit" || submitState.submissionRequiresData) {
+      return;
+    }
+
+    claimProducerMutation.mutate({
+      producerId: step.producer.id,
+      verification: match(step.verification.method)
+        .with("domain-email-link", (v) => ({
+          method: v,
+          domainDomainEmailPart: submitState.userSpecifiedAddress!,
+        }))
+        .with("social-post", (v) => ({
+          method: v,
+          socialHandle: submitState.choosenSocialHandle!,
+        }))
+        .otherwise((v) => ({
+          method: v,
+        })),
+    });
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(e) => {
+        if (!e) {
+          setStep({ mode: "select" });
+          setPage(0);
+          setQuery(undefined);
+        }
+        setOpen(e);
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button variant={"outline"}>Claim</Button>
+      </DialogTrigger>
+      <DialogContent showCloseButton={false} className="sm:max-w-3xl">
+        <Tabs value={step.mode}>
+          <DialogHeader>
+            <div className="flex justify-between items-center">
+              <DialogTitle>Claim Producer</DialogTitle>
+              <TabsList>
+                <TabsTrigger value="select">Select</TabsTrigger>
+                <TabsTrigger value="review">Review</TabsTrigger>
+                <TabsTrigger value="verify">Verify</TabsTrigger>
+                <TabsTrigger value="submit">Submit</TabsTrigger>
+              </TabsList>
+            </div>
+          </DialogHeader>
+
+          <TabsContent value="select" className="p-5">
+            <div className="flex flex-col gap-5">
+              <Input
+                placeholder="Search producers"
+                value={query ?? ""}
+                onChange={(e) =>
+                  setQuery(
+                    e.currentTarget.value.length == 0
+                      ? undefined
+                      : e.currentTarget.value
+                  )
+                }
+              />
+              <ScrollArea className="h-52 w-full">
+                <div className="flex flex-col gap-3">
+                  {data?.data.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setStep({ mode: "review", producer: p })}
+                      className="bg-white hover:bg-accent cursor-pointer border overflow-hidden flex gap-2 items-center rounded-lg"
+                    >
+                      <Image
+                        src={primaryImageUrl(p)}
+                        alt=""
+                        className="border-r"
+                        width={100}
+                        height={100}
+                      />
+                      <p>{p.name}</p>
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+              <div className="flex justify-between gap-5">
+                <span>Current Page: {page + 1}</span>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => setPage((old) => Math.max(old - 1, 0))}
+                    disabled={page === 0}
+                  >
+                    <ArrowLeft />
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (!isPlaceholderData && data?.hasNextPage) {
+                        setPage((old) => old + 1);
+                      }
+                    }}
+                    // Disable the Next Page button until we know a next page is available
+                    disabled={isPlaceholderData || !data?.hasNextPage}
+                  >
+                    <ArrowRight />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="review" className="p-5">
+            {step.mode === "review" && (
+              <div className="flex flex-col gap-5">
+                <p>
+                  Are you the owner of{" "}
+                  <span className="font-bold">{step.producer.name}</span>? If so
+                  please take a moment to verify the below details are correct.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <Label>Phone</Label>
+                    <p>{step.producer.contact?.phone}</p>
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <p>{step.producer.contact?.email}</p>
+                  </div>
+                  <div>
+                    <Label>Website</Label>
+                    <p>{step.producer.contact?.website}</p>
+                  </div>
+                  <div>
+                    <Label>Address</Label>
+                    <p>
+                      {step.producer.address?.street},{" "}
+                      {step.producer.address?.city},{" "}
+                      {step.producer.address?.state},
+                      {step.producer.address?.zip},{" "}
+                      {step.producer.address?.country
+                        ? countryByAlpha3Code(step.producer.address?.country)
+                            .name
+                        : undefined}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="verify" className="p-5">
+            <ScrollArea className="w-full h-[40vh] pr-5">
+              {step.mode === "verify" && (
+                <div className="flex flex-col gap-5 pb-5">
+                  <p>
+                    Select a verification method to claim{" "}
+                    <span className="font-bold">{step.producer.name}</span>
+                  </p>
+                  <p className="font-bold text-lg">Instant / Auto</p>
+                  <div className="flex flex-col gap-5">
+                    <VerificationCard
+                      title="Email link to an address already on the listing"
+                      step={step}
+                      setStep={setStep}
+                      verification="contact-email-link"
+                    />
+                    {step.producer.contact?.website && (
+                      <>
+                        <VerificationCard
+                          title="Email link to any email address on producers domain"
+                          step={step}
+                          setStep={setStep}
+                          verification="domain-email-link"
+                        />
+                        <VerificationCard
+                          title="Add TXT record to domains dns"
+                          step={step}
+                          setStep={setStep}
+                          verification="domain-dns"
+                        />
+                      </>
+                    )}
+                    {step.producer.contact?.phone && (
+                      <VerificationCard
+                        title="Send link to listed phone number"
+                        step={step}
+                        setStep={setStep}
+                        verification="contact-phone-link"
+                      />
+                    )}
+                  </div>
+                  <p className="font-bold text-lg">Slow / Human</p>
+                  <div className="flex flex-col gap-5">
+                    {(step.producer.socialMedia.facebook ||
+                      step.producer.socialMedia.instagram ||
+                      step.producer.socialMedia.twitter) && (
+                      <VerificationCard
+                        title="Post code on social media"
+                        step={step}
+                        setStep={setStep}
+                        verification="social-post"
+                      />
+                    )}
+                    <VerificationCard
+                      title="Manual verification"
+                      text={
+                        <p>
+                          Have some other way to verify your the owner of{" "}
+                          <span className="font-bold">
+                            {step.producer.name}
+                          </span>
+                          ? If so or your can't use any of the above methods
+                          then you can reach out to our team who will try to
+                          manually verify over email.
+                        </p>
+                      }
+                      step={step}
+                      setStep={setStep}
+                      verification="contact-phone-link"
+                    />
+                  </div>
+                </div>
+              )}
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="submit">
+            {step.mode === "submit" && (
+              <div className="flex flex-col gap-5 p-5">
+                <p>
+                  Claim <span className="font-bold">{step.producer.name}</span>{" "}
+                  by{" "}
+                  {match(step.verification)
+                    .with({ method: "contact-email-link" }, (v) => (
+                      <span>
+                        clicking link in email sent to{" "}
+                        <span className="font-bold">{v.email}</span>
+                      </span>
+                    ))
+                    .with({ method: "contact-phone-link" }, (v) => (
+                      <span>
+                        following link in text sent to{" "}
+                        <span className="font-bold">{v.phone}</span>
+                      </span>
+                    ))
+                    .with({ method: "domain-dns" }, (v) => (
+                      <span>
+                        adding a TXT DNS record containing our code to website:{" "}
+                        <span className="font-bold">{v.domain}</span>
+                      </span>
+                    ))
+                    .with({ method: "domain-email-link" }, (v) => (
+                      <span>
+                        clicking link in email sent to your choice of email
+                        using the domain{" "}
+                        <span className="font-bold">{v.domain}</span>
+                      </span>
+                    ))
+                    .with({ method: "social-post" }, (v) => (
+                      <span>
+                        makin social post using our code to one of the following
+                        handles:
+                      </span>
+                    ))
+                    .with({ method: "manual" }, () => <span></span>)
+                    .exhaustive()}
+                </p>
+                {step.verification.method === "domain-email-link" && (
+                  <>
+                    <Input
+                      value={submitState.userSpecifiedAddress ?? ""}
+                      onChange={(e) =>
+                        submitState.setUserSpecifiedAddress(
+                          e.currentTarget.value.length == 0
+                            ? undefined
+                            : e.currentTarget.value
+                        )
+                      }
+                    />
+                    <p>
+                      The email will be sent to{" "}
+                      <span className="font-bold">
+                        {submitState.userSpecifiedAddress}@
+                        {step.verification.domain}
+                      </span>
+                    </p>
+                  </>
+                )}
+                {step.verification.method === "social-post" && (
+                  <Select
+                    value={submitState.choosenSocialHandle ?? ""}
+                    onValueChange={(e) => submitState.setChoosenSocialHandle(e)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select profile" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {step.verification.socialProfiles.map((s) => (
+                        <SelectItem value={s} key={s}>
+                          {s}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            )}
+          </TabsContent>
+
+          <div className="flex gap-2">
+            <DialogClose asChild>
+              <Button variant={"destructive"}>Cancel</Button>
+            </DialogClose>
+            <Button
+              className="ml-auto"
+              variant={"outline"}
+              disabled={step.mode === "select"}
+              onClick={() =>
+                match(step)
+                  .with({ mode: "select" }, () => {})
+                  .with({ mode: "review" }, () => setStep({ mode: "select" }))
+                  .with({ mode: "verify" }, (s) =>
+                    setStep({ mode: "review", producer: s.producer })
+                  )
+                  .with({ mode: "submit" }, (s) =>
+                    setStep({ mode: "verify", producer: s.producer })
+                  )
+                  .exhaustive()
+              }
+            >
+              Back
+            </Button>
+            {step.mode === "review" ? (
+              <Button
+                onClick={() =>
+                  setStep({ mode: "verify", producer: step.producer })
+                }
+              >
+                Continue
+              </Button>
+            ) : (
+              <Button
+                onClick={submit}
+                disabled={
+                  step.mode !== "submit" ||
+                  submitState.submissionRequiresData ||
+                  claimProducerMutation.isPending
+                }
+              >
+                Submit
+              </Button>
+            )}
+          </div>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function VerificationCard({
+  title,
+  text,
+  setStep,
+  step,
+  verification,
+}: {
+  title: string;
+  text?: ReactNode;
+  setStep: StepSetter;
+  step: Exclude<Step, { mode: "select" }>;
+  verification: ProducerClaimVerificationMethods;
+}) {
+  return (
+    <Card className="p-2 flex flex-row items-center justify-between">
+      <div className="flex flex-col gap-2">
+        <p className="font-bold">{title}</p>
+        {text}
+      </div>
+      <div>
+        <Button
+          onClick={() =>
+            setStep({
+              mode: "submit",
+              producer: step.producer,
+              verification: verification,
+            })
+          }
+        >
+          Select
+        </Button>
+      </div>
+    </Card>
+  );
+}

@@ -49,6 +49,10 @@ export async function listProducersPublic(args: ListProducerArgs) {
       queries.push(eq(producers.type, args.type));
     }
 
+    if (args.claimed !== undefined) {
+      queries.push(eq(producers.claimed, args.claimed));
+    }
+
     if (args.certs.length > 0) {
       queries.push(
         inArray(
@@ -86,6 +90,7 @@ export async function listProducersPublic(args: ListProducerArgs) {
         contact: true,
         address: true,
         video: true,
+        socialMedia: true,
       },
       with: {
         certificationsToProducers: {
@@ -126,6 +131,10 @@ export async function listProducersPublicLight(args: ListProducerArgs) {
 
     if (args.type) {
       queries.push(eq(producers.type, args.type));
+    }
+
+    if (args.claimed !== undefined) {
+      queries.push(eq(producers.claimed, args.claimed));
     }
 
     if (args.certs.length > 0) {
@@ -228,6 +237,7 @@ export async function getProducerPublic(args: GetProducerArgs) {
       certificationsToProducers,
       address,
       video,
+      socialMedia,
     } = listing;
 
     return {
@@ -241,6 +251,7 @@ export async function getProducerPublic(args: GetProducerArgs) {
       address,
       contact,
       video,
+      socialMedia,
     } satisfies PublicProducer;
   } catch (err) {
     console.error(err);

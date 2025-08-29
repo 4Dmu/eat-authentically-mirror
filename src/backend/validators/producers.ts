@@ -10,6 +10,21 @@ export const PRODUCER_TYPES = [
 
 export const producerTypesValidator = type("'farm'|'ranch'|'eatery'");
 
+export const producerClaimContactEmailLinkMethod = type("'contact-email-link'");
+export const producerClaimDomainEmailLinkMethod = type("'domain-email-link'");
+export const producerClaimDomainDNSLinkMethod = type("'domain-dns'");
+export const producerClaimContactPhoneLinkMethod = type("'contact-phone-link'");
+export const producerClaimSocialPostMethod = type("'social-post'");
+export const producerClaimManualMethod = type("'manual'");
+
+export const producerClaimVerificationMethods =
+  producerClaimContactEmailLinkMethod
+    .or(producerClaimDomainEmailLinkMethod)
+    .or(producerClaimDomainDNSLinkMethod)
+    .or(producerClaimContactPhoneLinkMethod)
+    .or(producerClaimSocialPostMethod)
+    .or(producerClaimManualMethod);
+
 export const contactValidator = type({
   "email?": "string.email|null",
   "phone?": "string|null",
@@ -147,7 +162,8 @@ export const publicProducerValidator = producerValidator.pick(
   "certifications",
   "contact",
   "address",
-  "video"
+  "video",
+  "socialMedia"
 );
 
 export const publicProducerLightValidator = producerValidator.pick(
@@ -167,6 +183,7 @@ export const listProducersArgsValidator = type({
   "query?": "string",
   certs: type("string").array(),
   "locationSearchArea?": LatLangBoundsLiteralValidator,
+  "claimed?": "boolean",
 });
 
 export const getProducersArgsValidator = type({ id: "string.uuid" });
@@ -187,6 +204,28 @@ export const registerProducerArgsValidator = type({
   name: "string >= 3",
   type: producerTypesValidator,
   about: "string >= 20",
+});
+
+export const claimProducerArgs = type({
+  producerId: "string",
+  verification: type({
+    method: producerClaimContactEmailLinkMethod
+      .or(producerClaimContactPhoneLinkMethod)
+      .or(producerClaimDomainDNSLinkMethod)
+      .or(producerClaimManualMethod),
+  })
+    .or(
+      type({
+        method: producerClaimDomainEmailLinkMethod,
+        domainDomainEmailPart: "string",
+      })
+    )
+    .or(
+      type({
+        method: producerClaimSocialPostMethod,
+        socialHandle: "string",
+      })
+    ),
 });
 
 export type ListProducerArgs = typeof listProducersArgsValidator.infer;
@@ -214,3 +253,8 @@ export type PublicProducerLight = typeof publicProducerLightValidator.infer;
 export type Certification = typeof certificationValidator.infer;
 
 export type EditProducerArgs = typeof editProducerArgsValidator.infer;
+
+export type ProducerClaimVerificationMethods =
+  typeof producerClaimVerificationMethods.infer;
+
+export type ClaimProducerArgs = typeof claimProducerArgs.infer;

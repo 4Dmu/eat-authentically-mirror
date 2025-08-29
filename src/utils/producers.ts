@@ -15,6 +15,8 @@ import {
   requestVideoUploadUrl,
   updateExistingImages,
   deleteVideo,
+  listProducersPublic,
+  claimProducer,
 } from "@/backend/rpc/producers";
 import {
   ListProducerArgs,
@@ -22,6 +24,7 @@ import {
   PublicProducerLight,
   PublicProducer,
   EditProducerArgs,
+  ClaimProducerArgs,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import { ImageData } from "@/backend/validators/producers";
@@ -80,6 +83,17 @@ export const producersQueryOptions = (
   queryOptions({
     queryKey: ["producers", args],
     queryFn: () => listProducersPublicLight(args),
+    placeholderData: keepPreviousData,
+    initialData: initialData,
+  });
+
+export const producersFullQueryOptions = (
+  args: ListProducerArgs,
+  initialData?: { data: PublicProducer[]; hasNextPage: boolean }
+) =>
+  queryOptions({
+    queryKey: ["producers", args],
+    queryFn: () => listProducersPublic(args),
     placeholderData: keepPreviousData,
     initialData: initialData,
   });
@@ -249,4 +263,20 @@ export const updateExistingImagesOpts = () =>
     }) => {
       await updateExistingImages(data);
     },
+  });
+
+type ClaimProducerOpts = MutationOptions<
+  void,
+  Error,
+  ClaimProducerArgs,
+  unknown
+>;
+
+export const claimProducerOpts = (
+  opts?: Omit<ClaimProducerOpts, "mutationFn" | "mutationKey">
+) =>
+  mutationOptions({
+    ...opts,
+    mutationKey: ["claim-producer"],
+    mutationFn: (args: ClaimProducerArgs) => claimProducer(args),
   });

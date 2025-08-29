@@ -6,12 +6,14 @@ import {
   Producer,
   producerImagesValidator,
   listProducersArgsValidator,
+  producerClaimVerificationMethods,
+  claimProducerArgs,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
 import { db } from "../db";
 import { certificationsToProducers, producers, Video } from "../db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull, not } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
@@ -25,6 +27,7 @@ import {
   registerProducerArgsValidator,
 } from "../validators/producers";
 import { withCertificationsSingle } from "../utils/transform-data";
+import isURL from "validator/es/lib/isURL";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -695,3 +698,113 @@ export const updateExistingImages = producerActionClient
       );
     }
   });
+
+export const claimProducer = authenticatedActionClient
+  .input(claimProducerArgs)
+  .action(
+    async ({
+      ctx: { userId, producerIds },
+      input: { producerId, verification },
+    }) => {
+      const subTier = await getSubTier(userId);
+
+      if (
+        subTier !== "Free" &&
+        subTier.tier === "enterprise" &&
+        producerIds.length < 3
+      ) {
+        console.log("multiple");
+      } else if (producerIds.length > 0) {
+        throw new Error("Upgrade to make or claim more then one profile.");
+      }
+
+      const producer = await db.query.producers.findFirst({
+        where: and(
+          eq(producers.id, producerId),
+          isNull(producers.userId),
+          eq(producers.claimed, false)
+        ),
+      });
+
+      if (!producer) {
+        throw new Error("This listing cannot be claimed");
+      }
+
+      switch (verification.method) {
+        case "contact-email-link":
+          const email = type("string.email")(producer.contact?.email?.trim());
+
+          if (email instanceof type.errors) {
+            throw new Error("Method invalid: Missing or invalid contact email");
+          }
+
+          console.warn("Implement producer claim contact-email-link method");
+
+          break;
+        case "domain-dns":
+        case "domain-email-link":
+          const website = producer.contact?.website;
+          if (!website) {
+            throw new Error(
+              "Method invalid: Missing or invalid contact website"
+            );
+          }
+
+          const url = new URL(website);
+          let domain = url.hostname;
+          console.log(domain);
+          if (/\..*\./.test(domain)) {
+            console.log("match");
+            domain = domain.substring(domain.indexOf(".") + 1);
+          }
+
+          if (!isURL(domain, { require_tld: true, require_host: true })) {
+            throw new Error(
+              "Method invalid: Missing or invalid contact website"
+            );
+          }
+
+          console.warn(
+            "Implement producer claim domain-dns and domain-email-link methods"
+          );
+
+          break;
+        case "contact-phone-link":
+          const phone = producer.contact?.phone;
+
+          if (!phone) {
+            throw new Error("Missing or invalid contact phone");
+          }
+
+          console.warn("Implement producer claim contact-phone-link method");
+
+          break;
+        case "social-post":
+          const profiles: string[] = [];
+
+          if (producer.socialMedia.facebook) {
+            profiles.push(producer.socialMedia.facebook);
+          }
+          if (producer.socialMedia.instagram) {
+            profiles.push(producer.socialMedia.instagram);
+          }
+          if (producer.socialMedia.twitter) {
+            profiles.push(producer.socialMedia.twitter);
+          }
+
+          if (
+            profiles.length === 0 ||
+            !profiles.some((p) => p === verification.socialHandle)
+          ) {
+            throw new Error("Missing or invalid social handle");
+          }
+
+          console.warn("Implement producer claim social-post method");
+
+          break;
+        case "manual":
+          console.warn("Implement producer claim manual method");
+          break;
+      }
+    }
+  );
