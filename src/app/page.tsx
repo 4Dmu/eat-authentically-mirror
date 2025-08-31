@@ -1,5 +1,10 @@
+import { listProducersPublicLight } from "@/backend/rpc/producers";
 import { Page } from "./page-client";
 
 export default async function Home() {
-  return <Page />;
+  const initialProducersFromServer = await listProducersPublicLight({
+    page: 0,
+    certs: [],
+  });
+  return <Page initialProducersFromServer={initialProducersFromServer} />;
 }

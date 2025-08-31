@@ -10,23 +10,35 @@ import { producersQueryOptions } from "@/utils/producers";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
+import { PublicProducerLight } from "@/backend/validators/producers";
 
-export function Page() {
+export function Page({
+  initialProducersFromServer,
+}: {
+  initialProducersFromServer: {
+    data: PublicProducerLight[];
+    hasNextPage: boolean;
+    count: number;
+  };
+}) {
   const { typeFilter, query, certs, locationSearchArea, page, setPage } =
     useHomePageStore();
 
   const debouncedQuery = useDebounce(query, 500);
 
   const { data, isPlaceholderData } = useQuery(
-    producersQueryOptions({
-      type: typeFilter,
-      page: page,
-      certs: certs.map((cert) => cert.id),
-      locationSearchArea: locationSearchArea
-        ? locationSearchArea.toJSON()
-        : undefined,
-      query: debouncedQuery,
-    }),
+    producersQueryOptions(
+      {
+        type: typeFilter,
+        page: page,
+        certs: certs.map((cert) => cert.id),
+        locationSearchArea: locationSearchArea
+          ? locationSearchArea.toJSON()
+          : undefined,
+        query: debouncedQuery,
+      },
+      initialProducersFromServer,
+    ),
   );
 
   return (

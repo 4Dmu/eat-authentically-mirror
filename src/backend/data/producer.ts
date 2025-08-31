@@ -76,6 +76,8 @@ export async function listProducersPublic(args: ListProducerArgs) {
       );
     }
 
+    console.log(queries);
+
     const producersQuery = await db.query.producers.findMany({
       orderBy: [orderProducersByScrapedMetadata, desc(producers.createdAt)],
       columns: {
