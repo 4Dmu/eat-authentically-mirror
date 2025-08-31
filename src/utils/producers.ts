@@ -90,7 +90,11 @@ export function producerSlugFull(
 
 export const producersQueryOptions = (
   args: ListProducerArgs,
-  initialData?: { data: PublicProducerLight[]; hasNextPage: boolean },
+  initialData?: {
+    data: PublicProducerLight[];
+    hasNextPage: boolean;
+    count: number;
+  },
 ) =>
   queryOptions({
     queryKey: ["producers", args],
@@ -101,7 +105,7 @@ export const producersQueryOptions = (
 
 export const producersFullQueryOptions = (
   args: ListProducerArgs,
-  initialData?: { data: PublicProducer[]; hasNextPage: boolean },
+  initialData?: { data: PublicProducer[]; hasNextPage: boolean; count: number },
 ) =>
   queryOptions({
     queryKey: ["producers", args],

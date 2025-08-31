@@ -4,7 +4,7 @@ import type {
   PublicProducer,
 } from "@/backend/validators/producers";
 import { db } from "../db";
-import { and, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
 import { certificationsToProducers, producers } from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
 import { USER_PRODUCER_IDS_KV } from "../kv";
@@ -103,6 +103,12 @@ export async function listProducersPublic(args: ListProducerArgs) {
       where: queries.length > 0 ? and(...queries) : undefined,
     });
 
+    const rowsCount = await db
+      .select({ count: count() })
+      .from(producers)
+      .where(queries.length > 0 ? and(...queries) : undefined)
+      .then((r) => r[0].count ?? 0);
+
     const hasNextPage = producersQuery.length > limit;
     const paginatedProducers = hasNextPage
       ? producersQuery.slice(0, limit)
@@ -113,6 +119,7 @@ export async function listProducersPublic(args: ListProducerArgs) {
     return {
       data: result satisfies PublicProducer[],
       hasNextPage,
+      count: rowsCount,
     };
   } catch (err) {
     console.error(err);
@@ -163,6 +170,12 @@ export async function listProducersPublicLight(args: ListProducerArgs) {
       queries.push(like(producers.name, `%${args.query.toLowerCase()}%`));
     }
 
+    const rowsCount = await db
+      .select({ count: count() })
+      .from(producers)
+      .where(queries.length > 0 ? and(...queries) : undefined)
+      .then((r) => r[0].count ?? 0);
+
     const producersQuery = await db.query.producers.findMany({
       orderBy: [orderProducersByScrapedMetadata, desc(producers.createdAt)],
       columns: {
@@ -197,6 +210,7 @@ export async function listProducersPublicLight(args: ListProducerArgs) {
     return {
       data: result,
       hasNextPage,
+      count: rowsCount,
     };
   } catch (err) {
     console.error(err);

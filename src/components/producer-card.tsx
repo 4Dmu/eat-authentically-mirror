@@ -3,6 +3,8 @@ import { PublicProducerLight } from "@/backend/validators/producers";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "./ui/button";
+import { MapPin } from "lucide-react";
 
 export function ProducerCard({ producer }: { producer: PublicProducerLight }) {
   return (
@@ -21,8 +23,17 @@ export function ProducerCard({ producer }: { producer: PublicProducerLight }) {
         <p className="font-bold">{producer.name}</p>
       </div>
       {!producer.claimed && (
-        <Badge className="absolute top-2 left-2">Unclaimed</Badge>
+        <Badge variant={"brandBrown"} className="absolute top-4 left-4">
+          Unclaimed
+        </Badge>
       )}
+      <Button
+        onClick={(e) => e.preventDefault()}
+        size={"icon"}
+        className="absolute top-4 right-4 cursor-pointer"
+      >
+        <MapPin />
+      </Button>
     </Link>
   );
 }

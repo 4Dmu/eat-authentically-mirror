@@ -71,7 +71,7 @@ function SearchBox({ title }: { title: string }) {
             onKeyDown={handleSubmit}
             value={query ?? ""}
             onChange={updateQuery}
-            className="bg-white p-10 rounded-full text-2xl md:text-2xl pl-13 focus-visible:border-black focus-visible:ring-black"
+            className="bg-white p-10 rounded-full text-base md:text-2xl pl-13 focus-visible:border-black focus-visible:ring-black"
             placeholder="Search farms, ranches, eatieries..."
           />
         </div>
@@ -105,7 +105,7 @@ export function HeroCarousel() {
   return (
     <Carousel
       setApi={setApi}
-      className="h-screen flex w-full"
+      className="h-[50vh] flex w-full"
       opts={{ loop: true }}
     >
       <CarouselContent className="h-full w-full">

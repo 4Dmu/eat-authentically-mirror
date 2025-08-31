@@ -746,16 +746,6 @@ export const claimProducer = authenticatedActionClient
         throw new Error("Upgrade to make or claim more then one profile.");
       }
 
-      // if (
-      //   subTier !== "Free" &&
-      //   subTier.tier === "enterprise" &&
-      //   producerIds.length < 3
-      // ) {
-      //   console.log("multiple");
-      // } else if (producerIds.length > 0) {
-      //   throw new Error("Upgrade to make or claim more then one profile.");
-      // }
-
       const producer = await db.query.producers.findFirst({
         where: and(
           eq(producers.id, producerId),

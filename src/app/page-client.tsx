@@ -26,7 +26,7 @@ export function Page() {
         ? locationSearchArea.toJSON()
         : undefined,
       query: debouncedQuery,
-    })
+    }),
   );
 
   return (
@@ -34,7 +34,7 @@ export function Page() {
       <HeroCarousel />
       <div className="p-5">
         <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
-          <div className="flex gap-5 justify-between">
+          <div className="flex gap-5 justify-between items-center">
             <h2 className="font-bold text-4xl text-gray-900">
               Find Real Food Producers
             </h2>
@@ -65,9 +65,12 @@ export function Page() {
             </div>
           )}
           <div className="flex justify-between gap-5">
-            <span>Current Page: {page + 1}</span>
+            <Badge className="rounded-full" variant={"brandRed"}>
+              Page {page + 1} of {Math.ceil((data?.count ?? 1) / 100)}
+            </Badge>
             <div className="flex gap-2">
               <Button
+                variant={"brandBrown"}
                 size={"icon"}
                 onClick={() => setPage((old) => Math.max(old - 1, 0))}
                 disabled={page === 0}
@@ -76,6 +79,7 @@ export function Page() {
                 <ArrowLeft />
               </Button>
               <Button
+                variant={"brandBrown"}
                 size={"icon"}
                 onClick={() => {
                   if (!isPlaceholderData && data?.hasNextPage) {

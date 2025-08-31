@@ -18,6 +18,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { useHomePageStore } from "@/stores";
 import { LocationFilter } from "./location-filter";
+import { FilterIcon } from "lucide-react";
 
 export function FilterMenu() {
   const certsQuery = useQuery(certificationTypesOptions());
@@ -26,7 +27,9 @@ export function FilterMenu() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button>Filter</Button>
+        <Button variant={"brandGreen"}>
+          <FilterIcon /> Filter
+        </Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
