@@ -39,7 +39,8 @@ export default function ClaimListingEmail(props: {
                 Click here to claim
               </Button>
               <Text>
-                If the above link isn't working you can visit this url manually:
+                If the above link isn&apos;t working you can visit this url
+                manually:
               </Text>
               <Text>{props.url}</Text>
             </Column>

@@ -11,13 +11,16 @@ async function main() {
       verified: false,
       commodities: [],
       socialMedia: { twitter: null, facebook: null, instagram: null },
+      contact: {
+        website: "https://12dmu.com",
+      },
       images: {
         items: [],
         primaryImgId: null,
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-    })
+    }),
   );
 }
 

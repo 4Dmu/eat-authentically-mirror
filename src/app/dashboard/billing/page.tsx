@@ -1,7 +1,6 @@
 import { USER_STRIPE_CUSTOMER_ID_KV } from "@/backend/kv";
 import { billingPortalRatelimit } from "@/backend/lib/rate-limit";
 import { createBillingPortalSession } from "@/backend/rpc/stripe";
-import { env } from "@/env";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 

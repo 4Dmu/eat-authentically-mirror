@@ -6,8 +6,9 @@ import {
   Producer,
   producerImagesValidator,
   listProducersArgsValidator,
-  producerClaimVerificationMethods,
   claimProducerArgs,
+  checkClaimDomainDnsArgs,
+  PublicClaimRequest,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
@@ -18,14 +19,17 @@ import {
   producers,
   Video,
 } from "../db/schema";
-import { and, eq, inArray, isNull, not } from "drizzle-orm";
+import { and, count, eq, inArray, isNull } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
 import { cloudflare } from "../lib/cloudflare";
 import { normalizeAddress } from "../utils/normalize-data";
-import { videoRatelimit } from "../lib/rate-limit";
+import {
+  producerClaimDnsCheckRatelimit,
+  videoRatelimit,
+} from "../lib/rate-limit";
 import { authenticatedActionClient } from "./helpers/middleware";
 import {
   PublicProducerLight,
@@ -36,6 +40,9 @@ import isURL from "validator/es/lib/isURL";
 import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateToken } from "../utils/generate-tokens";
+import { getAllDnsRecords, getDnsRecords } from "@layered/dns-records";
+import { CLAIM_DNS_TXT_RECORD_NAME } from "./helpers/constants";
+import { getLoggedInUserProducerIds } from "./auth";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -82,7 +89,7 @@ export const fetchUserProducer = producerActionClient
         where: and(
           eq(producers.id, input),
           inArray(producers.id, producerIds),
-          eq(producers.userId, userId)
+          eq(producers.userId, userId),
         ),
         with: {
           certificationsToProducers: {
@@ -103,7 +110,7 @@ export const fetchUserProducers = producerActionClient.action(
       .findMany({
         where: and(
           inArray(producers.id, producerIds),
-          eq(producers.userId, userId)
+          eq(producers.userId, userId),
         ),
         with: {
           certificationsToProducers: {
@@ -116,7 +123,7 @@ export const fetchUserProducers = producerActionClient.action(
       .then((r) => (r ? withCertifications(r) : r));
 
     return result;
-  }
+  },
 );
 
 export const fetchUserProducerLight = producerActionClient
@@ -127,7 +134,7 @@ export const fetchUserProducerLight = producerActionClient
         where: and(
           eq(producers.id, input),
           inArray(producers.id, producerIds),
-          eq(producers.userId, userId)
+          eq(producers.userId, userId),
         ),
         with: {
           certificationsToProducers: {
@@ -151,7 +158,7 @@ export const listProducersPublicLight = actionClient
   .action(async ({ input }) => await listing.listProducersPublicLight(input));
 
 export const listCertificationTypesPublic = actionClient.action(
-  async () => await listing.listCertificationTypesPublic()
+  async () => await listing.listCertificationTypesPublic(),
 );
 
 export const getProducerPublic = actionClient
@@ -164,7 +171,7 @@ export const editProducer = producerActionClient
     const producer = await db.query.producers.findFirst({
       where: and(
         eq(producers.id, input.producerId),
-        eq(producers.userId, userId)
+        eq(producers.userId, userId),
       ),
     });
 
@@ -204,7 +211,7 @@ export const editProducer = producerActionClient
         .findFirst({
           where: and(
             eq(producers.id, input.producerId),
-            eq(producers.userId, userId)
+            eq(producers.userId, userId),
           ),
           columns: {},
           with: {
@@ -221,10 +228,10 @@ export const editProducer = producerActionClient
       if (currentCertifications && currentCertifications.length > 0) {
         const addedCerts = updatedCertifications.filter(
           (cert) =>
-            !currentCertifications.some((oldCert) => oldCert.id === cert.id)
+            !currentCertifications.some((oldCert) => oldCert.id === cert.id),
         );
         const removedCerts = currentCertifications.filter(
-          (cert) => !updatedCertifications.some((c) => c.id === cert.id)
+          (cert) => !updatedCertifications.some((c) => c.id === cert.id),
         );
 
         try {
@@ -233,14 +240,14 @@ export const editProducer = producerActionClient
               addedCerts.map((cert) => ({
                 listingId: producer.id,
                 certificationId: cert.id,
-              }))
+              })),
             );
           }
           await db.delete(certificationsToProducers).where(
             inArray(
               certificationsToProducers.certificationId,
-              removedCerts.map((c) => c.id)
-            )
+              removedCerts.map((c) => c.id),
+            ),
           );
         } catch (err) {
           console.log(err);
@@ -251,7 +258,7 @@ export const editProducer = producerActionClient
             input.certifications.map((cert) => ({
               listingId: producer.id,
               certificationId: cert.id,
-            }))
+            })),
           );
         } catch (err) {
           console.log(err);
@@ -271,7 +278,7 @@ export const editProducer = producerActionClient
           updatedAt: new Date(),
         })
         .where(
-          and(eq(producers.id, producer.id), eq(producers.userId, userId))
+          and(eq(producers.id, producer.id), eq(producers.userId, userId)),
         );
     }
   });
@@ -288,7 +295,7 @@ export const requestUploadUrls = producerActionClient
         .array()
         .atLeastLength(1)
         .atMostLength(10),
-    })
+    }),
   )
   .action(
     async ({ ctx: { userId }, input: { imageItemParams, producerId } }) => {
@@ -311,12 +318,12 @@ export const requestUploadUrls = producerActionClient
         tier === "Free"
           ? 1
           : tier.tier === "community"
-          ? 1
-          : tier.tier === "pro"
-          ? 4
-          : tier.tier === "premium" || tier.tier === "enterprise"
-          ? 5
-          : 1;
+            ? 1
+            : tier.tier === "pro"
+              ? 4
+              : tier.tier === "premium" || tier.tier === "enterprise"
+                ? 5
+                : 1;
 
       const remainingFiles = maxFiles - producer.images.items.length;
 
@@ -333,7 +340,7 @@ export const requestUploadUrls = producerActionClient
         form.set("creator", userId);
         form.set(
           "metadata",
-          JSON.stringify({ producerId: producer.id, userId: userId })
+          JSON.stringify({ producerId: producer.id, userId: userId }),
         );
 
         const uploadUrlGeneratorCloudflareResponse = await fetch(
@@ -344,7 +351,7 @@ export const requestUploadUrls = producerActionClient
               Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
             },
             body: form,
-          }
+          },
         );
 
         const uploadUrlGeneratorCloudflareResponseBody =
@@ -371,7 +378,7 @@ export const requestUploadUrls = producerActionClient
         .where(eq(producers.id, producer.id));
 
       return urls;
-    }
+    },
   );
 
 export const requestVideoUploadUrl = producerActionClient
@@ -424,7 +431,7 @@ export const requestVideoUploadUrl = producerActionClient
     form.set("maxDurationSeconds", "120");
     form.set(
       "meta",
-      JSON.stringify({ producerId: producer.id, userId: userId })
+      JSON.stringify({ producerId: producer.id, userId: userId }),
     );
 
     const uploadUrlGeneratorCloudflareResponse = await fetch(
@@ -449,7 +456,7 @@ export const requestVideoUploadUrl = producerActionClient
             userId: userId,
           },
         }),
-      }
+      },
     );
 
     const uploadUrlGeneratorCloudflareResponseBody =
@@ -506,7 +513,7 @@ export const confirmPengingUpload = producerActionClient
           headers: {
             Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
           },
-        }
+        },
       );
 
       const imagesListBody = (await imageListResponse.json()) as {
@@ -590,7 +597,7 @@ export const confirmPendingVideoUpload = producerActionClient
       });
 
       const pendingVideosThatExists = videosPage.result.filter((v) =>
-        producer.pendingVideos?.some((v2) => v.uid === v2)
+        producer.pendingVideos?.some((v2) => v.uid === v2),
       );
 
       for (const video of pendingVideosThatExists) {
@@ -671,11 +678,11 @@ export const updateExistingImages = producerActionClient
     }
 
     const imagesToKeep = producer.images.items.filter((i) =>
-      data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
+      data.items.some((i2) => i.cloudflareId === i2.cloudflareId),
     );
 
     const imagesToDelete = producer.images.items.filter(
-      (i) => !data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
+      (i) => !data.items.some((i2) => i.cloudflareId === i2.cloudflareId),
     );
 
     await db
@@ -686,7 +693,7 @@ export const updateExistingImages = producerActionClient
           primaryImgId:
             data.primaryImgId ??
             imagesToKeep.find(
-              (i) => i.cloudflareId === producer.images.primaryImgId
+              (i) => i.cloudflareId === producer.images.primaryImgId,
             )?.cloudflareId ??
             null,
         },
@@ -696,7 +703,7 @@ export const updateExistingImages = producerActionClient
 
     for (const image of imagesToDelete) {
       console.log(
-        `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by user(${userId})`
+        `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by user(${userId})`,
       );
 
       const response = await cloudflare.images.v1.delete(image.cloudflareId, {
@@ -705,7 +712,7 @@ export const updateExistingImages = producerActionClient
 
       console.log(
         `action [updateExistingImages] - Cloudflare delete image response`,
-        response
+        response,
       );
     }
   });
@@ -719,21 +726,35 @@ export const claimProducer = authenticatedActionClient
     }) => {
       const subTier = await getSubTier(userId);
 
-      if (
-        subTier !== "Free" &&
-        subTier.tier === "enterprise" &&
-        producerIds.length < 3
-      ) {
-        console.log("multiple");
+      const claimRequestsCountForUser = await db
+        .select({ count: count() })
+        .from(claimRequests)
+        .where(eq(claimRequests.userId, userId))
+        .then((r) => r[0].count ?? 0);
+
+      if (subTier !== "Free" && subTier.tier === "enterprise") {
+        if (producerIds.length + claimRequestsCountForUser >= 3) {
+          throw new Error("Exceeded maximum producers or producer claims");
+        }
       } else if (producerIds.length > 0) {
         throw new Error("Upgrade to make or claim more then one profile.");
       }
+
+      // if (
+      //   subTier !== "Free" &&
+      //   subTier.tier === "enterprise" &&
+      //   producerIds.length < 3
+      // ) {
+      //   console.log("multiple");
+      // } else if (producerIds.length > 0) {
+      //   throw new Error("Upgrade to make or claim more then one profile.");
+      // }
 
       const producer = await db.query.producers.findFirst({
         where: and(
           eq(producers.id, producerId),
           isNull(producers.userId),
-          eq(producers.claimed, false)
+          eq(producers.claimed, false),
         ),
       });
 
@@ -744,7 +765,7 @@ export const claimProducer = authenticatedActionClient
       const existingClaim = await db.query.claimRequests.findFirst({
         where: and(
           eq(claimRequests.producerId, producer.id),
-          eq(claimRequests.userId, userId)
+          eq(claimRequests.userId, userId),
         ),
       });
 
@@ -772,6 +793,7 @@ export const claimProducer = authenticatedActionClient
             },
             requestedVerification: {
               method: verification.method,
+              producerContactEmail: email,
             },
             claimToken: token,
             createdAt: new Date(),
@@ -794,7 +816,7 @@ export const claimProducer = authenticatedActionClient
           const website = producer.contact?.website;
           if (!website) {
             throw new Error(
-              "Method invalid: Missing or invalid contact website"
+              "Method invalid: Missing or invalid contact website",
             );
           }
 
@@ -808,7 +830,7 @@ export const claimProducer = authenticatedActionClient
 
           if (!isURL(domain, { require_tld: true, require_host: true })) {
             throw new Error(
-              "Method invalid: Missing or invalid contact website"
+              "Method invalid: Missing or invalid contact website",
             );
           }
 
@@ -827,6 +849,7 @@ export const claimProducer = authenticatedActionClient
               requestedVerification: {
                 method: verification.method,
                 domainDomainEmailPart: verification.domainDomainEmailPart,
+                domain: domain,
               },
               claimToken: token,
               createdAt: new Date(),
@@ -843,9 +866,23 @@ export const claimProducer = authenticatedActionClient
               }),
             });
           } else {
-            console.warn(
-              "Implement producer claim domain-dns and domain-email-link methods"
-            );
+            const token = generateToken();
+
+            await db.insert(claimRequests).values({
+              id: crypto.randomUUID(),
+              producerId: producer.id,
+              userId: userId,
+              status: {
+                type: "waiting",
+              },
+              requestedVerification: {
+                method: verification.method,
+                domain: domain,
+              },
+              claimToken: token,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
           }
 
           break;
@@ -886,12 +923,12 @@ export const claimProducer = authenticatedActionClient
           console.warn("Implement producer claim manual method");
           break;
       }
-    }
+    },
   );
 
 export const listClaimRequests = authenticatedActionClient.action(
   async ({ userId }) => {
-    return await db.query.claimRequests.findMany({
+    const requests = await db.query.claimRequests.findMany({
       where: eq(claimRequests.userId, userId),
       with: {
         producer: {
@@ -899,5 +936,94 @@ export const listClaimRequests = authenticatedActionClient.action(
         },
       },
     });
-  }
+
+    return requests.map(
+      ({
+        id,
+        userId,
+        producer,
+        producerId,
+        status,
+        requestedVerification,
+        claimToken,
+      }) =>
+        ({
+          id,
+          userId,
+          producer,
+          producerId,
+          status,
+          requestedVerification:
+            requestedVerification.method === "domain-dns"
+              ? { ...requestedVerification, token: claimToken }
+              : requestedVerification,
+        }) satisfies PublicClaimRequest,
+    );
+  },
 );
+
+export const checkClaimDomainDNS = authenticatedActionClient
+  .input(checkClaimDomainDnsArgs)
+  .action(async ({ ctx: { userId }, input: { claimRequestId } }) => {
+    // const { success } = await producerClaimDnsCheckRatelimit.limit(userId);
+
+    // if (!success) {
+    //   throw new Error("Rate limit exceded");
+    // }
+
+    const claimRequest = await db.query.claimRequests.findFirst({
+      where: and(
+        eq(claimRequests.userId, userId),
+        eq(claimRequests.id, claimRequestId),
+      ),
+    });
+
+    if (!claimRequest || claimRequest.status.type !== "waiting") {
+      throw new Error("Claim does not exist");
+    }
+
+    if (claimRequest.requestedVerification.method !== "domain-dns") {
+      throw new Error("Invalid claim verification method");
+    }
+
+    const recordName = `${CLAIM_DNS_TXT_RECORD_NAME}.${claimRequest.requestedVerification.domain}`;
+
+    console.log(recordName);
+    const records = await getDnsRecords(recordName, "TXT");
+
+    console.log(records);
+
+    const claimDnsRecord = records.find((r) => r.name === recordName);
+
+    if (!claimDnsRecord) {
+      throw new Error("Claim record not found");
+    }
+
+    const hasValidCode = claimDnsRecord.data === claimRequest.claimToken;
+
+    if (!hasValidCode) {
+      throw new Error("Claim tokens did not match.");
+    }
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(claimRequests)
+        .set({
+          status: { type: "claimed" },
+          claimedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(claimRequests.id, claimRequest.id));
+
+      await tx
+        .update(producers)
+        .set({
+          userId: claimRequest.userId,
+          claimed: true,
+          verified: true,
+        })
+        .where(eq(producers.id, claimRequest.producerId));
+    });
+
+    return "Claim successfull";
+  });

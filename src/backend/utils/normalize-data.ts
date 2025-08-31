@@ -30,7 +30,5 @@ export function normalizeAddress(address: Address) {
     normalized.coordinate = address.coordinate;
   }
 
-  console.log(normalized);
-
   return normalized;
 }

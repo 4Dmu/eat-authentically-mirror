@@ -8,7 +8,7 @@ export default function ClientRedirect({ to }: { to: string }) {
 
   useEffect(() => {
     router.replace(to);
-  }, []);
+  }, [router, to]);
 
   return null;
 }

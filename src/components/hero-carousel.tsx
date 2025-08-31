@@ -55,7 +55,6 @@ function SearchBox({ title }: { title: string }) {
 
   function handleSubmit(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && query) {
-      console.log(window.innerHeight);
       window.scroll({ top: window.innerHeight, behavior: "smooth" });
     }
   }
@@ -89,7 +88,6 @@ export function HeroCarousel() {
     if (!api) return;
     const index = api.selectedScrollSnap();
     const type = index == 0 ? undefined : PRODUCER_TYPES[index - 1];
-    console.log(type);
     setTypeFilter(type);
   }, [api, setTypeFilter]);
 

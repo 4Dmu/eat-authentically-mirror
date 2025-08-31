@@ -11,10 +11,8 @@ import {
   type ImageData,
   type Address,
   PRODUCER_TYPES,
-  PRODUCER_CLAIM_METHODS,
   ClaimProducerVerification,
 } from "@/backend/validators/producers";
-import { te } from "date-fns/locale";
 
 export type Video = {
   url: string;
@@ -127,7 +125,7 @@ export const certificationsRelations = relations(
   certifications,
   ({ many }) => ({
     certificationsToProducers: many(certificationsToProducers),
-  })
+  }),
 );
 
 export const certificationsToProducers = sqliteTable(
@@ -140,7 +138,7 @@ export const certificationsToProducers = sqliteTable(
       .notNull()
       .references(() => producers.id),
   },
-  (t) => [primaryKey({ columns: [t.certificationId, t.listingId] })]
+  (t) => [primaryKey({ columns: [t.certificationId, t.listingId] })],
 );
 
 export const certificationsToProducersRelations = relations(
@@ -154,7 +152,10 @@ export const certificationsToProducersRelations = relations(
       fields: [certificationsToProducers.listingId],
       references: [producers.id],
     }),
-  })
+  }),
 );
 
 export type Certification = typeof certifications.$inferSelect;
+export type ClaimRequest = typeof claimRequests.$inferSelect & {
+  producer: { name: string; id: string };
+};

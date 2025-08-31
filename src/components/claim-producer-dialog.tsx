@@ -39,8 +39,6 @@ import {
 } from "./ui/select";
 import { toast } from "sonner";
 
-type Mode = "select" | "review" | "verify" | "submit";
-
 type InputStep =
   | { mode: "select" }
   | { mode: "review"; producer: PublicProducer }
@@ -102,14 +100,17 @@ function useClaimProducerSteps() {
   const [choosenSocialHandle, setChoosenSocialHandle] = useState<
     string | undefined
   >(undefined);
-  const [userSpecifiedAddress, setUserSpecifiedAddress] = useState<
+  const [domainEmailPart, setDomainEmailPart] = useState<string | undefined>(
+    undefined,
+  );
+  const [manualContactEmail, setManualContactEmail] = useState<
     string | undefined
   >(undefined);
 
   function setStep(step: InputStep): "success" | { error: string } {
     if (currentStep.mode === "submit") {
       setChoosenSocialHandle(undefined);
-      setUserSpecifiedAddress(undefined);
+      setDomainEmailPart(undefined);
     }
 
     switch (step.mode) {
@@ -126,7 +127,7 @@ function useClaimProducerSteps() {
         switch (step.verification) {
           case "contact-email-link":
             const email = type("string.email")(
-              step.producer.contact?.email?.trim()
+              step.producer.contact?.email?.trim(),
             );
 
             if (email instanceof type.errors) {
@@ -225,19 +226,23 @@ function useClaimProducerSteps() {
   const submissionRequiresData =
     currentStep.mode === "submit" &&
     ((currentStep.verification.method === "domain-email-link" &&
-      userSpecifiedAddress === undefined) ||
+      domainEmailPart === undefined) ||
       (currentStep.verification.method === "social-post" &&
-        choosenSocialHandle === undefined));
+        choosenSocialHandle === undefined) ||
+      (currentStep.verification.method === "manual" &&
+        manualContactEmail === undefined));
 
   return {
     step: currentStep,
     setStep: setStep,
     submitState: {
       submissionRequiresData,
-      userSpecifiedAddress,
-      setUserSpecifiedAddress,
+      domainEmailPart: domainEmailPart,
+      setDomainEmailPart: setDomainEmailPart,
       choosenSocialHandle,
       setChoosenSocialHandle,
+      manualContactEmail,
+      setManualContactEmail,
     },
   };
 }
@@ -254,7 +259,7 @@ function useProducers() {
       certs: [],
       query: debouncedQuery,
       claimed: false,
-    })
+    }),
   );
 
   useEffect(() => {
@@ -286,7 +291,7 @@ export function ClaimProducerDialog() {
       onError(e) {
         toast.error(e.message);
       },
-    })
+    }),
   );
 
   function submit() {
@@ -299,7 +304,11 @@ export function ClaimProducerDialog() {
       verification: match(step.verification.method)
         .with("domain-email-link", (v) => ({
           method: v,
-          domainDomainEmailPart: submitState.userSpecifiedAddress!,
+          domainDomainEmailPart: submitState.domainEmailPart!,
+        }))
+        .with("manual", (v) => ({
+          method: v,
+          claimerEmail: submitState.manualContactEmail!,
         }))
         .with("social-post", (v) => ({
           method: v,
@@ -349,7 +358,7 @@ export function ClaimProducerDialog() {
                   setQuery(
                     e.currentTarget.value.length == 0
                       ? undefined
-                      : e.currentTarget.value
+                      : e.currentTarget.value,
                   )
                 }
               />
@@ -447,12 +456,14 @@ export function ClaimProducerDialog() {
                   </p>
                   <p className="font-bold text-lg">Instant / Auto</p>
                   <div className="flex flex-col gap-5">
-                    <VerificationCard
-                      title="Email link to an address already on the listing"
-                      step={step}
-                      setStep={setStep}
-                      verification="contact-email-link"
-                    />
+                    {step.producer.contact?.email && (
+                      <VerificationCard
+                        title="Email link to an address already on the listing"
+                        step={step}
+                        setStep={setStep}
+                        verification="contact-email-link"
+                      />
+                    )}
                     {step.producer.contact?.website && (
                       <>
                         <VerificationCard
@@ -498,9 +509,9 @@ export function ClaimProducerDialog() {
                           <span className="font-bold">
                             {step.producer.name}
                           </span>
-                          ? If so or your can't use any of the above methods
-                          then you can reach out to our team who will try to
-                          manually verify over email.
+                          ? If so or your can&apos;t use any of the above
+                          methods then you can reach out to our team who will
+                          try to manually verify over email.
                         </p>
                       }
                       step={step}
@@ -534,7 +545,7 @@ export function ClaimProducerDialog() {
                     ))
                     .with({ method: "domain-dns" }, (v) => (
                       <span>
-                        adding a TXT DNS record containing our code to website:{" "}
+                        adding a TXT DNS record containing our code to domain:{" "}
                         <span className="font-bold">{v.domain}</span>
                       </span>
                     ))
@@ -547,30 +558,54 @@ export function ClaimProducerDialog() {
                     ))
                     .with({ method: "social-post" }, (v) => (
                       <span>
-                        makin social post using our code to one of the following
-                        handles:
+                        making social post using our code to one of the
+                        following handles:
                       </span>
                     ))
-                    .with({ method: "manual" }, () => <span></span>)
+                    .with({ method: "manual" }, () => (
+                      <span>
+                        Replying to the email we will send about your claim
+                        request to the following address:
+                      </span>
+                    ))
                     .exhaustive()}
                 </p>
                 {step.verification.method === "domain-email-link" && (
                   <>
                     <Input
-                      value={submitState.userSpecifiedAddress ?? ""}
+                      value={submitState.domainEmailPart ?? ""}
                       onChange={(e) =>
-                        submitState.setUserSpecifiedAddress(
+                        submitState.setDomainEmailPart(
                           e.currentTarget.value.length == 0
                             ? undefined
-                            : e.currentTarget.value
+                            : e.currentTarget.value,
                         )
                       }
                     />
                     <p>
                       The email will be sent to{" "}
                       <span className="font-bold">
-                        {submitState.userSpecifiedAddress}@
-                        {step.verification.domain}
+                        {submitState.domainEmailPart}@{step.verification.domain}
+                      </span>
+                    </p>
+                  </>
+                )}
+                {step.verification.method === "manual" && (
+                  <>
+                    <Input
+                      value={submitState.domainEmailPart ?? ""}
+                      onChange={(e) =>
+                        submitState.setManualContactEmail(
+                          e.currentTarget.value.length == 0
+                            ? undefined
+                            : e.currentTarget.value,
+                        )
+                      }
+                    />
+                    <p>
+                      The email will be sent to{" "}
+                      <span className="font-bold">
+                        {submitState.manualContactEmail}
                       </span>
                     </p>
                   </>
@@ -609,10 +644,10 @@ export function ClaimProducerDialog() {
                   .with({ mode: "select" }, () => {})
                   .with({ mode: "review" }, () => setStep({ mode: "select" }))
                   .with({ mode: "verify" }, (s) =>
-                    setStep({ mode: "review", producer: s.producer })
+                    setStep({ mode: "review", producer: s.producer }),
                   )
                   .with({ mode: "submit" }, (s) =>
-                    setStep({ mode: "verify", producer: s.producer })
+                    setStep({ mode: "verify", producer: s.producer }),
                   )
                   .exhaustive()
               }

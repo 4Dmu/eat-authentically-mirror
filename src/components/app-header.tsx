@@ -8,8 +8,6 @@ export async function Header() {
   const subTier = await getSubTier();
   const ids = user ? await getUsersProducerIdsCached(user.id) : [];
 
-  console.log(user, subTier, ids);
-
   return (
     <HeaderClient userFromServer={user} producerIds={ids} subTier={subTier} />
   );

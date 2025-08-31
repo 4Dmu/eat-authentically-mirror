@@ -61,20 +61,18 @@ export async function listProducersPublic(args: ListProducerArgs) {
             .select({ listingId: certificationsToProducers.listingId })
             .from(certificationsToProducers)
             .where(
-              inArray(certificationsToProducers.certificationId, args.certs)
-            )
-        )
+              inArray(certificationsToProducers.certificationId, args.certs),
+            ),
+        ),
       );
     }
     if (args.locationSearchArea) {
       const { north, south, east, west } = args.locationSearchArea;
-      console.log(args.locationSearchArea);
-
       queries.push(
         and(
           sql`CAST(json_extract(address, '$.coordinate.latitude') AS INTEGER) BETWEEN ${south} AND ${north}`,
-          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`
-        )
+          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`,
+        ),
       );
     }
 
@@ -145,25 +143,23 @@ export async function listProducersPublicLight(args: ListProducerArgs) {
             .select({ listingId: certificationsToProducers.listingId })
             .from(certificationsToProducers)
             .where(
-              inArray(certificationsToProducers.certificationId, args.certs)
-            )
-        )
+              inArray(certificationsToProducers.certificationId, args.certs),
+            ),
+        ),
       );
     }
     if (args.locationSearchArea) {
       const { north, south, east, west } = args.locationSearchArea;
-      console.log(args.locationSearchArea);
 
       queries.push(
         and(
           sql`CAST(json_extract(address, '$.coordinate.latitude') AS INTEGER) BETWEEN ${south} AND ${north}`,
-          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`
-        )
+          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`,
+        ),
       );
     }
 
     if (args.query) {
-      console.log(args.query);
       queries.push(like(producers.name, `%${args.query.toLowerCase()}%`));
     }
 

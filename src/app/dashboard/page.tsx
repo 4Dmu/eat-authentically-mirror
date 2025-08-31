@@ -29,6 +29,7 @@ import { AddProducerDialog } from "@/components/add-producer-dialog";
 import { fetchUserProducers, listClaimRequests } from "@/backend/rpc/producers";
 import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
+import { ClaimRequestsSection } from "./_components/claim-requests-section";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -38,7 +39,7 @@ export default async function DashboardPage() {
   }
   const producers = await fetchUserProducers();
   const subTier = await getSubTier(user.id);
-  const claims = await listClaimRequests();
+  const claimRequests = await listClaimRequests();
 
   return (
     <div className="p-10">
@@ -152,18 +153,8 @@ export default async function DashboardPage() {
               <ClaimProducerDialog />
             </CardAction>
           </CardHeader>
-          {claims.length > 0 && (
-            <CardContent className="grid grid-cols-4">
-              {claims.map((p) => (
-                <div key={p.id} className="rounded-lg border p-5 shadow">
-                  <p className="font-bold">
-                    Claim Request For "{p.producer.name}"
-                  </p>
-                  <Badge>{p.status.type}</Badge>
-                </div>
-              ))}
-            </CardContent>
-          )}
+
+          <ClaimRequestsSection claims={claimRequests} />
         </Card>
         <Card className="bg-yellow-200">
           <CardHeader>

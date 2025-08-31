@@ -2,6 +2,7 @@ import {
   keepPreviousData,
   MutationOptions,
   mutationOptions,
+  QueryClient,
   QueryOptions,
   queryOptions,
 } from "@tanstack/react-query";
@@ -17,6 +18,8 @@ import {
   deleteVideo,
   listProducersPublic,
   claimProducer,
+  checkClaimDomainDNS,
+  listClaimRequests,
 } from "@/backend/rpc/producers";
 import {
   ListProducerArgs,
@@ -25,6 +28,8 @@ import {
   PublicProducer,
   EditProducerArgs,
   ClaimProducerArgs,
+  CheckClaimDomainDnsArgs,
+  PublicClaimRequest,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import { ImageData } from "@/backend/validators/producers";
@@ -37,11 +42,11 @@ import { ImageData } from "@/backend/validators/producers";
  *  - placeholder unsplash url
  */
 export function primaryImageUrl(
-  listing: Producer | PublicProducer | PublicProducerLight
+  listing: Producer | PublicProducer | PublicProducerLight,
 ) {
   return (
     listing.images?.items.find(
-      (i) => i.cloudflareId === listing.images.primaryImgId
+      (i) => i.cloudflareId === listing.images.primaryImgId,
     )?.cloudflareUrl ??
     listing.images?.items[0]?.cloudflareUrl ??
     "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"
@@ -69,7 +74,7 @@ export function producerSlug(name: string) {
  *  'Daves Ranch' returns 'daves-ranch-id'
  */
 export function producerSlugFull(
-  producer: Producer | PublicProducer | PublicProducerLight
+  producer: Producer | PublicProducer | PublicProducerLight,
 ) {
   return `${producer.name.toLowerCase().trim().split(" ").join("-")}-${
     producer.id
@@ -78,7 +83,7 @@ export function producerSlugFull(
 
 export const producersQueryOptions = (
   args: ListProducerArgs,
-  initialData?: { data: PublicProducerLight[]; hasNextPage: boolean }
+  initialData?: { data: PublicProducerLight[]; hasNextPage: boolean },
 ) =>
   queryOptions({
     queryKey: ["producers", args],
@@ -89,7 +94,7 @@ export const producersQueryOptions = (
 
 export const producersFullQueryOptions = (
   args: ListProducerArgs,
-  initialData?: { data: PublicProducer[]; hasNextPage: boolean }
+  initialData?: { data: PublicProducer[]; hasNextPage: boolean },
 ) =>
   queryOptions({
     queryKey: ["producers", args],
@@ -123,7 +128,7 @@ export const loggedInUserProducersOptions = (
     | "meta"
     | "retry"
     | "retryDelay"
-  >
+  >,
 ) =>
   queryOptions({
     ...opts,
@@ -150,7 +155,7 @@ export const loggedInUserProducerOptions = (
     | "meta"
     | "retry"
     | "retryDelay"
-  >
+  >,
 ) =>
   queryOptions({
     ...opts,
@@ -173,7 +178,7 @@ export const editUserProducerOpts = (
     | "retry"
     | "retryDelay"
     | "scope"
-  >
+  >,
 ) =>
   mutationOptions({
     ...opts,
@@ -273,10 +278,61 @@ type ClaimProducerOpts = MutationOptions<
 >;
 
 export const claimProducerOpts = (
-  opts?: Omit<ClaimProducerOpts, "mutationFn" | "mutationKey">
+  opts?: Omit<ClaimProducerOpts, "mutationFn" | "mutationKey">,
 ) =>
   mutationOptions({
     ...opts,
     mutationKey: ["claim-producer"],
     mutationFn: (args: ClaimProducerArgs) => claimProducer(args),
+  });
+
+/**
+ * Additional user provided mutation opts for `checkClaimDomainDnsOpts`
+ */
+type CheckClaimDomainDnsOpts = MutationOptions<
+  string,
+  Error,
+  CheckClaimDomainDnsArgs,
+  unknown
+>;
+
+/**
+ * Check for a users claimRequest with a verification type of domainDns
+ * and then checks the dns records of that domain for the required token.
+ *
+ * Will invalidate all queries using the key ["list-claim-requests"]
+ */
+export const checkClaimDomainDnsOpts = ({
+  opts,
+  deps,
+}: {
+  deps: { queryClient: QueryClient };
+  opts?: Omit<CheckClaimDomainDnsOpts, "mutationFn" | "mutationKey">;
+}) =>
+  mutationOptions({
+    ...opts,
+    onSuccess: (d, v, c) => {
+      if (opts?.onSuccess) {
+        opts.onSuccess(d, v, c);
+      }
+      deps.queryClient.invalidateQueries({
+        queryKey: ["list-claim-requests"],
+      });
+    },
+    mutationKey: ["check-claim-domain-dns"],
+    mutationFn: (args: CheckClaimDomainDnsArgs) => checkClaimDomainDNS(args),
+  });
+
+export const listClaimRequestsOpts = (
+  props: Omit<
+    QueryOptions<PublicClaimRequest[], Error, PublicClaimRequest[], string[]>,
+    "queryFn" | "queryKey"
+  >,
+) =>
+  queryOptions({
+    ...props,
+    queryKey: ["list-claim-requests"],
+    queryFn: async () => {
+      return await listClaimRequests();
+    },
   });

@@ -1,6 +1,7 @@
 import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { LatLangBoundsLiteralValidator } from "./maps";
+import { ClaimRequestStatus } from "../db/schema";
 
 export const PRODUCER_TYPES = [
   "farm",
@@ -36,33 +37,70 @@ export const producerClaimVerificationMethods =
 
 export const claimProducerVerification = type({
   method: producerClaimContactEmailLinkMethod,
+  producerContactEmail: "string.email",
 })
   .or(
     type({
       method: producerClaimContactPhoneLinkMethod,
-    })
+      producerContactPhone: "string",
+    }),
   )
   .or(
     type({
       method: producerClaimDomainDNSLinkMethod,
-    })
+      domain: "string",
+    }),
   )
   .or(
     type({
       method: producerClaimManualMethod,
-    })
+      claimerEmail: "string.email",
+    }),
   )
   .or(
     type({
       method: producerClaimDomainEmailLinkMethod,
       domainDomainEmailPart: "string",
-    })
+      domain: "string",
+    }),
   )
   .or(
     type({
       method: producerClaimSocialPostMethod,
       socialHandle: "string",
-    })
+    }),
+  );
+
+export const claimProducerVerificationClient = type({
+  method: producerClaimContactEmailLinkMethod,
+})
+  .or(
+    type({
+      method: producerClaimContactPhoneLinkMethod,
+    }),
+  )
+  .or(
+    type({
+      method: producerClaimDomainDNSLinkMethod,
+    }),
+  )
+  .or(
+    type({
+      method: producerClaimManualMethod,
+      claimerEmail: "string.email",
+    }),
+  )
+  .or(
+    type({
+      method: producerClaimDomainEmailLinkMethod,
+      domainDomainEmailPart: "string",
+    }),
+  )
+  .or(
+    type({
+      method: producerClaimSocialPostMethod,
+      socialHandle: "string",
+    }),
   );
 
 export const contactValidator = type({
@@ -166,7 +204,7 @@ export const editProducerFormValidator = type({
         data.items.length > 0 &&
         !data.items.some(
           (i) =>
-            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId
+            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId,
         ))
     ) {
       return ctx.reject({
@@ -203,7 +241,7 @@ export const publicProducerValidator = producerValidator.pick(
   "contact",
   "address",
   "video",
-  "socialMedia"
+  "socialMedia",
 );
 
 export const publicProducerLightValidator = producerValidator.pick(
@@ -214,7 +252,7 @@ export const publicProducerLightValidator = producerValidator.pick(
   "claimed",
   "certifications",
   "contact",
-  "address"
+  "address",
 );
 
 export const listProducersArgsValidator = type({
@@ -248,8 +286,10 @@ export const registerProducerArgsValidator = type({
 
 export const claimProducerArgs = type({
   producerId: "string",
-  verification: claimProducerVerification,
+  verification: claimProducerVerificationClient,
 });
+
+export const checkClaimDomainDnsArgs = type({ claimRequestId: "string" });
 
 export type ListProducerArgs = typeof listProducersArgsValidator.infer;
 
@@ -283,3 +323,43 @@ export type ProducerClaimVerificationMethods =
 export type ClaimProducerVerification = typeof claimProducerVerification.infer;
 
 export type ClaimProducerArgs = typeof claimProducerArgs.infer;
+
+export type CheckClaimDomainDnsArgs = typeof checkClaimDomainDnsArgs.infer;
+
+export type PublicClaimRequest = {
+  id: string;
+  userId: string;
+  producer: {
+    id: string;
+    name: string;
+  };
+  producerId: string;
+  status: ClaimRequestStatus;
+  requestedVerification:
+    | {
+        method: "contact-email-link";
+        producerContactEmail: string;
+      }
+    | {
+        method: "contact-phone-link";
+        producerContactPhone: string;
+      }
+    | {
+        method: "manual";
+        claimerEmail: string;
+      }
+    | {
+        method: "domain-email-link";
+        domainDomainEmailPart: string;
+        domain: string;
+      }
+    | {
+        method: "social-post";
+        socialHandle: string;
+      }
+    | {
+        token: string;
+        method: "domain-dns";
+        domain: string;
+      };
+};
