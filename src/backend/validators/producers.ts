@@ -291,6 +291,8 @@ export const claimProducerArgs = type({
 
 export const checkClaimDomainDnsArgs = type({ claimRequestId: "string" });
 
+export const deleteProducerArgs = type({ producerId: "string.uuid" });
+
 export type ListProducerArgs = typeof listProducersArgsValidator.infer;
 
 export type GetProducerArgs = typeof getProducersArgsValidator.infer;
@@ -363,3 +365,5 @@ export type PublicClaimRequest = {
         domain: string;
       };
 };
+
+export type DeleteProducerArgs = typeof deleteProducerArgs.infer;

@@ -30,6 +30,7 @@ import { fetchUserProducers, listClaimRequests } from "@/backend/rpc/producers";
 import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 import { ClaimRequestsSection } from "./_components/claim-requests-section";
+import { ProducersSection } from "./_components/producers-section";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -64,6 +65,7 @@ export default async function DashboardPage() {
 
           <BackButton href={"/"} text="Back to Home" />
         </div>
+
         <Card className="">
           <CardHeader className="flex flex-col items-center gap-5">
             <Image
@@ -88,74 +90,7 @@ export default async function DashboardPage() {
             </div>
           </CardHeader>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BuildingIcon />
-              My Producer Profiles
-            </CardTitle>
-            <CardAction className="flex gap-2">
-              <AddProducerDialog />
-              <ClaimProducerDialog />
-            </CardAction>
-          </CardHeader>
-          {producers.length > 0 && (
-            <CardContent className="grid grid-cols-2 gap-10">
-              {producers.map((p) => (
-                <Card
-                  key={p.id}
-                  className="rounded-lg overflow-hidden pt-0 gap-0"
-                >
-                  <Image
-                    src={primaryImageUrl(p)}
-                    alt=""
-                    className="w-full object-cover aspect-video"
-                    width={600}
-                    height={600}
-                  />
-                  <CardContent className="p-5 flex flex-col gap-2">
-                    <p className="font-fraunces text-lg">{p.name}</p>
-                    <Badge>{p.type}</Badge>
-                    <p>{p.about}</p>
-                  </CardContent>
-                  <CardFooter className="grid grid-cols-3 gap-2 mt-auto">
-                    <Button variant={"outline"} asChild>
-                      <Link href={`/producers/${producerSlugFull(p)}`}>
-                        <EyeIcon />
-                        View
-                      </Link>
-                    </Button>
-                    <Button variant={"outline"} asChild>
-                      <Link href={`/dashboard/producers/${p.id}`}>
-                        <EditIcon />
-                        Edit
-                      </Link>
-                    </Button>
-                    <div>
-                      <Button size={"icon"} variant={"destructive"}>
-                        <TrashIcon />
-                      </Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </CardContent>
-          )}
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BuildingIcon />
-              Claim Requests
-            </CardTitle>
-            <CardAction className="flex gap-2">
-              <AddProducerDialog />
-              <ClaimProducerDialog />
-            </CardAction>
-          </CardHeader>
 
-          <ClaimRequestsSection claims={claimRequests} />
-        </Card>
         <Card className="bg-yellow-200">
           <CardHeader>
             <CardTitle>Upgrade</CardTitle>
@@ -192,6 +127,10 @@ export default async function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+
+        <ProducersSection producers={producers} />
+
+        <ClaimRequestsSection claims={claimRequests} />
       </div>
     </div>
   );

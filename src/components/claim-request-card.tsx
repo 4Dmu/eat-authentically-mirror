@@ -25,7 +25,7 @@ export function ClaimRequestCard({
   );
 
   return (
-    <div className="rounded-lg border p-5 shadow flex flex-col gap-5 flex-1">
+    <div className="rounded-lg border p-5 shadow flex flex-col gap-5 flex-1 bg-white">
       <div className="flex justify-between items-center gap-5">
         <p className="text-lg">
           Claim Submitted:{" "}

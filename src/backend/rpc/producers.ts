@@ -9,6 +9,7 @@ import {
   claimProducerArgs,
   checkClaimDomainDnsArgs,
   PublicClaimRequest,
+  deleteProducerArgs,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
@@ -19,7 +20,7 @@ import {
   producers,
   Video,
 } from "../db/schema";
-import { and, count, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
 import { withCertifications } from "../utils/transform-data";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
@@ -729,7 +730,12 @@ export const claimProducer = authenticatedActionClient
       const claimRequestsCountForUser = await db
         .select({ count: count() })
         .from(claimRequests)
-        .where(eq(claimRequests.userId, userId))
+        .where(
+          and(
+            eq(claimRequests.userId, userId),
+            sql`json_extract(${claimRequests.status}, '$.type') = 'waiting'`,
+          ),
+        )
         .then((r) => r[0].count ?? 0);
 
       if (subTier !== "Free" && subTier.tier === "enterprise") {
@@ -1026,4 +1032,55 @@ export const checkClaimDomainDNS = authenticatedActionClient
     });
 
     return "Claim successfull";
+  });
+
+export const deleteProducer = producerActionClient
+  .input(deleteProducerArgs)
+  .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
+    if (!producerIds.includes(producerId)) {
+      throw new Error("Producer not found");
+    }
+
+    const producer = await db.query.producers.findFirst({
+      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+    });
+
+    if (!producer) {
+      throw new Error("Producer not found");
+    }
+
+    console.log(
+      `[deleteProducer] Starting deletion proccess - userId: ${userId} producerId: ${producer.id}`,
+    );
+
+    if (producer.video) {
+      const videDelRes = await cloudflare.stream.delete(producer.video.uid, {
+        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+      });
+      console.log(`[deleteProducer] deleting video`, videDelRes);
+    }
+
+    for (const image of producer.images.items) {
+      const imageDelRes = await cloudflare.images.v1.delete(
+        image.cloudflareId,
+        {
+          account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+        },
+      );
+      console.log(`[deleteProducer] deleting image`, imageDelRes);
+    }
+
+    const delTxRes = await db.transaction(async (tx) => {
+      await tx
+        .delete(certificationsToProducers)
+        .where(eq(certificationsToProducers.listingId, producer.id));
+
+      await tx
+        .delete(claimRequests)
+        .where(eq(claimRequests.producerId, producer.id));
+
+      return await tx.delete(producers).where(eq(producers.id, producer.id));
+    });
+
+    console.log(`[deleteProducer] deletion successfull`, delTxRes);
   });

@@ -20,6 +20,7 @@ import {
   claimProducer,
   checkClaimDomainDNS,
   listClaimRequests,
+  deleteProducer,
 } from "@/backend/rpc/producers";
 import {
   ListProducerArgs,
@@ -30,9 +31,15 @@ import {
   ClaimProducerArgs,
   CheckClaimDomainDnsArgs,
   PublicClaimRequest,
+  DeleteProducerArgs,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import { ImageData } from "@/backend/validators/producers";
+
+type SimpleMutationOps<TData, TArgs> = Omit<
+  MutationOptions<TData, Error, TArgs, unknown>,
+  "mutationFn" | "mutationKey"
+>;
 
 /**
  * Gets the image url of the primary image.
@@ -159,26 +166,14 @@ export const loggedInUserProducerOptions = (
 ) =>
   queryOptions({
     ...opts,
-    queryKey: ["logged-in-user-producers"],
+    queryKey: ["logged-in-user-producer"],
     queryFn: () => fetchUserProducer(producerId),
   });
 
 type EditProducerOpts = MutationOptions<void, Error, EditProducerArgs, unknown>;
 
 export const editUserProducerOpts = (
-  opts?: Pick<
-    EditProducerOpts,
-    | "onSuccess"
-    | "onError"
-    | "onSettled"
-    | "onMutate"
-    | "gcTime"
-    | "meta"
-    | "networkMode"
-    | "retry"
-    | "retryDelay"
-    | "scope"
-  >,
+  opts?: Omit<EditProducerOpts, "mutationKey" | "mutationFn">,
 ) =>
   mutationOptions({
     ...opts,
@@ -278,10 +273,21 @@ type ClaimProducerOpts = MutationOptions<
 >;
 
 export const claimProducerOpts = (
+  deps: { queryClient: QueryClient },
   opts?: Omit<ClaimProducerOpts, "mutationFn" | "mutationKey">,
 ) =>
   mutationOptions({
     ...opts,
+    onSuccess: async (d, v, c) => {
+      if (opts?.onSuccess) {
+        await opts.onSuccess(d, v, c);
+      }
+      await Promise.all([
+        deps.queryClient.invalidateQueries({
+          queryKey: ["list-claim-requests"],
+        }),
+      ]);
+    },
     mutationKey: ["claim-producer"],
     mutationFn: (args: ClaimProducerArgs) => claimProducer(args),
   });
@@ -311,18 +317,32 @@ export const checkClaimDomainDnsOpts = ({
 }) =>
   mutationOptions({
     ...opts,
-    onSuccess: (d, v, c) => {
+    onSuccess: async (d, v, c) => {
       if (opts?.onSuccess) {
-        opts.onSuccess(d, v, c);
+        await opts.onSuccess(d, v, c);
       }
-      deps.queryClient.invalidateQueries({
-        queryKey: ["list-claim-requests"],
-      });
+      await Promise.all([
+        deps.queryClient.invalidateQueries({
+          queryKey: ["list-claim-requests"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["fetch-user-producers"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producer"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producers"],
+        }),
+      ]);
     },
     mutationKey: ["check-claim-domain-dns"],
     mutationFn: (args: CheckClaimDomainDnsArgs) => checkClaimDomainDNS(args),
   });
 
+/**
+ * List all of a users claim requests
+ */
 export const listClaimRequestsOpts = (
   props: Omit<
     QueryOptions<PublicClaimRequest[], Error, PublicClaimRequest[], string[]>,
@@ -334,5 +354,64 @@ export const listClaimRequestsOpts = (
     queryKey: ["list-claim-requests"],
     queryFn: async () => {
       return await listClaimRequests();
+    },
+  });
+
+/**
+ * Delets a users producer. Will delete associated data from tables like
+ * certificationsToProducers and claimRequests.
+ *
+ * Will also invalidate the following queries:
+ * - ["fetch-user-producers"]
+ * - ["logged-in-user-producer"]
+ * - ["logged-in-user-producers"]
+ * - ["producers"]
+ * - ["list-claim-requests"]
+ */
+export const deleteProducerOpts = (
+  deps: { queryClient: QueryClient },
+  opts?: SimpleMutationOps<void, DeleteProducerArgs>,
+) =>
+  mutationOptions({
+    ...opts,
+    onSuccess: async (d, v, c) => {
+      if (opts?.onSuccess) {
+        await opts.onSuccess(d, v, c);
+      }
+      await Promise.all([
+        deps.queryClient.invalidateQueries({
+          queryKey: ["fetch-user-producers"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producer"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producers"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["producers"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["list-claim-requests"],
+        }),
+      ]);
+    },
+    mutationKey: ["delete-producer"],
+    mutationFn: async (args: DeleteProducerArgs) => {
+      await deleteProducer(args);
+    },
+  });
+
+export const fetchUserProducersOpts = (
+  opts?: Omit<
+    QueryOptions<Producer[], Error, Producer[], string[]>,
+    "queryFn" | "queryKey"
+  >,
+) =>
+  queryOptions({
+    ...opts,
+    queryKey: ["fetch-user-producers"],
+    queryFn: async () => {
+      return await fetchUserProducers();
     },
   });

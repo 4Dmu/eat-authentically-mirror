@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   claimProducerOpts,
   primaryImageUrl,
@@ -282,16 +282,20 @@ export function ClaimProducerDialog() {
     setOpen(false);
   };
 
+  const queryClient = useQueryClient();
   const claimProducerMutation = useMutation(
-    claimProducerOpts({
-      onSuccess() {
-        closeDialog();
-        toast.success("Producer claim proccess started");
+    claimProducerOpts(
+      { queryClient },
+      {
+        onSuccess() {
+          closeDialog();
+          toast.success("Producer claim proccess started");
+        },
+        onError(e) {
+          toast.error(e.message);
+        },
       },
-      onError(e) {
-        toast.error(e.message);
-      },
-    }),
+    ),
   );
 
   function submit() {
