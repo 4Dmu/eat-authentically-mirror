@@ -31,11 +31,12 @@ export function LocationFilter() {
 }
 
 function Comp({ location }: { location: { lat: number; lng: number } | null }) {
-  const [bounds, setBounds] = useState<google.maps.LatLngBounds | null>(null);
+  const [bounds, setBounds] = useState<google.maps.LatLngBounds | undefined>(
+    undefined,
+  );
   const { locationSearchArea, setLocationSearchArea } = useHomePageStore();
 
   const map = useMap();
-  const coreLibrary = useMapsLibrary("core");
 
   const disableSelect = useMemo(() => {
     if (!bounds || !locationSearchArea) {
@@ -45,30 +46,22 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
   }, [bounds, locationSearchArea]);
 
   const handleSelectLocation = useCallback(() => {
-    console.log(map?.getBounds()?.toJSON());
     setLocationSearchArea(bounds ?? undefined);
   }, [bounds]);
 
   useEffect(() => {
-    if (!coreLibrary || !map) return;
+    if (!map) {
+      return;
+    }
 
-    setBounds(
-      new coreLibrary.LatLngBounds(
-        location
-          ? getBoundsFromCenter(location.lat, location.lng)
-          : {
-              south: 32.45823411743235,
-              west: -125.44785728400825,
-              north: 41.13266168275932,
-              east: -110.37461509650825,
-            },
-      ),
-    );
-  }, [map, coreLibrary]);
+    const free = map.addListener("bounds_changed", () => {
+      setBounds(map.getBounds());
+    });
 
-  const changeBounds = (newBounds: google.maps.LatLngBounds | null) => {
-    setBounds(newBounds);
-  };
+    return () => {
+      free.remove();
+    };
+  }, [map]);
 
   return (
     <div className="space-y-4">
@@ -85,23 +78,24 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
       >
         {location && (
           <Marker
+            // label={{
+            //   text: "Your Location",
+            //   className: "label",
+            // }}
+            //
+
+            icon={{
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              fillColor: "#4285F4", // Google Maps blue
+              fillOpacity: 1,
+              strokeWeight: 2,
+              strokeColor: "white",
+            }}
             position={{
               lat: location.lat,
               lng: location.lng,
             }}
-          />
-        )}
-        {bounds && (
-          <Rectangle
-            bounds={bounds}
-            onBoundsChanged={changeBounds}
-            strokeColor={"#0c4cb3"}
-            strokeOpacity={1}
-            strokeWeight={3}
-            fillColor={"#3b82f6"}
-            fillOpacity={0.3}
-            editable
-            draggable
           />
         )}
       </Map>
