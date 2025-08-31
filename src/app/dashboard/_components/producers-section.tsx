@@ -55,7 +55,7 @@ export function ProducersSection({ producers }: { producers: Producer[] }) {
         </CardAction>
       </CardHeader>
       {(data?.length ?? 0) > 0 && (
-        <CardContent className="grid grid-cols-2 gap-10">
+        <CardContent className="grid md:grid-cols-2 gap-10">
           {data?.map((p) => (
             <Card key={p.id} className="rounded-lg overflow-hidden pt-0 gap-0">
               <Image

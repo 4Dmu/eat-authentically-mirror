@@ -26,8 +26,8 @@ export function Header({
     <div
       className={`${
         pathname === "/"
-          ? "fixed top-0 left-0 z-10 bg-primary/50"
-          : "bg-primary"
+          ? "fixed top-0 left-0 z-10 bg-brand-green/50"
+          : "bg-brand-green"
       } text-primary-foreground w-full`}
     >
       <div className="grid grid-cols-3 w-full p-5 max-w-7xl mx-auto">

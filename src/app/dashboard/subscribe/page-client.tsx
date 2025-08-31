@@ -22,17 +22,22 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { BackButton } from "@/components/back-button";
+import {
+  COMMUNITY_TIER_PROS,
+  PREMIUM_TIER_PROS,
+  PRO_TIER_PROS,
+} from "@/backend/rpc/helpers/constants";
 
 export function ClientPage(props: {
   user: UserJSON;
   mode?: "community" | "producer";
 }) {
   const [tier, setTier] = useState<Tier>(
-    props.mode === "community" ? "community" : "pro"
+    props.mode === "community" ? "community" : "pro",
   );
   const [interval, setInterval] = useState<Interval>("month");
   const [mode, setMode] = useState<"community" | "producer">(
-    props.mode ?? "producer"
+    props.mode ?? "producer",
   );
 
   const createOrgCheckoutSessionMutation = useMutation({
@@ -101,7 +106,7 @@ export function ClientPage(props: {
         className="flex flex-col gap-5"
       >
         {/* <Tabs
-        
+
           value={interval}
           onValueChange={(e) => setInterval(e as "month")}
           className="gap-5"
@@ -263,7 +268,7 @@ export function ClientPage(props: {
                 onClick={() => setInterval("month")}
                 className={cn(
                   "flex gap-1 items-center rounded-full p-2",
-                  interval == "month" && "text-primary-foreground bg-primary"
+                  interval == "month" && "text-primary-foreground bg-primary",
                 )}
               >
                 1 Month
@@ -273,7 +278,7 @@ export function ClientPage(props: {
                 type="button"
                 className={cn(
                   "flex gap-1 items-center rounded-full p-2",
-                  interval == "year" && "text-primary-foreground bg-primary"
+                  interval == "year" && "text-primary-foreground bg-primary",
                 )}
               >
                 <span>12 Months</span>
@@ -292,13 +297,7 @@ export function ClientPage(props: {
               name={"Commiunity Member"}
               price="$4.99"
               badge={{ name: "Commiunity Member" }}
-              pros={[
-                "Leave detailed reviews for producers.",
-                "Send direct messages to producers.",
-                "Access exclusive community content.",
-                "Priority customer support.",
-                "Support sustainable food producers.",
-              ]}
+              pros={COMMUNITY_TIER_PROS}
               cons={[]}
             />
           </TabsContent>
@@ -313,14 +312,7 @@ export function ClientPage(props: {
               name="Producer Pro"
               price="$29.99"
               priceSubtitle="per month"
-              pros={[
-                "Edit basic info: Yes",
-                "Add certifications: Up to 6",
-                "Add products: Up to 10",
-                "Upload hero images: 3 images",
-                "Additional images: 2 extra",
-                "Featured in listings: Randomized",
-              ]}
+              pros={PRO_TIER_PROS}
               cons={["Upload video: No"]}
             />
             <TierCard
@@ -333,15 +325,7 @@ export function ClientPage(props: {
               }}
               price="$69.99"
               priceSubtitle="per month"
-              pros={[
-                "Edit basic info: Yes",
-                "Add certifications: Unlimited",
-                "Add products: Unlimited",
-                "Upload hero images: 10 images + video",
-                "Additional images: Up to 10 total",
-                "Featured in listings: Priority slot",
-                "Upload video: Yes",
-              ]}
+              pros={PREMIUM_TIER_PROS}
               cons={[]}
             />
           </TabsContent>

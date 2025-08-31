@@ -57,12 +57,14 @@ export function UserButton({
             <p className="text-sm font-bold items-start">
               {user?.first_name ??
                 user?.email_addresses?.find(
-                  (e) => e.id === user.primary_email_address_id
+                  (e) => e.id === user.primary_email_address_id,
                 )?.email_address}
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Badge>{subTier === "Free" ? "Free" : subTier.tier}</Badge>
+            <Badge variant={"brandGreen"}>
+              {subTier === "Free" ? "Free" : subTier.tier}
+            </Badge>
           </div>
         </div>
         <Separator />

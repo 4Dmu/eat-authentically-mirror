@@ -131,7 +131,7 @@ export const USER_PRODUCER_IDS_KV = {
     const current = (await this.get(userId)) ?? [];
     await this.set(
       userId,
-      current.filter((i) => i !== id)
+      current.filter((i) => i !== id),
     );
   },
   async delete(userId: string) {
@@ -177,7 +177,7 @@ export const STRIPE_CUSTOMER_SUBSCRIPTIONS_KV = {
   },
   async get(stripeCustomerId: string) {
     const data = await redis.get<SubscriptionJSON[]>(
-      this.generateKey(stripeCustomerId)
+      this.generateKey(stripeCustomerId),
     );
     if (data == null) {
       return data;
