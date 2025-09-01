@@ -15,6 +15,7 @@ export const PRO_TIER_PROS = [
   "Upload hero images: 3 images",
   "Additional images: 2 extra",
   "Featured in listings: Randomized",
+  "Receive messages from community members",
 ];
 
 export const PREMIUM_TIER_PROS = [
@@ -25,4 +26,5 @@ export const PREMIUM_TIER_PROS = [
   "Additional images: Up to 10 total",
   "Featured in listings: Priority slot",
   "Upload video: Yes",
+  "Receive messages from community members",
 ];
