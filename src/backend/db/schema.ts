@@ -156,6 +156,7 @@ export const certificationsToProducersRelations = relations(
 );
 
 export type Certification = typeof certifications.$inferSelect;
+export type ProducerSelect = typeof producers.$inferSelect;
 export type ClaimRequest = typeof claimRequests.$inferSelect & {
   producer: { name: string; id: string };
 };

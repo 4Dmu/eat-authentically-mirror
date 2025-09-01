@@ -55,8 +55,8 @@ export default async function ProducerPage({
                     producer.images.primaryImgId === a.cloudflareId
                       ? -1
                       : producer.images.primaryImgId === b.cloudflareId
-                      ? 1
-                      : 0
+                        ? 1
+                        : 0,
                   )
                   .map((img) => (
                     <CarouselItem key={img.cloudflareId}>
@@ -155,7 +155,9 @@ export default async function ProducerPage({
                 </div>
               </CardContent>
             </Card>
-            {!producer.claimed && <ClaimProducerCard name={producer.name} />}
+            {!producer.claimed && (
+              <ClaimProducerCard id={producer.id} name={producer.name} />
+            )}
           </div>
         </div>
       </div>

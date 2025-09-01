@@ -38,6 +38,10 @@ export function ClaimRequestsSection({
 }) {
   const { data } = useQuery(listClaimRequestsOpts({ initialData: claims }));
 
+  if (data?.length === 0) {
+    return null;
+  }
+
   return (
     <Card className="bg-gray-50">
       <CardHeader>

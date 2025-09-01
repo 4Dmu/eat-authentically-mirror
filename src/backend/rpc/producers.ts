@@ -105,7 +105,7 @@ export const fetchUserProducer = producerActionClient
     return result;
   });
 
-export const fetchUserProducers = producerActionClient.action(
+export const fetchUserProducers = authenticatedActionClient.action(
   async ({ producerIds, userId }) => {
     const result = await db.query.producers
       .findMany({
