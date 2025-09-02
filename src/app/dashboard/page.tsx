@@ -179,12 +179,16 @@ export default async function DashboardPage() {
           )}
           <Separator />
           <CardFooter className="flex gap-5 justify-center items-center w-full">
-            <Button className="w-32">
-              <EditIcon /> Account
+            <Button className="w-32" asChild>
+              <Link href={"/dashboard/account"}>
+                <EditIcon /> Account
+              </Link>
             </Button>
-            <Button className="w-32">
-              <CreditCard />
-              Subscription
+            <Button className="w-32" asChild>
+              <Link href={"/dashboard/billing/maybe"}>
+                <CreditCard />
+                Subscription
+              </Link>
             </Button>
           </CardFooter>
         </Card>
