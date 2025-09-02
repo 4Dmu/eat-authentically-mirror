@@ -1,5 +1,7 @@
+import { internalClaimProducer } from "@/backend/data/producer";
 import { db } from "@/backend/db";
 import { claimRequests, producers } from "@/backend/db/schema";
+import { USER_PRODUCER_IDS_KV } from "@/backend/kv";
 import { and, eq, sql } from "drizzle-orm";
 import { Loader } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
@@ -9,7 +11,7 @@ async function ClaimPage({ token }: { token: string }) {
   const claim = await db.query.claimRequests.findFirst({
     where: and(
       eq(claimRequests.claimToken, token),
-      sql`json_extract(${claimRequests.status}, '$.type') = 'waiting'`
+      sql`json_extract(${claimRequests.status}, '$.type') = 'waiting'`,
     ),
   });
 
@@ -19,26 +21,10 @@ async function ClaimPage({ token }: { token: string }) {
     notFound();
   }
 
-  await db.transaction(async (tx) => {
-    await tx
-      .update(claimRequests)
-      .set({
-        status: {
-          type: "claimed",
-        },
-        claimedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(claimRequests.id, claim.id));
-
-    await tx
-      .update(producers)
-      .set({
-        userId: claim.userId,
-        claimed: true,
-        verified: true,
-      })
-      .where(eq(producers.id, claim.producerId));
+  await internalClaimProducer({
+    userId: claim.userId,
+    producerId: claim.producerId,
+    claimRequestId: claim.id,
   });
 
   return redirect("/dashboard");

@@ -1,11 +1,22 @@
-import { getProducerPublic } from "@/backend/data/producer";
+import {
+  getProducerPublic,
+  getUsersProducerIdsCached,
+} from "@/backend/data/producer";
 import { BackButton } from "@/components/back-button";
 import { AddToPinboardButton } from "@/components/pinboard";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { producerSlug } from "@/utils/producers";
-import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
+import {
+  GlobeIcon,
+  MailIcon,
+  MapPin,
+  MessageCircleIcon,
+  PhoneIcon,
+  Send,
+  Star,
+} from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import { ClaimProducerCard } from "@/components/claim-producer-card";
@@ -18,6 +29,15 @@ import {
 } from "@/components/ui/carousel";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { Stream } from "@/components/stream";
+import { Button } from "@/components/ui/button";
+import { NotSubbed, Subbed } from "@/components/auth/RequireSub";
+import { MessageProducerDialog } from "@/components/message-producer-dialog";
+import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
+import {
+  CommunityBenefitsCard,
+  CommunityBenefitsCTACard,
+} from "@/components/community-benefits-card";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function ProducerPage({
   params,
@@ -27,6 +47,11 @@ export default async function ProducerPage({
   const { slug } = await params;
   const id = slug.substring(slug.length - 36);
   const receivedSlug = slug.substring(0, slug.length - 36);
+  const session = await auth();
+  const subTier = session.userId ? await getSubTier(session.userId) : "Free";
+  const userProducerIds = session.userId
+    ? await getUsersProducerIdsCached(session.userId)
+    : [];
 
   const producer = await getProducerPublic({ id: id });
 
@@ -39,6 +64,12 @@ export default async function ProducerPage({
     redirect(`${correctSlug}${producer.id}`);
   }
 
+  const hasAddress =
+    producer.address !== null &&
+    Object.entries(producer.address).some(
+      (v) => v[1] !== null && v[1] !== undefined,
+    );
+
   return (
     <div>
       <div className="p-10 flex flex-col gap-10 max-w-7xl mx-auto">
@@ -46,7 +77,7 @@ export default async function ProducerPage({
           <BackButton text="Return Home" href="/" />
           <AddToPinboardButton />
         </div>
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col lg:flex-row gap-5">
           <Card className="pt-0 overflow-hidden flex-5/8">
             <Carousel>
               <CarouselContent>
@@ -96,10 +127,10 @@ export default async function ProducerPage({
           </Card>
           <div className="flex-3/8 flex flex-col gap-5">
             <Card className="">
-              <CardHeader>
+              <CardHeader className="flex justify-between items-center">
                 <CardTitle>Contact</CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col gap-5">
+              <CardContent className="flex flex-col gap-5 break-all">
                 {producer.contact?.email && (
                   <div className="flex flex-col gap-2">
                     <Label>
@@ -139,22 +170,51 @@ export default async function ProducerPage({
                     </a>
                   </div>
                 )}
-                <div className="flex flex-col gap-2">
-                  <Label>
-                    <MapPin size={20} />
-                    Map
-                  </Label>
-                  {producer?.address && (
-                    <div>
-                      {producer.address.street}, {producer.address.city},{" "}
-                      {producer.address.state}, {producer.address.zip},{" "}
-                      {producer.address.country &&
-                        countryByAlpha3Code(producer.address.country).name}
+                {hasAddress && producer.address !== null && (
+                  <div className="flex flex-col gap-2">
+                    <Label>
+                      <MapPin size={20} />
+                      Map
+                    </Label>
+                    <div className="flex flex-col gap-2">
+                      <div>
+                        {producer.address.street &&
+                          `${producer.address.street}, `}
+                        {producer.address.city && `${producer.address.city}, `}
+                        {producer.address.state &&
+                          `${producer.address.state}, `}
+                        {producer.address.zip && `${producer.address.zip}, `}
+                        {producer.address.country &&
+                          countryByAlpha3Code(producer.address.country).name}
+                      </div>
+                      {producer.address.coordinate && (
+                        <Button variant={"outline"} asChild>
+                          <a
+                            target="_blank"
+                            href={`https://www.google.com/maps/search/?api=1&query=${producer.address.coordinate.latitude},${producer.address.coordinate.longitude}`}
+                          >
+                            View On Map
+                          </a>
+                        </Button>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
+            {producer.claimed && (
+              <>
+                <Subbed initialSubTier={subTier}>
+                  <CommunityBenefitsCard
+                    userProducerIds={userProducerIds}
+                    producer={producer}
+                  />
+                </Subbed>
+                <NotSubbed>
+                  <CommunityBenefitsCTACard />
+                </NotSubbed>
+              </>
+            )}
             {!producer.claimed && (
               <ClaimProducerCard id={producer.id} name={producer.name} />
             )}

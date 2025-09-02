@@ -5,7 +5,11 @@ import type {
 } from "@/backend/validators/producers";
 import { db } from "../db";
 import { and, count, desc, eq, inArray, like, SQL, sql } from "drizzle-orm";
-import { certificationsToProducers, producers } from "../db/schema";
+import {
+  certificationsToProducers,
+  claimRequests,
+  producers,
+} from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 
@@ -16,11 +20,15 @@ export async function getUsersProducerIdsCached(userId: string) {
     return profileIds;
   }
 
-  return await db
+  const existing = await db
     .select({ id: producers.id })
     .from(producers)
     .where(eq(producers.userId, userId))
     .then((r) => r.map((i) => i.id));
+
+  await USER_PRODUCER_IDS_KV.set(userId, existing);
+
+  return existing;
 }
 
 const orderProducersByScrapedMetadata = sql`
@@ -75,8 +83,6 @@ export async function listProducersPublic(args: ListProducerArgs) {
         ),
       );
     }
-
-    console.log(queries);
 
     const producersQuery = await db.query.producers.findMany({
       orderBy: [orderProducersByScrapedMetadata, desc(producers.createdAt)],
@@ -275,4 +281,38 @@ export async function listCertificationTypesPublic() {
   const certs = await db.query.certifications.findMany();
 
   return certs;
+}
+
+export async function internalClaimProducer({
+  claimRequestId,
+  producerId,
+  userId,
+}: {
+  claimRequestId: string;
+  producerId: string;
+  userId: string;
+}) {
+  await db.transaction(async (tx) => {
+    await tx
+      .update(claimRequests)
+      .set({
+        status: {
+          type: "claimed",
+        },
+        claimedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(claimRequests.id, claimRequestId));
+
+    await tx
+      .update(producers)
+      .set({
+        userId: userId,
+        claimed: true,
+        verified: true,
+      })
+      .where(eq(producers.id, producerId));
+
+    await USER_PRODUCER_IDS_KV.push(userId, producerId);
+  });
 }

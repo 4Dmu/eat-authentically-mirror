@@ -48,14 +48,12 @@ type SimpleMutationOps<TData, TArgs> = Omit<
  *  - legacy image property
  *  - placeholder unsplash url
  */
-export function primaryImageUrl(
-  listing: Producer | PublicProducer | PublicProducerLight,
-) {
+export function primaryImageUrl(producer: Pick<Producer, "images">) {
   return (
-    listing.images?.items.find(
-      (i) => i.cloudflareId === listing.images.primaryImgId,
+    producer.images?.items.find(
+      (i) => i.cloudflareId === producer.images.primaryImgId,
     )?.cloudflareUrl ??
-    listing.images?.items[0]?.cloudflareUrl ??
+    producer.images?.items[0]?.cloudflareUrl ??
     "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"
   );
 }

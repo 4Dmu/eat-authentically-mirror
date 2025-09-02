@@ -1,9 +1,13 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   integer,
+  real,
   primaryKey,
   sqliteTable,
   text,
+  unique,
+  uniqueIndex,
+  check,
 } from "drizzle-orm/sqlite-core";
 import {
   type SocialMedia,
@@ -84,6 +88,13 @@ export const producers = sqliteTable("producers", {
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
 
+export const producersRelations = relations(producers, ({ many }) => ({
+  certificationsToProducers: many(certificationsToProducers),
+  claimRequests: many(claimRequests),
+  chats: many(producerChats),
+  reviews: many(reviews),
+}));
+
 export const claimRequests = sqliteTable("claim_requests", {
   id: text().primaryKey(),
   userId: text().notNull(),
@@ -101,14 +112,83 @@ export const claimRequests = sqliteTable("claim_requests", {
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
 
-export const producersRelations = relations(producers, ({ many }) => ({
-  certificationsToProducers: many(certificationsToProducers),
-  claimRequests: many(claimRequests),
-}));
-
 export const claimRequestsRelations = relations(claimRequests, ({ one }) => ({
   producer: one(producers, {
     fields: [claimRequests.producerId],
+    references: [producers.id],
+  }),
+}));
+
+export const producerChats = sqliteTable(
+  "producer_chats",
+  {
+    id: text().primaryKey(),
+    producerId: text()
+      .notNull()
+      .references(() => producers.id),
+    producerUserId: text().notNull(),
+    initiatorUserId: text().notNull(),
+    initiatorPreventedMoreMessagesAt: integer({ mode: "timestamp" }),
+    producerPreventedMoreMessagesAt: integer({ mode: "timestamp" }),
+    createdAt: integer({ mode: "timestamp" }).notNull(),
+    updatedAt: integer({ mode: "timestamp" }).notNull(),
+  },
+  (t) => [unique().on(t.initiatorUserId, t.producerId, t.producerUserId)],
+);
+
+export const producerChatsRelations = relations(
+  producerChats,
+  ({ many, one }) => ({
+    messages: many(producerChatMessages),
+    producer: one(producers, {
+      fields: [producerChats.producerId],
+      references: [producers.id],
+    }),
+  }),
+);
+
+export const producerChatMessages = sqliteTable("producer_chat_messages", {
+  id: text().primaryKey(),
+  chatId: text()
+    .notNull()
+    .references(() => producerChats.id),
+  senderUserId: text().notNull(),
+  content: text().notNull(),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  updatedAt: integer({ mode: "timestamp" }).notNull(),
+});
+
+export const producerChatMessagesRelations = relations(
+  producerChatMessages,
+  ({ one }) => ({
+    chat: one(producerChats, {
+      fields: [producerChatMessages.chatId],
+      references: [producerChats.id],
+    }),
+  }),
+);
+
+export const reviews = sqliteTable(
+  "reviews",
+  {
+    id: text().primaryKey(),
+    producerId: text()
+      .notNull()
+      .references(() => producers.id),
+    reviewerUserId: text().notNull(),
+    content: text().notNull(),
+    rating: real().notNull(),
+    createdAt: integer({ mode: "timestamp" }).notNull(),
+    updatedAt: integer({ mode: "timestamp" }).notNull(),
+  },
+  (table) => [
+    check("rating_check", sql`${table.rating} >= 0.5 AND rating <= 5.0`),
+  ],
+);
+
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  producer: one(producers, {
+    fields: [reviews.producerId],
     references: [producers.id],
   }),
 }));

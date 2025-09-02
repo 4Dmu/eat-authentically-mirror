@@ -44,6 +44,7 @@ import { generateToken } from "../utils/generate-tokens";
 import { getAllDnsRecords, getDnsRecords } from "@layered/dns-records";
 import { CLAIM_DNS_TXT_RECORD_NAME } from "./helpers/constants";
 import { getLoggedInUserProducerIds } from "./auth";
+import { USER_PRODUCER_IDS_KV } from "../kv";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -78,6 +79,8 @@ export const registerProducer = authenticatedActionClient
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+
+    await USER_PRODUCER_IDS_KV.push(userId, producerProfileId);
 
     return producerProfileId;
   });
@@ -961,11 +964,11 @@ export const listClaimRequests = authenticatedActionClient.action(
 export const checkClaimDomainDNS = authenticatedActionClient
   .input(checkClaimDomainDnsArgs)
   .action(async ({ ctx: { userId }, input: { claimRequestId } }) => {
-    // const { success } = await producerClaimDnsCheckRatelimit.limit(userId);
+    const { success } = await producerClaimDnsCheckRatelimit.limit(userId);
 
-    // if (!success) {
-    //   throw new Error("Rate limit exceded");
-    // }
+    if (!success) {
+      throw new Error("Rate limit exceded");
+    }
 
     const claimRequest = await db.query.claimRequests.findFirst({
       where: and(
@@ -1001,24 +1004,10 @@ export const checkClaimDomainDNS = authenticatedActionClient
       throw new Error("Claim tokens did not match.");
     }
 
-    await db.transaction(async (tx) => {
-      await tx
-        .update(claimRequests)
-        .set({
-          status: { type: "claimed" },
-          claimedAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(claimRequests.id, claimRequest.id));
-
-      await tx
-        .update(producers)
-        .set({
-          userId: claimRequest.userId,
-          claimed: true,
-          verified: true,
-        })
-        .where(eq(producers.id, claimRequest.producerId));
+    await listing.internalClaimProducer({
+      userId: claimRequest.userId,
+      producerId: claimRequest.producerId,
+      claimRequestId: claimRequest.id,
     });
 
     return "Claim successfull";
