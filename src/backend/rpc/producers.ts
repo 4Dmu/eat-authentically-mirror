@@ -45,6 +45,8 @@ import { getAllDnsRecords, getDnsRecords } from "@layered/dns-records";
 import { CLAIM_DNS_TXT_RECORD_NAME } from "./helpers/constants";
 import { getLoggedInUserProducerIds } from "./auth";
 import { USER_PRODUCER_IDS_KV } from "../kv";
+import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
+import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -811,7 +813,7 @@ export const claimProducer = authenticatedActionClient
 
           break;
         case "domain-dns":
-        case "domain-email-link":
+        case "domain-email-link": {
           const website = producer.contact?.website;
           if (!website) {
             throw new Error(
@@ -885,6 +887,7 @@ export const claimProducer = authenticatedActionClient
           }
 
           break;
+        }
         case "contact-phone-link":
           const phone = producer.contact?.phone;
 
@@ -895,7 +898,7 @@ export const claimProducer = authenticatedActionClient
           console.warn("Implement producer claim contact-phone-link method");
 
           break;
-        case "social-post":
+        case "social-post": {
           const profiles: string[] = [];
 
           if (producer.socialMedia.facebook) {
@@ -915,12 +918,67 @@ export const claimProducer = authenticatedActionClient
             throw new Error("Missing or invalid social handle");
           }
 
-          console.warn("Implement producer claim social-post method");
+          const token = generateToken();
+
+          await db.insert(claimRequests).values({
+            id: crypto.randomUUID(),
+            producerId: producer.id,
+            userId: userId,
+            status: {
+              type: "waiting",
+            },
+            requestedVerification: {
+              method: verification.method,
+              socialHandle: verification.socialHandle,
+            },
+            claimToken: token,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          await resend.emails.send({
+            from: env.RESEND_FROM_EMAIL,
+            to: [env.RESEND_FROM_EMAIL],
+            subject: "Social Claim Producer Request",
+            react: SocialClaimListingInternalEmail({
+              producer: producer,
+              socialHandle: verification.socialHandle,
+              token: token,
+            }),
+          });
 
           break;
-        case "manual":
-          console.warn("Implement producer claim manual method");
+        }
+        case "manual": {
+          const token = generateToken();
+
+          await db.insert(claimRequests).values({
+            id: crypto.randomUUID(),
+            producerId: producer.id,
+            userId: userId,
+            status: {
+              type: "waiting",
+            },
+            requestedVerification: {
+              method: verification.method,
+              claimerEmail: verification.claimerEmail,
+            },
+            claimToken: token,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          await resend.emails.send({
+            from: env.RESEND_FROM_EMAIL,
+            to: [verification.claimerEmail],
+            subject: "Claim Producer",
+            react: ManualClaimListingEmail({
+              producer: { name: producer.name },
+            }),
+          });
+
           break;
+        }
       }
     },
   );
@@ -955,7 +1013,9 @@ export const listClaimRequests = authenticatedActionClient.action(
           requestedVerification:
             requestedVerification.method === "domain-dns"
               ? { ...requestedVerification, token: claimToken }
-              : requestedVerification,
+              : requestedVerification.method === "social-post"
+                ? { ...requestedVerification, token: claimToken }
+                : requestedVerification,
         }) satisfies PublicClaimRequest,
     );
   },

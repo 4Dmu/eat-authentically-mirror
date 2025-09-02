@@ -296,7 +296,7 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                       ))
                       .with({ method: "manual" }, () => (
                         <span>
-                          Replying to the email we will send about your claim
+                          replying to the email we will send about your claim
                           request to the following address:
                         </span>
                       ))

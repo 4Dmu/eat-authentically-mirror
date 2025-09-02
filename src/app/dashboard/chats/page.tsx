@@ -48,7 +48,7 @@ export default async function MessagesPage() {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <BackButton href={"/"} text="Back to Home" />
+          <BackButton href={"./"} text="Back" />
         </div>
         {sub !== "Free" && <ChatsPageClient />}
       </div>

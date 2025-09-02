@@ -357,6 +357,7 @@ export type PublicClaimRequest = {
       }
     | {
         method: "social-post";
+        token: string;
         socialHandle: string;
       }
     | {
