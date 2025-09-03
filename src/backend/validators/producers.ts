@@ -255,6 +255,27 @@ export const publicProducerLightValidator = producerValidator.pick(
   "address",
 );
 
+export const ipGeoValidator = type({
+  /** The city that the request originated from. */
+  "city?": "string",
+  /** The country that the request originated from. */
+  "country?": "string",
+  /** The flag emoji for the country the request originated from. */
+  "flag?": "string",
+  /** The [Vercel Edge Network region](https://vercel.com/docs/concepts/edge-network/regions) that received the request. */
+  "region?": "string",
+  /** The region part of the ISO 3166-2 code of the client IP.
+   * See [docs](https://vercel.com/docs/concepts/edge-network/headers#x-vercel-ip-country-region).
+   */
+  "countryRegion?": "string",
+  /** The latitude of the client. */
+  "latitude?": "string.numeric.parse",
+  /** The longitude of the client. */
+  "longitude?": "string.numeric.parse",
+  /** The postal code of the client */
+  "postalCode?": "string",
+});
+
 export const listProducersArgsValidator = type({
   "type?": producerTypesValidator,
   page: "number",
@@ -262,6 +283,7 @@ export const listProducersArgsValidator = type({
   certs: type("string").array(),
   "locationSearchArea?": LatLangBoundsLiteralValidator,
   "claimed?": "boolean",
+  "userIpGeo?": ipGeoValidator,
 });
 
 export const getProducersArgsValidator = type({ id: "string.uuid" });
@@ -368,3 +390,5 @@ export type PublicClaimRequest = {
 };
 
 export type DeleteProducerArgs = typeof deleteProducerArgs.infer;
+
+export type IpGeoValidator = typeof ipGeoValidator.infer;

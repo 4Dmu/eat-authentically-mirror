@@ -1,5 +1,7 @@
 export const CLAIM_DNS_TXT_RECORD_NAME = "ea-verify";
 
+export const CUSTOM_GEO_HEADER_NAME = "x-custom-geo";
+
 export const COMMUNITY_TIER_PROS = [
   "Leave detailed reviews for producers.",
   "Send direct messages to producers.",

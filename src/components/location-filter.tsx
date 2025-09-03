@@ -14,9 +14,6 @@ import { Rectangle } from "./maps/square";
 
 export function LocationFilter() {
   const location = useGeolocation();
-  if (location.loading) {
-    return;
-  }
   return (
     <APIProvider apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_JS_PUBLIC_KEY}>
       <Comp
@@ -65,7 +62,10 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
 
   return (
     <div className="space-y-4">
-      <div></div>
+      <div>
+        Filter producers to ones located within this maps bounds (It will
+        automatically center at your location if allowed)
+      </div>
       <Map
         style={{ width: "100%", height: "40vh" }}
         gestureHandling={"greedy"}
@@ -76,7 +76,7 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
           lng: location?.lng ?? -119.417931,
         }}
       >
-        {location && (
+        {location && map && (
           <Marker
             // label={{
             //   text: "Your Location",

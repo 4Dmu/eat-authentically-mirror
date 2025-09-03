@@ -1,6 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { getSubTier } from "./backend/rpc/utils/get-sub-tier";
 import { NextResponse } from "next/server";
+import { geolocation } from "@vercel/functions";
+import { CUSTOM_GEO_HEADER_NAME } from "./backend/rpc/helpers/constants";
 
 const isPublicRoute = createRouteMatcher([
   "/producers(.*)",
@@ -13,6 +15,8 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 const isSubRoute = createRouteMatcher(["/dashboard/subscribe"]);
+
+const isHome = createRouteMatcher(["/"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
@@ -29,6 +33,20 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
+
+  const response = NextResponse.next();
+
+  if (isHome(req)) {
+    const geo = geolocation(req);
+    if (process.env.NODE_ENV === "development") {
+      geo.latitude = "38.581650486149975";
+      geo.longitude = "-121.36493918991683";
+    }
+
+    response.headers.set(CUSTOM_GEO_HEADER_NAME, JSON.stringify(geo));
+  }
+
+  return response;
 });
 
 export const config = {

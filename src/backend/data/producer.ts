@@ -1,5 +1,6 @@
 import type {
   GetProducerArgs,
+  IpGeoValidator,
   ListProducerArgs,
   PublicProducer,
 } from "@/backend/validators/producers";
@@ -12,6 +13,51 @@ import {
 } from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
 import { USER_PRODUCER_IDS_KV } from "../kv";
+
+const orderProducersByScrapedMetadata = sql`
+  CASE
+    WHEN scrapeMeta IS NOT NULL THEN 1
+    ELSE 0
+  END,
+  CASE json_extract(scrapeMeta, '$.status')
+      WHEN 'Registered' THEN 0
+      ELSE 1
+    END,
+  CAST(json_extract(scrapeMeta, '$.numFavorites') AS INTEGER) DESC,
+  CASE json_array_length(images) > 0
+    WHEN true THEN 0
+      ELSE 1
+    END`;
+
+function orderProducerByIpGeo(geo?: IpGeoValidator) {
+  if (geo?.longitude === undefined || geo?.latitude === undefined) {
+    return undefined;
+  }
+
+  const latitude = geo.latitude;
+  const longitude = geo.longitude;
+
+  return sql`
+      json_type(json_extract(address, '$.coordinate.latitude')) IS NOT NULL AND
+      json_type(json_extract(address, '$.coordinate.longitude')) IS NOT NULL DESC,
+
+      -- Then: order by squared Euclidean distance
+      (
+        (CAST(json_extract(address, '$.coordinate.latitude') AS REAL) - ${latitude}) *
+        (CAST(json_extract(address, '$.coordinate.latitude') AS REAL) - ${latitude}) +
+        (CAST(json_extract(address, '$.coordinate.longitude') AS REAL) - ${longitude}) *
+        (CAST(json_extract(address, '$.coordinate.longitude') AS REAL) - ${longitude})
+      ) ASC
+  `;
+}
+
+// 6371 * acos(
+//   cos(radians(${latitude}))
+//   * cos(radians(CAST(json_extract(address, '$.coordinate.latitude') AS REAL)))
+//   * cos(radians(CAST(json_extract(address, '$.coordinate.longitude') AS REAL)) - radians(${longitude}))
+//   + sin(radians(${latitude}))
+//   * sin(radians(CAST(json_extract(address, '$.coordinate.latitude') AS REAL)))
+// )
 
 export async function getUsersProducerIdsCached(userId: string) {
   const profileIds = await USER_PRODUCER_IDS_KV.get(userId);
@@ -30,21 +76,6 @@ export async function getUsersProducerIdsCached(userId: string) {
 
   return existing;
 }
-
-const orderProducersByScrapedMetadata = sql`
-  CASE
-    WHEN scrapeMeta IS NOT NULL THEN 1
-    ELSE 0
-  END,
-  CASE json_extract(scrapeMeta, '$.status')
-      WHEN 'Registered' THEN 0
-      ELSE 1
-    END,
-  CAST(json_extract(scrapeMeta, '$.numFavorites') AS INTEGER) DESC,
-  CASE json_array_length(images) > 0
-    WHEN true THEN 0
-      ELSE 1
-    END`;
 
 export async function listProducersPublic(args: ListProducerArgs) {
   try {
@@ -84,8 +115,17 @@ export async function listProducersPublic(args: ListProducerArgs) {
       );
     }
 
+    let orderBy = [orderProducersByScrapedMetadata, desc(producers.createdAt)];
+
+    const ipGeo = orderProducerByIpGeo(args.userIpGeo);
+    console.log(ipGeo);
+
+    if (ipGeo) {
+      orderBy = [ipGeo, ...orderBy];
+    }
+
     const producersQuery = await db.query.producers.findMany({
-      orderBy: [orderProducersByScrapedMetadata, desc(producers.createdAt)],
+      orderBy: orderBy,
       columns: {
         id: true,
         name: true,
@@ -184,8 +224,16 @@ export async function listProducersPublicLight(args: ListProducerArgs) {
       .where(queries.length > 0 ? and(...queries) : undefined)
       .then((r) => r[0].count ?? 0);
 
+    let orderBy = [orderProducersByScrapedMetadata, desc(producers.createdAt)];
+
+    const ipGeo = orderProducerByIpGeo(args.userIpGeo);
+
+    if (ipGeo) {
+      orderBy = [ipGeo, ...orderBy];
+    }
+
     const producersQuery = await db.query.producers.findMany({
-      orderBy: [orderProducersByScrapedMetadata, desc(producers.createdAt)],
+      orderBy: orderBy,
       columns: {
         id: true,
         name: true,

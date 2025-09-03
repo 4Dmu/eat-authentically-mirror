@@ -11,15 +11,18 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { PublicProducerLight } from "@/backend/validators/producers";
+import type { Geo } from "@vercel/functions";
 
 export function Page({
   initialProducersFromServer,
+  userIpGeo,
 }: {
   initialProducersFromServer: {
     data: PublicProducerLight[];
     hasNextPage: boolean;
     count: number;
   };
+  userIpGeo: Geo | undefined;
 }) {
   const { typeFilter, query, certs, locationSearchArea, page, setPage } =
     useHomePageStore();
@@ -36,6 +39,7 @@ export function Page({
           ? locationSearchArea.toJSON()
           : undefined,
         query: debouncedQuery,
+        userIpGeo: userIpGeo,
       },
       initialProducersFromServer,
     ),

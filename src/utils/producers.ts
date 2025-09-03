@@ -67,7 +67,9 @@ export function primaryImageUrl(producer: Pick<Producer, "images">) {
  *  'Daves Ranch' returns 'daves-ranch-'
  */
 export function producerSlug(name: string) {
-  return `${name.toLowerCase().trim().split(" ").join("-")}-`;
+  return encodeURIComponent(
+    `${name.toLowerCase().trim().split(" ").join("-")}-`,
+  );
 }
 
 /**
