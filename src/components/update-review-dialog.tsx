@@ -1,4 +1,3 @@
-import { PublicProducer } from "@/backend/validators/producers";
 import {
   Dialog,
   DialogClose,
@@ -9,22 +8,13 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import {
-  ComponentRef,
-  Dispatch,
-  Ref,
-  SetStateAction,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { reviewProducerOpts, updateReviewOpts } from "@/utils/reviews";
+import { updateReviewOpts } from "@/utils/reviews";
 import { ReviewSelect } from "@/backend/db/schema";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
-import { EditIcon, LucideProps, Star } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { EditIcon } from "lucide-react";
 import { Stars } from "@/backend/validators/reviews";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";

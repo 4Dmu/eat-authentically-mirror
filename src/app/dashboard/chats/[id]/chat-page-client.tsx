@@ -12,9 +12,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -28,9 +26,8 @@ import {
   unblockUserChatOpts,
 } from "@/utils/messages";
 import { primaryImageUrl } from "@/utils/producers";
-import { useAuth } from "@clerk/nextjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Shield, ShieldIcon, ShieldOff, StopCircleIcon } from "lucide-react";
+import { Shield, ShieldOff } from "lucide-react";
 import { startTransition, useMemo, useOptimistic, useState } from "react";
 import { toast } from "sonner";
 import { match, P } from "ts-pattern";
@@ -189,7 +186,7 @@ export function ChatPageClient(props: { chat: ProducerChat; userId: string }) {
                     <p>{v.initiatorUserName}</p>
                   </>
                 ))
-                .otherwise((v) => (
+                .otherwise(() => (
                   <>
                     <Avatar>
                       <AvatarImage src={primaryImageUrl(data.producer)} />

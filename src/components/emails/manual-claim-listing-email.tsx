@@ -8,7 +8,6 @@ import {
   Img,
   Column,
   Container,
-  Button,
   Link,
 } from "@react-email/components";
 import * as React from "react";

@@ -14,10 +14,8 @@ import {
   UpdateUserPinboardArgs,
 } from "@/backend/validators/pinboard";
 import {
-  keepPreviousData,
   MutationOptions,
   mutationOptions,
-  QueryClient,
   QueryOptions,
   queryOptions,
 } from "@tanstack/react-query";

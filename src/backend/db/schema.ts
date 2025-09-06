@@ -6,7 +6,6 @@ import {
   sqliteTable,
   text,
   unique,
-  uniqueIndex,
   check,
   index,
 } from "drizzle-orm/sqlite-core";
@@ -247,7 +246,7 @@ export const pinboards = sqliteTable("pinboards", {
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
 
-export const pinboardsRelations = relations(pinboards, ({ one, many }) => ({
+export const pinboardsRelations = relations(pinboards, ({ many }) => ({
   pins: many(pins),
   pinLists: many(pinLists),
 }));
@@ -271,7 +270,7 @@ export const pins = sqliteTable(
   ],
 );
 
-export const pinsRelations = relations(pins, ({ one, many }) => ({
+export const pinsRelations = relations(pins, ({ one }) => ({
   pinboard: one(pinboards, {
     fields: [pins.pinboardId],
     references: [pinboards.id],

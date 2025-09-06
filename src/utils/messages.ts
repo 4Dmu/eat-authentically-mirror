@@ -25,10 +25,8 @@ import {
   UnblockUserChatArgs,
 } from "@/backend/validators/messages";
 import {
-  keepPreviousData,
   MutationOptions,
   mutationOptions,
-  QueryClient,
   QueryKey,
   QueryOptions,
   queryOptions,

@@ -60,7 +60,7 @@ export function ChatsPageClient() {
                     </p>
                   </>
                 ))
-                .otherwise((v) => (
+                .otherwise(() => (
                   <>
                     <Avatar>
                       <AvatarImage src={primaryImageUrl(chat.producer)} />

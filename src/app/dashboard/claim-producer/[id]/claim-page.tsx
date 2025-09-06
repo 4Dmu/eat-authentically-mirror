@@ -20,11 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Step,
-  StepSetter,
-  useClaimProducerSteps,
-} from "@/hooks/use-claim-producer-steps";
+import { useClaimProducerSteps } from "@/hooks/use-claim-producer-steps";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { claimProducerOpts } from "@/utils/producers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -288,7 +284,7 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                           <span className="font-bold">{v.domain}</span>
                         </span>
                       ))
-                      .with({ method: "social-post" }, (v) => (
+                      .with({ method: "social-post" }, () => (
                         <span>
                           making social post using our code to one of the
                           following handles:

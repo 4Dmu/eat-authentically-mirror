@@ -2,14 +2,13 @@ import { PinboardFull } from "@/backend/rpc/pinboard";
 import { ImageData } from "@/backend/validators/producers";
 import { env } from "@/env";
 import { countryByAlpha3Code } from "@/utils/contries";
-import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
+import { producerSlugFull } from "@/utils/producers";
 import {
   APIProvider,
   InfoWindow,
   Map,
   Marker,
 } from "@vis.gl/react-google-maps";
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -54,6 +53,7 @@ export function PinboardMap({ pinboard }: PinboardMapProps) {
           ...p.producer,
           address: {
             ...p.producer.address,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
             coordinate: p.producer.address?.coordinate!,
           },
         },

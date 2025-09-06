@@ -2,11 +2,9 @@ import { getUsersProducerIdsCached } from "@/backend/data/producer";
 import { db } from "@/backend/db";
 import { producers } from "@/backend/db/schema";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
-import { countryByAlpha3Code } from "@/utils/contries";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq, isNotNull, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
-import * as R from "remeda";
 import { ClaimPage } from "./claim-page";
 
 export default async function Page(props: {

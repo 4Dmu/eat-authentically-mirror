@@ -11,7 +11,6 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { useSubTier } from "@/hooks/use-sub-tier";
 
 export default async function MessagesPage() {
   const session = await auth.protect();

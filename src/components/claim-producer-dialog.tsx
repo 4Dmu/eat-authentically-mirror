@@ -20,15 +20,11 @@ import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import {
-  ProducerClaimVerificationMethods,
-  PublicProducer,
-} from "@/backend/validators/producers";
+import { ProducerClaimVerificationMethods } from "@/backend/validators/producers";
 import Image from "next/image";
 import { match } from "ts-pattern";
 import { Label } from "./ui/label";
 import { countryByAlpha3Code } from "@/utils/contries";
-import { type } from "arktype";
 import { Card } from "./ui/card";
 import {
   Select,
@@ -357,7 +353,7 @@ export function ClaimProducerDialog() {
                         <span className="font-bold">{v.domain}</span>
                       </span>
                     ))
-                    .with({ method: "social-post" }, (v) => (
+                    .with({ method: "social-post" }, () => (
                       <span>
                         making social post using our code to one of the
                         following handles:

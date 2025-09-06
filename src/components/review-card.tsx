@@ -3,13 +3,9 @@ import { PublicReview } from "@/backend/rpc/reviews";
 import Image from "next/image";
 import { StarRatingReadonly } from "./star-rating";
 import { useAuth } from "@clerk/nextjs";
-import { Button } from "./ui/button";
-import { EditIcon, Trash2Icon } from "lucide-react";
-import { ReviewProducerArgs } from "@/backend/validators/reviews";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteReviewOpts } from "@/utils/reviews";
 import { DeleteReviewDialog } from "./delete-review-dialog";
 import { UpdateReviewDialog } from "./update-review-dialog";
+import { ReviewProducerArgs } from "@/backend/validators/reviews";
 
 export function ReviewCard({ review }: { review: PublicReview }) {
   const auth = useAuth();

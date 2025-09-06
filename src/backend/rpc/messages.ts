@@ -1,8 +1,5 @@
 "use server";
-import {
-  authenticatedActionClient,
-  producerActionClient,
-} from "./helpers/middleware";
+import { authenticatedActionClient } from "./helpers/middleware";
 import { db } from "../db";
 import {
   and,
@@ -345,12 +342,15 @@ export const listUserChats = authenticatedActionClient.action(
 export const listProducerChats = authenticatedActionClient
   .input(listProducerChatsArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
-    if (!producerId.includes(producerId)) {
+    if (!producerIds.includes(producerId)) {
       return;
     }
 
     const chats = await db.query.producerChats.findMany({
-      where: eq(producerChats.producerId, producerId),
+      where: and(
+        eq(producerChats.producerId, producerId),
+        eq(producerChats.producerUserId, userId),
+      ),
       with: {
         producer: {
           columns: {

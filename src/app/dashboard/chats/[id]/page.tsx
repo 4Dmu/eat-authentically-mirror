@@ -10,7 +10,6 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { useSubTier } from "@/hooks/use-sub-tier";
 import { notFound, redirect } from "next/navigation";
 import { getUserOrProducerChat } from "@/backend/rpc/messages";
 import { ChatPageClient } from "./chat-page-client";

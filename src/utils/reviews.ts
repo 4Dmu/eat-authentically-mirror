@@ -11,11 +11,8 @@ import {
   UpdateReviewArgs,
 } from "@/backend/validators/reviews";
 import {
-  keepPreviousData,
   MutationOptions,
   mutationOptions,
-  QueryKey,
-  QueryOptions,
   queryOptions,
   useMutationState,
 } from "@tanstack/react-query";
@@ -23,17 +20,6 @@ import {
 type MutationOpts<T, T2, T3, T4> = Omit<
   MutationOptions<T, T2, T3, T4>,
   "mutationFn" | "mutationKey"
->;
-
-type QueryOpts<
-  TQueryFnData = unknown,
-  TError = Error,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = readonly unknown[],
-  TPageParam = never,
-> = Omit<
-  QueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
-  "queryKey" | "queryFn"
 >;
 
 export const reviewProducerOpts = (

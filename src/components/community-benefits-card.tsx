@@ -1,4 +1,3 @@
-import { Star } from "lucide-react";
 import { MessageProducerDialog } from "./message-producer-dialog";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -40,7 +39,7 @@ export function CommunityBenefitsCard({
   );
 }
 
-export function CommunityBenefitsCTACard({}: {}) {
+export function CommunityBenefitsCTACard() {
   return (
     <Card className="shadow-none">
       <CardHeader>

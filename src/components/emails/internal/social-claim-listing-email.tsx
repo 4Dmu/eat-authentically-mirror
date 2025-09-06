@@ -1,5 +1,4 @@
 import { ProducerSelect } from "@/backend/db/schema";
-import { Producer } from "@/backend/validators/producers";
 import { env } from "@/env";
 import {
   Text,

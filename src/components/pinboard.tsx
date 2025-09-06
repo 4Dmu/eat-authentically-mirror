@@ -5,7 +5,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   addToPinboardOpts,
   getUserPinboardFullOpts,
-  getUserProducerPinOpts,
   removeFromPinboardOpts,
 } from "@/utils/pinboard";
 import { toast } from "sonner";
@@ -41,7 +40,14 @@ export function AddToPinboardButton({
       return false;
     }
     return pin !== undefined;
-  }, [pinboard.data, add.isPending, remove.isPending]);
+  }, [
+    pinboard.data,
+    add.isPending,
+    remove.isPending,
+    add.variables?.producerId,
+    producerId,
+  ]);
+
   return (
     <Button
       className={cn("w-40", className)}
@@ -96,7 +102,13 @@ export function AddToPinboardIconButton({
       return false;
     }
     return pin !== undefined;
-  }, [pinboard.data, add.isPending, remove.isPending]);
+  }, [
+    pinboard.data,
+    add.isPending,
+    remove.isPending,
+    add.variables?.producerId,
+    producerId,
+  ]);
 
   return (
     <Button

@@ -1,7 +1,6 @@
 import { internalClaimProducer } from "@/backend/data/producer";
 import { db } from "@/backend/db";
-import { claimRequests, producers } from "@/backend/db/schema";
-import { USER_PRODUCER_IDS_KV } from "@/backend/kv";
+import { claimRequests } from "@/backend/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { Loader } from "lucide-react";
 import { notFound, redirect } from "next/navigation";

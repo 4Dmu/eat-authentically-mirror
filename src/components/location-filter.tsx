@@ -1,16 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  APIProvider,
-  Map,
-  Marker,
-  useMap,
-  useMapsLibrary,
-} from "@vis.gl/react-google-maps";
+import { APIProvider, Map, Marker, useMap } from "@vis.gl/react-google-maps";
 import { useHomePageStore } from "@/stores";
 import { Button } from "./ui/button";
 import { env } from "@/env";
 import { useGeolocation } from "@uidotdev/usehooks";
-import { Rectangle } from "./maps/square";
 
 export function LocationFilter() {
   const location = useGeolocation();
@@ -44,7 +37,7 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
 
   const handleSelectLocation = useCallback(() => {
     setLocationSearchArea(bounds ?? undefined);
-  }, [bounds]);
+  }, [bounds, setLocationSearchArea]);
 
   useEffect(() => {
     if (!map) {
@@ -78,12 +71,6 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
       >
         {location && map && (
           <Marker
-            // label={{
-            //   text: "Your Location",
-            //   className: "label",
-            // }}
-            //
-
             icon={{
               path: google.maps.SymbolPath.CIRCLE,
               scale: 10,
@@ -111,17 +98,4 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
       </div>
     </div>
   );
-}
-
-function getBoundsFromCenter(lat: number, lng: number, zoom = 5) {
-  // Approximate spans for zoom level 5
-  const latSpan = 180 / Math.pow(2, zoom); // ≈ 5.625
-  const lngSpan = 360 / Math.pow(2, zoom); // ≈ 11.25
-
-  const south = lat - latSpan / 2;
-  const north = lat + latSpan / 2;
-  const west = lng - lngSpan / 2;
-  const east = lng + lngSpan / 2;
-
-  return { south, north, west, east };
 }

@@ -7,7 +7,7 @@ import { useState } from "react";
 
 type NeededProducer = Pick<
   PublicProducer,
-  "contact" | "id" | "name" | "socialMedia"
+  "contact" | "id" | "name" | "socialMedia" | "address"
 >;
 
 export type InputStep =

@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { BackButton } from "@/components/back-button";
-import { useMemo } from "react";
 import { ProducerCard } from "@/components/producer-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GridIcon, ListIcon, MapIcon } from "lucide-react";

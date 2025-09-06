@@ -10,23 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import {
-  fetchUserProducersOpts,
-  producerPublicOpts,
-  producerSlug,
-} from "@/utils/producers";
-import {
-  EditIcon,
-  GlobeIcon,
-  MailIcon,
-  MapPin,
-  MessageCircleIcon,
-  PhoneIcon,
-  Send,
-  Star,
-  Trash2Icon,
-} from "lucide-react";
-import { notFound, redirect } from "next/navigation";
+import { producerPublicOpts } from "@/utils/producers";
+import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { ClaimProducerCard } from "@/components/claim-producer-card";
 import {
   Carousel,
@@ -37,10 +22,8 @@ import {
 } from "@/components/ui/carousel";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { Stream } from "@/components/stream";
-import { Button } from "@/components/ui/button";
 import { NotSubbed, Subbed } from "@/components/auth/RequireSub";
-import { MessageProducerDialog } from "@/components/message-producer-dialog";
-import { getSubTier, SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import {
   CommunityBenefitsCard,
   CommunityBenefitsCTACard,
@@ -53,9 +36,7 @@ import {
   listReviewsPublicOpts,
   useReviewProducerPendingState,
 } from "@/utils/reviews";
-import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
-import { StarRatingReadonly } from "@/components/star-rating";
 import { PendingReviewCard, ReviewCard } from "@/components/review-card";
 
 export function ProducerPageClient(props: {
@@ -194,7 +175,7 @@ export function ProducerPageClient(props: {
           <CardHeader>
             <CardTitle>Reviews</CardTitle>
             <CardDescription>
-              Here's what people are saying about {producer?.name}
+              Here&apos;s what people are saying about {producer?.name}
             </CardDescription>
           </CardHeader>
           <CardContent className="bg-gray-50 p-5 border-t">

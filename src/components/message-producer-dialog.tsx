@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -15,7 +15,7 @@ import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { type } from "arktype";
-import { FieldInfo, FormInfo } from "./forms/helpers/field-info";
+import { FieldInfo } from "./forms/helpers/field-info";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   getProducerChatOpts,
@@ -84,7 +84,7 @@ export function MessageProducerDialog({
     if (!open) {
       form.reset();
     }
-  }, [open]);
+  }, [open, form]);
 
   function submit() {
     form.handleSubmit();

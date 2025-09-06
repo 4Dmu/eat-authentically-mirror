@@ -20,20 +20,11 @@ import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import {
-  BuildingIcon,
-  CreditCard,
-  EditIcon,
-  EyeIcon,
-  TrashIcon,
-} from "lucide-react";
+import { CreditCard, EditIcon } from "lucide-react";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Badge } from "@/components/ui/badge";
 import { NotSubbed } from "@/components/auth/RequireSub";
-import { AddProducerDialog } from "@/components/add-producer-dialog";
 import { fetchUserProducers, listClaimRequests } from "@/backend/rpc/producers";
-import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
-import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 import { ClaimRequestsSection } from "./_components/claim-requests-section";
 import { ProducersSection } from "./_components/producers-section";
 import { Separator } from "@/components/ui/separator";
