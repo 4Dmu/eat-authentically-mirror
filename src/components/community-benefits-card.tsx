@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { PublicProducer } from "@/backend/validators/producers";
 import Link from "next/link";
+import { ReviewProducerDialog } from "./review-producer-dialog";
 
 export function CommunityBenefitsCard({
   producer,
@@ -25,11 +26,10 @@ export function CommunityBenefitsCard({
         )}
       </CardHeader>
       <CardContent className="flex gap-3">
-        <MessageProducerDialog disabled={isUserListing} producer={producer} />
-        <Button disabled={isUserListing} className="w-28">
-          <Star />
-          Review
-        </Button>
+        {producer.claimed && (
+          <MessageProducerDialog disabled={isUserListing} producer={producer} />
+        )}
+        <ReviewProducerDialog disable={isUserListing} producer={producer} />
         {isUserListing && (
           <Button>
             <Link href={"/dashboard"}>View on dashboard</Link>

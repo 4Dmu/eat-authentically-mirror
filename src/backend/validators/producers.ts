@@ -315,7 +315,11 @@ export const checkClaimDomainDnsArgs = type({ claimRequestId: "string" });
 
 export const deleteProducerArgs = type({ producerId: "string.uuid" });
 
-export type ListProducerArgs = typeof listProducersArgsValidator.infer;
+export type ListProducerArgsBeforeValidate =
+  typeof listProducersArgsValidator.inferIn;
+
+export type ListProducerArgsAfterValidate =
+  typeof listProducersArgsValidator.infer;
 
 export type GetProducerArgs = typeof getProducersArgsValidator.infer;
 

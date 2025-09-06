@@ -21,9 +21,10 @@ import {
   checkClaimDomainDNS,
   listClaimRequests,
   deleteProducer,
+  getProducerPublic,
 } from "@/backend/rpc/producers";
 import {
-  ListProducerArgs,
+  ListProducerArgsBeforeValidate,
   Producer,
   PublicProducerLight,
   PublicProducer,
@@ -89,7 +90,7 @@ export function producerSlugFull(
 }
 
 export const producersQueryOptions = (
-  args: ListProducerArgs,
+  args: ListProducerArgsBeforeValidate,
   initialData?: {
     data: PublicProducerLight[];
     hasNextPage: boolean;
@@ -104,7 +105,7 @@ export const producersQueryOptions = (
   });
 
 export const producersFullQueryOptions = (
-  args: ListProducerArgs,
+  args: ListProducerArgsBeforeValidate,
   initialData?: { data: PublicProducer[]; hasNextPage: boolean; count: number },
 ) =>
   queryOptions({
@@ -112,6 +113,31 @@ export const producersFullQueryOptions = (
     queryFn: () => listProducersPublic(args),
     placeholderData: keepPreviousData,
     initialData: initialData,
+  });
+
+export const producerPublicOpts = (
+  producerId: string,
+  opts?: Omit<
+    QueryOptions<
+      PublicProducer | undefined,
+      Error,
+      PublicProducer | undefined,
+      string[]
+    >,
+    "queryKey" | "queryFn"
+  >,
+) =>
+  queryOptions({
+    ...opts,
+    queryKey: ["producer", producerId],
+    queryFn: async () => {
+      const producer = getProducerPublic({ id: producerId });
+      if (!producer) {
+        throw new Error("Producer not found");
+      }
+      return producer;
+    },
+    placeholderData: keepPreviousData,
   });
 
 export const certificationTypesOptions = () =>

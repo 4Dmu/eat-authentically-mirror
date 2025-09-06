@@ -1,7 +1,7 @@
 import type {
   GetProducerArgs,
   IpGeoValidator,
-  ListProducerArgs,
+  ListProducerArgsAfterValidate,
   PublicProducer,
 } from "@/backend/validators/producers";
 import { db } from "../db";
@@ -77,7 +77,7 @@ export async function getUsersProducerIdsCached(userId: string) {
   return existing;
 }
 
-export async function listProducersPublic(args: ListProducerArgs) {
+export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
   try {
     const limit = 100;
     const offest = args.page * limit;
@@ -175,7 +175,9 @@ export async function listProducersPublic(args: ListProducerArgs) {
   }
 }
 
-export async function listProducersPublicLight(args: ListProducerArgs) {
+export async function listProducersPublicLight(
+  args: ListProducerArgsAfterValidate,
+) {
   try {
     const limit = 100;
     const offest = args.page * limit;

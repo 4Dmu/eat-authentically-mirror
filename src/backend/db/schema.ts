@@ -17,6 +17,7 @@ import {
   PRODUCER_TYPES,
   ClaimProducerVerification,
 } from "@/backend/validators/producers";
+import { Stars } from "../validators/reviews";
 
 export type Video = {
   url: string;
@@ -177,12 +178,12 @@ export const reviews = sqliteTable(
       .references(() => producers.id),
     reviewerUserId: text().notNull(),
     content: text().notNull(),
-    rating: real().notNull(),
+    rating: real().$type<Stars>().notNull(),
     createdAt: integer({ mode: "timestamp" }).notNull(),
     updatedAt: integer({ mode: "timestamp" }).notNull(),
   },
   (table) => [
-    check("rating_check", sql`${table.rating} >= 0.5 AND rating <= 5.0`),
+    check("rating_check", sql`${table.rating} >= 0 AND rating <= 5.0`),
   ],
 );
 
@@ -240,3 +241,5 @@ export type ProducerSelect = typeof producers.$inferSelect;
 export type ClaimRequest = typeof claimRequests.$inferSelect & {
   producer: { name: string; id: string };
 };
+
+export type ReviewSelect = typeof reviews.$inferSelect;
