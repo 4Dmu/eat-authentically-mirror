@@ -8,6 +8,7 @@ import {
   unique,
   uniqueIndex,
   check,
+  index,
 } from "drizzle-orm/sqlite-core";
 import {
   type SocialMedia,
@@ -62,6 +63,8 @@ export type ClaimRequestStatus =
   | {
       type: "expired";
     };
+
+export const pinboardViewModes = ["grid", "list", "map"] as const;
 
 export const producers = sqliteTable("producers", {
   id: text().primaryKey(),
@@ -236,6 +239,100 @@ export const certificationsToProducersRelations = relations(
   }),
 );
 
+export const pinboards = sqliteTable("pinboards", {
+  id: text().primaryKey(),
+  userId: text().notNull().unique(),
+  viewMode: text({ enum: pinboardViewModes }).notNull().default("grid"),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  updatedAt: integer({ mode: "timestamp" }).notNull(),
+});
+
+export const pinboardsRelations = relations(pinboards, ({ one, many }) => ({
+  pins: many(pins),
+  pinLists: many(pinLists),
+}));
+
+export const pins = sqliteTable(
+  "pins",
+  {
+    id: text().primaryKey(),
+    pinboardId: text()
+      .notNull()
+      .references(() => pinboards.id, { onDelete: "cascade" }),
+    producerId: text()
+      .notNull()
+      .references(() => producers.id, { onDelete: "cascade" }),
+    createdAt: integer({ mode: "timestamp" }).notNull(),
+  },
+  (t) => [
+    unique().on(t.pinboardId, t.producerId),
+    index("idxPinPinboard").on(t.pinboardId),
+    index("idxPinProducer").on(t.producerId),
+  ],
+);
+
+export const pinsRelations = relations(pins, ({ one, many }) => ({
+  pinboard: one(pinboards, {
+    fields: [pins.pinboardId],
+    references: [pinboards.id],
+  }),
+  producer: one(producers, {
+    fields: [pins.producerId],
+    references: [producers.id],
+  }),
+}));
+
+export const pinLists = sqliteTable(
+  "pinLists",
+  {
+    id: text().primaryKey(),
+    pinboardId: text()
+      .notNull()
+      .references(() => pinboards.id, { onDelete: "cascade" }),
+    name: text().notNull(),
+    description: text(),
+    createdAt: integer({ mode: "timestamp" }).notNull(),
+    updatedAt: integer({ mode: "timestamp" }).notNull(),
+  },
+  (t) => [
+    unique().on(t.pinboardId, t.name),
+    index("idxPinlistPinboard").on(t.pinboardId),
+  ],
+);
+
+export const pinListsRelations = relations(pinLists, ({ one, many }) => ({
+  pinboard: one(pinboards, {
+    fields: [pinLists.pinboardId],
+    references: [pinboards.id],
+  }),
+  items: many(pinListItems),
+}));
+
+export const pinListItems = sqliteTable(
+  "pinListItems",
+  {
+    pinListId: text()
+      .notNull()
+      .references(() => pinLists.id, { onDelete: "cascade" }),
+    pinId: text()
+      .notNull()
+      .references(() => pins.id, { onDelete: "cascade" }),
+    createdAt: integer({ mode: "timestamp" }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.pinListId, t.pinId] })],
+);
+
+export const pinListItemsRelations = relations(pinListItems, ({ one }) => ({
+  pinList: one(pinLists, {
+    fields: [pinListItems.pinListId],
+    references: [pinLists.id],
+  }),
+  pin: one(pins, {
+    fields: [pinListItems.pinId],
+    references: [pins.id],
+  }),
+}));
+
 export type Certification = typeof certifications.$inferSelect;
 export type ProducerSelect = typeof producers.$inferSelect;
 export type ClaimRequest = typeof claimRequests.$inferSelect & {
@@ -243,3 +340,7 @@ export type ClaimRequest = typeof claimRequests.$inferSelect & {
 };
 
 export type ReviewSelect = typeof reviews.$inferSelect;
+export type Pin = typeof pins.$inferSelect;
+export type Pinboard = typeof pinboards.$inferSelect;
+export type Pinlist = typeof pinLists.$inferSelect;
+export type PinlistItem = typeof pinListItems.$inferSelect;

@@ -81,9 +81,7 @@ export function producerSlug(name: string) {
  * @example
  *  'Daves Ranch' returns 'daves-ranch-id'
  */
-export function producerSlugFull(
-  producer: Producer | PublicProducer | PublicProducerLight,
-) {
+export function producerSlugFull(producer: Pick<Producer, "name" | "id">) {
   return `${producer.name.toLowerCase().trim().split(" ").join("-")}-${
     producer.id
   }`;

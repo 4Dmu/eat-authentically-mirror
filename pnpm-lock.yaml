@@ -107,6 +107,9 @@ importers:
       '@react-email/components':
         specifier: 0.5.1
         version: 0.5.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@react-hook/throttle':
+        specifier: ^2.2.0
+        version: 2.2.0(react@19.1.0)
       '@standard-schema/spec':
         specifier: ^1.0.0
         version: 1.0.0
@@ -2426,6 +2429,16 @@ packages:
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
+
+  '@react-hook/latest@1.0.3':
+    resolution: {integrity: sha512-dy6duzl+JnAZcDbNTfmaP3xHiKtbXYOaz3G51MGVljh548Y8MWzTr+PHLOfvpypEVW9zwvl+VyKjbWKEVbV1Rg==}
+    peerDependencies:
+      react: '>=16.8'
+
+  '@react-hook/throttle@2.2.0':
+    resolution: {integrity: sha512-LJ5eg+yMV8lXtqK3lR+OtOZ2WH/EfWvuiEEu0M3bhR7dZRfTyEJKxH1oK9uyBxiXPtWXiQggWbZirMCXam51tg==}
+    peerDependencies:
+      react: '>=16.8'
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
@@ -7778,6 +7791,15 @@ snapshots:
     dependencies:
       react: 19.1.0
 
+  '@react-hook/latest@1.0.3(react@19.1.0)':
+    dependencies:
+      react: 19.1.0
+
+  '@react-hook/throttle@2.2.0(react@19.1.0)':
+    dependencies:
+      '@react-hook/latest': 1.0.3(react@19.1.0)
+      react: 19.1.0
+
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.12.0': {}
@@ -8027,7 +8049,7 @@ snapshots:
     dependencies:
       '@types/node': 20.19.11
       tapable: 2.2.2
-      webpack: 5.101.3(esbuild@0.25.9)
+      webpack: 5.101.3(esbuild@0.25.0)
     transitivePeerDependencies:
       - '@swc/core'
       - esbuild
@@ -10990,14 +11012,14 @@ snapshots:
       mkdirp: 3.0.1
       yallist: 5.0.0
 
-  terser-webpack-plugin@5.3.14(esbuild@0.25.0)(webpack@5.101.3(esbuild@0.25.0)):
+  terser-webpack-plugin@5.3.14(esbuild@0.25.0)(webpack@5.101.3(esbuild@0.25.9)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.30
       jest-worker: 27.5.1
       schema-utils: 4.3.2
       serialize-javascript: 6.0.2
       terser: 5.43.1
-      webpack: 5.101.3(esbuild@0.25.9)
+      webpack: 5.101.3(esbuild@0.25.0)
     optionalDependencies:
       esbuild: 0.25.0
 
@@ -11240,7 +11262,7 @@ snapshots:
 
   webpack-sources@3.3.3: {}
 
-  webpack@5.101.3(esbuild@0.25.9):
+  webpack@5.101.3(esbuild@0.25.0):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.8
@@ -11264,7 +11286,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.2
       tapable: 2.2.2
-      terser-webpack-plugin: 5.3.14(esbuild@0.25.0)(webpack@5.101.3(esbuild@0.25.0))
+      terser-webpack-plugin: 5.3.14(esbuild@0.25.0)(webpack@5.101.3(esbuild@0.25.9))
       watchpack: 2.4.4
       webpack-sources: 3.3.3
     transitivePeerDependencies:

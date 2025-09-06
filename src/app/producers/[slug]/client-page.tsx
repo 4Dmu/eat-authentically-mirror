@@ -217,7 +217,7 @@ export function ProducerPageClient(props: {
       <div className="p-10 flex flex-col gap-5 max-w-7xl mx-auto">
         <div className="flex gap-5 justify-between">
           <BackButton text="Return Home" href="/" />
-          <AddToPinboardButton />
+          <AddToPinboardButton producerId={producer?.id ?? props.producer.id} />
         </div>
         <div className="flex flex-col lg:flex-row gap-5">
           {producer && (
