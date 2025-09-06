@@ -8,7 +8,9 @@ export default async function Home() {
   const headerList = await headers();
 
   const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
-  const parsedGeo = rawGeo ? (JSON.parse(rawGeo) as Geo) : undefined;
+  const parsedGeo = rawGeo
+    ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
+    : undefined;
 
   const initialProducersFromServer = await listProducersPublicLight({
     page: 0,

@@ -43,7 +43,9 @@ export default clerkMiddleware(async (auth, req) => {
       geo.longitude = "-121.36493918991683";
     }
 
-    response.headers.set(CUSTOM_GEO_HEADER_NAME, JSON.stringify(geo));
+    const encodedGeo = Buffer.from(JSON.stringify(geo)).toString("base64");
+
+    response.headers.set(CUSTOM_GEO_HEADER_NAME, encodedGeo);
   }
 
   return response;

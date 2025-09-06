@@ -68,7 +68,6 @@ export const getUserPinboardFull = authenticatedActionClient.action(
     });
 
     if (pinboard) {
-      console.log(pinboard);
       return pinboard;
     }
 
