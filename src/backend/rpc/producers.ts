@@ -10,6 +10,8 @@ import {
   checkClaimDomainDnsArgs,
   PublicClaimRequest,
   deleteProducerArgs,
+  verifyClaimPhoneArgs,
+  regenerateClaimPhoneTokenArgs,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
@@ -28,7 +30,9 @@ import { env } from "@/env";
 import { cloudflare } from "../lib/cloudflare";
 import { normalizeAddress } from "../utils/normalize-data";
 import {
+  claimProducerRateLimit,
   producerClaimDnsCheckRatelimit,
+  producerClaimVerifyPhoneRatelimit,
   videoRatelimit,
 } from "../lib/rate-limit";
 import { authenticatedActionClient } from "./helpers/middleware";
@@ -40,12 +44,16 @@ import { withCertificationsSingle } from "../utils/transform-data";
 import isURL from "validator/es/lib/isURL";
 import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
-import { generateToken } from "../utils/generate-tokens";
+import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
 import { CLAIM_DNS_TXT_RECORD_NAME } from "./helpers/constants";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
 import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
+import crypto from "node:crypto";
+import { sendClaimCodeMessage } from "./helpers/sms";
+import { isMobilePhone, isNumeric } from "validator";
+import { addMinutes, isAfter, isBefore } from "date-fns";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -729,6 +737,12 @@ export const claimProducer = authenticatedActionClient
       ctx: { userId, producerIds },
       input: { producerId, verification },
     }) => {
+      const success = await claimProducerRateLimit.limit(userId);
+
+      if (!success) {
+        throw new Error("Rate limit exceded");
+      }
+
       const subTier = await getSubTier(userId);
 
       const claimRequestsCountForUser = await db
@@ -887,16 +901,47 @@ export const claimProducer = authenticatedActionClient
 
           break;
         }
-        case "contact-phone-link":
-          const phone = producer.contact?.phone;
+        case "contact-phone-link": {
+          const rawPhone = producer.contact?.phone;
 
-          if (!phone) {
+          if (!rawPhone) {
             throw new Error("Missing or invalid contact phone");
           }
 
-          console.warn("Implement producer claim contact-phone-link method");
+          const phone = rawPhone
+            .trim()
+            .split("")
+            .filter((c) => isNumeric(c) || c == "+")
+            .join("");
 
+          console.log(phone);
+
+          if (!isMobilePhone(phone)) {
+            throw new Error("Missing or invalid contact phone");
+          }
+
+          const token = generateCode();
+
+          await db.insert(claimRequests).values({
+            id: crypto.randomUUID(),
+            producerId: producer.id,
+            userId: userId,
+            status: {
+              type: "waiting",
+            },
+            requestedVerification: {
+              method: verification.method,
+              producerContactPhone: phone,
+              tokenExpiresAt: addMinutes(new Date(), 3),
+            },
+            claimToken: token.toString(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          await sendClaimCodeMessage(phone, token.toString());
           break;
+        }
         case "social-post": {
           const profiles: string[] = [];
 
@@ -1014,7 +1059,9 @@ export const listClaimRequests = authenticatedActionClient.action(
               ? { ...requestedVerification, token: claimToken }
               : requestedVerification.method === "social-post"
                 ? { ...requestedVerification, token: claimToken }
-                : requestedVerification,
+                : requestedVerification.method === "contact-phone-link"
+                  ? { ...requestedVerification }
+                  : requestedVerification,
         }) satisfies PublicClaimRequest,
     );
   },
@@ -1072,6 +1119,91 @@ export const checkClaimDomainDNS = authenticatedActionClient
     return "Claim successfull";
   });
 
+export const verifyClaimPhone = authenticatedActionClient
+  .input(verifyClaimPhoneArgs)
+  .action(async ({ ctx: { userId }, input: { claimRequestId, code } }) => {
+    const { success } = await producerClaimVerifyPhoneRatelimit.limit(userId);
+
+    if (!success) {
+      throw new Error("Rate limit exceded");
+    }
+
+    const claimRequest = await db.query.claimRequests.findFirst({
+      where: and(
+        eq(claimRequests.userId, userId),
+        eq(claimRequests.id, claimRequestId),
+      ),
+    });
+
+    if (!claimRequest || claimRequest.status.type !== "waiting") {
+      throw new Error("Claim does not exist");
+    }
+
+    if (claimRequest.requestedVerification.method !== "contact-phone-link") {
+      throw new Error("Invalid claim verification method");
+    }
+
+    if (
+      isAfter(new Date(), claimRequest.requestedVerification.tokenExpiresAt)
+    ) {
+      throw new Error("Token is expired please request a new one.");
+    }
+
+    if (claimRequest.claimToken === code) {
+      await listing.internalClaimProducer({
+        userId: claimRequest.userId,
+        producerId: claimRequest.producerId,
+        claimRequestId: claimRequest.id,
+      });
+      return "Claim successfull";
+    }
+
+    throw new Error("Claim did not match");
+  });
+
+export const regenerateClaimPhoneToken = authenticatedActionClient
+  .input(regenerateClaimPhoneTokenArgs)
+  .action(async ({ ctx: { userId }, input: { claimRequestId } }) => {
+    const claimRequest = await db.query.claimRequests.findFirst({
+      where: and(
+        eq(claimRequests.userId, userId),
+        eq(claimRequests.id, claimRequestId),
+      ),
+    });
+
+    if (!claimRequest || claimRequest.status.type !== "waiting") {
+      throw new Error("Claim does not exist");
+    }
+
+    if (claimRequest.requestedVerification.method !== "contact-phone-link") {
+      throw new Error("Invalid claim verification method");
+    }
+
+    if (
+      isBefore(new Date(), claimRequest.requestedVerification.tokenExpiresAt)
+    ) {
+      throw new Error("Token has not expired");
+    }
+
+    const token = generateCode();
+
+    await db
+      .update(claimRequests)
+      .set({
+        claimToken: token.toString(),
+        requestedVerification: {
+          ...claimRequest.requestedVerification,
+          tokenExpiresAt: addMinutes(new Date(), 3),
+        },
+      })
+      .where(eq(claimRequests.id, claimRequest.id));
+
+    await sendClaimCodeMessage(
+      claimRequest.requestedVerification.producerContactPhone,
+      token.toString(),
+    );
+  });
+
 export const deleteProducer = producerActionClient
   .input(deleteProducerArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
@@ -1116,6 +1248,8 @@ export const deleteProducer = producerActionClient
       await tx
         .delete(claimRequests)
         .where(eq(claimRequests.producerId, producer.id));
+
+      await USER_PRODUCER_IDS_KV.pop(userId, producer.id);
 
       return await tx.delete(producers).where(eq(producers.id, producer.id));
     });

@@ -147,16 +147,18 @@ export function AddProducerDialog() {
             </form.Field>
           </div>
           <DialogFooter>
-            <Button
-              className="w-40"
-              disabled={
-                registerProducerMutation.isPending ||
-                form.state.isDirty === false ||
-                form.state.isValid === false
-              }
+            <form.Subscribe
+              selector={(state) => state.isDirty && state.isValid}
             >
-              Create
-            </Button>
+              {(isValid) => (
+                <Button
+                  className="w-40"
+                  disabled={registerProducerMutation.isPending || !isValid}
+                >
+                  Create
+                </Button>
+              )}
+            </form.Subscribe>
           </DialogFooter>
         </form>
       </DialogContent>

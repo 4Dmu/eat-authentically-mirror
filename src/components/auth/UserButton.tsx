@@ -28,8 +28,8 @@ export function UserButton({
   userFromServer: UserJSON | null;
 }) {
   const { subTier } = useSubTier({ initialData: subTierFromServer });
-  const { signOut, userId } = useAuth();
-  const { user } = useUser({ initialData: userFromServer, userId });
+  const { signOut } = useAuth();
+  const { user } = useUser({ initialData: userFromServer });
 
   if (!user) {
     return null;

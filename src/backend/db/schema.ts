@@ -15,7 +15,7 @@ import {
   type ImageData,
   type Address,
   PRODUCER_TYPES,
-  ClaimProducerVerification,
+  ClaimProducerVerificationInternal,
 } from "@/backend/validators/producers";
 import { Stars } from "../validators/reviews";
 
@@ -61,6 +61,7 @@ export type ClaimRequestStatus =
     }
   | {
       type: "expired";
+      expiredAt: Date;
     };
 
 export const pinboardViewModes = ["grid", "list", "map"] as const;
@@ -103,14 +104,13 @@ export const claimRequests = sqliteTable("claim_requests", {
   userId: text().notNull(),
   producerId: text()
     .notNull()
-    .references(() => producers.id),
+    .references(() => producers.id, { onDelete: "cascade" }),
   requestedVerification: text({ mode: "json" })
-    .$type<ClaimProducerVerification>()
+    .$type<ClaimProducerVerificationInternal>()
     .notNull(),
   status: text({ mode: "json" }).$type<ClaimRequestStatus>().notNull(),
   claimToken: text().notNull(),
   claimedAt: integer({ mode: "timestamp" }),
-  expiredAt: integer({ mode: "timestamp" }),
   createdAt: integer({ mode: "timestamp" }).notNull(),
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
@@ -128,7 +128,7 @@ export const producerChats = sqliteTable(
     id: text().primaryKey(),
     producerId: text()
       .notNull()
-      .references(() => producers.id),
+      .references(() => producers.id, { onDelete: "cascade" }),
     producerUserId: text().notNull(),
     initiatorUserId: text().notNull(),
     initiatorPreventedMoreMessagesAt: integer({ mode: "timestamp" }),
@@ -154,7 +154,7 @@ export const producerChatMessages = sqliteTable("producer_chat_messages", {
   id: text().primaryKey(),
   chatId: text()
     .notNull()
-    .references(() => producerChats.id),
+    .references(() => producerChats.id, { onDelete: "cascade" }),
   senderUserId: text().notNull(),
   content: text().notNull(),
   createdAt: integer({ mode: "timestamp" }).notNull(),
@@ -177,7 +177,7 @@ export const reviews = sqliteTable(
     id: text().primaryKey(),
     producerId: text()
       .notNull()
-      .references(() => producers.id),
+      .references(() => producers.id, { onDelete: "cascade" }),
     reviewerUserId: text().notNull(),
     content: text().notNull(),
     rating: real().$type<Stars>().notNull(),
@@ -216,10 +216,10 @@ export const certificationsToProducers = sqliteTable(
   {
     certificationId: text()
       .notNull()
-      .references(() => certifications.id),
+      .references(() => certifications.id, { onDelete: "cascade" }),
     listingId: text()
       .notNull()
-      .references(() => producers.id),
+      .references(() => producers.id, { onDelete: "cascade" }),
   },
   (t) => [primaryKey({ columns: [t.certificationId, t.listingId] })],
 );

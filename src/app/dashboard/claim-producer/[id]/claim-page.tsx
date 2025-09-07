@@ -45,7 +45,7 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
       { queryClient },
       {
         onSuccess() {
-          router.push("/dashboard");
+          router.push("/dashboard#claim");
           toast.success("Producer claim proccess started");
         },
         onError(e) {
@@ -116,46 +116,49 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
               value="review"
               className="flex flex-col items-center gap-5"
             >
-              <p className="text-center text-lg">
+              <p className="text-center text-xl leading-8">
                 Please take a minute to review the farms public information,
-                <br /> if it seems correct then go ahead and continue.
+                <br className="max-md:hidden" /> if it seems correct then go
+                ahead and continue.
               </p>
               <div className="flex flex-col gap-5 w-full max-w-3xl">
                 <div className="flex flex-col gap-2">
-                  <Label>Phone</Label>
-                  <Input
-                    className="md:text-lg h-[unset] p-3"
-                    defaultValue={producer.contact?.phone ?? undefined}
-                    readOnly
-                  />
+                  <Label>Name</Label>
+                  <p className="md:text-lg h-[unset] p-3">{producer.name}</p>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Label>Email</Label>
-                  <Input
-                    className="md:text-lg h-[unset] p-3"
-                    defaultValue={producer.contact?.email ?? undefined}
-                    readOnly
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label>Website</Label>
-                  <Input
-                    className="md:text-lg h-[unset] p-3"
-                    defaultValue={producer.contact?.website ?? undefined}
-                    readOnly
-                  />
-                </div>
+                {producer.contact?.phone && (
+                  <div className="flex flex-col gap-2">
+                    <Label>Phone</Label>
+                    <p className="md:text-lg h-[unset] p-3">
+                      {producer.contact?.phone ?? undefined}
+                    </p>
+                  </div>
+                )}
+                {producer.contact?.email && (
+                  <div className="flex flex-col gap-2">
+                    <Label>Email</Label>
+                    <p className="md:text-lg h-[unset] p-3">
+                      {producer.contact?.email}
+                    </p>
+                  </div>
+                )}
+                {producer.contact?.website && (
+                  <div className="flex flex-col gap-2">
+                    <Label>Website</Label>
+                    <p className="md:text-lg h-[unset] p-3">
+                      {producer.contact?.website}
+                    </p>
+                  </div>
+                )}
                 <div className="flex flex-col gap-2">
                   <Label>Address</Label>
-                  <Input
-                    className="md:text-lg h-[unset] p-3"
-                    defaultValue={`${producer.address?.street}${producer.address?.city ? `, ${format(producer.address?.city)}` : ""}${format(producer.address?.state)}${format(producer.address?.zip)}${
+                  <p className="md:text-lg h-[unset] p-3">
+                    {`${producer.address?.street ?? ""}${producer.address?.city ? `, ${format(producer.address?.city)}` : ""}${format(producer.address?.state) ?? ""}${format(producer.address?.zip) ?? ""}${
                       producer.address?.country
                         ? countryByAlpha3Code(producer.address?.country).name
-                        : undefined
+                        : ""
                     }`}
-                    readOnly
-                  />
+                  </p>
                 </div>
               </div>
             </TabsContent>
@@ -267,8 +270,9 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                       ))
                       .with({ method: "contact-phone-link" }, (v) => (
                         <span>
-                          following link in text sent to{" "}
-                          <span className="font-bold">{v.phone}</span>
+                          entering the code send to following number{" "}
+                          <span className="font-bold">{v.phone}</span> in the
+                          claim section of your dashboard.
                         </span>
                       ))
                       .with({ method: "domain-dns" }, (v) => (
@@ -436,15 +440,15 @@ function VerificationCard({
 }) {
   return (
     <Card className="p-5 flex flex-row items-center justify-between">
-      <div className="flex flex-col gap-2">
-        <p className="font-bold">{title}</p>
-        {text}
-      </div>
       <Checkbox
         checked={checked}
         onCheckedChange={onCheckedChange}
         className="size-8"
       />
+      <div className="flex flex-col w-full gap-2">
+        <p className="font-bold">{title}</p>
+        {text}
+      </div>
     </Card>
   );
 }

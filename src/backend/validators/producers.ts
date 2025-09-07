@@ -315,11 +315,23 @@ export const checkClaimDomainDnsArgs = type({ claimRequestId: "string" });
 
 export const deleteProducerArgs = type({ producerId: "string.uuid" });
 
+export const verifyClaimPhoneArgs = type({
+  claimRequestId: "string.uuid",
+  code: type("string.numeric").exactlyLength(6),
+});
+
+export const regenerateClaimPhoneTokenArgs = type({ claimRequestId: "string" });
+
 export type ListProducerArgsBeforeValidate =
   typeof listProducersArgsValidator.inferIn;
 
 export type ListProducerArgsAfterValidate =
   typeof listProducersArgsValidator.infer;
+
+export type VerifyClaimPhoneArgs = typeof verifyClaimPhoneArgs.infer;
+
+export type RegenerateClaimPhoneTokenArgs =
+  typeof regenerateClaimPhoneTokenArgs.infer;
 
 export type GetProducerArgs = typeof getProducersArgsValidator.infer;
 
@@ -354,6 +366,34 @@ export type ClaimProducerArgs = typeof claimProducerArgs.infer;
 
 export type CheckClaimDomainDnsArgs = typeof checkClaimDomainDnsArgs.infer;
 
+export type ClaimProducerVerificationInternal =
+  | {
+      method: "contact-email-link";
+      producerContactEmail: string;
+    }
+  | {
+      method: "contact-phone-link";
+      producerContactPhone: string;
+      tokenExpiresAt: Date;
+    }
+  | {
+      method: "domain-dns";
+      domain: string;
+    }
+  | {
+      method: "manual";
+      claimerEmail: string;
+    }
+  | {
+      method: "domain-email-link";
+      domainDomainEmailPart: string;
+      domain: string;
+    }
+  | {
+      method: "social-post";
+      socialHandle: string;
+    };
+
 export type PublicClaimRequest = {
   id: string;
   userId: string;
@@ -367,10 +407,6 @@ export type PublicClaimRequest = {
     | {
         method: "contact-email-link";
         producerContactEmail: string;
-      }
-    | {
-        method: "contact-phone-link";
-        producerContactPhone: string;
       }
     | {
         method: "manual";
@@ -390,6 +426,11 @@ export type PublicClaimRequest = {
         token: string;
         method: "domain-dns";
         domain: string;
+      }
+    | {
+        method: "contact-phone-link";
+        producerContactPhone: string;
+        tokenExpiresAt: Date;
       };
 };
 

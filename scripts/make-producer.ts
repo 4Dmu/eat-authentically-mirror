@@ -5,7 +5,7 @@ async function main() {
   console.log(
     await db.insert(producers).values({
       id: crypto.randomUUID(),
-      name: "Test Farm",
+      name: "Bridge Farm",
       type: "farm",
       claimed: false,
       verified: false,
@@ -13,6 +13,7 @@ async function main() {
       socialMedia: { twitter: null, facebook: null, instagram: null },
       contact: {
         website: "https://12dmu.com",
+        phone: "+1 (321) 236-2162",
       },
       images: {
         items: [],

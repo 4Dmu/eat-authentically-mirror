@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { randomBytes, randomInt } from "crypto";
 
 /**
  * Generates a secure, unique string for verification purposes.
@@ -17,4 +17,12 @@ export function generateToken(length = 64): string {
     .replace(/\//g, "_")
     .replace(/=+$/, "")
     .slice(0, length); // Ensure final length
+}
+
+/**
+ * Generates a secure random 6 digit code.
+ * @returns A 6 digit number
+ */
+export function generateCode() {
+  return randomInt(100000, 999999);
 }

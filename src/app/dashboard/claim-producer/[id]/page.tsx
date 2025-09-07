@@ -14,7 +14,7 @@ export default async function Page(props: {
   const params = await props.params;
 
   if (!params.id) {
-    notFound();
+    notFound(); //user_3242kRkqkCrz0kiMO9N5brjepmS
   }
 
   const tier = await getSubTier(session.userId);

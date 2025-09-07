@@ -24,7 +24,7 @@ export function ClaimRequestsSection({
   }
 
   return (
-    <Card className="bg-gray-50">
+    <Card className="bg-gray-50" id="claim">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BuildingIcon />

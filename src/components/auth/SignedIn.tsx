@@ -1,6 +1,5 @@
 import { useUser } from "@/hooks/use-user";
 import { UserJSON } from "@clerk/backend";
-import { useAuth } from "@clerk/nextjs";
 import { PropsWithChildren } from "react";
 
 export default function SignedIn({
@@ -9,8 +8,7 @@ export default function SignedIn({
 }: {
   userFromServer: UserJSON | null;
 } & PropsWithChildren) {
-  const { userId } = useAuth();
-  const { user } = useUser({ initialData: userFromServer, userId });
+  const { user } = useUser({ initialData: userFromServer });
 
   if (!user) {
     return null;

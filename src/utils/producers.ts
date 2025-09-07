@@ -22,6 +22,8 @@ import {
   listClaimRequests,
   deleteProducer,
   getProducerPublic,
+  verifyClaimPhone,
+  regenerateClaimPhoneToken,
 } from "@/backend/rpc/producers";
 import {
   ListProducerArgsBeforeValidate,
@@ -33,6 +35,8 @@ import {
   CheckClaimDomainDnsArgs,
   PublicClaimRequest,
   DeleteProducerArgs,
+  VerifyClaimPhoneArgs,
+  RegenerateClaimPhoneTokenArgs,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import { ImageData } from "@/backend/validators/producers";
@@ -442,4 +446,56 @@ export const fetchUserProducersOpts = (
     queryFn: async () => {
       return await fetchUserProducers();
     },
+  });
+
+type VerifyClaimPhoneOpts = MutationOptions<
+  string,
+  Error,
+  VerifyClaimPhoneArgs,
+  unknown
+>;
+
+export const verifyClaimPhoneOpts = ({
+  opts,
+  deps,
+}: {
+  deps: { queryClient: QueryClient };
+  opts?: Omit<VerifyClaimPhoneOpts, "mutationFn" | "mutationKey">;
+}) =>
+  mutationOptions({
+    ...opts,
+    onSuccess: async (d, v, c) => {
+      if (opts?.onSuccess) {
+        await opts.onSuccess(d, v, c);
+      }
+      await Promise.all([
+        deps.queryClient.invalidateQueries({
+          queryKey: ["list-claim-requests"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["fetch-user-producers"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producer"],
+        }),
+        deps.queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producers"],
+        }),
+      ]);
+    },
+    mutationKey: ["verify-claim-phone"],
+    mutationFn: (args: VerifyClaimPhoneArgs) => verifyClaimPhone(args),
+  });
+
+export const regenerateClaimPhoneTokenOpts = (
+  opts?: Omit<
+    MutationOptions<void, Error, RegenerateClaimPhoneTokenArgs, unknown>,
+    "mutationFn" | "mutationKey"
+  >,
+) =>
+  mutationOptions({
+    ...opts,
+    mutationKey: ["regenerate-claim-phone-token"],
+    mutationFn: (args: RegenerateClaimPhoneTokenArgs) =>
+      regenerateClaimPhoneToken(args),
   });

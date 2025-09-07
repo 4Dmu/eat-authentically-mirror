@@ -1,5 +1,6 @@
 import { AnyFieldApi, AnyFormApi, useStore } from "@tanstack/react-form";
 import { ReactNode } from "react";
+import { match, P } from "ts-pattern";
 
 export function FieldInfo({
   field,
@@ -12,7 +13,13 @@ export function FieldInfo({
     <>
       {!field.state.meta.isValid ? (
         <em className="text-destructive">
-          {field.state.meta.errors.map((err) => err.message).join(",")}
+          {field.state.meta.errors
+            .map((err) =>
+              match(err)
+                .with({ message: P.string }, (v) => v.message)
+                .otherwise((v) => v),
+            )
+            .join(",")}
         </em>
       ) : (
         otherwise
