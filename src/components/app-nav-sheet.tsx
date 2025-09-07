@@ -77,16 +77,16 @@ export function AppNavSheet({
               <span>About</span>
             </Link>
           </Button>
-          <Button
+          {/*<Button
             variant={"ghost"}
             asChild
             className="flex font-bold items-center justify-start text-sm gap-5"
           >
-            <Link href="/">
+            <Link href="/about/messages">
               <MessageCircleIcon size={20} />
               <span>Messages</span>
             </Link>
-          </Button>
+          </Button>*/}
           <IsNotProducer producerIds={producerIds}>
             <Button variant={"secondary"} asChild>
               <Link href="/dashboard">Become a producer</Link>
