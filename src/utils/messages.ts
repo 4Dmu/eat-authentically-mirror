@@ -107,21 +107,40 @@ export const unblockProducerChatOpts = (
       await unblockProducerChat(args),
   });
 
-export const listUserChatsOpts = () =>
+export const listUserChatsOpts = (
+  opts?: Omit<
+    QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
+    "queryKey" | "queryFn"
+  >,
+) =>
   queryOptions({
+    ...opts,
     queryKey: ["user-chats"],
     queryFn: async () => await listUserChats(),
   });
 
-export const listProducerChatsOpts = (args: ListProducerChatsArgs) =>
+export const listProducerChatsOpts = (
+  args: ListProducerChatsArgs,
+  opts?: Omit<
+    QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
+    "queryKey" | "queryFn"
+  >,
+) =>
   queryOptions({
+    ...opts,
     queryKey: ["producer-chats"],
     queryFn: async () => await listProducerChats(args),
   });
 
-export const listAllProducersChatsOpts = () =>
+export const listAllProducersChatsOpts = (
+  opts?: Omit<
+    QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
+    "queryKey" | "queryFn"
+  >,
+) =>
   queryOptions({
-    queryKey: ["producers-chats"],
+    ...opts,
+    queryKey: ["all-producers-chats"],
     queryFn: async () => await listAllProducersChats(),
   });
 

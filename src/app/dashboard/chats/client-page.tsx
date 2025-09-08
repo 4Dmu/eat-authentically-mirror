@@ -11,9 +11,15 @@ import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { match, P } from "ts-pattern";
 
-export function ChatsPageClient() {
+export function ChatsPageClient(props: {
+  userChats: ProducerChat[];
+  producerChats: ProducerChat[];
+}) {
   const chatsQuery = useQueries({
-    queries: [listUserChatsOpts(), listAllProducersChatsOpts()],
+    queries: [
+      listUserChatsOpts({ initialData: props.userChats }),
+      listAllProducersChatsOpts({ initialData: props.producerChats }),
+    ],
     combine: (results) => {
       return {
         data: results.flatMap((r) => r.data ?? []) as ProducerChat[],

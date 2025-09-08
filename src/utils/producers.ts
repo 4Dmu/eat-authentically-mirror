@@ -40,6 +40,7 @@ import {
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import { ImageData } from "@/backend/validators/producers";
+import { match, P } from "ts-pattern";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -103,7 +104,20 @@ export const producersQueryOptions = (
     queryKey: ["producers", args],
     queryFn: () => listProducersPublicLight(args),
     placeholderData: keepPreviousData,
-    initialData: initialData,
+    ...match(args)
+      .with(
+        {
+          page: 0,
+          certs: [],
+          type: P.nullish.optional(),
+          query: P.nullish.optional(),
+          locationSearchArea: P.nullish.optional(),
+          claimed: P.nullish.optional(),
+          userIpGeo: P.nullish.optional(),
+        },
+        () => ({ initialData }),
+      )
+      .otherwise(() => ({})),
   });
 
 export const producersFullQueryOptions = (
@@ -111,10 +125,23 @@ export const producersFullQueryOptions = (
   initialData?: { data: PublicProducer[]; hasNextPage: boolean; count: number },
 ) =>
   queryOptions({
-    queryKey: ["producers", args],
+    queryKey: ["producers", "full", args],
     queryFn: () => listProducersPublic(args),
     placeholderData: keepPreviousData,
-    initialData: initialData,
+    ...match(args)
+      .with(
+        {
+          page: 0,
+          certs: [],
+          type: P.nullish.optional(),
+          query: P.nullish.optional(),
+          locationSearchArea: P.nullish.optional(),
+          claimed: P.nullish.optional(),
+          userIpGeo: P.nullish.optional(),
+        },
+        () => ({ initialData }),
+      )
+      .otherwise(() => ({})),
   });
 
 export const producerPublicOpts = (

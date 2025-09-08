@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getUserOrProducerChat } from "@/backend/rpc/messages";
+import {
+  getUserOrProducerChat,
+  getUserOrProducerChatMessages,
+} from "@/backend/rpc/messages";
 import { ChatPageClient } from "./chat-page-client";
 import { match, P } from "ts-pattern";
 
@@ -39,6 +42,8 @@ export default async function ChatPage({
   if (!chat) {
     notFound();
   }
+
+  const messages = await getUserOrProducerChatMessages({ chatId: chat.id });
 
   return (
     <div className="p-10 h-[calc(100vh_-_150px)]">
@@ -88,7 +93,11 @@ export default async function ChatPage({
 
           <BackButton href={"/"} text="Back to Home" />
         </div>
-        <ChatPageClient userId={session.userId} chat={chat} />
+        <ChatPageClient
+          messages={messages}
+          userId={session.userId}
+          chat={chat}
+        />
       </div>
     </div>
   );

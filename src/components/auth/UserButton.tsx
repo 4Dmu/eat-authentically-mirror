@@ -14,10 +14,9 @@ import {
   SendIcon,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { UserJSON } from "@clerk/backend";
-import { useUser } from "@/hooks/use-user";
 import { useSubTier } from "@/hooks/use-sub-tier";
 
 export function UserButton({
@@ -29,7 +28,9 @@ export function UserButton({
 }) {
   const { subTier } = useSubTier({ initialData: subTierFromServer });
   const { signOut } = useAuth();
-  const { user } = useUser({ initialData: userFromServer });
+  const { isLoaded, user: clientUser } = useUser();
+
+  const user = isLoaded ? clientUser : userFromServer;
 
   if (!user) {
     return null;
@@ -43,7 +44,7 @@ export function UserButton({
           width={28}
           height={28}
           alt=""
-          src={user.image_url}
+          src={"image_url" in user ? user.image_url : user.imageUrl}
         />
       </PopoverTrigger>
       <PopoverContent
@@ -56,14 +57,18 @@ export function UserButton({
             width={40}
             height={40}
             alt=""
-            src={user.image_url}
+            src={"image_url" in user ? user.image_url : user.imageUrl}
           />
           <div className="flex flex-col items-start">
             <p className="text-sm font-bold items-start">
-              {user?.first_name ??
-                user?.email_addresses?.find(
-                  (e) => e.id === user.primary_email_address_id,
-                )?.email_address}
+              {("first_name" in user ? user.first_name : user.firstName) ??
+                ("email_addresses" in user
+                  ? user?.email_addresses?.find(
+                      (e) => e.id === user.primary_email_address_id,
+                    )?.email_address
+                  : user.emailAddresses.find(
+                      (e) => e.id === user.primaryEmailAddressId,
+                    )?.emailAddress)}
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">

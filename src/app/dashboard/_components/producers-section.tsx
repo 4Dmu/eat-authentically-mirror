@@ -23,9 +23,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BuildingIcon, EyeIcon, EditIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function ProducersSection({ producers }: { producers: Producer[] }) {
+  const [producerDialogOpen, setProducerDialogOpen] = useState(false);
+  const searchparams = useSearchParams();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const deleteProducer = useMutation(deleteProducerOpts({ queryClient }));
   const { data } = useQuery(fetchUserProducersOpts({ initialData: producers }));
@@ -42,6 +47,17 @@ export function ProducersSection({ producers }: { producers: Producer[] }) {
     await deletePromise;
   }
 
+  const mode = searchparams.get("mode");
+
+  useEffect(() => {
+    if (mode === "become-producer") {
+      setProducerDialogOpen(true);
+      const newParams = new URLSearchParams(searchparams);
+      newParams.delete("mode");
+      router.replace(`?${newParams.toString()}`);
+    }
+  }, [mode, router, searchparams]);
+
   return (
     <Card className="bg-gray-50">
       <CardHeader>
@@ -50,7 +66,10 @@ export function ProducersSection({ producers }: { producers: Producer[] }) {
           My Producer Profiles
         </CardTitle>
         <CardAction className="flex gap-2">
-          <AddProducerDialog />
+          <AddProducerDialog
+            open={producerDialogOpen}
+            onOpenChange={setProducerDialogOpen}
+          />
           <ClaimProducerDialog />
         </CardAction>
       </CardHeader>

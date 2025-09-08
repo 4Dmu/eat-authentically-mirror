@@ -21,8 +21,10 @@ export type HomePageState = {
   setQuery: (query: string | undefined) => void;
   setCerts: (certs: CertificationFilter[]) => void;
   setLocationSearchArea: (
-    locationSearchArea: google.maps.LatLngBounds | undefined
+    locationSearchArea: google.maps.LatLngBounds | undefined,
   ) => void;
+  useIpGeo: boolean;
+  setUseIpGeo: (val: boolean) => void;
 };
 
 export const useHomePageStore = create<HomePageState>((set, get) => ({
@@ -42,6 +44,8 @@ export const useHomePageStore = create<HomePageState>((set, get) => ({
   setCerts: (certs) => set({ certs }),
   locationSearchArea: undefined,
   setLocationSearchArea: (locationSearchArea) => set({ locationSearchArea }),
+  useIpGeo: false,
+  setUseIpGeo: (useIpGeo) => set({ useIpGeo }),
 }));
 
 export const useProducerRegisterStore = create<{

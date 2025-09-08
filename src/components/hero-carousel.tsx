@@ -62,7 +62,7 @@ function SearchBox({ title }: { title: string }) {
   return (
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-full -translate-y-1/2">
       <div className="p-5 flex flex-col gap-10 items-center text-center">
-        <h1 className="font-bold text-6xl text-white text-shadow-lg">
+        <h1 className="font-bold text-4xl md:text-6xl text-white text-shadow-lg">
           {title}
         </h1>
         <div className="flex w-full relative max-w-xl">
@@ -112,6 +112,7 @@ export function HeroCarousel() {
         {slides.map((slide) => (
           <CarouselItem className="h-full w-full relative" key={slide.id}>
             <Image
+              priority={slide.id === "food"}
               width={1920}
               height={1080}
               alt={slide.title}
@@ -123,8 +124,8 @@ export function HeroCarousel() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselNext className="max-md:top-3/4" />
-      <CarouselPrevious className="max-md:top-3/4" />
+      <CarouselNext className="max-md:top-3/4 max-md:translate-y-10" />
+      <CarouselPrevious className="max-md:top-3/4 max-md:translate-y-10" />
     </Carousel>
   );
 }

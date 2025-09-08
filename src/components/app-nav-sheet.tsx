@@ -1,18 +1,13 @@
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
-import {
-  HomeIcon,
-  InfoIcon,
-  MapPinIcon,
-  MenuIcon,
-  MessageCircleIcon,
-} from "lucide-react";
+import { HomeIcon, InfoIcon, MenuIcon } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { NotSubbed } from "./auth/RequireSub";
 import { IsNotProducer } from "./auth/RequireOrg";
@@ -47,17 +42,19 @@ export function AppNavSheet({
           </SheetTitle>
         </SheetHeader>
         <div className="p-5 flex flex-col gap-5">
-          <Button
-            variant={"ghost"}
-            asChild
-            className="flex font-bold items-center justify-start text-sm gap-5"
-          >
-            <Link href="/">
-              <HomeIcon size={20} />
-              <span>Home</span>
-            </Link>
-          </Button>
-          <Button
+          <SheetClose asChild>
+            <Button
+              variant={"ghost"}
+              asChild
+              className="flex font-bold items-center justify-start text-sm gap-5"
+            >
+              <Link href="/">
+                <HomeIcon size={20} />
+                <span>Home</span>
+              </Link>
+            </Button>
+          </SheetClose>
+          {/*<Button
             variant={"ghost"}
             asChild
             className="flex font-bold items-center justify-start text-sm gap-5"
@@ -66,17 +63,19 @@ export function AppNavSheet({
               <MapPinIcon size={20} />
               <span>Find Producers</span>
             </Link>
-          </Button>
-          <Button
-            variant={"ghost"}
-            asChild
-            className="flex font-bold items-center justify-start text-sm gap-5"
-          >
-            <Link href="/about">
-              <InfoIcon size={20} />
-              <span>About</span>
-            </Link>
-          </Button>
+          </Button>*/}
+          <SheetClose asChild>
+            <Button
+              variant={"ghost"}
+              asChild
+              className="flex font-bold items-center justify-start text-sm gap-5"
+            >
+              <Link href="/about">
+                <InfoIcon size={20} />
+                <span>About</span>
+              </Link>
+            </Button>
+          </SheetClose>
           {/*<Button
             variant={"ghost"}
             asChild
@@ -88,22 +87,30 @@ export function AppNavSheet({
             </Link>
           </Button>*/}
           <IsNotProducer producerIds={producerIds}>
-            <Button variant={"secondary"} asChild>
-              <Link href="/dashboard">Become a producer</Link>
-            </Button>
+            <SheetClose asChild>
+              <Button variant={"secondary"} asChild>
+                <Link href="/dashboard?mode=become-producer">
+                  Become a producer
+                </Link>
+              </Button>
+            </SheetClose>
           </IsNotProducer>
           <SignedOut>
             <Separator />
-            <Button asChild>
-              <Link href="/sign-in">SignIn</Link>
-            </Button>
+            <SheetClose asChild>
+              <Button asChild>
+                <Link href="/sign-in">SignIn</Link>
+              </Button>
+            </SheetClose>
           </SignedOut>
           <SignedIn>
             <NotSubbed initialSubTier={subTier}>
               <Separator />
-              <Button asChild>
-                <Link href="/members/subscribe">Upgrade</Link>
-              </Button>
+              <SheetClose asChild>
+                <Button asChild>
+                  <Link href="/members/subscribe">Upgrade</Link>
+                </Button>
+              </SheetClose>
             </NotSubbed>
           </SignedIn>
         </div>

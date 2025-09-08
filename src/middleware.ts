@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { getSubTier } from "./backend/rpc/utils/get-sub-tier";
 import { NextResponse } from "next/server";
 import { geolocation } from "@vercel/functions";
-import { CUSTOM_GEO_HEADER_NAME } from "./backend/rpc/helpers/constants";
+import { CUSTOM_GEO_HEADER_NAME } from "./backend/constants";
 
 const isPublicRoute = createRouteMatcher([
   "/producers(.*)",

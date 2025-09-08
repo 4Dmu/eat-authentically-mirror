@@ -1,5 +1,5 @@
 "use client";
-import { CLAIM_DNS_TXT_RECORD_NAME } from "@/backend/rpc/helpers/constants";
+import { CLAIM_DNS_TXT_RECORD_NAME } from "@/backend/constants";
 import { PublicClaimRequest } from "@/backend/validators/producers";
 import {
   checkClaimDomainDnsOpts,

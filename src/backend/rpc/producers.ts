@@ -46,7 +46,7 @@ import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
-import { CLAIM_DNS_TXT_RECORD_NAME } from "./helpers/constants";
+import { CLAIM_DNS_TXT_RECORD_NAME } from "../constants";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
 import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";

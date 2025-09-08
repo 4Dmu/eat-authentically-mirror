@@ -30,3 +30,5 @@ export const PREMIUM_TIER_PROS = [
   "Upload video: Yes",
   "Receive messages from community members",
 ];
+
+export const HOME_PAGE_RESULT_LIMIT = 50;

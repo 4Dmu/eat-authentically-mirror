@@ -11,11 +11,15 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import { listAllProducersChats, listUserChats } from "@/backend/rpc/messages";
 
 export default async function MessagesPage() {
   const session = await auth.protect();
 
   const sub = await getSubTier(session.userId);
+
+  const userChats = await listUserChats();
+  const producerChats = await listAllProducersChats();
 
   return (
     <div className="p-10 pb-20">
@@ -49,7 +53,12 @@ export default async function MessagesPage() {
 
           <BackButton href={"./"} text="Back" />
         </div>
-        {sub !== "Free" && <ChatsPageClient />}
+        {sub !== "Free" && (
+          <ChatsPageClient
+            userChats={userChats}
+            producerChats={producerChats}
+          />
+        )}
       </div>
     </div>
   );

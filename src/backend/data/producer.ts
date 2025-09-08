@@ -13,6 +13,7 @@ import {
 } from "../db/schema";
 import * as transformers from "@/backend/utils/transform-data";
 import { USER_PRODUCER_IDS_KV } from "../kv";
+import { HOME_PAGE_RESULT_LIMIT } from "../constants";
 
 const orderProducersByScrapedMetadata = sql`
   CASE
@@ -79,8 +80,7 @@ export async function getUsersProducerIdsCached(userId: string) {
 
 export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
   try {
-    const limit = 100;
-    const offest = args.page * limit;
+    const offest = args.page * HOME_PAGE_RESULT_LIMIT;
 
     const queries: (SQL | undefined)[] = [];
 
@@ -146,7 +146,7 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
           },
         },
       },
-      limit: limit + 1,
+      limit: HOME_PAGE_RESULT_LIMIT + 1,
       offset: offest,
       where: queries.length > 0 ? and(...queries) : undefined,
     });
@@ -157,9 +157,9 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
       .where(queries.length > 0 ? and(...queries) : undefined)
       .then((r) => r[0].count ?? 0);
 
-    const hasNextPage = producersQuery.length > limit;
+    const hasNextPage = producersQuery.length > HOME_PAGE_RESULT_LIMIT;
     const paginatedProducers = hasNextPage
-      ? producersQuery.slice(0, limit)
+      ? producersQuery.slice(0, HOME_PAGE_RESULT_LIMIT)
       : producersQuery;
 
     const result = transformers.withCertifications(paginatedProducers);
@@ -179,8 +179,7 @@ export async function listProducersPublicLight(
   args: ListProducerArgsAfterValidate,
 ) {
   try {
-    const limit = 100;
-    const offest = args.page * limit;
+    const offest = args.page * HOME_PAGE_RESULT_LIMIT;
 
     const queries: (SQL | undefined)[] = [];
 
@@ -254,13 +253,13 @@ export async function listProducersPublicLight(
         },
       },
       where: queries.length > 0 ? and(...queries) : undefined,
-      limit: limit + 1,
+      limit: HOME_PAGE_RESULT_LIMIT + 1,
       offset: offest,
     });
 
-    const hasNextPage = producersQuery.length > limit;
+    const hasNextPage = producersQuery.length > HOME_PAGE_RESULT_LIMIT;
     const paginatedProducers = hasNextPage
-      ? producersQuery.slice(0, limit)
+      ? producersQuery.slice(0, HOME_PAGE_RESULT_LIMIT)
       : producersQuery;
 
     const result = transformers.withCertifications(paginatedProducers);

@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { useHomePageStore } from "@/stores";
 import { producersQueryOptions } from "@/utils/producers";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { PublicProducerLight } from "@/backend/validators/producers";
 import type { Geo } from "@vercel/functions";
+import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 
 export function Page({
   initialProducersFromServer,
@@ -24,8 +25,15 @@ export function Page({
   };
   userIpGeo: Geo | undefined;
 }) {
-  const { typeFilter, query, certs, locationSearchArea, page, setPage } =
-    useHomePageStore();
+  const {
+    typeFilter,
+    query,
+    certs,
+    locationSearchArea,
+    page,
+    setPage,
+    useIpGeo,
+  } = useHomePageStore();
 
   const debouncedQuery = useDebounce(query, 500);
 
@@ -39,7 +47,7 @@ export function Page({
           ? locationSearchArea.toJSON()
           : undefined,
         query: debouncedQuery,
-        userIpGeo: userIpGeo,
+        userIpGeo: useIpGeo ? userIpGeo : undefined,
       },
       initialProducersFromServer,
     ),
@@ -51,7 +59,7 @@ export function Page({
       <div className="p-5">
         <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
           <div className="flex gap-5 justify-between items-center">
-            <h2 className="font-bold text-4xl text-gray-900">
+            <h2 className="font-bold text-3xl md:text-4xl text-gray-900">
               Find Real Food Producers
             </h2>
             <FilterMenu />
@@ -81,38 +89,41 @@ export function Page({
             </div>
           )}
           <div className="flex justify-between gap-5">
-            <Badge className="rounded-full" variant={"brandRed"}>
-              Page {page + 1} of {Math.ceil((data?.count ?? 1) / 100)}
+            <Button
+              variant={"brandBrown"}
+              size={"icon"}
+              onClick={() => setPage((old) => Math.max(old - 1, 0))}
+              disabled={page === 0}
+            >
+              <ArrowLeft />
+            </Button>
+            <Badge variant={"brandBrown"}>
+              Page {page + 1} of{" "}
+              {Math.ceil((data?.count ?? 1) / HOME_PAGE_RESULT_LIMIT)}
             </Badge>
-            <div className="flex gap-2">
-              <Button
-                variant={"brandBrown"}
-                size={"icon"}
-                onClick={() => setPage((old) => Math.max(old - 1, 0))}
-                disabled={page === 0}
-                hidden={page === 0}
-              >
-                <ArrowLeft />
-              </Button>
-              <Button
-                variant={"brandBrown"}
-                size={"icon"}
-                onClick={() => {
-                  if (!isPlaceholderData && data?.hasNextPage) {
-                    setPage((old) => old + 1);
-                  }
-                }}
-                // Disable the Next Page button until we know a next page is available
-                disabled={isPlaceholderData || !data?.hasNextPage}
-              >
-                <ArrowRight />
-              </Button>
-            </div>
+            <Button
+              variant={"brandBrown"}
+              size={"icon"}
+              onClick={() => {
+                if (!isPlaceholderData && data?.hasNextPage) {
+                  setPage((old) => old + 1);
+                }
+              }}
+              // Disable the Next Page button until we know a next page is available
+              disabled={isPlaceholderData || !data?.hasNextPage}
+            >
+              <ArrowRight />
+            </Button>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {data?.data.map((producer) => (
               <ProducerCard key={producer.id} producer={producer} />
             ))}
+          </div>
+          <div>
+            <Button onClick={() => window.scrollTo({ top: 0 })}>
+              <ArrowUp /> Back to top
+            </Button>
           </div>
         </div>
       </div>

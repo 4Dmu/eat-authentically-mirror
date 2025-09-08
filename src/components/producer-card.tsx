@@ -4,6 +4,7 @@ import { Badge } from "./ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import { AddToPinboardIconButton } from "./pinboard";
+import { SignedIn } from "@clerk/nextjs";
 
 export function ProducerCard({
   producer,
@@ -34,7 +35,9 @@ export function ProducerCard({
         </div>
         <div className="p-5 flex gap-3 justify-between items-center w-full">
           <p className="font-bold">{producer.name}</p>
-          <AddToPinboardIconButton producerId={producer.id} />
+          <SignedIn>
+            <AddToPinboardIconButton producerId={producer.id} />
+          </SignedIn>
         </div>
       </Link>
     );
@@ -60,10 +63,12 @@ export function ProducerCard({
           Unclaimed
         </Badge>
       )}
-      <AddToPinboardIconButton
-        className="absolute top-4 right-4 cursor-pointer"
-        producerId={producer.id}
-      />
+      <SignedIn>
+        <AddToPinboardIconButton
+          className="absolute top-4 right-4 cursor-pointer"
+          producerId={producer.id}
+        />
+      </SignedIn>
     </Link>
   );
 }

@@ -343,7 +343,7 @@ export const listProducerChats = authenticatedActionClient
   .input(listProducerChatsArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
     if (!producerIds.includes(producerId)) {
-      return;
+      return [];
     }
 
     const chats = await db.query.producerChats.findMany({
@@ -381,6 +381,7 @@ export const listAllProducersChats = authenticatedActionClient.action(
       where: and(
         inArray(producerChats.producerId, producerIds),
         ne(producerChats.initiatorUserId, userId),
+        eq(producerChats.producerUserId, userId),
       ),
       with: {
         producer: {

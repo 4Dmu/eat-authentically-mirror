@@ -26,7 +26,7 @@ import {
   COMMUNITY_TIER_PROS,
   PREMIUM_TIER_PROS,
   PRO_TIER_PROS,
-} from "@/backend/rpc/helpers/constants";
+} from "@/backend/constants";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export function ClientPage(props: {

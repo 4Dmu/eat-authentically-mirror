@@ -1,4 +1,3 @@
-"use client";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import {
@@ -31,7 +30,13 @@ import {
 } from "./ui/select";
 import { toast } from "sonner";
 
-export function AddProducerDialog() {
+export function AddProducerDialog({
+  open,
+  onOpenChange,
+}: {
+  open?: boolean;
+  onOpenChange?: (val: boolean) => void;
+}) {
   const router = useRouter();
   const registerProducerMutation = useMutation({
     mutationKey: ["register-producer"],
@@ -64,16 +69,18 @@ export function AddProducerDialog() {
 
   return (
     <Dialog
+      open={open}
       onOpenChange={(e) => {
         if (e === false) {
           form.reset();
         }
+        onOpenChange?.(e);
       }}
     >
       <DialogTrigger asChild>
         <Button>Add New</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:w-[90%] sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Become a Producer</DialogTitle>
           <DialogDescription>

@@ -32,13 +32,19 @@ import { startTransition, useMemo, useOptimistic, useState } from "react";
 import { toast } from "sonner";
 import { match, P } from "ts-pattern";
 
-export function ChatPageClient(props: { chat: ProducerChat; userId: string }) {
+export function ChatPageClient(props: {
+  chat: ProducerChat;
+  userId: string;
+  messages: ProducerChatMessage[];
+}) {
   const [message, setMessage] = useState("");
   const chatQuery = useQuery(
     getUserOrProducerChatOpts(props.chat.id, { initialData: props.chat }),
   );
   const messagesQuery = useQuery(
-    getUserOrProducerChatMessagesOpts(props.chat.id),
+    getUserOrProducerChatMessagesOpts(props.chat.id, {
+      initialData: props.messages,
+    }),
   );
 
   const messagesQueryData = messagesQuery.data ?? [];

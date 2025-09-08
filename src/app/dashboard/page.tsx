@@ -30,6 +30,7 @@ import { ProducersSection } from "./_components/producers-section";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { match } from "ts-pattern";
+import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -114,7 +115,12 @@ export default async function DashboardPage() {
                         : "Upgrade to a payed producer subscription to increase search revelence, add extra images and even video."}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="grid grid-cols-2 gap-10">
+                  <CardContent
+                    className={cn(
+                      "grid gap-10",
+                      subTier === "Free" ? "grid-cols-2" : "",
+                    )}
+                  >
                     <NotSubbed initialSubTier={subTier}>
                       <div className="flex flex-col gap-2">
                         <p>
@@ -142,7 +148,7 @@ export default async function DashboardPage() {
                                   : "/dashboard/billing"
                               }
                             >
-                              Upgrade Your Producer Listing
+                              Upgrade to Producer tier
                             </Link>
                           </Button>
                         </div>

@@ -19,10 +19,11 @@ import { Label } from "./ui/label";
 import { useHomePageStore } from "@/stores";
 import { LocationFilter } from "./location-filter";
 import { FilterIcon } from "lucide-react";
+import { Switch } from "./ui/switch";
 
 export function FilterMenu() {
   const certsQuery = useQuery(certificationTypesOptions());
-  const { certs, setCerts } = useHomePageStore();
+  const { certs, setCerts, useIpGeo, setUseIpGeo } = useHomePageStore();
 
   return (
     <Sheet>
@@ -33,9 +34,13 @@ export function FilterMenu() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Filter</SheetTitle>
+          <SheetTitle>Filter And Sort</SheetTitle>
         </SheetHeader>
         <div className="p-5">
+          <div className="flex flex-col gap-2">
+            <Label>Sort by closest to you</Label>
+            <Switch checked={useIpGeo} onCheckedChange={setUseIpGeo} />
+          </div>
           <Accordion
             about=""
             className="h-full"
@@ -74,7 +79,7 @@ export function FilterMenu() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2" className="w-full h-full">
-              <AccordionTrigger>Location</AccordionTrigger>
+              <AccordionTrigger>Map Bounds</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-2">
                 <LocationFilter />
                 {/* <SignedIn>
