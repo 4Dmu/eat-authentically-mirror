@@ -53,6 +53,21 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
     };
   }, [map]);
 
+  useEffect(() => {
+    console.log(map, location, "rn");
+    if (!map || !location) return;
+    const center = map.getCenter();
+    if (!center) return;
+
+    if (
+      center.lat() == 36.778259 &&
+      center.lng() == -119.417931 &&
+      (location.lat !== 36.778259 || location.lng !== -119.417931)
+    ) {
+      map.setCenter({ lat: location.lat, lng: location.lng });
+    }
+  }, [location, map]);
+
   return (
     <div className="space-y-4">
       <div>
