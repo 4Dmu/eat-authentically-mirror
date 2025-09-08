@@ -12,6 +12,7 @@ import { getMonth, getYear } from "date-fns";
 
 export const geocodeRegion = authenticatedActionClient
   .input(GeocodeRegionProps)
+  .name("geocodeRegion")
   .action(async ({ input: { center }, ctx: { userId } }) => {
     const date = new Date();
     const month = getMonth(date);
@@ -39,7 +40,7 @@ export const geocodeRegion = authenticatedActionClient
       userId,
       year,
       month,
-      perUserRequests + 1
+      perUserRequests + 1,
     );
     await TOTAL_GEOCODE_REQUESTS_KV.increment(year, month);
 

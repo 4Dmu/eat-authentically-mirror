@@ -29,6 +29,7 @@ import { USER_DATA_KV } from "../kv";
 
 export const sendMessageToProducer = authenticatedActionClient
   .input(sendMessageToProducerArgs)
+  .name("sendMessageToProducer")
   .action(async ({ ctx: { userId }, input: { producerId, message } }) => {
     const { success } = await messageRatelimit.limit(userId);
 
@@ -105,6 +106,7 @@ export const sendMessageToProducer = authenticatedActionClient
 
 export const replyToUserMessage = authenticatedActionClient
   .input(replyToUserMessageArgs)
+  .name("replyToUserMessage")
   .action(
     async ({ ctx: { userId }, input: { producerId, message, chatId } }) => {
       const { success } = await messageRatelimit.limit(userId);
@@ -160,6 +162,7 @@ export const replyToUserMessage = authenticatedActionClient
 
 export const blockUserChat = authenticatedActionClient
   .input(blockUserChatArgs)
+  .name("blockUserChat")
   .action(async ({ ctx: { userId }, input: { producerId, chatId } }) => {
     const { success } = await messageRatelimit.limit(userId);
 
@@ -201,6 +204,7 @@ export const blockUserChat = authenticatedActionClient
   });
 
 export const unblockUserChat = authenticatedActionClient
+  .name("unblockUserChat")
   .input(unblockUserChatArgs)
   .action(async ({ ctx: { userId }, input: { producerId, chatId } }) => {
     const { success } = await messageRatelimit.limit(userId);
@@ -238,6 +242,7 @@ export const unblockUserChat = authenticatedActionClient
   });
 
 export const blockProducerChat = authenticatedActionClient
+  .name("blockProducerChat")
   .input(blockProducerChatArgs)
   .action(async ({ ctx: { userId }, input: { chatId } }) => {
     const { success } = await messageRatelimit.limit(userId);
@@ -268,6 +273,7 @@ export const blockProducerChat = authenticatedActionClient
   });
 
 export const unblockProducerChat = authenticatedActionClient
+  .name("unblockProducerChat")
   .input(unblockProducerChatArgs)
   .action(async ({ ctx: { userId }, input: { chatId } }) => {
     const { success } = await messageRatelimit.limit(userId);
@@ -298,6 +304,7 @@ export const unblockProducerChat = authenticatedActionClient
   });
 
 export const getProducerChat = authenticatedActionClient
+  .name("getProducerChat")
   .input(getProducerChatArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
     const chat = await db.query.producerChats.findFirst({
@@ -323,8 +330,9 @@ export const getProducerChat = authenticatedActionClient
     return chat;
   });
 
-export const listUserChats = authenticatedActionClient.action(
-  async ({ userId }) => {
+export const listUserChats = authenticatedActionClient
+  .name("listUserChats")
+  .action(async ({ userId }) => {
     return await db.query.producerChats.findMany({
       where: eq(producerChats.initiatorUserId, userId),
       with: {
@@ -336,10 +344,10 @@ export const listUserChats = authenticatedActionClient.action(
         },
       },
     });
-  },
-);
+  });
 
 export const listProducerChats = authenticatedActionClient
+  .name("listProducerChats")
   .input(listProducerChatsArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
     if (!producerIds.includes(producerId)) {
@@ -375,8 +383,9 @@ export const listProducerChats = authenticatedActionClient
     return results;
   });
 
-export const listAllProducersChats = authenticatedActionClient.action(
-  async ({ userId, producerIds }) => {
+export const listAllProducersChats = authenticatedActionClient
+  .name("listAllProducersChats")
+  .action(async ({ userId, producerIds }) => {
     const chats = await db.query.producerChats.findMany({
       where: and(
         inArray(producerChats.producerId, producerIds),
@@ -405,10 +414,10 @@ export const listAllProducersChats = authenticatedActionClient.action(
     }
 
     return results;
-  },
-);
+  });
 
 export const getUserOrProducerChat = authenticatedActionClient
+  .name("getUserOrProducerChat")
   .input(getUserOrProducerChatArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { chatId } }) => {
     const chat = await db.query.producerChats.findFirst({
@@ -450,6 +459,7 @@ export const getUserOrProducerChat = authenticatedActionClient
   });
 
 export const getUserOrProducerChatMessages = authenticatedActionClient
+  .name("getUserOrProducerChatMessages")
   .input(getUserOrProducerChatArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { chatId } }) => {
     const chat = await db.query.producerChats.findFirst({

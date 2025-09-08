@@ -18,6 +18,7 @@ import { type } from "arktype";
 
 export const createCheckoutSession = authenticatedWithUserActionClient
   .input(CreateCheckoutSessionArgsValidator)
+  .name("createCheckoutSession")
   .action(async ({ ctx: { userId, user }, input: { tier, timeframe } }) => {
     let stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
 
@@ -27,12 +28,12 @@ export const createCheckoutSession = authenticatedWithUserActionClient
 
     const activeSub = existingSubs?.find(
       (sub) =>
-        plans.isActive(sub.status) && !!plans.getPlanByPriceId(sub.priceId)
+        plans.isActive(sub.status) && !!plans.getPlanByPriceId(sub.priceId),
     );
 
     console.log(
       "[createCheckoutSession] Active user subscription (if any):",
-      activeSub
+      activeSub,
     );
 
     const targetPlan = plans.getPlanBySubscriptionTier(tier, timeframe);
@@ -40,27 +41,27 @@ export const createCheckoutSession = authenticatedWithUserActionClient
     if (!targetPlan) {
       console.error(
         "[createCheckoutSession] Error invalid target plan:",
-        targetPlan
+        targetPlan,
       );
       throw new Error("Invalid target subscription tier/interval.");
     }
 
     if (activeSub) {
       console.error(
-        "[createCheckoutSession] Error user already has active sub"
+        "[createCheckoutSession] Error user already has active sub",
       );
       throw new Error("You already have an active sub");
     }
 
     console.log(
       "[createCheckoutSession] Here's the stripe id we got from kv:",
-      stripeCustomerId
+      stripeCustomerId,
     );
 
     if (!stripeCustomerId) {
       console.log(
         "[createCheckoutSession] No stripe id found in kv, creatring new customer",
-        stripeCustomerId
+        stripeCustomerId,
       );
 
       const newCustomer = await stripe.customers.create({
@@ -102,7 +103,7 @@ export const createCheckoutSession = authenticatedWithUserActionClient
     } catch (err) {
       console.error(err);
       throw new Error(
-        "Failed to create checkout session. Pleae refresh and try again."
+        "Failed to create checkout session. Pleae refresh and try again.",
       );
     }
 
@@ -170,6 +171,7 @@ export const createCheckoutSession = authenticatedWithUserActionClient
 
 export const createBillingPortalSession = authenticatedActionClient
   .input(type({ redirectPath: "string" }))
+  .name("createBillingPortalSession")
   .action(async ({ ctx: { userId }, input: { redirectPath } }) => {
     const customerId = await USER_STRIPE_CUSTOMER_ID_KV.get(userId);
 
@@ -185,11 +187,14 @@ export const createBillingPortalSession = authenticatedActionClient
   });
 
 export async function triggerStripeSync() {
+  console.log("[ACTION triggerStripeSync] start");
   const user = await auth();
   if (!user.userId) return;
 
   const stripeCustomerId = await USER_STRIPE_CUSTOMER_ID_KV.get(user.userId);
   if (!stripeCustomerId) return;
 
-  return await updateKvWithLatestStripeData(stripeCustomerId);
+  const response = await updateKvWithLatestStripeData(stripeCustomerId);
+  console.log("[ACTION triggerStripeSync] end");
+  return response;
 }

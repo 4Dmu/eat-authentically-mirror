@@ -11,6 +11,9 @@ export const authenticatedActionClient = actionClient.use(async () => {
   }
 
   const producerIds = await getUsersProducerIdsCached(userId);
+  console.log(
+    `[MIDDLEWARE authenticatedActionClient] userId: ${userId} - producerIds: ${producerIds}`,
+  );
 
   return { userId, producerIds };
 });
@@ -24,6 +27,10 @@ export const authenticatedWithUserActionClient = actionClient.use(async () => {
 
   const producerIds = await getUsersProducerIdsCached(user.id);
 
+  console.log(
+    `[MIDDLEWARE authenticatedWithUserActionClient] user: ${user} - producerIds: ${producerIds}`,
+  );
+
   return { user: user, userId: user.id, producerIds };
 });
 
@@ -32,8 +39,11 @@ export const producerActionClient = authenticatedActionClient.use(
     if (producerIds.length < 1) {
       throw new Error("Unauthorized");
     }
+    console.log(
+      `[MIDDLEWARE producerActionClient] producerIds: ${producerIds}`,
+    );
     return {};
-  }
+  },
 );
 
 export const subscribedActionClient = authenticatedActionClient.use(
@@ -44,6 +54,8 @@ export const subscribedActionClient = authenticatedActionClient.use(
       throw new Error("Unauthorized");
     }
 
+    console.log(`[MIDDLEWARE subscribedActionClient] subTier: ${subTier}`);
+
     return { subTier };
-  }
+  },
 );

@@ -57,6 +57,7 @@ import { addMinutes, isAfter, isBefore } from "date-fns";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
+  .name("registerProducer")
   .action(async ({ ctx: { userId, producerIds }, input }) => {
     const subTier = await getSubTier(userId);
     if (
@@ -96,6 +97,7 @@ export const registerProducer = authenticatedActionClient
 
 export const fetchUserProducer = producerActionClient
   .input(type("string"))
+  .name("fetchUserProducer")
   .action(async ({ input, ctx: { producerIds, userId } }) => {
     const result = await db.query.producers
       .findFirst({
@@ -117,8 +119,9 @@ export const fetchUserProducer = producerActionClient
     return result;
   });
 
-export const fetchUserProducers = authenticatedActionClient.action(
-  async ({ producerIds, userId }) => {
+export const fetchUserProducers = authenticatedActionClient
+  .name("fetchUserProducers")
+  .action(async ({ producerIds, userId }) => {
     const result = await db.query.producers
       .findMany({
         where: and(
@@ -136,11 +139,11 @@ export const fetchUserProducers = authenticatedActionClient.action(
       .then((r) => (r ? withCertifications(r) : r));
 
     return result;
-  },
-);
+  });
 
 export const fetchUserProducerLight = producerActionClient
   .input(type("string"))
+  .name("fetchUserProducerLight")
   .action(async ({ input, ctx: { producerIds, userId } }) => {
     const result = await db.query.producers
       .findFirst({
@@ -164,22 +167,26 @@ export const fetchUserProducerLight = producerActionClient
 
 export const listProducersPublic = actionClient
   .input(listProducersArgsValidator)
+  .name("listProducersPublic")
   .action(async ({ input }) => await listing.listProducersPublic(input));
 
 export const listProducersPublicLight = actionClient
   .input(listProducersArgsValidator)
+  .name("listProducersPublicLight")
   .action(async ({ input }) => await listing.listProducersPublicLight(input));
 
-export const listCertificationTypesPublic = actionClient.action(
-  async () => await listing.listCertificationTypesPublic(),
-);
+export const listCertificationTypesPublic = actionClient
+  .name("listCertificationTypesPublic")
+  .action(async () => await listing.listCertificationTypesPublic());
 
 export const getProducerPublic = actionClient
   .input(getProducersArgsValidator)
+  .name("getProducerPublic")
   .action(async ({ input }) => await listing.getProducerPublic(input));
 
 export const editProducer = producerActionClient
   .input(editProducerArgsValidator)
+  .name("editProducer")
   .action(async ({ input, ctx: { userId } }) => {
     const producer = await db.query.producers.findFirst({
       where: and(
@@ -310,6 +317,7 @@ export const requestUploadUrls = producerActionClient
         .atMostLength(10),
     }),
   )
+  .name("requestUploadUrls")
   .action(
     async ({ ctx: { userId }, input: { imageItemParams, producerId } }) => {
       const producer = await db.query.producers.findFirst({
@@ -396,6 +404,7 @@ export const requestUploadUrls = producerActionClient
 
 export const requestVideoUploadUrl = producerActionClient
   .input(type({ producerId: "string" }))
+  .name("requestVideoUploadUrl")
   .action(async ({ ctx: { userId }, input: { producerId } }) => {
     const { success } = await videoRatelimit.limit(userId);
 
@@ -498,6 +507,7 @@ export const requestVideoUploadUrl = producerActionClient
 
 export const confirmPengingUpload = producerActionClient
   .input(type({ producerId: "string" }))
+  .name("confirmPengingUpload")
   .action(async ({ ctx: { userId }, input: { producerId } }) => {
     const producer = await db.query.producers.findFirst({
       columns: {
@@ -583,6 +593,7 @@ export const confirmPengingUpload = producerActionClient
 
 export const confirmPendingVideoUpload = producerActionClient
   .input(type({ producerId: "string" }))
+  .name("confirmPendingVideoUpload")
   .action(async ({ ctx: { userId }, input: { producerId } }) => {
     const producer = await db.query.producers.findFirst({
       columns: {
@@ -648,6 +659,7 @@ export const confirmPendingVideoUpload = producerActionClient
 
 export const deleteVideo = producerActionClient
   .input(type({ producerId: "string" }))
+  .name("deleteVideo")
   .action(async ({ ctx: { userId }, input: { producerId } }) => {
     const producer = await db.query.producers.findFirst({
       columns: {
@@ -676,6 +688,7 @@ export const deleteVideo = producerActionClient
 
 export const updateExistingImages = producerActionClient
   .input(type({ producerId: "string", data: producerImagesValidator }))
+  .name("updateExistingImages")
   .action(async ({ ctx: { userId }, input: { producerId, data } }) => {
     const producer = await db.query.producers.findFirst({
       columns: {
@@ -732,6 +745,7 @@ export const updateExistingImages = producerActionClient
 
 export const claimProducer = authenticatedActionClient
   .input(claimProducerArgs)
+  .name("claimProducer")
   .action(
     async ({
       ctx: { userId, producerIds },
@@ -1027,8 +1041,9 @@ export const claimProducer = authenticatedActionClient
     },
   );
 
-export const listClaimRequests = authenticatedActionClient.action(
-  async ({ userId }) => {
+export const listClaimRequests = authenticatedActionClient
+  .name("listClaimRequests")
+  .action(async ({ userId }) => {
     const requests = await db.query.claimRequests.findMany({
       where: eq(claimRequests.userId, userId),
       with: {
@@ -1064,11 +1079,11 @@ export const listClaimRequests = authenticatedActionClient.action(
                   : requestedVerification,
         }) satisfies PublicClaimRequest,
     );
-  },
-);
+  });
 
 export const checkClaimDomainDNS = authenticatedActionClient
   .input(checkClaimDomainDnsArgs)
+  .name("checkClaimDomainDNS")
   .action(async ({ ctx: { userId }, input: { claimRequestId } }) => {
     const { success } = await producerClaimDnsCheckRatelimit.limit(userId);
 
@@ -1121,6 +1136,7 @@ export const checkClaimDomainDNS = authenticatedActionClient
 
 export const verifyClaimPhone = authenticatedActionClient
   .input(verifyClaimPhoneArgs)
+  .name("verifyClaimPhone")
   .action(async ({ ctx: { userId }, input: { claimRequestId, code } }) => {
     const { success } = await producerClaimVerifyPhoneRatelimit.limit(userId);
 
@@ -1163,6 +1179,7 @@ export const verifyClaimPhone = authenticatedActionClient
 
 export const regenerateClaimPhoneToken = authenticatedActionClient
   .input(regenerateClaimPhoneTokenArgs)
+  .name("regenerateClaimPhoneToken")
   .action(async ({ ctx: { userId }, input: { claimRequestId } }) => {
     const claimRequest = await db.query.claimRequests.findFirst({
       where: and(
@@ -1206,6 +1223,7 @@ export const regenerateClaimPhoneToken = authenticatedActionClient
 
 export const deleteProducer = producerActionClient
   .input(deleteProducerArgs)
+  .name("deleteProducer")
   .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
     if (!producerIds.includes(producerId)) {
       throw new Error("Producer not found");

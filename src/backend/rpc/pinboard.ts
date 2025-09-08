@@ -16,8 +16,9 @@ import {
   updateUserPinboardArgs,
 } from "../validators/pinboard";
 
-export const getUserPinboard = authenticatedActionClient.action(
-  async ({ userId }) => {
+export const getUserPinboard = authenticatedActionClient
+  .name("getUserPinboard")
+  .action(async ({ userId }) => {
     const pinboard = await db.query.pinboards.findFirst({
       where: eq(pinboards.userId, userId),
     });
@@ -38,11 +39,11 @@ export const getUserPinboard = authenticatedActionClient.action(
       .then((r) => r[1]);
 
     return newPinboard;
-  },
-);
+  });
 
-export const getUserPinboardFull = authenticatedActionClient.action(
-  async ({ userId }) => {
+export const getUserPinboardFull = authenticatedActionClient
+  .name("getUserPinboardFull")
+  .action(async ({ userId }) => {
     const pinboard = await db.query.pinboards.findFirst({
       where: eq(pinboards.userId, userId),
       with: {
@@ -83,10 +84,10 @@ export const getUserPinboardFull = authenticatedActionClient.action(
       .then((r) => r[1]);
 
     return { ...newPinboard, pins: [], pinLists: [] };
-  },
-);
+  });
 
 export const updateUserPinboard = authenticatedActionClient
+  .name("updateUserPinboard")
   .input(updateUserPinboardArgs)
   .action(async ({ ctx: { userId }, input: { viewMode } }) => {
     await db
@@ -96,6 +97,7 @@ export const updateUserPinboard = authenticatedActionClient
   });
 
 export const addToPinboard = authenticatedActionClient
+  .name("addToPinboard")
   .input(addToPinboardArgs)
   .action(async ({ ctx: { userId }, input: { producerId, pinListId } }) => {
     const pinboard = await db.query.pinboards.findFirst({
@@ -153,6 +155,7 @@ export const addToPinboard = authenticatedActionClient
 
 export const removeFromPinboard = authenticatedActionClient
   .input(removeFromPinboardArgs)
+  .name("removeFromPinboard")
   .action(async ({ ctx: { userId }, input: { pinId } }) => {
     const pinboard = await db.query.pinboards.findFirst({
       where: eq(pinboards.userId, userId),
@@ -177,6 +180,7 @@ export const removeFromPinboard = authenticatedActionClient
 
 export const getUserProducerPin = authenticatedActionClient
   .input(getPinboardStatusArgs)
+  .name("getUserProducerPin")
   .action(async ({ ctx: { userId }, input: { producerId } }) => {
     const pinboard = await db.query.pinboards.findFirst({
       where: eq(pinboards.userId, userId),

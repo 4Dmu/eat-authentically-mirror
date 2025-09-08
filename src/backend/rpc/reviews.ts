@@ -15,6 +15,7 @@ import { USER_DATA_KV } from "../kv";
 
 export const reviewProducer = authenticatedActionClient
   .input(reviewProducerArgs)
+  .name("reviewProducer")
   .action(
     async ({
       ctx: { userId, producerIds },
@@ -69,6 +70,7 @@ export const reviewProducer = authenticatedActionClient
 
 export const listReviewsPublic = actionClient
   .input(listReviewsPublicArgs)
+  .name("listReviewsPublic")
   .action(async ({ input: { producerId } }) => {
     const results = await db.query.reviews.findMany({
       where: eq(reviews.producerId, producerId),
@@ -90,6 +92,7 @@ export const listReviewsPublic = actionClient
 
 export const deleteReview = authenticatedActionClient
   .input(deleteReviewArgs)
+  .name("deleteReview")
   .action(async ({ ctx: { userId }, input: { reviewId } }) => {
     const results = await db
       .delete(reviews)
@@ -105,6 +108,7 @@ export const deleteReview = authenticatedActionClient
 
 export const updateReview = authenticatedActionClient
   .input(updateReviewArgs)
+  .name("updateReview")
   .action(async ({ ctx: { userId }, input: { content, stars, reviewId } }) => {
     const review = await db.query.reviews.findFirst({
       where: and(eq(reviews.id, reviewId), eq(reviews.reviewerUserId, userId)),

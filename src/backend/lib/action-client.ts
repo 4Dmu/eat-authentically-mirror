@@ -7,29 +7,45 @@ type EmptyCtx = Record<string, any>;
 
 type Middleware<P, N extends P> = [...Fn<P, P>[], Fn<P, N>] | [];
 
+function makeReqId() {
+  // Cheap, collision-resistant enough for per-invocation correlation
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
 class InputActionClient<
   TPreviousContext extends EmptyCtx,
   TNextContext extends TPreviousContext,
-  TSchema extends StandardSchemaV1
+  TSchema extends StandardSchemaV1,
 > {
   schema: TSchema;
   client: ActionClient<TPreviousContext, TNextContext>;
 
   constructor(
     client: ActionClient<TPreviousContext, TNextContext>,
-    schema: TSchema
+    schema: TSchema,
   ) {
     this.client = client;
     this.schema = schema;
+  }
+
+  name(name: string) {
+    return new InputActionClient(
+      new ActionClient(this.client.middleware, name),
+      this.schema,
+    );
   }
 
   action<TResult>(
     fn: (input: {
       ctx: TNextContext;
       input: StandardSchemaV1.InferOutput<TSchema>;
-    }) => TResult | Promise<TResult>
+    }) => TResult | Promise<TResult>,
   ) {
     return async (input: StandardSchemaV1.InferInput<TSchema>) => {
+      const reqId = makeReqId();
+      const actionName = this.client.actionName ?? "anonymous";
+      console.log(`[ACTION ${actionName} ${reqId}] start`);
+
       const ctx = await this.client.resolveCtx();
 
       let result = this.schema["~standard"].validate(input);
@@ -39,19 +55,32 @@ class InputActionClient<
         throw new Error(JSON.stringify(result.issues, null, 2));
       }
 
-      return await fn({ ctx, input: result.value });
+      const response = await fn({ ctx, input: result.value });
+
+      console.log(`[ACTION ${actionName} ${reqId}] end`);
+
+      return response;
     };
   }
 }
 
 export class ActionClient<
   TPreviousContext extends EmptyCtx,
-  TNextContext extends TPreviousContext
+  TNextContext extends TPreviousContext,
 > {
   middleware: Middleware<TPreviousContext, TNextContext>;
+  actionName: string | undefined;
+
+  constructor(
+    middleware: Middleware<TPreviousContext, TNextContext> = [],
+    name?: string,
+  ) {
+    this.middleware = middleware;
+    this.actionName = name;
+  }
 
   use<N extends EmptyCtx>(
-    fn: Fn<TNextContext, N>
+    fn: Fn<TNextContext, N>,
   ): ActionClient<TNextContext, TNextContext & N> {
     const newMiddleware = [...this.middleware, fn] as Middleware<
       TNextContext,
@@ -60,10 +89,21 @@ export class ActionClient<
     return new ActionClient(newMiddleware);
   }
 
+  name(name: string) {
+    return new ActionClient(this.middleware, name);
+  }
+
   action<TResult>(fn: (ctx: TNextContext) => TResult | Promise<TResult>) {
     return async () => {
+      const reqId = makeReqId();
+      const actionName = this.actionName ?? "anonymous";
+      console.log(`[ACTION ${actionName} ${reqId}] start`);
+
       const ctx = await this.resolveCtx();
-      return await fn(ctx);
+      const result = await fn(ctx);
+
+      console.log(`[ACTION ${actionName} ${reqId}] end`);
+      return result;
     };
   }
 
@@ -78,9 +118,5 @@ export class ActionClient<
 
   input<T extends StandardSchemaV1>(schema: T) {
     return new InputActionClient(this, schema);
-  }
-
-  constructor(middleware: Middleware<TPreviousContext, TNextContext> = []) {
-    this.middleware = middleware;
   }
 }

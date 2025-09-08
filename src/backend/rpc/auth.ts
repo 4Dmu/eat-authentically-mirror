@@ -5,11 +5,13 @@ import { USER_DATA_KV } from "../kv";
 import { getSubTier, SubTier } from "./utils/get-sub-tier";
 import { getUsersProducerIdsCached } from "../data/producer";
 
-export const fetchSubTier = actionClient.action(async (): Promise<SubTier> => {
-  return await getSubTier();
-});
+export const fetchSubTier = actionClient
+  .name("fetchSubTier")
+  .action(async (): Promise<SubTier> => {
+    return await getSubTier();
+  });
 
-export const fetchUser = actionClient.action(async () => {
+export const fetchUser = actionClient.name("fetchUser").action(async () => {
   const { userId } = await auth();
 
   if (!userId) {
@@ -21,12 +23,14 @@ export const fetchUser = actionClient.action(async () => {
   return userData;
 });
 
-export const getLoggedInUserProducerIds = actionClient.action(async () => {
-  const { userId } = await auth();
+export const getLoggedInUserProducerIds = actionClient
+  .name("getLoggedInUserProducerIds")
+  .action(async () => {
+    const { userId } = await auth();
 
-  if (!userId) {
-    return [];
-  }
+    if (!userId) {
+      return [];
+    }
 
-  return await getUsersProducerIdsCached(userId);
-});
+    return await getUsersProducerIdsCached(userId);
+  });
