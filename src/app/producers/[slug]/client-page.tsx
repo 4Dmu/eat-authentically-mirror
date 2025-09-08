@@ -1,6 +1,9 @@
 "use client";
 import { BackButton } from "@/components/back-button";
-import { AddToPinboardButton } from "@/components/pinboard";
+import {
+  AddToPinboardButton,
+  AddToPinboardButtonRedirectToAuth,
+} from "@/components/pinboard";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -38,6 +41,7 @@ import {
 } from "@/utils/reviews";
 import Image from "next/image";
 import { PendingReviewCard, ReviewCard } from "@/components/review-card";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 export function ProducerPageClient(props: {
   producer: PublicProducer;
@@ -198,7 +202,14 @@ export function ProducerPageClient(props: {
       <div className="p-10 flex flex-col gap-5 max-w-7xl mx-auto">
         <div className="flex gap-5 justify-between">
           <BackButton text="Return Home" href="/" />
-          <AddToPinboardButton producerId={producer?.id ?? props.producer.id} />
+          <SignedIn>
+            <AddToPinboardButton
+              producerId={producer?.id ?? props.producer.id}
+            />
+          </SignedIn>
+          <SignedOut>
+            <AddToPinboardButtonRedirectToAuth />
+          </SignedOut>
         </div>
         <div className="flex flex-col lg:flex-row gap-5">
           {producer && (

@@ -9,6 +9,7 @@ import {
 } from "@/utils/pinboard";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function AddToPinboardButton({
   producerId,
@@ -68,6 +69,17 @@ export function AddToPinboardButton({
     >
       {isPinned ? <PinIcon /> : <MapPin />}
       <span>{isPinned ? "Unpin" : "Add to Pinboard"}</span>
+    </Button>
+  );
+}
+
+export function AddToPinboardButtonRedirectToAuth() {
+  return (
+    <Button asChild className={"w-40"} variant={"brandBrown"}>
+      <Link href={"/sign-in"}>
+        <MapPin />
+        <span>Add to Pinboard</span>
+      </Link>
     </Button>
   );
 }
