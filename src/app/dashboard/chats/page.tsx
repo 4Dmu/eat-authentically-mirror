@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { listAllProducersChats, listUserChats } from "@/backend/rpc/messages";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CreditCard } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function MessagesPage() {
   const session = await auth.protect();
@@ -53,11 +56,25 @@ export default async function MessagesPage() {
 
           <BackButton href={"./"} text="Back" />
         </div>
-        {sub !== "Free" && (
+        {sub !== "Free" ? (
           <ChatsPageClient
             userChats={userChats}
             producerChats={producerChats}
           />
+        ) : (
+          <Card className="bg-gray-50">
+            <CardHeader>
+              <CardTitle>Your Chats</CardTitle>
+            </CardHeader>
+            <CardContent className="min-h-40 flex flex-col gap-5">
+              <p>You must be subscribed to send messages to producers.</p>
+              <Button variant={"brandGreen"} asChild>
+                <Link href={"/dashboard/subscribe?mode=community"}>
+                  Subscribe
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
