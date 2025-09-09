@@ -85,6 +85,17 @@ export function ChatsPageClient(props: {
               </p>
             </Link>
           ))}
+          {chatsQuery.data && chatsQuery.data.length === 0 && (
+            <>
+              <p>
+                You dont have any chats yet, message a producer and their chat
+                will appear here.
+              </p>
+              <Link href={"/"} className="underline">
+                Find a producer
+              </Link>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
