@@ -20,7 +20,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { CreditCard, EditIcon } from "lucide-react";
+import { CreditCard, EditIcon, MailIcon, PinIcon } from "lucide-react";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Badge } from "@/components/ui/badge";
 import { NotSubbed } from "@/components/auth/RequireSub";
@@ -176,7 +176,7 @@ export default async function DashboardPage() {
           )}
           <Separator />
           <CardFooter className="flex gap-5 justify-center items-center w-full">
-            <Button className="w-32" asChild>
+            <Button variant={"brandRed"} className="w-32" asChild>
               <Link href={"/dashboard/account"}>
                 <EditIcon /> Account
               </Link>
@@ -185,6 +185,18 @@ export default async function DashboardPage() {
               <Link href={"/dashboard/billing/maybe"}>
                 <CreditCard />
                 Subscription
+              </Link>
+            </Button>
+            <Button variant={"brandGreen"} className="w-32" asChild>
+              <Link href={"/dashboard/chats"}>
+                <MailIcon />
+                Chats
+              </Link>
+            </Button>
+            <Button variant={"brandBrown"} className="w-32" asChild>
+              <Link href={"/dashboard/pinboard"}>
+                <PinIcon />
+                Pinboard
               </Link>
             </Button>
           </CardFooter>
