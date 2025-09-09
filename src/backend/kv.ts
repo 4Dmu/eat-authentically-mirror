@@ -35,6 +35,80 @@ export const USER_COUNT_KV = {
   },
 };
 
+export const USER_MESSAGE_NOTIFICATIONS_KV = {
+  dcrOneClampScript: `
+    local per = KEYS[1]; local tot = KEYS[2]
+    local v = tonumber(redis.call("GET", per) or "0")
+    if v > 0 then
+      v = v - 1
+      redis.call("SET", per, v)
+      local t = tonumber(redis.call("GET", tot) or "0") - 1
+      if t < 0 then t = 0 end
+      redis.call("SET", tot, t)
+      return 1
+    end
+    return 0
+  `,
+
+  resetChatScript: `
+    local per = KEYS[1]; local tot = KEYS[2]
+    local cur = tonumber(redis.call("GET", per) or "0")
+    if cur > 0 then
+      local t = tonumber(redis.call("GET", tot) or "0") - cur
+      if t < 0 then t = 0 end
+      redis.call("SET", tot, t)
+      redis.call("SET", per, 0)
+    end
+    return cur
+  `,
+
+  generatePerChatKey(userId: string, chatId: string) {
+    return `users.${userId}.msg.notif.unread.${chatId}`;
+  },
+
+  generateTotalKey(userId: string) {
+    return `users.${userId}.msg.notif.unread`;
+  },
+
+  async incr(userId: string, chatId: string) {
+    await redis
+      .multi()
+      .incr(this.generatePerChatKey(userId, chatId))
+      .incr(this.generateTotalKey(userId))
+      .exec();
+  },
+
+  async dcr(userId: string, chatId: string) {
+    await redis.eval(
+      this.dcrOneClampScript,
+      [this.generatePerChatKey(userId, chatId), this.generateTotalKey(userId)],
+      [],
+    );
+  },
+
+  async getForChat(userId: string, chatId: string) {
+    return await redis.get<number>(this.generatePerChatKey(userId, chatId));
+  },
+
+  async getTotal(userId: string) {
+    return await redis.get<number>(this.generateTotalKey(userId));
+  },
+
+  async setTotal(userId: string, value: number) {
+    return await redis.set(this.generateTotalKey(userId), value);
+  },
+
+  async setForChat(userId: string, chatId: string, value: number) {
+    return await redis.set(this.generatePerChatKey(userId, chatId), value);
+  },
+
+  async resetChat(userId: string, chatId: string) {
+    const per = this.generatePerChatKey(userId, chatId);
+    const tot = this.generateTotalKey(userId);
+    await redis.eval(this.resetChatScript, [per, tot], []);
+  },
+};
+
 export const USER_DELETED_COUNT_KV = {
   key: `users.deleted-count`,
   async get() {

@@ -18,14 +18,16 @@ import {
   blockProducerChatArgs,
   blockUserChatArgs,
   getProducerChatArgs,
+  getUserChatMessageNotificationsCountArgs,
   getUserOrProducerChatArgs,
   listProducerChatsArgs,
   replyToUserMessageArgs,
+  resetChatNotificationsArgs,
   sendMessageToProducerArgs,
   unblockProducerChatArgs,
   unblockUserChatArgs,
 } from "../validators/messages";
-import { USER_DATA_KV } from "../kv";
+import { USER_DATA_KV, USER_MESSAGE_NOTIFICATIONS_KV } from "../kv";
 
 export const sendMessageToProducer = authenticatedActionClient
   .input(sendMessageToProducerArgs)
@@ -101,6 +103,8 @@ export const sendMessageToProducer = authenticatedActionClient
       updatedAt: new Date(),
     });
 
+    await USER_MESSAGE_NOTIFICATIONS_KV.incr(producer.userId, chat.id);
+
     return chat.id;
   });
 
@@ -157,6 +161,8 @@ export const replyToUserMessage = authenticatedActionClient
         .update(producerChats)
         .set({ updatedAt: new Date() })
         .where(eq(producerChats.id, chat.id));
+
+      await USER_MESSAGE_NOTIFICATIONS_KV.incr(chat.initiatorUserId, chat.id);
     },
   );
 
@@ -488,9 +494,40 @@ export const getUserOrProducerChatMessages = authenticatedActionClient
       return [];
     }
 
-    return await db.query.producerChatMessages.findMany({
+    const result = await db.query.producerChatMessages.findMany({
       where: eq(producerChatMessages.chatId, chat.id),
     });
+
+    await USER_MESSAGE_NOTIFICATIONS_KV.resetChat(userId, chatId);
+    return result;
+  });
+
+export const getUserChatsMessageNotificationsCount = authenticatedActionClient
+  .name("getUserChatMessageNotificationsCount")
+  .action(async ({ userId }) => {
+    return await USER_MESSAGE_NOTIFICATIONS_KV.getTotal(userId);
+  });
+
+export const getUserChatMessageNotificationsCount = authenticatedActionClient
+  .name("getUserChatMessageNotificationsCount")
+  .input(getUserChatMessageNotificationsCountArgs)
+  .action(async ({ ctx: { userId }, input: { chatIds } }) => {
+    const counts: { chatId: string; count: number }[] = [];
+
+    for (const chatId of chatIds) {
+      const count = Number(
+        (await USER_MESSAGE_NOTIFICATIONS_KV.getForChat(userId, chatId)) ?? 0,
+      );
+      counts.push({ chatId, count });
+    }
+
+    return counts;
+  });
+
+export const resetChatNotifications = authenticatedActionClient
+  .input(resetChatNotificationsArgs)
+  .action(async ({ ctx: { userId }, input: { chatId } }) => {
+    await USER_MESSAGE_NOTIFICATIONS_KV.resetChat(userId, chatId);
   });
 
 export type ProducerChat = NonNullable<
@@ -499,4 +536,8 @@ export type ProducerChat = NonNullable<
 
 export type ProducerChatMessage = NonNullable<
   Awaited<ReturnType<typeof getUserOrProducerChatMessages>>
+>[number];
+
+export type ChatNotificationsCount = NonNullable<
+  Awaited<ReturnType<typeof getUserChatMessageNotificationsCount>>
 >[number];

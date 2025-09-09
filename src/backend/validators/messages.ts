@@ -33,8 +33,16 @@ export const getUserOrProducerChatArgs = type({
   chatId: "string",
 });
 
+export const getUserChatMessageNotificationsCountArgs = type({
+  chatIds: "string[]",
+});
+
 export const getProducerChatArgs = type({
   producerId: "string",
+});
+
+export const resetChatNotificationsArgs = type({
+  chatId: "string",
 });
 
 export const listProducerChatsArgs = type({ producerId: "string.uuid" });
@@ -56,3 +64,9 @@ export type UnblockProducerChatArgs = typeof unblockProducerChatArgs.infer;
 export type GetUserOrProducerChatArgs = typeof getUserOrProducerChatArgs.infer;
 
 export type GetProducerChatArgs = typeof getProducerChatArgs.infer;
+
+export type GetUserChatMessageNotificationsCountArgs =
+  typeof getUserChatMessageNotificationsCountArgs.infer;
+
+export type ResetChatNotificationsArgs =
+  typeof resetChatNotificationsArgs.infer;

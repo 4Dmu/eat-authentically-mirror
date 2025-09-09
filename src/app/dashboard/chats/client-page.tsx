@@ -1,12 +1,17 @@
 "use client";
 
 import { ProducerChat } from "@/backend/rpc/messages";
+import { ChatMessageNotifications } from "@/components/message-notifications";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { countListItemsByPropertyValues } from "@/utils/array";
-import { listAllProducersChatsOpts, listUserChatsOpts } from "@/utils/messages";
+import {
+  getUserChatMessageNotificationsCountOpts,
+  listAllProducersChatsOpts,
+  listUserChatsOpts,
+} from "@/utils/messages";
 import { primaryImageUrl } from "@/utils/producers";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { match, P } from "ts-pattern";
@@ -33,6 +38,12 @@ export function ChatsPageClient(props: {
     "producerUserId",
   ).some((entry) => entry[1] > 1);
 
+  const countsQuery = useQuery(
+    getUserChatMessageNotificationsCountOpts({
+      chatIds: chatsQuery.data.map((c) => c.id),
+    }),
+  );
+
   return (
     <div>
       <Card className="bg-gray-50">
@@ -44,7 +55,7 @@ export function ChatsPageClient(props: {
             <Link
               href={`/dashboard/chats/${chat.id}`}
               key={chat.id}
-              className="bg-background p-2 rounded-lg border flex gap-5 items-center"
+              className="bg-background p-2 rounded-lg border flex gap-5 items-center relative"
             >
               {match(chat)
                 .with({ initiatorUserName: P.nonNullable }, (v) => (
@@ -83,6 +94,11 @@ export function ChatsPageClient(props: {
               <p className="ml-auto">
                 {formatDistance(chat.updatedAt, new Date())}
               </p>
+              <ChatMessageNotifications
+                chatId={chat.id}
+                counts={countsQuery.data}
+                className="absolute -top-2 -right-2"
+              />
             </Link>
           ))}
           {chatsQuery.data && chatsQuery.data.length === 0 && (

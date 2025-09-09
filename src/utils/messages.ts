@@ -13,13 +13,19 @@ import {
   blockProducerChat,
   unblockProducerChat,
   getProducerChat,
+  getUserChatMessageNotificationsCount,
+  getUserChatsMessageNotificationsCount,
+  ChatNotificationsCount,
+  resetChatNotifications,
 } from "@/backend/rpc/messages";
 import {
   BlockProducerChatArgs,
   BlockUserChatArgs,
   GetProducerChatArgs,
+  GetUserChatMessageNotificationsCountArgs,
   ListProducerChatsArgs,
   ReplyToUserMessageArgs,
+  ResetChatNotificationsArgs,
   SendMessageToProducerArgs,
   UnblockProducerChatArgs,
   UnblockUserChatArgs,
@@ -31,6 +37,7 @@ import {
   QueryOptions,
   queryOptions,
 } from "@tanstack/react-query";
+import { ar } from "zod/v4/locales";
 
 type MutationOpts<T, T2, T3, T4> = Omit<
   MutationOptions<T, T2, T3, T4>,
@@ -182,5 +189,48 @@ export const getUserOrProducerChatMessagesOpts = (
     ...opts,
     queryKey: ["chat-messages", chatId],
     queryFn: () => getUserOrProducerChatMessages({ chatId: chatId }),
-    refetchInterval: 1000,
+    refetchInterval: 1000 * 10,
+  });
+
+export const getUserChatsMessageNotificationsCountOpts = (
+  userId: string | undefined | null,
+  opts?: QueryOpts<number | null, Error, number | null, string[]>,
+) =>
+  queryOptions({
+    ...opts,
+    queryKey: ["user-chats-message-notifications"],
+    queryFn: async () => await getUserChatsMessageNotificationsCount(),
+    refetchInterval: 1000 * 60,
+    enabled: userId != null && userId !== undefined,
+  });
+
+export const getUserChatMessageNotificationsCountOpts = (
+  args: GetUserChatMessageNotificationsCountArgs,
+  opts?: QueryOpts<
+    ChatNotificationsCount[],
+    Error,
+    ChatNotificationsCount[],
+    (
+      | string
+      | {
+          chatIds: string[];
+        }
+    )[]
+  >,
+) =>
+  queryOptions({
+    ...opts,
+    queryKey: ["user-chat-message-notifications", args],
+    queryFn: async () => await getUserChatMessageNotificationsCount(args),
+    refetchInterval: 1000 * 60,
+  });
+
+export const resetChatNotificationsOpts = (
+  opts?: MutationOpts<void, Error, ResetChatNotificationsArgs, unknown>,
+) =>
+  mutationOptions({
+    ...opts,
+    mutationKey: ["reset-chat-notifications"],
+    mutationFn: async (args: ResetChatNotificationsArgs) =>
+      await resetChatNotifications(args),
   });

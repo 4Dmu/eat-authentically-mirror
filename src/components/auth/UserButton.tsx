@@ -18,6 +18,10 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { UserJSON } from "@clerk/backend";
 import { useSubTier } from "@/hooks/use-sub-tier";
+import { useQuery } from "@tanstack/react-query";
+import { getUserChatMessageNotificationsCountOpts } from "@/utils/messages";
+import { MessageNotifications } from "../message-notifications";
+import { Suspense } from "react";
 
 export function UserButton({
   subTierFromServer,
@@ -38,14 +42,15 @@ export function UserButton({
 
   return (
     <Popover>
-      <PopoverTrigger className="rounded-full overflow-hidden w-7 h-7 data-[state=open]:ring-3 ring-black/10">
+      <PopoverTrigger className="rounded-full relative w-7 h-7 data-[state=open]:ring-3 ring-black/10">
         <Image
-          className="w-full h-full"
+          className="w-full h-full rounded-full"
           width={28}
           height={28}
           alt=""
           src={"image_url" in user ? user.image_url : user.imageUrl}
         />
+        <MessageNotifications className="absolute -top-2 -right-2" />
       </PopoverTrigger>
       <PopoverContent
         className="w-[unset] min-w-xs flex flex-col gap-3 rounded-lg p-5"
@@ -101,11 +106,12 @@ export function UserButton({
         <Button
           asChild
           variant={"ghost"}
-          className="w-full justify-start gap-5"
+          className="w-full justify-start gap-5 relative"
         >
           <Link href="/dashboard/chats">
             <SendIcon />
             <p>Chats</p>
+            <MessageNotifications className="ml-auto" />
           </Link>
         </Button>
         <Separator />
