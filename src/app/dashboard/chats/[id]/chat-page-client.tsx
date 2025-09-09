@@ -146,6 +146,7 @@ export function ChatPageClient(props: {
         message: message,
       });
     }
+
     startTransition(() => {
       addMessageOptimistic({
         id: crypto.randomUUID(),
@@ -155,8 +156,9 @@ export function ChatPageClient(props: {
         updatedAt: new Date(),
         chatId: chatQuery.data!.id,
       });
-      setMessage("");
     });
+
+    setMessage("");
   }
 
   const chatIsBlocked =
@@ -281,10 +283,11 @@ export function ChatPageClient(props: {
                   disabled={chatIsBlocked}
                   value={message}
                   onChange={(e) => setMessage(e.currentTarget.value)}
-                  className="h-9 resize-none bg-muted"
+                  className="w-full  resize-none"
                   placeholder="Message..."
                 />
                 <Button
+                  className="self-end"
                   onClick={sendMessage}
                   disabled={chatIsBlocked || messageIsInvalid}
                 >
