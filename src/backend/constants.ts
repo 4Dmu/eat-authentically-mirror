@@ -1,3 +1,5 @@
+import { Plan } from "./stripe/subscription-plans";
+
 export const CLAIM_DNS_TXT_RECORD_NAME = "ea-verify";
 
 export const CUSTOM_GEO_HEADER_NAME = "x-custom-geo";
@@ -32,3 +34,25 @@ export const PREMIUM_TIER_PROS = [
 ];
 
 export const HOME_PAGE_RESULT_LIMIT = 50;
+
+export const PRODUCER_CERT_LIMIT_BY_TIER: Record<
+  "Free" | Plan["tier"],
+  number
+> = {
+  Free: 1,
+  community: 1,
+  pro: 6,
+  premium: 10,
+  enterprise: 999, // effectively unlimited
+};
+
+export const PRODUCER_PRODUCTS_LIMIT_BY_TIER: Record<
+  "Free" | Plan["tier"],
+  number
+> = {
+  Free: 1,
+  community: 1,
+  pro: 10,
+  premium: 999, // effectively unlimited
+  enterprise: 999, // effectively unlimited
+};

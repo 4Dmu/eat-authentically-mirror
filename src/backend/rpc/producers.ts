@@ -46,7 +46,11 @@ import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
-import { CLAIM_DNS_TXT_RECORD_NAME } from "../constants";
+import {
+  CLAIM_DNS_TXT_RECORD_NAME,
+  PRODUCER_CERT_LIMIT_BY_TIER,
+  PRODUCER_PRODUCTS_LIMIT_BY_TIER,
+} from "../constants";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
 import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
@@ -199,6 +203,8 @@ export const editProducer = producerActionClient
       throw new Error("Unauthorized");
     }
 
+    const subTier = await getSubTier(userId);
+
     const toUpdate: Partial<Producer> = {};
 
     if (input.name) {
@@ -244,49 +250,58 @@ export const editProducer = producerActionClient
           },
         })
         .then((r) => withCertifications(r ? [r] : [])[0]?.certifications ?? []);
+      const tier = subTier == "Free" ? "Free" : subTier.tier;
+      const maxCerts = PRODUCER_CERT_LIMIT_BY_TIER[tier];
 
-      if (currentCertifications && currentCertifications.length > 0) {
-        const addedCerts = updatedCertifications.filter(
-          (cert) =>
-            !currentCertifications.some((oldCert) => oldCert.id === cert.id),
-        );
-        const removedCerts = currentCertifications.filter(
-          (cert) => !updatedCertifications.some((c) => c.id === cert.id),
-        );
+      const addedCerts = updatedCertifications.filter(
+        (cert) =>
+          !currentCertifications.some((oldCert) => oldCert.id === cert.id),
+      );
+      const removedCerts = currentCertifications.filter(
+        (cert) => !updatedCertifications.some((c) => c.id === cert.id),
+      );
 
-        try {
-          if (addedCerts.length > 0) {
-            await db.insert(certificationsToProducers).values(
-              addedCerts.map((cert) => ({
-                listingId: producer.id,
-                certificationId: cert.id,
-              })),
-            );
-          }
+      const projectedCount =
+        currentCertifications.length + addedCerts.length - removedCerts.length;
+
+      if (projectedCount > maxCerts) {
+        throw new Error(
+          `Your current plan ("${tier}") allows only ${maxCerts} certifications.`,
+        );
+      }
+
+      try {
+        if (addedCerts.length > 0) {
+          await db.insert(certificationsToProducers).values(
+            addedCerts.map((cert) => ({
+              listingId: producer.id,
+              certificationId: cert.id,
+            })),
+          );
+        }
+        if (removedCerts.length > 0) {
           await db.delete(certificationsToProducers).where(
             inArray(
               certificationsToProducers.certificationId,
               removedCerts.map((c) => c.id),
             ),
           );
-        } catch (err) {
-          console.log(err);
         }
-      } else {
-        try {
-          await db.insert(certificationsToProducers).values(
-            input.certifications.map((cert) => ({
-              listingId: producer.id,
-              certificationId: cert.id,
-            })),
-          );
-        } catch (err) {
-          console.log(err);
-        }
+      } catch (err) {
+        console.log(err);
       }
     }
 
     if (input.commodities) {
+      const tier = subTier == "Free" ? "Free" : subTier.tier;
+      const maxProducts = PRODUCER_PRODUCTS_LIMIT_BY_TIER[tier];
+
+      if (input.commodities.length > maxProducts) {
+        throw new Error(
+          `Your current plan ("${tier}") allows only ${maxProducts} products.`,
+        );
+      }
+
       toUpdate.commodities = input.commodities;
     }
 
