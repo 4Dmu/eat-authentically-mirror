@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -8,8 +7,9 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogFooter,
+  DialogClose,
 } from "./ui/dialog";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { registerProducer } from "@/backend/rpc/producers";
 import {
   PRODUCER_TYPES,
@@ -37,15 +37,16 @@ export function AddProducerDialog({
   open?: boolean;
   onOpenChange?: (val: boolean) => void;
 }) {
-  const router = useRouter();
+  const client = useQueryClient();
   const registerProducerMutation = useMutation({
     mutationKey: ["register-producer"],
     mutationFn: async (data: RegisterProducerArgs) => {
       return await registerProducer(data);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Producer created successfully.");
-      router.refresh();
+      client.invalidateQueries({ queryKey: ["fetch-user-producers"] });
+      onOpenChange?.(false);
     },
     onError(e) {
       toast.error(e.message);
