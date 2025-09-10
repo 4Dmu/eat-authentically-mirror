@@ -42,9 +42,8 @@ class InputActionClient<
     }) => TResult | Promise<TResult>,
   ) {
     return async (input: StandardSchemaV1.InferInput<TSchema>) => {
-      const reqId = makeReqId();
       const actionName = this.client.actionName ?? "anonymous";
-      console.log(`[ACTION ${actionName} ${reqId}] start`);
+      console.log(`[ACTION ${actionName}] start`);
 
       const ctx = await this.client.resolveCtx();
 
@@ -57,7 +56,7 @@ class InputActionClient<
 
       const response = await fn({ ctx, input: result.value });
 
-      console.log(`[ACTION ${actionName} ${reqId}] end`);
+      console.log(`[ACTION ${actionName}] end`);
 
       return response;
     };
@@ -95,14 +94,13 @@ export class ActionClient<
 
   action<TResult>(fn: (ctx: TNextContext) => TResult | Promise<TResult>) {
     return async () => {
-      const reqId = makeReqId();
       const actionName = this.actionName ?? "anonymous";
-      console.log(`[ACTION ${actionName} ${reqId}] start`);
+      console.log(`[ACTION ${actionName}] start`);
 
       const ctx = await this.resolveCtx();
       const result = await fn(ctx);
 
-      console.log(`[ACTION ${actionName} ${reqId}] end`);
+      console.log(`[ACTION ${actionName}] end`);
       return result;
     };
   }
