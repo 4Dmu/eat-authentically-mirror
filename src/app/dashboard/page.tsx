@@ -69,7 +69,7 @@ export default async function DashboardPage() {
         <Card className="">
           <CardHeader className="flex flex-col items-center gap-5">
             <Image
-              className="rounded-full"
+              className="rounded-full aspect-square object-cover"
               width={100}
               height={100}
               alt="profile img"
@@ -102,26 +102,20 @@ export default async function DashboardPage() {
               <Link href={"/dashboard/billing"}>Subscription</Link>
             </div>*/}
           </CardHeader>
-          {(subTier === "Free" || subTier.tier !== "enterprise") && (
-            <>
-              <Separator />
-              <CardContent>
-                <Card className="bg-[#DCFCE7] shadow-none">
-                  <CardHeader>
-                    <CardTitle>Upgrade</CardTitle>
-                    <CardDescription>
-                      {subTier == "Free"
-                        ? "Upgrade to a payed subscription to unlock our best features."
-                        : "Upgrade to a payed producer subscription to increase search revelence, add extra images and even video."}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent
-                    className={cn(
-                      "grid gap-10",
-                      subTier === "Free" ? "grid-cols-2" : "",
-                    )}
-                  >
-                    <NotSubbed initialSubTier={subTier}>
+          {match(subTier)
+            .with("Free", (r) => (
+              <>
+                <Separator />
+                <CardContent>
+                  <Card className="bg-[#DCFCE7] shadow-none">
+                    <CardHeader>
+                      <CardTitle>Upgrade</CardTitle>
+                      <CardDescription>
+                        Upgrade to a payed subscription to unlock our best
+                        features.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className={cn("grid gap-10 grid-cols-2")}>
                       <div className="flex flex-col gap-2">
                         <p>
                           For food enthusiasts who want to connect and engage.
@@ -132,50 +126,108 @@ export default async function DashboardPage() {
                           </Link>
                         </Button>
                       </div>
-                    </NotSubbed>
-                    {match(subTier)
-                      .with("Free", { tier: "community" }, () => (
-                        <div className="flex flex-col gap-2">
-                          <p>
-                            For businesses who want to grow their reach and
-                            sales.
-                          </p>
-                          <Button variant={"brandGreen"}>
-                            <Link
-                              href={
-                                subTier === "Free"
-                                  ? "/dashboard/subscribe?mode=producer"
-                                  : "/dashboard/billing"
-                              }
-                            >
-                              Upgrade to Producer tier
-                            </Link>
-                          </Button>
-                        </div>
-                      ))
-                      .otherwise(() => (
-                        <div className="flex flex-col gap-2 col-span-2">
-                          <p>Upgrade to the</p>
-                          <Button variant={"brandGreen"}>
-                            <Link
-                              href={
-                                subTier === "Free"
-                                  ? "/dashboard/subscribe?mode=producer"
-                                  : "/dashboard/billing"
-                              }
-                            >
-                              Upgrade Your Subscription
-                            </Link>
-                          </Button>
-                        </div>
-                      ))}
-                  </CardContent>
-                </Card>
-              </CardContent>
-            </>
-          )}
+                      <div className="flex flex-col gap-2">
+                        <p>
+                          For businesses who want to grow their reach and sales.
+                        </p>
+                        <Button variant={"brandGreen"}>
+                          <Link href={"/dashboard/subscribe?mode=producer"}>
+                            Upgrade to Producer tier
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </>
+            ))
+            .with({ tier: "community" }, (r) => (
+              <>
+                <Separator />
+                <CardContent>
+                  <Card className="bg-[#DCFCE7] shadow-none">
+                    <CardHeader>
+                      <CardTitle>Upgrade</CardTitle>
+                      <CardDescription>
+                        Want more then 1 image or 3 certifications? Upgrade to
+                        the pro tier or higher.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className={"grid gap-10"}>
+                      <div className="flex flex-col gap-2 col-span-2">
+                        <p>Upgrade to the</p>
+                        <Button variant={"brandGreen"}>
+                          <Link
+                            href={
+                              subTier === "Free"
+                                ? "/dashboard/subscribe?mode=producer"
+                                : "/dashboard/billing"
+                            }
+                          >
+                            Upgrade Your Subscription
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </>
+            ))
+            .with({ tier: "pro" }, (r) => (
+              <>
+                <Separator />
+                <CardContent>
+                  <Card className="bg-[#DCFCE7] shadow-none">
+                    <CardHeader>
+                      <CardTitle>Upgrade</CardTitle>
+                      <CardDescription>
+                        Want to add more images and certifications, a priority
+                        results slot or a video? Upgrade to the premium tier.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className={"grid gap-10"}>
+                      <div className="flex flex-col gap-2 col-span-2">
+                        <Button variant={"brandGreen"}>
+                          <Link href={"/dashboard/billing"}>
+                            Upgrade Your Subscription
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </>
+            ))
+            .with({ tier: "premium" }, (r) => (
+              <>
+                <Separator />
+                <CardContent>
+                  <Card className="bg-[#DCFCE7] shadow-none">
+                    <CardHeader>
+                      <CardTitle>Upgrade</CardTitle>
+                      <CardDescription>
+                        Need more then one producer? Upgrade to the enterprise
+                        tier to add more than one producer.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className={"grid gap-10"}>
+                      <div className="flex flex-col gap-2 col-span-2">
+                        <Button variant={"brandGreen"}>
+                          <Link href={"/dashboard/billing"}>
+                            Upgrade Your Subscription
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </>
+            ))
+            .otherwise(() => (
+              <></>
+            ))}
           <Separator />
-          <CardFooter className="flex gap-5 justify-center items-center w-full">
+          <CardFooter className="flex gap-5 justify-center items-center w-full flex-wrap">
             <Button variant={"brandRed"} className="w-32" asChild>
               <Link href={"/dashboard/account"}>
                 <EditIcon /> Account
