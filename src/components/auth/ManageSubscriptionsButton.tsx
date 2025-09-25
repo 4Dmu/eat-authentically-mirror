@@ -1,18 +1,15 @@
 import { Button } from "../ui/button";
 import { Landmark } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { billingPortableMutationOpts } from "@/utils/stripe";
+import { useBillingPortableMutation } from "@/utils/stripe";
 
 export function ManageSubscriptionsButton() {
-  const createBillingPortalSessionMutation = useMutation(
-    billingPortableMutationOpts({
-      onSuccess: (url) => {
-        window.location.href = url;
-      },
-      onError: (err) => toast.error(err.message),
-    })
-  );
+  const createBillingPortalSessionMutation = useBillingPortableMutation({
+    onSuccess: (url) => {
+      window.location.href = url;
+    },
+    onError: (err) => toast.error(err.message),
+  });
 
   return (
     <Button

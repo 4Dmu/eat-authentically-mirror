@@ -8,7 +8,6 @@ import { CertificationsForm } from "./sub-forms/certifications-form";
 import { ProductsForm } from "./sub-forms/products-form";
 import { AddressForm } from "./sub-forms/address-form";
 import { SaveButton } from "./save-button";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   useDeleteVideo,
   useEditUserProducer,

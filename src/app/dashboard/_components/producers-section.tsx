@@ -19,7 +19,7 @@ import {
   primaryImageUrl,
   producerSlugFull,
 } from "@/utils/producers";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { BuildingIcon, EyeIcon, EditIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

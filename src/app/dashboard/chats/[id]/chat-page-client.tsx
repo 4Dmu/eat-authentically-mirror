@@ -26,7 +26,6 @@ import {
   useUnblockUserChat,
 } from "@/utils/messages";
 import { primaryImageUrl } from "@/utils/producers";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { Shield, ShieldOff } from "lucide-react";
 import { startTransition, useMemo, useOptimistic, useState } from "react";
 import { toast } from "sonner";

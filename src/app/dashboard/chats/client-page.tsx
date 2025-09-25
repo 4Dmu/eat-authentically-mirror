@@ -11,7 +11,6 @@ import {
   useUserChats,
 } from "@/utils/messages";
 import { primaryImageUrl } from "@/utils/producers";
-import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { useMemo } from "react";

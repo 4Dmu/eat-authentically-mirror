@@ -2,7 +2,6 @@
 
 import type { PinboardFull } from "@/backend/rpc/pinboard";
 import { useUserPinboardFull, useUpdateUserPinboard } from "@/utils/pinboard";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Breadcrumb,
   BreadcrumbItem,

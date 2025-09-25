@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { Button } from "./ui/button";
 import { MapPin, PinIcon } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   useAddToPinboard,
   useUserPinboardFull,
