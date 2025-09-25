@@ -10,8 +10,8 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { reviewProducerOpts } from "@/utils/reviews";
+import { useQueryClient } from "@tanstack/react-query";
+import { useReviewProducer } from "@/utils/reviews";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { Star } from "lucide-react";
@@ -35,18 +35,16 @@ export function ReviewProducerDialog({
 
   const actualMessage = useMemo(() => message.trim(), [message]);
 
-  const reviewProducerMt = useMutation(
-    reviewProducerOpts({
-      onSettled: async () => {
-        setMessage("");
-        setRating(0);
-        await queryClient.invalidateQueries({
-          queryKey: ["reviews", producer.id],
-        });
-      },
-      onError: (e) => toast.error(e.message),
-    }),
-  );
+  const reviewProducerMt = useReviewProducer({
+    onSettled: async () => {
+      setMessage("");
+      setRating(0);
+      await queryClient.invalidateQueries({
+        queryKey: ["reviews", producer.id],
+      });
+    },
+    onError: (e) => toast.error(e.message),
+  });
 
   async function submit() {
     // onCreatedOptimistic?.({ message: actualMessage, rating: rating });

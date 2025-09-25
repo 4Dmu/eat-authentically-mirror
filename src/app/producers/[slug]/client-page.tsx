@@ -34,9 +34,8 @@ import {
 import { MapCard } from "@/components/map-card";
 import { cn } from "@/lib/utils";
 import { PublicProducer } from "@/backend/validators/producers";
-import { useQuery } from "@tanstack/react-query";
 import {
-  listReviewsPublicOpts,
+  useReviewsPublic,
   useReviewProducerPendingState,
 } from "@/utils/reviews";
 import Image from "next/image";
@@ -49,7 +48,7 @@ export function ProducerPageClient(props: {
   userProducerIds: string[];
 }) {
   const { data: producer } = useProducerPublic(props.producer.id);
-  const reviews = useQuery(listReviewsPublicOpts(props.producer.id));
+  const reviews = useReviewsPublic(props.producer.id);
   const pendingReviews = useReviewProducerPendingState();
 
   const hasAddress =

@@ -11,34 +11,55 @@ import {
   UpdateReviewArgs,
 } from "@/backend/validators/reviews";
 import {
-  MutationOptions,
-  mutationOptions,
-  queryOptions,
+  useMutation,
+  UseMutationOptions,
   useMutationState,
+  useQuery,
+  UseQueryOptions,
 } from "@tanstack/react-query";
 
-type MutationOpts<T, T2, T3, T4> = Omit<
-  MutationOptions<T, T2, T3, T4>,
-  "mutationFn" | "mutationKey"
->;
+// --- mutations ---
 
-export const reviewProducerOpts = (
-  opts?: MutationOpts<ReviewSelect, Error, ReviewProducerArgs, unknown>,
-) =>
-  mutationOptions({
+export function useReviewProducer(
+  opts?: Omit<
+    UseMutationOptions<ReviewSelect, Error, ReviewProducerArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["review-producer"],
+    mutationKey: ["review-producer"] as const,
     mutationFn: (args: ReviewProducerArgs) => reviewProducer(args),
   });
+}
 
-export const deleteReviewOpts = (
-  opts?: MutationOpts<void, Error, DeleteReviewArgs, unknown>,
-) =>
-  mutationOptions({
+export function useDeleteReview(
+  opts?: Omit<
+    UseMutationOptions<void, Error, DeleteReviewArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["delete-review"],
+    mutationKey: ["delete-review"] as const,
     mutationFn: (args: DeleteReviewArgs) => deleteReview(args),
   });
+}
+
+export function useUpdateReview(
+  opts?: Omit<
+    UseMutationOptions<void, Error, UpdateReviewArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["update-review"] as const,
+    mutationFn: (args: UpdateReviewArgs) => updateReview(args),
+  });
+}
+
+// --- mutation state (pending tracking) ---
 
 export function useReviewProducerPendingState() {
   return useMutationState<ReviewProducerArgs>({
@@ -47,17 +68,23 @@ export function useReviewProducerPendingState() {
   });
 }
 
-export const listReviewsPublicOpts = (producerId: string) =>
-  queryOptions({
-    queryKey: ["reviews", producerId],
+// --- queries ---
+
+export function useReviewsPublic(
+  producerId: string,
+  opts?: Omit<
+    UseQueryOptions<
+      ReviewSelect[],
+      Error,
+      ReviewSelect[],
+      readonly [string, string]
+    >,
+    "queryKey" | "queryFn"
+  >
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["reviews", producerId] as const,
     queryFn: () => listReviewsPublic({ producerId }),
   });
-
-export const updateReviewOpts = (
-  opts?: MutationOpts<void, Error, UpdateReviewArgs, unknown>,
-) =>
-  mutationOptions({
-    ...opts,
-    mutationKey: ["update-review"],
-    mutationFn: (args: UpdateReviewArgs) => updateReview(args),
-  });
+}

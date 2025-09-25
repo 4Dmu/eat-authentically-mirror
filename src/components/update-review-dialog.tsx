@@ -9,8 +9,8 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateReviewOpts } from "@/utils/reviews";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUpdateReview } from "@/utils/reviews";
 import { ReviewSelect } from "@/backend/db/schema";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
@@ -34,16 +34,14 @@ export function UpdateReviewDialog({
 
   const actualMessage = useMemo(() => message.trim(), [message]);
 
-  const updateReviewMt = useMutation(
-    updateReviewOpts({
-      onSettled: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: ["reviews", review.producerId],
-        });
-      },
-      onError: (e) => toast.error(e.message),
-    }),
-  );
+  const updateReviewMt = useUpdateReview({
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["reviews", review.producerId],
+      });
+    },
+    onError: (e) => toast.error(e.message),
+  });
 
   async function submit() {
     updateReviewMt.mutate({
