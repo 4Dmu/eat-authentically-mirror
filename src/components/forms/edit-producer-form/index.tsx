@@ -10,12 +10,12 @@ import { AddressForm } from "./sub-forms/address-form";
 import { SaveButton } from "./save-button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  deleteVideoOpts,
-  editUserProducerOpts,
-  loggedInUserProducerOptions,
-  updateExistingImagesOpts,
-  uploadImagesOpts,
-  uploadVideoOpts,
+  useDeleteVideo,
+  useEditUserProducer,
+  useLoggedInUserProducer,
+  useUpdateExistingImages,
+  useUploadImages,
+  useUploadVideo,
 } from "@/utils/producers";
 import { toast } from "sonner";
 import * as R from "remeda";
@@ -31,24 +31,20 @@ export function ProducerEditForm(props: {
   tier: SubTier;
   certifications: Certification[];
 }) {
-  const producerQuery = useQuery(
-    loggedInUserProducerOptions(props.producer.id, {
-      initialData: props.producer,
-    })
-  );
+  const producerQuery = useLoggedInUserProducer(props.producer.id, {
+    initialData: props.producer,
+  });
 
-  const editUserListingMutation = useMutation(
-    editUserProducerOpts({
-      onError(err) {
-        toast.error(err.message);
-      },
-    })
-  );
+  const editUserListingMutation = useEditUserProducer({
+    onError(err) {
+      toast.error(err.message);
+    },
+  });
 
-  const uploadImagesMutation = useMutation(uploadImagesOpts());
-  const uploadVideoMutation = useMutation(uploadVideoOpts());
-  const deleteVideoMutation = useMutation(deleteVideoOpts());
-  const updateExisingImagesMutation = useMutation(updateExistingImagesOpts());
+  const uploadImagesMutation = useUploadImages();
+  const uploadVideoMutation = useUploadVideo();
+  const deleteVideoMutation = useDeleteVideo();
+  const updateExisingImagesMutation = useUpdateExistingImages();
 
   const form = useAppForm({
     defaultValues: {

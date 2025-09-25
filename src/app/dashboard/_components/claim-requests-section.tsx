@@ -8,8 +8,7 @@ import {
   CardAction,
   CardContent,
 } from "@/components/ui/card";
-import { listClaimRequestsOpts } from "@/utils/producers";
-import { useQuery } from "@tanstack/react-query";
+import { useListClaimRequests } from "@/utils/producers";
 import { BuildingIcon } from "lucide-react";
 
 export function ClaimRequestsSection({
@@ -17,7 +16,7 @@ export function ClaimRequestsSection({
 }: {
   claims: PublicClaimRequest[];
 }) {
-  const { data } = useQuery(listClaimRequestsOpts({ initialData: claims }));
+  const { data } = useListClaimRequests({ initialData: claims });
 
   if (data?.length === 0) {
     return null;

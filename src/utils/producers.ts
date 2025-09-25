@@ -5,6 +5,11 @@ import {
   QueryClient,
   QueryOptions,
   queryOptions,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
 } from "@tanstack/react-query";
 import {
   confirmPengingUpload,
@@ -47,6 +52,51 @@ type SimpleMutationOps<TData, TArgs> = Omit<
   "mutationFn" | "mutationKey"
 >;
 
+type QOpts<T, T2, T3, T4 extends readonly unknown[]> = Omit<
+  QueryOptions<T, T2, T3, T4>,
+  "queryKey" | "queryFn"
+>;
+
+type LoggedInUserProducersOptions = QueryOptions<
+  Producer[],
+  Error,
+  Producer[],
+  string[]
+>;
+
+type LoggedInUserProducerOptions = QueryOptions<
+  Producer | undefined,
+  Error,
+  Producer | undefined,
+  string[]
+>;
+
+type EditProducerOpts = MutationOptions<void, Error, EditProducerArgs, unknown>;
+
+type ClaimProducerOpts = MutationOptions<
+  void,
+  Error,
+  ClaimProducerArgs,
+  unknown
+>;
+
+/**
+ * Additional user provided mutation opts for `checkClaimDomainDnsOpts`
+ */
+type CheckClaimDomainDnsOpts = MutationOptions<
+  string,
+  Error,
+  CheckClaimDomainDnsArgs,
+  unknown
+>;
+
+type VerifyClaimPhoneOpts = MutationOptions<
+  string,
+  Error,
+  VerifyClaimPhoneArgs,
+  unknown
+>;
+
 /**
  * Gets the image url of the primary image.
  * Fallsback through:
@@ -57,7 +107,7 @@ type SimpleMutationOps<TData, TArgs> = Omit<
 export function primaryImageUrl(producer: Pick<Producer, "images">) {
   return (
     producer.images?.items.find(
-      (i) => i.cloudflareId === producer.images.primaryImgId,
+      (i) => i.cloudflareId === producer.images.primaryImgId
     )?.cloudflareUrl ??
     producer.images?.items[0]?.cloudflareUrl ??
     "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"
@@ -74,7 +124,7 @@ export function primaryImageUrl(producer: Pick<Producer, "images">) {
  */
 export function producerSlug(name: string) {
   return encodeURIComponent(
-    `${name.toLowerCase().trim().split(" ").join("-")}-`,
+    `${name.toLowerCase().trim().split(" ").join("-")}-`
   );
 }
 
@@ -92,100 +142,97 @@ export function producerSlugFull(producer: Pick<Producer, "name" | "id">) {
   }`;
 }
 
-export const producersQueryOptions = (
+export function useProducers(
   args: ListProducerArgsBeforeValidate,
   initialData?: {
     data: PublicProducerLight[];
     hasNextPage: boolean;
     count: number;
-  },
-) =>
-  queryOptions({
-    queryKey: ["producers", args],
+  }
+) {
+  const gate = match(args)
+    .with(
+      {
+        page: 0,
+        certs: [],
+        type: P.nullish.optional(),
+        query: P.nullish.optional(),
+        locationSearchArea: P.nullish.optional(),
+        claimed: P.nullish.optional(),
+        userIpGeo: P.nullish.optional(),
+      },
+      () => ({ initialData })
+    )
+    .otherwise(() => ({}));
+
+  return useQuery({
+    queryKey: ["producers", args] as const,
     queryFn: () => listProducersPublicLight(args),
     placeholderData: keepPreviousData,
-    ...match(args)
-      .with(
-        {
-          page: 0,
-          certs: [],
-          type: P.nullish.optional(),
-          query: P.nullish.optional(),
-          locationSearchArea: P.nullish.optional(),
-          claimed: P.nullish.optional(),
-          userIpGeo: P.nullish.optional(),
-        },
-        () => ({ initialData }),
-      )
-      .otherwise(() => ({})),
+    ...gate,
   });
+}
 
-export const producersFullQueryOptions = (
+export function useProducersFull(
   args: ListProducerArgsBeforeValidate,
-  initialData?: { data: PublicProducer[]; hasNextPage: boolean; count: number },
-) =>
-  queryOptions({
-    queryKey: ["producers", "full", args],
+  initialData?: { data: PublicProducer[]; hasNextPage: boolean; count: number }
+) {
+  const gate = match(args)
+    .with(
+      {
+        page: 0,
+        certs: [],
+        type: P.nullish.optional(),
+        query: P.nullish.optional(),
+        locationSearchArea: P.nullish.optional(),
+        claimed: P.nullish.optional(),
+        userIpGeo: P.nullish.optional(),
+      },
+      () => ({ initialData })
+    )
+    .otherwise(() => ({}));
+
+  return useQuery({
+    queryKey: ["producers", "full", args] as const,
     queryFn: () => listProducersPublic(args),
     placeholderData: keepPreviousData,
-    ...match(args)
-      .with(
-        {
-          page: 0,
-          certs: [],
-          type: P.nullish.optional(),
-          query: P.nullish.optional(),
-          locationSearchArea: P.nullish.optional(),
-          claimed: P.nullish.optional(),
-          userIpGeo: P.nullish.optional(),
-        },
-        () => ({ initialData }),
-      )
-      .otherwise(() => ({})),
+    ...gate,
   });
+}
 
-export const producerPublicOpts = (
+export function useProducerPublic(
   producerId: string,
-  opts?: Omit<
-    QueryOptions<
-      PublicProducer | undefined,
-      Error,
-      PublicProducer | undefined,
-      string[]
-    >,
-    "queryKey" | "queryFn"
-  >,
-) =>
-  queryOptions({
+  opts?: UseQueryOptions<
+    PublicProducer | undefined,
+    Error,
+    PublicProducer | undefined,
+    readonly [string, string]
+  >
+) {
+  return useQuery({
     ...opts,
-    queryKey: ["producer", producerId],
+    queryKey: ["producer", producerId] as const,
     queryFn: async () => {
-      const producer = getProducerPublic({ id: producerId });
-      if (!producer) {
-        throw new Error("Producer not found");
-      }
+      const producer = await getProducerPublic({ id: producerId });
+      if (!producer) throw new Error("Producer not found");
       return producer;
     },
     placeholderData: keepPreviousData,
   });
+}
 
-export const certificationTypesOptions = () =>
-  queryOptions({
-    queryKey: ["certification-types"],
+export function useCertificationTypes() {
+  return useQuery({
+    queryKey: ["certification-types"] as const,
     queryFn: () => listCertificationTypesPublic(),
     staleTime: 24 * 60 * 60 * 1000, // 24h
     gcTime: 7 * 24 * 60 * 60 * 1000,
   });
+}
 
-type LoggedInUserProducersOptions = QueryOptions<
-  Producer[],
-  Error,
-  Producer[],
-  string[]
->;
-export const loggedInUserProducersOptions = (
+export function useLoggedInUserProducers(
   opts?: Pick<
-    LoggedInUserProducersOptions,
+    UseQueryOptions<Producer[], Error, Producer[], readonly [string]>,
     | "initialData"
     | "networkMode"
     | "persister"
@@ -194,25 +241,24 @@ export const loggedInUserProducersOptions = (
     | "meta"
     | "retry"
     | "retryDelay"
-  >,
-) =>
-  queryOptions({
+  >
+) {
+  return useQuery({
     ...opts,
-    queryKey: ["logged-in-user-producers"],
+    queryKey: ["logged-in-user-producers"] as const,
     queryFn: () => fetchUserProducers(),
   });
+}
 
-type LoggedInUserProducerOptions = QueryOptions<
-  Producer | undefined,
-  Error,
-  Producer | undefined,
-  string[]
->;
-
-export const loggedInUserProducerOptions = (
+export function useLoggedInUserProducer(
   producerId: string,
   opts?: Pick<
-    LoggedInUserProducerOptions,
+    UseQueryOptions<
+      Producer | undefined,
+      Error,
+      Producer | undefined,
+      readonly [string]
+    >,
     | "initialData"
     | "networkMode"
     | "persister"
@@ -221,44 +267,74 @@ export const loggedInUserProducerOptions = (
     | "meta"
     | "retry"
     | "retryDelay"
-  >,
-) =>
-  queryOptions({
+  >
+) {
+  return useQuery({
     ...opts,
-    queryKey: ["logged-in-user-producer"],
+    queryKey: ["logged-in-user-producer"] as const,
     queryFn: () => fetchUserProducer(producerId),
   });
+}
 
-type EditProducerOpts = MutationOptions<void, Error, EditProducerArgs, unknown>;
+export function useListClaimRequests(
+  props?: Omit<
+    UseQueryOptions<
+      PublicClaimRequest[],
+      Error,
+      PublicClaimRequest[],
+      readonly [string]
+    >,
+    "queryFn" | "queryKey"
+  >
+) {
+  return useQuery({
+    ...(props as object),
+    queryKey: ["list-claim-requests"] as const,
+    queryFn: () => listClaimRequests(),
+  });
+}
 
-export const editUserProducerOpts = (
-  opts?: Omit<EditProducerOpts, "mutationKey" | "mutationFn">,
-) =>
-  mutationOptions({
+export function useFetchUserProducers(
+  opts?: Omit<
+    UseQueryOptions<Producer[], Error, Producer[], readonly [string]>,
+    "queryFn" | "queryKey"
+  >
+) {
+  return useQuery({
     ...opts,
-    mutationKey: ["edit-producer"],
+    queryKey: ["fetch-user-producers"] as const,
+    queryFn: () => fetchUserProducers(),
+  });
+}
+
+// ---------- Mutations
+
+export function useEditUserProducer(
+  opts?: Omit<
+    UseMutationOptions<void, Error, EditProducerArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["edit-producer"] as const,
     mutationFn: async (args: EditProducerArgs) => {
       await editProducer(args);
     },
   });
+}
 
-export const uploadImagesOpts = () =>
-  mutationOptions({
-    mutationKey: ["upload-images"],
+export function useUploadImages() {
+  return useMutation({
+    mutationKey: ["upload-images"] as const,
     mutationFn: async ({
       toUpload,
       producerId,
     }: {
-      toUpload: {
-        _type: "upload";
-        file: File;
-        isPrimary: boolean;
-      }[];
+      toUpload: { _type: "upload"; file: File; isPrimary: boolean }[];
       producerId: string;
     }) => {
-      if (toUpload.length === 0) {
-        return;
-      }
+      if (toUpload.length === 0) return;
 
       const uploadUrls = await requestUploadUrls({
         producerId,
@@ -277,13 +353,14 @@ export const uploadImagesOpts = () =>
         await fetch(url.uploadURL, { method: "POST", body: form });
       }
 
-      await confirmPengingUpload({ producerId: producerId });
+      await confirmPengingUpload({ producerId });
     },
   });
+}
 
-export const uploadVideoOpts = () =>
-  mutationOptions({
-    mutationKey: ["upload-video"],
+export function useUploadVideo() {
+  return useMutation({
+    mutationKey: ["upload-video"] as const,
     mutationFn: async ({
       producerId,
       toUpload,
@@ -292,237 +369,150 @@ export const uploadVideoOpts = () =>
       toUpload: { _type: "upload"; file: File };
     }) => {
       const uploadUrl = await requestVideoUploadUrl({ producerId });
-
-      const file = toUpload.file;
       const form = new FormData();
-      form.set("file", file);
+      form.set("file", toUpload.file);
       await fetch(uploadUrl, { method: "POST", body: form });
-
       await confirmPendingVideoUpload({ producerId });
     },
   });
+}
 
-export const deleteVideoOpts = () =>
-  mutationOptions({
-    mutationKey: ["delete-video"],
+export function useDeleteVideo() {
+  return useMutation({
+    mutationKey: ["delete-video"] as const,
     mutationFn: async ({ producerId }: { producerId: string }) => {
       await deleteVideo({ producerId });
     },
   });
+}
 
-export const updateExistingImagesOpts = () =>
-  mutationOptions({
-    mutationKey: ["update-existing-images"],
+export function useUpdateExistingImages() {
+  return useMutation({
+    mutationKey: ["update-existing-images"] as const,
     mutationFn: async (data: {
-      data: {
-        items: ImageData[];
-        primaryImgId: string | null;
-      };
+      data: { items: ImageData[]; primaryImgId: string | null };
       producerId: string;
     }) => {
       await updateExistingImages(data);
     },
   });
+}
 
-type ClaimProducerOpts = MutationOptions<
-  void,
-  Error,
-  ClaimProducerArgs,
-  unknown
->;
+export function useClaimProducer(
+  opts?: Omit<
+    UseMutationOptions<void, Error, ClaimProducerArgs, unknown>,
+    "mutationFn" | "mutationKey"
+  >
+) {
+  const queryClient = useQueryClient();
 
-export const claimProducerOpts = (
-  deps: { queryClient: QueryClient },
-  opts?: Omit<ClaimProducerOpts, "mutationFn" | "mutationKey">,
-) =>
-  mutationOptions({
+  return useMutation({
     ...opts,
-    onSuccess: async (d, v, c) => {
-      if (opts?.onSuccess) {
-        await opts.onSuccess(d, v, c);
-      }
-      await Promise.all([
-        deps.queryClient.invalidateQueries({
-          queryKey: ["list-claim-requests"],
-        }),
-      ]);
-    },
-    mutationKey: ["claim-producer"],
+    mutationKey: ["claim-producer"] as const,
     mutationFn: (args: ClaimProducerArgs) => claimProducer(args),
-  });
-
-/**
- * Additional user provided mutation opts for `checkClaimDomainDnsOpts`
- */
-type CheckClaimDomainDnsOpts = MutationOptions<
-  string,
-  Error,
-  CheckClaimDomainDnsArgs,
-  unknown
->;
-
-/**
- * Check for a users claimRequest with a verification type of domainDns
- * and then checks the dns records of that domain for the required token.
- *
- * Will invalidate all queries using the key ["list-claim-requests"]
- */
-export const checkClaimDomainDnsOpts = ({
-  opts,
-  deps,
-}: {
-  deps: { queryClient: QueryClient };
-  opts?: Omit<CheckClaimDomainDnsOpts, "mutationFn" | "mutationKey">;
-}) =>
-  mutationOptions({
-    ...opts,
     onSuccess: async (d, v, c) => {
-      if (opts?.onSuccess) {
-        await opts.onSuccess(d, v, c);
-      }
+      await opts?.onSuccess?.(d, v, c);
       await Promise.all([
-        deps.queryClient.invalidateQueries({
-          queryKey: ["list-claim-requests"],
-        }),
-        deps.queryClient.invalidateQueries({
-          queryKey: ["fetch-user-producers"],
-        }),
-        deps.queryClient.invalidateQueries({
-          queryKey: ["logged-in-user-producer"],
-        }),
-        deps.queryClient.invalidateQueries({
-          queryKey: ["logged-in-user-producers"],
-        }),
+        queryClient.invalidateQueries({ queryKey: ["list-claim-requests"] }),
       ]);
     },
-    mutationKey: ["check-claim-domain-dns"],
+  });
+}
+
+export function useCheckClaimDomainDns(
+  opts?: Omit<
+    UseMutationOptions<string, Error, CheckClaimDomainDnsArgs, unknown>,
+    "mutationFn" | "mutationKey"
+  >
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...opts,
+    mutationKey: ["check-claim-domain-dns"] as const,
     mutationFn: (args: CheckClaimDomainDnsArgs) => checkClaimDomainDNS(args),
-  });
-
-/**
- * List all of a users claim requests
- */
-export const listClaimRequestsOpts = (
-  props: Omit<
-    QueryOptions<PublicClaimRequest[], Error, PublicClaimRequest[], string[]>,
-    "queryFn" | "queryKey"
-  >,
-) =>
-  queryOptions({
-    ...props,
-    queryKey: ["list-claim-requests"],
-    queryFn: async () => {
-      return await listClaimRequests();
-    },
-  });
-
-/**
- * Delets a users producer. Will delete associated data from tables like
- * certificationsToProducers and claimRequests.
- *
- * Will also invalidate the following queries:
- * - ["fetch-user-producers"]
- * - ["logged-in-user-producer"]
- * - ["logged-in-user-producers"]
- * - ["producers"]
- * - ["list-claim-requests"]
- */
-export const deleteProducerOpts = (
-  deps: { queryClient: QueryClient },
-  opts?: SimpleMutationOps<void, DeleteProducerArgs>,
-) =>
-  mutationOptions({
-    ...opts,
     onSuccess: async (d, v, c) => {
-      if (opts?.onSuccess) {
-        await opts.onSuccess(d, v, c);
-      }
+      await opts?.onSuccess?.(d, v, c);
       await Promise.all([
-        deps.queryClient.invalidateQueries({
-          queryKey: ["fetch-user-producers"],
-        }),
-        deps.queryClient.invalidateQueries({
+        queryClient.invalidateQueries({ queryKey: ["list-claim-requests"] }),
+        queryClient.invalidateQueries({ queryKey: ["fetch-user-producers"] }),
+        queryClient.invalidateQueries({
           queryKey: ["logged-in-user-producer"],
         }),
-        deps.queryClient.invalidateQueries({
+        queryClient.invalidateQueries({
           queryKey: ["logged-in-user-producers"],
-        }),
-        deps.queryClient.invalidateQueries({
-          queryKey: ["producers"],
-        }),
-        deps.queryClient.invalidateQueries({
-          queryKey: ["list-claim-requests"],
         }),
       ]);
     },
-    mutationKey: ["delete-producer"],
+  });
+}
+
+export function useDeleteProducer(
+  opts?: SimpleMutationOps<void, DeleteProducerArgs>
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...opts,
+    mutationKey: ["delete-producer"] as const,
     mutationFn: async (args: DeleteProducerArgs) => {
       await deleteProducer(args);
     },
-  });
-
-export const fetchUserProducersOpts = (
-  opts?: Omit<
-    QueryOptions<Producer[], Error, Producer[], string[]>,
-    "queryFn" | "queryKey"
-  >,
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["fetch-user-producers"],
-    queryFn: async () => {
-      return await fetchUserProducers();
-    },
-  });
-
-type VerifyClaimPhoneOpts = MutationOptions<
-  string,
-  Error,
-  VerifyClaimPhoneArgs,
-  unknown
->;
-
-export const verifyClaimPhoneOpts = ({
-  opts,
-  deps,
-}: {
-  deps: { queryClient: QueryClient };
-  opts?: Omit<VerifyClaimPhoneOpts, "mutationFn" | "mutationKey">;
-}) =>
-  mutationOptions({
-    ...opts,
     onSuccess: async (d, v, c) => {
-      if (opts?.onSuccess) {
-        await opts.onSuccess(d, v, c);
-      }
+      await opts?.onSuccess?.(d, v, c);
       await Promise.all([
-        deps.queryClient.invalidateQueries({
-          queryKey: ["list-claim-requests"],
-        }),
-        deps.queryClient.invalidateQueries({
-          queryKey: ["fetch-user-producers"],
-        }),
-        deps.queryClient.invalidateQueries({
+        queryClient.invalidateQueries({ queryKey: ["fetch-user-producers"] }),
+        queryClient.invalidateQueries({
           queryKey: ["logged-in-user-producer"],
         }),
-        deps.queryClient.invalidateQueries({
+        queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producers"],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["producers"] }),
+        queryClient.invalidateQueries({ queryKey: ["list-claim-requests"] }),
+      ]);
+    },
+  });
+}
+
+export function useVerifyClaimPhone(
+  opts?: Omit<
+    UseMutationOptions<string, Error, VerifyClaimPhoneArgs, unknown>,
+    "mutationFn" | "mutationKey"
+  >
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...opts,
+    mutationKey: ["verify-claim-phone"] as const,
+    mutationFn: (args: VerifyClaimPhoneArgs) => verifyClaimPhone(args),
+    onSuccess: async (d, v, c) => {
+      await opts?.onSuccess?.(d, v, c);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["list-claim-requests"] }),
+        queryClient.invalidateQueries({ queryKey: ["fetch-user-producers"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["logged-in-user-producer"],
+        }),
+        queryClient.invalidateQueries({
           queryKey: ["logged-in-user-producers"],
         }),
       ]);
     },
-    mutationKey: ["verify-claim-phone"],
-    mutationFn: (args: VerifyClaimPhoneArgs) => verifyClaimPhone(args),
   });
+}
 
-export const regenerateClaimPhoneTokenOpts = (
+export function useRegenerateClaimPhoneToken(
   opts?: Omit<
-    MutationOptions<void, Error, RegenerateClaimPhoneTokenArgs, unknown>,
+    UseMutationOptions<void, Error, RegenerateClaimPhoneTokenArgs, unknown>,
     "mutationFn" | "mutationKey"
-  >,
-) =>
-  mutationOptions({
+  >
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["regenerate-claim-phone-token"],
+    mutationKey: ["regenerate-claim-phone-token"] as const,
     mutationFn: (args: RegenerateClaimPhoneTokenArgs) =>
       regenerateClaimPhoneToken(args),
   });
+}

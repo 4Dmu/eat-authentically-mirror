@@ -6,8 +6,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { certificationTypesOptions } from "@/utils/producers";
+import { useCertificationTypes } from "@/utils/producers";
 import {
   Accordion,
   AccordionContent,
@@ -22,7 +21,7 @@ import { FilterIcon } from "lucide-react";
 import { Switch } from "./ui/switch";
 
 export function FilterMenu() {
-  const certsQuery = useQuery(certificationTypesOptions());
+  const certsQuery = useCertificationTypes();
   const { certs, setCerts, useIpGeo, setUseIpGeo } = useHomePageStore();
 
   return (

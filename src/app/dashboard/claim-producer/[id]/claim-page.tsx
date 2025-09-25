@@ -22,8 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClaimProducerSteps } from "@/hooks/use-claim-producer-steps";
 import { countryByAlpha3Code } from "@/utils/contries";
-import { claimProducerOpts } from "@/utils/producers";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useClaimProducer } from "@/utils/producers";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { toast } from "sonner";
@@ -39,21 +38,15 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
     producer: producer,
   });
 
-  const queryClient = useQueryClient();
-  const claimProducerMutation = useMutation(
-    claimProducerOpts(
-      { queryClient },
-      {
-        onSuccess() {
-          router.push("/dashboard#claim");
-          toast.success("Producer claim proccess started");
-        },
-        onError(e) {
-          toast.error(e.message);
-        },
-      },
-    ),
-  );
+  const claimProducerMutation = useClaimProducer({
+    onSuccess() {
+      router.push("/dashboard#claim");
+      toast.success("Producer claim proccess started");
+    },
+    onError(e) {
+      toast.error(e.message);
+    },
+  });
 
   function submit() {
     if (step.mode !== "submit" || submitState.submissionRequiresData) {
@@ -310,7 +303,7 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                           submitState.setDomainEmailPart(
                             e.currentTarget.value.length == 0
                               ? undefined
-                              : e.currentTarget.value,
+                              : e.currentTarget.value
                           )
                         }
                       />
@@ -331,7 +324,7 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                           submitState.setManualContactEmail(
                             e.currentTarget.value.length == 0
                               ? undefined
-                              : e.currentTarget.value,
+                              : e.currentTarget.value
                           )
                         }
                       />
@@ -373,10 +366,10 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
               onClick={() =>
                 match(step)
                   .with({ mode: "verify" }, (s) =>
-                    setStep({ mode: "review", producer: s.producer }),
+                    setStep({ mode: "review", producer: s.producer })
                   )
                   .with({ mode: "submit" }, (s) =>
-                    setStep({ mode: "verify", producer: s.producer }),
+                    setStep({ mode: "verify", producer: s.producer })
                   )
                   .otherwise(() => {})
               }

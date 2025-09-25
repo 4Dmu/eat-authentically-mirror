@@ -14,8 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  deleteProducerOpts,
-  fetchUserProducersOpts,
+  useDeleteProducer,
+  useFetchUserProducers,
   primaryImageUrl,
   producerSlugFull,
 } from "@/utils/producers";
@@ -32,8 +32,8 @@ export function ProducersSection({ producers }: { producers: Producer[] }) {
   const searchparams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const deleteProducer = useMutation(deleteProducerOpts({ queryClient }));
-  const { data } = useQuery(fetchUserProducersOpts({ initialData: producers }));
+  const deleteProducer = useDeleteProducer();
+  const { data } = useFetchUserProducers({ initialData: producers });
 
   async function handleDeleteProducer(producer: { id: string; name: string }) {
     const deletePromise = deleteProducer.mutateAsync({

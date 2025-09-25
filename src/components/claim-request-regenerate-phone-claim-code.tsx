@@ -1,6 +1,5 @@
 import { PublicClaimRequest } from "@/backend/validators/producers";
-import { regenerateClaimPhoneTokenOpts } from "@/utils/producers";
-import { useMutation } from "@tanstack/react-query";
+import { useRegenerateClaimPhoneToken } from "@/utils/producers";
 import { addMinutes, differenceInSeconds, isAfter } from "date-fns";
 import { RotateCwIcon } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -29,24 +28,22 @@ export function RegenerateClaimPhoneCode({
   >;
 }) {
   const [expiresAt, setExpiresAt] = useState(
-    () => cr.requestedVerification.tokenExpiresAt,
+    () => cr.requestedVerification.tokenExpiresAt
   );
   const [timeLeft, setTimeLeft] = useState(() =>
-    calculateTimeLeft(cr.requestedVerification.tokenExpiresAt),
+    calculateTimeLeft(cr.requestedVerification.tokenExpiresAt)
   );
 
   const isExpired = timeLeft <= 0;
 
-  const regenerate = useMutation(
-    regenerateClaimPhoneTokenOpts({
-      onSuccess() {
-        const at = addMinutes(new Date(), 3);
-        setExpiresAt(at);
-        setTimeLeft(calculateTimeLeft(at));
-      },
-      onError: (e) => toast.error(e.message),
-    }),
-  );
+  const regenerate = useRegenerateClaimPhoneToken({
+    onSuccess() {
+      const at = addMinutes(new Date(), 3);
+      setExpiresAt(at);
+      setTimeLeft(calculateTimeLeft(at));
+    },
+    onError: (e) => toast.error(e.message),
+  });
 
   useEffect(() => {
     // Recalculate every second

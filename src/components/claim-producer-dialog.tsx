@@ -9,11 +9,10 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  claimProducerOpts,
+  useClaimProducer,
   primaryImageUrl,
-  producersFullQueryOptions,
+  useProducersFull,
 } from "@/utils/producers";
 import { useDebounce } from "@uidotdev/usehooks";
 import { Input } from "./ui/input";
@@ -46,14 +45,12 @@ function useProducers() {
 
   const debouncedQuery = useDebounce(query, 500);
 
-  const { data, isPlaceholderData } = useQuery(
-    producersFullQueryOptions({
-      page,
-      certs: [],
-      query: debouncedQuery,
-      claimed: false,
-    }),
-  );
+  const { data, isPlaceholderData } = useProducersFull({
+    page,
+    certs: [],
+    query: debouncedQuery,
+    claimed: false,
+  });
 
   useEffect(() => {
     setPage(0);
@@ -75,21 +72,15 @@ export function ClaimProducerDialog() {
     setOpen(false);
   };
 
-  const queryClient = useQueryClient();
-  const claimProducerMutation = useMutation(
-    claimProducerOpts(
-      { queryClient },
-      {
-        onSuccess() {
-          closeDialog();
-          toast.success("Producer claim proccess started");
-        },
-        onError(e) {
-          toast.error(e.message);
-        },
-      },
-    ),
-  );
+  const claimProducerMutation = useClaimProducer({
+    onSuccess() {
+      closeDialog();
+      toast.success("Producer claim proccess started");
+    },
+    onError(e) {
+      toast.error(e.message);
+    },
+  });
 
   function submit() {
     if (step.mode !== "submit" || submitState.submissionRequiresData) {
@@ -155,7 +146,7 @@ export function ClaimProducerDialog() {
                   setQuery(
                     e.currentTarget.value.length == 0
                       ? undefined
-                      : e.currentTarget.value,
+                      : e.currentTarget.value
                   )
                 }
               />
@@ -375,7 +366,7 @@ export function ClaimProducerDialog() {
                         submitState.setDomainEmailPart(
                           e.currentTarget.value.length == 0
                             ? undefined
-                            : e.currentTarget.value,
+                            : e.currentTarget.value
                         )
                       }
                     />
@@ -395,7 +386,7 @@ export function ClaimProducerDialog() {
                         submitState.setManualContactEmail(
                           e.currentTarget.value.length == 0
                             ? undefined
-                            : e.currentTarget.value,
+                            : e.currentTarget.value
                         )
                       }
                     />
@@ -441,10 +432,10 @@ export function ClaimProducerDialog() {
                   .with({ mode: "select" }, () => {})
                   .with({ mode: "review" }, () => setStep({ mode: "select" }))
                   .with({ mode: "verify" }, (s) =>
-                    setStep({ mode: "review", producer: s.producer }),
+                    setStep({ mode: "review", producer: s.producer })
                   )
                   .with({ mode: "submit" }, (s) =>
-                    setStep({ mode: "verify", producer: s.producer }),
+                    setStep({ mode: "verify", producer: s.producer })
                   )
                   .exhaustive()
               }

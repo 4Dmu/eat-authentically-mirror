@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { producerPublicOpts } from "@/utils/producers";
+import { useProducerPublic } from "@/utils/producers";
 import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { ClaimProducerCard } from "@/components/claim-producer-card";
 import {
@@ -48,7 +48,7 @@ export function ProducerPageClient(props: {
   subTier: SubTier;
   userProducerIds: string[];
 }) {
-  const { data: producer } = useQuery(producerPublicOpts(props.producer.id));
+  const { data: producer } = useProducerPublic(props.producer.id);
   const reviews = useQuery(listReviewsPublicOpts(props.producer.id));
   const pendingReviews = useReviewProducerPendingState();
 
@@ -56,14 +56,14 @@ export function ProducerPageClient(props: {
     producer &&
     producer.address !== null &&
     Object.entries(producer.address).some(
-      (v) => v[1] !== null && v[1] !== undefined,
+      (v) => v[1] !== null && v[1] !== undefined
     );
 
   const hasContact =
     producer &&
     producer.contact !== null &&
     Object.entries(producer.contact).some(
-      (v) => v[1] !== null && v[1] !== undefined,
+      (v) => v[1] !== null && v[1] !== undefined
     );
 
   const communityBenefitsCard = (
@@ -217,7 +217,7 @@ export function ProducerPageClient(props: {
               <Card
                 className={cn(
                   "overflow-hidden flex-1",
-                  producer.images.items.length > 0 && "pt-0",
+                  producer.images.items.length > 0 && "pt-0"
                 )}
               >
                 {producer.images.items.length > 0 && (
@@ -229,7 +229,7 @@ export function ProducerPageClient(props: {
                             ? -1
                             : producer.images.primaryImgId === b.cloudflareId
                               ? 1
-                              : 0,
+                              : 0
                         )
                         .map((img) => (
                           <CarouselItem key={img.cloudflareId}>

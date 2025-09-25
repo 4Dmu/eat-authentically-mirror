@@ -1,11 +1,7 @@
 "use client";
 import { CLAIM_DNS_TXT_RECORD_NAME } from "@/backend/constants";
 import { PublicClaimRequest } from "@/backend/validators/producers";
-import {
-  checkClaimDomainDnsOpts,
-  verifyClaimPhoneOpts,
-} from "@/utils/producers";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCheckClaimDomainDns, useVerifyClaimPhone } from "@/utils/producers";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -31,16 +27,10 @@ export function ClaimRequestCard({
 }: {
   claimRequest: PublicClaimRequest;
 }) {
-  const queryClient = useQueryClient();
-  const checkClaimDomainDNS = useMutation(
-    checkClaimDomainDnsOpts({
-      deps: { queryClient },
-      opts: {
-        onSuccess: (message) => toast.success(message),
-        onError: (e) => toast.error(e.message),
-      },
-    }),
-  );
+  const checkClaimDomainDNS = useCheckClaimDomainDns({
+    onSuccess: (message) => toast.success(message),
+    onError: (e) => toast.error(e.message),
+  });
 
   return (
     <div className="rounded-lg border p-5 shadow flex flex-col gap-0 flex-1 bg-white">
@@ -104,7 +94,7 @@ export function ClaimRequestCard({
                       </Button>
                     </div>
                   </>
-                ),
+                )
               )
               .with({ requestedVerification: { method: "manual" } }, (cr) => (
                 <>
@@ -139,7 +129,7 @@ export function ClaimRequestCard({
                       </div>
                     </div>
                   </>
-                ),
+                )
               )
               .with(
                 {
@@ -160,7 +150,7 @@ export function ClaimRequestCard({
                       </p>
                     </div>
                   </>
-                ),
+                )
               )
               .with(
                 {
@@ -172,7 +162,7 @@ export function ClaimRequestCard({
                   <>
                     <VerifyContactPhoneInstructions cr={cr} />
                   </>
-                ),
+                )
               )
               .exhaustive()}
           </AccordionContent>
@@ -185,9 +175,9 @@ export function ClaimRequestCard({
 const RegenerateClaimPhoneCode = dynamic(
   () =>
     import("./claim-request-regenerate-phone-claim-code").then(
-      (r) => r.RegenerateClaimPhoneCode,
+      (r) => r.RegenerateClaimPhoneCode
     ),
-  { ssr: false },
+  { ssr: false }
 );
 
 function VerifyContactPhoneInstructions({
@@ -202,15 +192,9 @@ function VerifyContactPhoneInstructions({
     }
   >;
 }) {
-  const queryClient = useQueryClient();
-  const verifyClaimPhoneMutation = useMutation(
-    verifyClaimPhoneOpts({
-      deps: { queryClient },
-      opts: {
-        onError: (e) => toast.error(e.message),
-      },
-    }),
-  );
+  const verifyClaimPhoneMutation = useVerifyClaimPhone({
+    onError: (e) => toast.error(e.message),
+  });
 
   const form = useForm({
     defaultValues: {

@@ -6,8 +6,7 @@ import { ProducerCard } from "@/components/producer-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useHomePageStore } from "@/stores";
-import { producersQueryOptions } from "@/utils/producers";
-import { useQuery } from "@tanstack/react-query";
+import { useProducers } from "@/utils/producers";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { PublicProducerLight } from "@/backend/validators/producers";
@@ -37,20 +36,18 @@ export function Page({
 
   const debouncedQuery = useDebounce(query, 500);
 
-  const { data, isPlaceholderData } = useQuery(
-    producersQueryOptions(
-      {
-        type: typeFilter,
-        page: page,
-        certs: certs.map((cert) => cert.id),
-        locationSearchArea: locationSearchArea
-          ? locationSearchArea.toJSON()
-          : undefined,
-        query: debouncedQuery,
-        userIpGeo: useIpGeo ? userIpGeo : undefined,
-      },
-      initialProducersFromServer,
-    ),
+  const { data, isPlaceholderData } = useProducers(
+    {
+      type: typeFilter,
+      page: page,
+      certs: certs.map((cert) => cert.id),
+      locationSearchArea: locationSearchArea
+        ? locationSearchArea.toJSON()
+        : undefined,
+      query: debouncedQuery,
+      userIpGeo: useIpGeo ? userIpGeo : undefined,
+    },
+    initialProducersFromServer
   );
 
   return (
