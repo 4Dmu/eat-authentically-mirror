@@ -13,7 +13,6 @@ import {
 import Link from "next/link";
 import { listAllProducersChats, listUserChats } from "@/backend/rpc/messages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function MessagesPage() {

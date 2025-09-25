@@ -18,10 +18,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { UserJSON } from "@clerk/backend";
 import { useSubTier } from "@/hooks/use-sub-tier";
-import { useQuery } from "@tanstack/react-query";
-import { getUserChatMessageNotificationsCountOpts } from "@/utils/messages";
 import { MessageNotifications } from "../message-notifications";
-import { Suspense } from "react";
 
 export function UserButton({
   subTierFromServer,
@@ -69,10 +66,10 @@ export function UserButton({
               {("first_name" in user ? user.first_name : user.firstName) ??
                 ("email_addresses" in user
                   ? user?.email_addresses?.find(
-                      (e) => e.id === user.primary_email_address_id,
+                      (e) => e.id === user.primary_email_address_id
                     )?.email_address
                   : user.emailAddresses.find(
-                      (e) => e.id === user.primaryEmailAddressId,
+                      (e) => e.id === user.primaryEmailAddressId
                     )?.emailAddress)}
             </p>
           </div>

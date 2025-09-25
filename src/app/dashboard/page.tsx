@@ -23,7 +23,6 @@ import { redirect } from "next/navigation";
 import { CreditCard, EditIcon, MailIcon, PinIcon } from "lucide-react";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Badge } from "@/components/ui/badge";
-import { NotSubbed } from "@/components/auth/RequireSub";
 import { fetchUserProducers, listClaimRequests } from "@/backend/rpc/producers";
 import { ClaimRequestsSection } from "./_components/claim-requests-section";
 import { ProducersSection } from "./_components/producers-section";
@@ -97,13 +96,9 @@ export default async function DashboardPage() {
                 </Badge>
               </div>
             </div>
-            {/*<div className="flex gap-10 underline">
-              <Link href={"/dashboard/account"}>Account</Link>
-              <Link href={"/dashboard/billing"}>Subscription</Link>
-            </div>*/}
           </CardHeader>
           {match(subTier)
-            .with("Free", (r) => (
+            .with("Free", () => (
               <>
                 <Separator />
                 <CardContent>
@@ -141,7 +136,7 @@ export default async function DashboardPage() {
                 </CardContent>
               </>
             ))
-            .with({ tier: "community" }, (r) => (
+            .with({ tier: "community" }, () => (
               <>
                 <Separator />
                 <CardContent>
@@ -173,7 +168,7 @@ export default async function DashboardPage() {
                 </CardContent>
               </>
             ))
-            .with({ tier: "pro" }, (r) => (
+            .with({ tier: "pro" }, () => (
               <>
                 <Separator />
                 <CardContent>
@@ -198,7 +193,7 @@ export default async function DashboardPage() {
                 </CardContent>
               </>
             ))
-            .with({ tier: "premium" }, (r) => (
+            .with({ tier: "premium" }, () => (
               <>
                 <Separator />
                 <CardContent>

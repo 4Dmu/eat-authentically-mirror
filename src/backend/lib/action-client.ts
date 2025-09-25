@@ -7,11 +7,6 @@ type EmptyCtx = Record<string, any>;
 
 type Middleware<P, N extends P> = [...Fn<P, P>[], Fn<P, N>] | [];
 
-function makeReqId() {
-  // Cheap, collision-resistant enough for per-invocation correlation
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
 class InputActionClient<
   TPreviousContext extends EmptyCtx,
   TNextContext extends TPreviousContext,
@@ -22,7 +17,7 @@ class InputActionClient<
 
   constructor(
     client: ActionClient<TPreviousContext, TNextContext>,
-    schema: TSchema,
+    schema: TSchema
   ) {
     this.client = client;
     this.schema = schema;
@@ -31,7 +26,7 @@ class InputActionClient<
   name(name: string) {
     return new InputActionClient(
       new ActionClient(this.client.middleware, name),
-      this.schema,
+      this.schema
     );
   }
 
@@ -39,7 +34,7 @@ class InputActionClient<
     fn: (input: {
       ctx: TNextContext;
       input: StandardSchemaV1.InferOutput<TSchema>;
-    }) => TResult | Promise<TResult>,
+    }) => TResult | Promise<TResult>
   ) {
     return async (input: StandardSchemaV1.InferInput<TSchema>) => {
       const actionName = this.client.actionName ?? "anonymous";
@@ -72,14 +67,14 @@ export class ActionClient<
 
   constructor(
     middleware: Middleware<TPreviousContext, TNextContext> = [],
-    name?: string,
+    name?: string
   ) {
     this.middleware = middleware;
     this.actionName = name;
   }
 
   use<N extends EmptyCtx>(
-    fn: Fn<TNextContext, N>,
+    fn: Fn<TNextContext, N>
   ): ActionClient<TNextContext, TNextContext & N> {
     const newMiddleware = [...this.middleware, fn] as Middleware<
       TNextContext,

@@ -7,7 +7,6 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogFooter,
-  DialogClose,
 } from "./ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { registerProducer } from "@/backend/rpc/producers";

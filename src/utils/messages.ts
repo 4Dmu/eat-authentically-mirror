@@ -37,7 +37,6 @@ import {
   QueryOptions,
   queryOptions,
 } from "@tanstack/react-query";
-import { ar } from "zod/v4/locales";
 
 type MutationOpts<T, T2, T3, T4> = Omit<
   MutationOptions<T, T2, T3, T4>,
@@ -56,7 +55,7 @@ type QueryOpts<
 >;
 
 export const sendMessageToProducerOpts = (
-  opts?: MutationOpts<string, Error, SendMessageToProducerArgs, unknown>,
+  opts?: MutationOpts<string, Error, SendMessageToProducerArgs, unknown>
 ) =>
   mutationOptions({
     ...opts,
@@ -66,7 +65,7 @@ export const sendMessageToProducerOpts = (
   });
 
 export const replyToUserMessageOpts = (
-  opts?: MutationOpts<void, Error, ReplyToUserMessageArgs, unknown>,
+  opts?: MutationOpts<void, Error, ReplyToUserMessageArgs, unknown>
 ) =>
   mutationOptions({
     ...opts,
@@ -76,7 +75,7 @@ export const replyToUserMessageOpts = (
   });
 
 export const blockUserChatOpts = (
-  opts?: MutationOpts<void, Error, BlockUserChatArgs, unknown>,
+  opts?: MutationOpts<void, Error, BlockUserChatArgs, unknown>
 ) =>
   mutationOptions({
     ...opts,
@@ -85,7 +84,7 @@ export const blockUserChatOpts = (
   });
 
 export const unblockUserChatOpts = (
-  opts?: MutationOpts<void, Error, UnblockUserChatArgs, unknown>,
+  opts?: MutationOpts<void, Error, UnblockUserChatArgs, unknown>
 ) =>
   mutationOptions({
     ...opts,
@@ -95,7 +94,7 @@ export const unblockUserChatOpts = (
   });
 
 export const blockProducerChatOpts = (
-  opts?: MutationOpts<void, Error, BlockProducerChatArgs, unknown>,
+  opts?: MutationOpts<void, Error, BlockProducerChatArgs, unknown>
 ) =>
   mutationOptions({
     ...opts,
@@ -105,7 +104,7 @@ export const blockProducerChatOpts = (
   });
 
 export const unblockProducerChatOpts = (
-  opts?: MutationOpts<void, Error, UnblockProducerChatArgs, unknown>,
+  opts?: MutationOpts<void, Error, UnblockProducerChatArgs, unknown>
 ) =>
   mutationOptions({
     ...opts,
@@ -118,7 +117,7 @@ export const listUserChatsOpts = (
   opts?: Omit<
     QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
     "queryKey" | "queryFn"
-  >,
+  >
 ) =>
   queryOptions({
     ...opts,
@@ -131,7 +130,7 @@ export const listProducerChatsOpts = (
   opts?: Omit<
     QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
     "queryKey" | "queryFn"
-  >,
+  >
 ) =>
   queryOptions({
     ...opts,
@@ -143,7 +142,7 @@ export const listAllProducersChatsOpts = (
   opts?: Omit<
     QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
     "queryKey" | "queryFn"
-  >,
+  >
 ) =>
   queryOptions({
     ...opts,
@@ -158,7 +157,7 @@ export const getUserOrProducerChatOpts = (
     Error,
     ProducerChat | undefined,
     string[]
-  >,
+  >
 ) =>
   queryOptions({
     ...opts,
@@ -168,7 +167,7 @@ export const getUserOrProducerChatOpts = (
 
 export const getProducerChatOpts = (
   args: GetProducerChatArgs,
-  opts?: QueryOpts<ProducerChat | null, Error, ProducerChat | null, string[]>,
+  opts?: QueryOpts<ProducerChat | null, Error, ProducerChat | null, string[]>
 ) =>
   queryOptions({
     ...opts,
@@ -183,7 +182,7 @@ export const getUserOrProducerChatMessagesOpts = (
     Error,
     ProducerChatMessage[] | undefined,
     string[]
-  >,
+  >
 ) =>
   queryOptions({
     ...opts,
@@ -194,7 +193,7 @@ export const getUserOrProducerChatMessagesOpts = (
 
 export const getUserChatsMessageNotificationsCountOpts = (
   userId: string | undefined | null,
-  opts?: QueryOpts<number | null, Error, number | null, string[]>,
+  opts?: QueryOpts<number | null, Error, number | null, string[]>
 ) =>
   queryOptions({
     ...opts,
@@ -216,7 +215,7 @@ export const getUserChatMessageNotificationsCountOpts = (
           chatIds: string[];
         }
     )[]
-  >,
+  >
 ) =>
   queryOptions({
     ...opts,
@@ -226,7 +225,7 @@ export const getUserChatMessageNotificationsCountOpts = (
   });
 
 export const resetChatNotificationsOpts = (
-  opts?: MutationOpts<void, Error, ResetChatNotificationsArgs, unknown>,
+  opts?: MutationOpts<void, Error, ResetChatNotificationsArgs, unknown>
 ) =>
   mutationOptions({
     ...opts,
