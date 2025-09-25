@@ -1,10 +1,7 @@
 "use client";
 
 import type { PinboardFull } from "@/backend/rpc/pinboard";
-import {
-  getUserPinboardFullOpts,
-  updateUserPinboardOpts,
-} from "@/utils/pinboard";
+import { useUserPinboardFull, useUpdateUserPinboard } from "@/utils/pinboard";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Breadcrumb,
@@ -24,20 +21,16 @@ import { useThrottleCallback } from "@react-hook/throttle";
 import { UpdateUserPinboardArgs } from "@/backend/validators/pinboard";
 
 export function PinboardPageClient(props: { pinboard: PinboardFull }) {
-  const pinboard = useQuery(
-    getUserPinboardFullOpts({ initialData: props.pinboard }),
-  );
+  const pinboard = useUserPinboardFull({ initialData: props.pinboard });
 
   const updatePinboard = useThrottleCallback(
     (args: UpdateUserPinboardArgs) => updatePinboardMt.mutate(args),
-    1,
+    1
   );
 
-  const updatePinboardMt = useMutation(
-    updateUserPinboardOpts({
-      onSuccess: async () => await pinboard.refetch(),
-    }),
-  );
+  const updatePinboardMt = useUpdateUserPinboard({
+    onSuccess: async () => await pinboard.refetch(),
+  });
 
   return (
     <div className="p-10 h-[calc(100vh_-_100px)]">

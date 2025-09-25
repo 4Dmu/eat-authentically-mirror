@@ -3,9 +3,9 @@ import { Button } from "./ui/button";
 import { MapPin, PinIcon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  addToPinboardOpts,
-  getUserPinboardFullOpts,
-  removeFromPinboardOpts,
+  useAddToPinboard,
+  useUserPinboardFull,
+  useRemoveFromPinboard,
 } from "@/utils/pinboard";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -18,22 +18,18 @@ export function AddToPinboardButton({
   producerId: string;
   className?: string;
 }) {
-  const pinboard = useQuery(getUserPinboardFullOpts());
-  const add = useMutation(
-    addToPinboardOpts({
-      onSuccess: async () => await pinboard.refetch(),
-      onError: (t) => toast.error(t.message),
-    }),
-  );
-  const remove = useMutation(
-    removeFromPinboardOpts({
-      onSuccess: async () => await pinboard.refetch(),
-    }),
-  );
+  const pinboard = useUserPinboardFull();
+  const add = useAddToPinboard({
+    onSuccess: async () => await pinboard.refetch(),
+    onError: (t) => toast.error(t.message),
+  });
+  const remove = useRemoveFromPinboard({
+    onSuccess: async () => await pinboard.refetch(),
+  });
 
   const isPinned = useMemo(() => {
     const pin = pinboard.data?.pins.find(
-      (pin) => pin.producerId === producerId,
+      (pin) => pin.producerId === producerId
     );
     if (add.isPending && add.variables.producerId === producerId) {
       return true;
@@ -91,22 +87,18 @@ export function AddToPinboardIconButton({
   producerId: string;
   className?: string;
 }) {
-  const pinboard = useQuery(getUserPinboardFullOpts());
-  const add = useMutation(
-    addToPinboardOpts({
-      onSuccess: async () => await pinboard.refetch(),
-      onError: (t) => toast.error(t.message),
-    }),
-  );
-  const remove = useMutation(
-    removeFromPinboardOpts({
-      onSuccess: async () => await pinboard.refetch(),
-    }),
-  );
+  const pinboard = useUserPinboardFull();
+  const add = useAddToPinboard({
+    onSuccess: async () => await pinboard.refetch(),
+    onError: (t) => toast.error(t.message),
+  });
+  const remove = useRemoveFromPinboard({
+    onSuccess: async () => await pinboard.refetch(),
+  });
 
   const isPinned = useMemo(() => {
     const pin = pinboard.data?.pins.find(
-      (pin) => pin.producerId === producerId,
+      (pin) => pin.producerId === producerId
     );
     if (add.isPending && add.variables.producerId === producerId) {
       return true;

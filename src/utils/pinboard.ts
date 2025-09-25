@@ -14,86 +14,94 @@ import {
   UpdateUserPinboardArgs,
 } from "@/backend/validators/pinboard";
 import {
-  MutationOptions,
-  mutationOptions,
-  QueryOptions,
-  queryOptions,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  UseQueryOptions,
 } from "@tanstack/react-query";
 
-export const getUserPinboardOpts = (
+// --- queries ---
+
+export function useUserPinboard(
   opts?: Omit<
-    QueryOptions<Pinboard, Error, Pinboard, string[]>,
+    UseQueryOptions<Pinboard, Error, Pinboard, readonly [string]>,
     "queryKey" | "queryFn"
-  >,
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["get-user-pinboard"],
-    queryFn: async () => await getUserPinboard(),
+  >
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["get-user-pinboard"] as const,
+    queryFn: () => getUserPinboard(),
   });
+}
 
-export const getUserPinboardFullOpts = (
+export function useUserPinboardFull(
   opts?: Omit<
-    QueryOptions<PinboardFull, Error, PinboardFull, string[]>,
+    UseQueryOptions<PinboardFull, Error, PinboardFull, readonly [string]>,
     "queryKey" | "queryFn"
-  >,
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["get-user-pinboard-full"],
-    queryFn: async () => await getUserPinboardFull(),
+  >
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["get-user-pinboard-full"] as const,
+    queryFn: () => getUserPinboardFull(),
   });
+}
 
-export const updateUserPinboardOpts = (
-  opts?: Omit<
-    MutationOptions<void, Error, UpdateUserPinboardArgs, unknown>,
-    "mutationKey" | "mutationFn"
-  >,
-) =>
-  mutationOptions({
-    ...opts,
-    mutationKey: ["update-pinboard"],
-    mutationFn: async (args: UpdateUserPinboardArgs) =>
-      await updateUserPinboard(args),
-  });
-
-export const addToPinboardOpts = (
-  opts?: Omit<
-    MutationOptions<void, Error, AddToPinboardArgs, unknown>,
-    "mutationKey" | "mutationFn"
-  >,
-) =>
-  mutationOptions({
-    ...opts,
-    mutationKey: ["add-to-pinboard"],
-    mutationFn: async (args: AddToPinboardArgs) => await addToPinboard(args),
-  });
-
-export const removeFromPinboardOpts = (
-  opts?: Omit<
-    MutationOptions<void, Error, RemoveFromPinboardArgs, unknown>,
-    "mutationKey" | "mutationFn"
-  >,
-) =>
-  mutationOptions({
-    ...opts,
-    mutationKey: ["remove-from-pinboard"],
-    mutationFn: async (args: RemoveFromPinboardArgs) =>
-      await removeFromPinboard(args),
-  });
-
-export const getUserProducerPinOpts = (
+export function useUserProducerPin(
   producerId: string,
   opts?: Omit<
-    QueryOptions<Pin | null, Error, Pin | null, string[]>,
+    UseQueryOptions<Pin | null, Error, Pin | null, readonly [string, string]>,
     "queryKey" | "queryFn"
-  >,
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["producer-pin", producerId],
+  >
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["producer-pin", producerId] as const,
     queryFn: async () => {
       const pin = await getUserProducerPin({ producerId });
       return pin ?? null;
     },
   });
+}
+
+// --- mutations ---
+
+export function useUpdateUserPinboard(
+  opts?: Omit<
+    UseMutationOptions<void, Error, UpdateUserPinboardArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["update-pinboard"] as const,
+    mutationFn: (args: UpdateUserPinboardArgs) => updateUserPinboard(args),
+  });
+}
+
+export function useAddToPinboard(
+  opts?: Omit<
+    UseMutationOptions<void, Error, AddToPinboardArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["add-to-pinboard"] as const,
+    mutationFn: (args: AddToPinboardArgs) => addToPinboard(args),
+  });
+}
+
+export function useRemoveFromPinboard(
+  opts?: Omit<
+    UseMutationOptions<void, Error, RemoveFromPinboardArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["remove-from-pinboard"] as const,
+    mutationFn: (args: RemoveFromPinboardArgs) => removeFromPinboard(args),
+  });
+}
