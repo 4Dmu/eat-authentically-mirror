@@ -16,14 +16,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  blockProducerChatOpts,
-  blockUserChatOpts,
-  getUserOrProducerChatMessagesOpts,
-  getUserOrProducerChatOpts,
-  replyToUserMessageOpts,
-  sendMessageToProducerOpts,
-  unblockProducerChatOpts,
-  unblockUserChatOpts,
+  useBlockProducerChat,
+  useBlockUserChat,
+  useChatMessages,
+  useChat,
+  useReplyToUserMessage,
+  useSendMessageToProducer,
+  useUnblockProducerChat,
+  useUnblockUserChat,
 } from "@/utils/messages";
 import { primaryImageUrl } from "@/utils/producers";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -38,57 +38,41 @@ export function ChatPageClient(props: {
   messages: ProducerChatMessage[];
 }) {
   const [message, setMessage] = useState("");
-  const chatQuery = useQuery(
-    getUserOrProducerChatOpts(props.chat.id, { initialData: props.chat }),
-  );
-  const messagesQuery = useQuery(
-    getUserOrProducerChatMessagesOpts(props.chat.id, {
-      initialData: props.messages,
-    }),
-  );
+  const chatQuery = useChat(props.chat.id, { initialData: props.chat });
+  const messagesQuery = useChatMessages(props.chat.id, {
+    initialData: props.messages,
+  });
 
   const messagesQueryData = messagesQuery.data ?? [];
 
   const [messages, addMessageOptimistic] = useOptimistic(
     messagesQueryData,
-    (state, message: ProducerChatMessage) => [...state, message],
+    (state, message: ProducerChatMessage) => [...state, message]
   );
 
-  const blockUserChatMut = useMutation(
-    blockUserChatOpts({
-      onSuccess: async () => await chatQuery.refetch(),
-      onError: (e) => toast.error(e.message),
-    }),
-  );
-  const unblockUserChatMut = useMutation(
-    unblockUserChatOpts({
-      onSuccess: async () => await chatQuery.refetch(),
-      onError: (e) => toast.error(e.message),
-    }),
-  );
-  const blockProducerChatMut = useMutation(
-    blockProducerChatOpts({
-      onSuccess: async () => await chatQuery.refetch(),
-      onError: (e) => toast.error(e.message),
-    }),
-  );
-  const unblockProducerChatMut = useMutation(
-    unblockProducerChatOpts({
-      onSuccess: async () => await chatQuery.refetch(),
-      onError: (e) => toast.error(e.message),
-    }),
-  );
+  const blockUserChatMut = useBlockUserChat({
+    onSuccess: async () => await chatQuery.refetch(),
+    onError: (e) => toast.error(e.message),
+  });
+  const unblockUserChatMut = useUnblockUserChat({
+    onSuccess: async () => await chatQuery.refetch(),
+    onError: (e) => toast.error(e.message),
+  });
+  const blockProducerChatMut = useBlockProducerChat({
+    onSuccess: async () => await chatQuery.refetch(),
+    onError: (e) => toast.error(e.message),
+  });
+  const unblockProducerChatMut = useUnblockProducerChat({
+    onSuccess: async () => await chatQuery.refetch(),
+    onError: (e) => toast.error(e.message),
+  });
 
-  const sendMessageToProducer = useMutation(
-    sendMessageToProducerOpts({
-      onSuccess: async () => await messagesQuery.refetch(),
-    }),
-  );
-  const replyToUserMessage = useMutation(
-    replyToUserMessageOpts({
-      onSuccess: async () => await messagesQuery.refetch(),
-    }),
-  );
+  const sendMessageToProducer = useSendMessageToProducer({
+    onSuccess: async () => await messagesQuery.refetch(),
+  });
+  const replyToUserMessage = useReplyToUserMessage({
+    onSuccess: async () => await messagesQuery.refetch(),
+  });
 
   async function blockChat() {
     if (!chatQuery.data) {
@@ -168,7 +152,7 @@ export function ChatPageClient(props: {
 
   const messageIsInvalid = useMemo(
     () => message.trim().length === 0,
-    [message],
+    [message]
   );
 
   const userIsInitiator = chatQuery.data?.initiatorUserId === props.userId;

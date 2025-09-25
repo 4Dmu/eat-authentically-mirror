@@ -1,5 +1,4 @@
-import { getUserChatsMessageNotificationsCountOpts } from "@/utils/messages";
-import { useQuery } from "@tanstack/react-query";
+import { useUserChatsMessageNotificationsCount } from "@/utils/messages";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { ChatNotificationsCount } from "@/backend/rpc/messages";
@@ -7,9 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 
 export function MessageNotifications({ className }: { className?: string }) {
   const { userId } = useAuth();
-  const countQuery = useQuery(
-    getUserChatsMessageNotificationsCountOpts(userId),
-  );
+  const countQuery = useUserChatsMessageNotificationsCount(userId);
 
   if (!countQuery.data || countQuery.data == 0) {
     return;

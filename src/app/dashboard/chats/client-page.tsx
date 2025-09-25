@@ -6,43 +6,53 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { countListItemsByPropertyValues } from "@/utils/array";
 import {
-  getUserChatMessageNotificationsCountOpts,
-  listAllProducersChatsOpts,
-  listUserChatsOpts,
+  useUserChatMessageNotificationsCount,
+  useAllProducersChats,
+  useUserChats,
 } from "@/utils/messages";
 import { primaryImageUrl } from "@/utils/producers";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
+import { useMemo } from "react";
 import { match, P } from "ts-pattern";
 
 export function ChatsPageClient(props: {
   userChats: ProducerChat[];
   producerChats: ProducerChat[];
 }) {
-  const chatsQuery = useQueries({
-    queries: [
-      listUserChatsOpts({ initialData: props.userChats }),
-      listAllProducersChatsOpts({ initialData: props.producerChats }),
-    ],
-    combine: (results) => {
-      return {
-        data: results.flatMap((r) => r.data ?? []) as ProducerChat[],
-        pending: results.some((result) => result.isPending),
-      };
-    },
+  const userChatsQuery = useUserChats({ initialData: props.userChats });
+  const producerChatsQuery = useAllProducersChats({
+    initialData: props.producerChats,
   });
+
+  const chatsQuery = useMemo(() => {
+    const userChats = userChatsQuery.data;
+    const producerChats = producerChatsQuery.data;
+
+    const chats = [
+      ...(userChats ?? []),
+      ...(producerChats ?? []),
+    ] as ProducerChat[];
+
+    const pending = userChatsQuery.isPending || producerChatsQuery.isPending;
+
+    return { data: chats, pending };
+  }, [
+    userChatsQuery.data,
+    producerChatsQuery.data,
+    userChatsQuery.isPending,
+    producerChatsQuery.isPending,
+  ]);
 
   const hasMoreThanOneChatWithSameProducer = countListItemsByPropertyValues(
     chatsQuery.data,
-    "producerUserId",
+    "producerUserId"
   ).some((entry) => entry[1] > 1);
 
-  const countsQuery = useQuery(
-    getUserChatMessageNotificationsCountOpts({
-      chatIds: chatsQuery.data.map((c) => c.id),
-    }),
-  );
+  const countsQuery = useUserChatMessageNotificationsCount({
+    chatIds: chatsQuery.data.map((c) => c.id),
+  });
 
   return (
     <div>

@@ -31,205 +31,219 @@ import {
   UnblockUserChatArgs,
 } from "@/backend/validators/messages";
 import {
-  MutationOptions,
-  mutationOptions,
-  QueryKey,
-  QueryOptions,
-  queryOptions,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  UseQueryOptions,
 } from "@tanstack/react-query";
 
-type MutationOpts<T, T2, T3, T4> = Omit<
-  MutationOptions<T, T2, T3, T4>,
-  "mutationFn" | "mutationKey"
->;
+// ----------------------- Mutations -----------------------
 
-type QueryOpts<
-  TQueryFnData = unknown,
-  TError = Error,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = readonly unknown[],
-  TPageParam = never,
-> = Omit<
-  QueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
-  "queryKey" | "queryFn"
->;
-
-export const sendMessageToProducerOpts = (
-  opts?: MutationOpts<string, Error, SendMessageToProducerArgs, unknown>
-) =>
-  mutationOptions({
+export function useSendMessageToProducer(
+  opts?: UseMutationOptions<string, Error, SendMessageToProducerArgs, unknown>
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["send-message-to-producer"],
-    mutationFn: async (args: SendMessageToProducerArgs) =>
-      await sendMessageToProducer(args),
+    mutationKey: ["send-message-to-producer"] as const,
+    mutationFn: (args: SendMessageToProducerArgs) =>
+      sendMessageToProducer(args),
   });
+}
 
-export const replyToUserMessageOpts = (
-  opts?: MutationOpts<void, Error, ReplyToUserMessageArgs, unknown>
-) =>
-  mutationOptions({
+export function useReplyToUserMessage(
+  opts?: UseMutationOptions<void, Error, ReplyToUserMessageArgs, unknown>
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["reply-to-user-message"],
-    mutationFn: async (args: ReplyToUserMessageArgs) =>
-      await replyToUserMessage(args),
+    mutationKey: ["reply-to-user-message"] as const,
+    mutationFn: (args: ReplyToUserMessageArgs) => replyToUserMessage(args),
   });
+}
 
-export const blockUserChatOpts = (
-  opts?: MutationOpts<void, Error, BlockUserChatArgs, unknown>
-) =>
-  mutationOptions({
+export function useBlockUserChat(
+  opts?: UseMutationOptions<void, Error, BlockUserChatArgs, unknown>
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["block-user-chat"],
-    mutationFn: async (args: BlockUserChatArgs) => await blockUserChat(args),
+    mutationKey: ["block-user-chat"] as const,
+    mutationFn: (args: BlockUserChatArgs) => blockUserChat(args),
   });
+}
 
-export const unblockUserChatOpts = (
-  opts?: MutationOpts<void, Error, UnblockUserChatArgs, unknown>
-) =>
-  mutationOptions({
+export function useUnblockUserChat(
+  opts?: UseMutationOptions<void, Error, UnblockUserChatArgs, unknown>
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["unblock-user-chat"],
-    mutationFn: async (args: UnblockUserChatArgs) =>
-      await unblockUserChat(args),
+    mutationKey: ["unblock-user-chat"] as const,
+    mutationFn: (args: UnblockUserChatArgs) => unblockUserChat(args),
   });
+}
 
-export const blockProducerChatOpts = (
-  opts?: MutationOpts<void, Error, BlockProducerChatArgs, unknown>
-) =>
-  mutationOptions({
+export function useBlockProducerChat(
+  opts?: UseMutationOptions<void, Error, BlockProducerChatArgs, unknown>
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["block-producer-chat"],
-    mutationFn: async (args: BlockProducerChatArgs) =>
-      await blockProducerChat(args),
+    mutationKey: ["block-producer-chat"] as const,
+    mutationFn: (args: BlockProducerChatArgs) => blockProducerChat(args),
   });
+}
 
-export const unblockProducerChatOpts = (
-  opts?: MutationOpts<void, Error, UnblockProducerChatArgs, unknown>
-) =>
-  mutationOptions({
+export function useUnblockProducerChat(
+  opts?: UseMutationOptions<void, Error, UnblockProducerChatArgs, unknown>
+) {
+  return useMutation({
     ...opts,
-    mutationKey: ["unblock-producer-chat"],
-    mutationFn: async (args: UnblockProducerChatArgs) =>
-      await unblockProducerChat(args),
+    mutationKey: ["unblock-producer-chat"] as const,
+    mutationFn: (args: UnblockProducerChatArgs) => unblockProducerChat(args),
   });
+}
 
-export const listUserChatsOpts = (
+export function useResetChatNotifications(
+  opts?: UseMutationOptions<void, Error, ResetChatNotificationsArgs, unknown>
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["reset-chat-notifications"] as const,
+    mutationFn: (args: ResetChatNotificationsArgs) =>
+      resetChatNotifications(args),
+  });
+}
+
+// ------------------------- Queries -------------------------
+
+export function useUserChats(
   opts?: Omit<
-    QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
+    UseQueryOptions<ProducerChat[], Error, ProducerChat[], readonly [string]>,
     "queryKey" | "queryFn"
   >
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["user-chats"],
-    queryFn: async () => await listUserChats(),
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["user-chats"] as const,
+    queryFn: () => listUserChats(),
   });
+}
 
-export const listProducerChatsOpts = (
+export function useProducerChats(
   args: ListProducerChatsArgs,
   opts?: Omit<
-    QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
+    UseQueryOptions<
+      ProducerChat[],
+      Error,
+      ProducerChat[],
+      readonly [string, ListProducerChatsArgs]
+    >,
     "queryKey" | "queryFn"
   >
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["producer-chats"],
-    queryFn: async () => await listProducerChats(args),
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["producer-chats", args] as const, // include args to avoid collisions
+    queryFn: () => listProducerChats(args),
   });
+}
 
-export const listAllProducersChatsOpts = (
+export function useAllProducersChats(
   opts?: Omit<
-    QueryOptions<ProducerChat[], Error, ProducerChat[], string[]>,
+    UseQueryOptions<ProducerChat[], Error, ProducerChat[], readonly [string]>,
     "queryKey" | "queryFn"
   >
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["all-producers-chats"],
-    queryFn: async () => await listAllProducersChats(),
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["all-producers-chats"] as const,
+    queryFn: () => listAllProducersChats(),
   });
+}
 
-export const getUserOrProducerChatOpts = (
+export function useChat<TData = ProducerChat | undefined, TSelect = TData>(
   chatId: string,
-  opts?: QueryOpts<
-    ProducerChat | undefined,
-    Error,
-    ProducerChat | undefined,
-    string[]
+  opts?: Omit<
+    UseQueryOptions<
+      ProducerChat | undefined,
+      Error,
+      TSelect,
+      readonly [string, string]
+    >,
+    "queryKey" | "queryFn"
   >
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["chat"],
-    queryFn: () => getUserOrProducerChat({ chatId: chatId }),
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["chat", chatId] as const, // include id to scope cache
+    queryFn: () => getUserOrProducerChat({ chatId }),
   });
+}
 
-export const getProducerChatOpts = (
+export function useProducerChat<TData = ProducerChat | null, TSelect = TData>(
   args: GetProducerChatArgs,
-  opts?: QueryOpts<ProducerChat | null, Error, ProducerChat | null, string[]>
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["chat"],
+  opts?: UseQueryOptions<
+    ProducerChat | null,
+    Error,
+    TSelect,
+    readonly [string, GetProducerChatArgs]
+  >
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["chat", args] as const, // include args to scope cache
     queryFn: () => getProducerChat(args),
   });
+}
 
-export const getUserOrProducerChatMessagesOpts = (
+export function useChatMessages(
   chatId: string,
-  opts?: QueryOpts<
-    ProducerChatMessage[] | undefined,
-    Error,
-    ProducerChatMessage[] | undefined,
-    string[]
+  opts?: Omit<
+    UseQueryOptions<
+      ProducerChatMessage[] | undefined,
+      Error,
+      ProducerChatMessage[] | undefined,
+      readonly [string, string]
+    >,
+    "queryKey" | "queryFn"
   >
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["chat-messages", chatId],
-    queryFn: () => getUserOrProducerChatMessages({ chatId: chatId }),
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["chat-messages", chatId] as const,
+    queryFn: () => getUserOrProducerChatMessages({ chatId }),
     refetchInterval: 1000 * 10,
   });
+}
 
-export const getUserChatsMessageNotificationsCountOpts = (
+export function useUserChatsMessageNotificationsCount(
   userId: string | undefined | null,
-  opts?: QueryOpts<number | null, Error, number | null, string[]>
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["user-chats-message-notifications"],
-    queryFn: async () => await getUserChatsMessageNotificationsCount(),
+  opts?: UseQueryOptions<
+    number | null,
+    Error,
+    number | null,
+    readonly [string, string | null]
+  >
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["user-chats-message-notifications", userId ?? null] as const,
+    queryFn: () => getUserChatsMessageNotificationsCount(),
     refetchInterval: 1000 * 60,
-    enabled: userId != null && userId !== undefined,
+    enabled: userId != null && userId !== undefined && (opts?.enabled ?? true),
   });
+}
 
-export const getUserChatMessageNotificationsCountOpts = (
+export function useUserChatMessageNotificationsCount(
   args: GetUserChatMessageNotificationsCountArgs,
-  opts?: QueryOpts<
+  opts?: UseQueryOptions<
     ChatNotificationsCount[],
     Error,
     ChatNotificationsCount[],
-    (
-      | string
-      | {
-          chatIds: string[];
-        }
-    )[]
+    readonly [string, GetUserChatMessageNotificationsCountArgs]
   >
-) =>
-  queryOptions({
-    ...opts,
-    queryKey: ["user-chat-message-notifications", args],
-    queryFn: async () => await getUserChatMessageNotificationsCount(args),
+) {
+  return useQuery({
+    ...(opts as object),
+    queryKey: ["user-chat-message-notifications", args] as const,
+    queryFn: () => getUserChatMessageNotificationsCount(args),
     refetchInterval: 1000 * 60,
   });
-
-export const resetChatNotificationsOpts = (
-  opts?: MutationOpts<void, Error, ResetChatNotificationsArgs, unknown>
-) =>
-  mutationOptions({
-    ...opts,
-    mutationKey: ["reset-chat-notifications"],
-    mutationFn: async (args: ResetChatNotificationsArgs) =>
-      await resetChatNotifications(args),
-  });
+}

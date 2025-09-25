@@ -16,11 +16,7 @@ import { Send } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { type } from "arktype";
 import { FieldInfo } from "./forms/helpers/field-info";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  getProducerChatOpts,
-  sendMessageToProducerOpts,
-} from "@/utils/messages";
+import { useProducerChat, useSendMessageToProducer } from "@/utils/messages";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { match, P } from "ts-pattern";
@@ -37,14 +33,12 @@ export function MessageProducerDialog({
   producer: PublicProducerLight;
   disabled: boolean;
 }) {
-  const chatQuery = useQuery(getProducerChatOpts({ producerId: producer.id }));
+  const chatQuery = useProducerChat({ producerId: producer.id });
   const router = useRouter();
-  const sendMessage = useMutation(
-    sendMessageToProducerOpts({
-      onError: (e) => toast.error(e.message),
-      onSuccess: async () => await chatQuery.refetch(),
-    }),
-  );
+  const sendMessage = useSendMessageToProducer({
+    onError: (e) => toast.error(e.message),
+    onSuccess: async () => await chatQuery.refetch(),
+  });
 
   const [open, setOpen] = useState(false);
 
