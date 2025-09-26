@@ -1,7 +1,6 @@
 import {
   keepPreviousData,
   MutationOptions,
-  QueryOptions,
   useMutation,
   UseMutationOptions,
   useQuery,
@@ -47,51 +46,6 @@ import { match, P } from "ts-pattern";
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
   "mutationFn" | "mutationKey"
->;
-
-type QOpts<T, T2, T3, T4 extends readonly unknown[]> = Omit<
-  QueryOptions<T, T2, T3, T4>,
-  "queryKey" | "queryFn"
->;
-
-type LoggedInUserProducersOptions = QueryOptions<
-  Producer[],
-  Error,
-  Producer[],
-  string[]
->;
-
-type LoggedInUserProducerOptions = QueryOptions<
-  Producer | undefined,
-  Error,
-  Producer | undefined,
-  string[]
->;
-
-type EditProducerOpts = MutationOptions<void, Error, EditProducerArgs, unknown>;
-
-type ClaimProducerOpts = MutationOptions<
-  void,
-  Error,
-  ClaimProducerArgs,
-  unknown
->;
-
-/**
- * Additional user provided mutation opts for `checkClaimDomainDnsOpts`
- */
-type CheckClaimDomainDnsOpts = MutationOptions<
-  string,
-  Error,
-  CheckClaimDomainDnsArgs,
-  unknown
->;
-
-type VerifyClaimPhoneOpts = MutationOptions<
-  string,
-  Error,
-  VerifyClaimPhoneArgs,
-  unknown
 >;
 
 /**

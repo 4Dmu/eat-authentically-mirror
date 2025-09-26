@@ -19,7 +19,6 @@ import {
   primaryImageUrl,
   producerSlugFull,
 } from "@/utils/producers";
-import { useQueryClient } from "@tanstack/react-query";
 import { BuildingIcon, EyeIcon, EditIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,7 +30,6 @@ export function ProducersSection({ producers }: { producers: Producer[] }) {
   const [producerDialogOpen, setProducerDialogOpen] = useState(false);
   const searchparams = useSearchParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const deleteProducer = useDeleteProducer();
   const { data } = useFetchUserProducers({ initialData: producers });
 

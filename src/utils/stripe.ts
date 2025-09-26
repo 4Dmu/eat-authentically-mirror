@@ -1,8 +1,4 @@
-import {
-  useMutation,
-  UseMutationOptions,
-  WithRequired,
-} from "@tanstack/react-query";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { createBillingPortalSession } from "@/backend/rpc/stripe";
 
 export function useBillingPortableMutation(
