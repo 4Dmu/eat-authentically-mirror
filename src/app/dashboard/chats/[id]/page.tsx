@@ -46,9 +46,9 @@ export default async function ChatPage({
   const messages = await getUserOrProducerChatMessages({ chatId: chat.id });
 
   return (
-    <div className="p-10 h-[calc(100vh_-_150px)]">
+    <div className="p-2 md:p-10 h-[calc(100vh_-_90px)]">
       <div className="max-w-4xl mx-auto flex flex-col gap-10 h-full">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between max-md:hidden">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -83,7 +83,7 @@ export default async function ChatPage({
                   {match(chat)
                     .with(
                       { initiatorUserName: P.nonNullable },
-                      (v) => v.initiatorUserName,
+                      (v) => v.initiatorUserName
                     )
                     .otherwise((c) => c.producer.name)}
                 </BreadcrumbPage>
@@ -91,7 +91,7 @@ export default async function ChatPage({
             </BreadcrumbList>
           </Breadcrumb>
 
-          <BackButton href={"/"} text="Back to Home" />
+          <BackButton href={"/dashboard/chats"} text="Back" />
         </div>
         <ChatPageClient
           messages={messages}

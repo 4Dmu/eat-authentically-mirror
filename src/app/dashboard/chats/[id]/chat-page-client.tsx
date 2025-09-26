@@ -26,8 +26,17 @@ import {
   useUnblockUserChat,
 } from "@/utils/messages";
 import { primaryImageUrl } from "@/utils/producers";
+import { format, startOfDay } from "date-fns";
 import { Shield, ShieldOff } from "lucide-react";
-import { startTransition, useMemo, useOptimistic, useState } from "react";
+import {
+  Fragment,
+  startTransition,
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useRef,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import { match, P } from "ts-pattern";
 
@@ -36,6 +45,7 @@ export function ChatPageClient(props: {
   userId: string;
   messages: ProducerChatMessage[];
 }) {
+  const messageListRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState("");
   const chatQuery = useChat(props.chat.id, { initialData: props.chat });
   const messagesQuery = useChatMessages(props.chat.id, {
@@ -48,6 +58,19 @@ export function ChatPageClient(props: {
     messagesQueryData,
     (state, message: ProducerChatMessage) => [...state, message]
   );
+
+  const sortedMessages = useMemo(() => {
+    const groups = new Map<number, ProducerChatMessage[]>();
+
+    for (const message of messages) {
+      const date = startOfDay(message.createdAt).getTime();
+      const group = groups.get(date) ?? [];
+      group.push(message);
+      groups.set(date, group);
+    }
+
+    return Array.from(groups.entries());
+  }, [messages]);
 
   const blockUserChatMut = useBlockUserChat({
     onSuccess: async () => await chatQuery.refetch(),
@@ -78,7 +101,6 @@ export function ChatPageClient(props: {
       return;
     }
 
-    console.log(chatQuery.data.initiatorUserId === props.userId);
     if (chatQuery.data.initiatorUserId === props.userId) {
       blockProducerChatMut.mutate({
         chatId: chatQuery.data.id,
@@ -156,6 +178,12 @@ export function ChatPageClient(props: {
 
   const userIsInitiator = chatQuery.data?.initiatorUserId === props.userId;
 
+  useEffect(() => {
+    messageListRef.current?.scrollTo({
+      top: messageListRef.current.scrollHeight,
+    });
+  }, [messages]);
+
   return (
     <>
       {match(chatQuery.data)
@@ -224,15 +252,25 @@ export function ChatPageClient(props: {
             </CardHeader>
             <Separator />
             <CardContent className="h-full min-h-0">
-              <div className="overflow-auto flex-1 shrink h-full min-h-0">
+              <div
+                ref={messageListRef}
+                className="overflow-auto flex-1 shrink h-full min-h-0 px-5"
+              >
                 <div className="flex flex-col gap-5 pb-0">
                   <div className="flex flex-col gap-5">
-                    {messages.map((message) => (
-                      <MessageCard
-                        message={message}
-                        userId={props.userId}
-                        key={message.id}
-                      />
+                    {sortedMessages.map((group, i) => (
+                      <Fragment key={i}>
+                        <p className="text-center">
+                          {format(new Date(group[0]), "EE, MMM dd, yyyy")}
+                        </p>
+                        {group[1].map((message) => (
+                          <MessageCard
+                            message={message}
+                            userId={props.userId}
+                            key={message.id}
+                          />
+                        ))}
+                      </Fragment>
                     ))}
                   </div>
                   {((userIsInitiator &&
