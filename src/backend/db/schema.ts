@@ -27,8 +27,13 @@ export type Video = {
 };
 
 export type BusinessHours = {
-  open: string;
-  close: string;
+  sun: { open: string; close: string };
+  mon: { open: string; close: string };
+  tue: { open: string; close: string };
+  wed: { open: string; close: string };
+  thu: { open: string; close: string };
+  fri: { open: string; close: string };
+  sat: { open: string; close: string };
 };
 
 export type ScrapeMeta = {
@@ -64,6 +69,22 @@ export type ClaimRequestStatus =
       expiredAt: Date;
     };
 
+export type GoogleMapsPlaceDetails = {
+  name: string;
+  id: string;
+  googleMapsUri: string;
+  businessStatus: string;
+  types: string[];
+  rating: number;
+};
+
+export type ServiceDetails = {
+  takeout: true;
+  delivery: false;
+  dineIn: true;
+  reservable: true;
+};
+
 export const pinboardViewModes = ["grid", "list", "map"] as const;
 
 export const producers = sqliteTable("producers", {
@@ -87,7 +108,11 @@ export const producers = sqliteTable("producers", {
   address: text({ mode: "json" }).$type<Address>(),
   video: text({ mode: "json" }).$type<Video>(),
   scrapeMeta: text({ mode: "json" }).$type<ScrapeMeta>(),
-
+  hours: text({ mode: "json" }).$type<BusinessHours>(),
+  googleMapsPlaceDetails: text({
+    mode: "json",
+  }).$type<GoogleMapsPlaceDetails>(),
+  serviceDetails: text({ mode: "json" }).$type<ServiceDetails>(),
   createdAt: integer({ mode: "timestamp" }).notNull(),
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
