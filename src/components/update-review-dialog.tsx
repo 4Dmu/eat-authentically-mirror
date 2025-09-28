@@ -18,13 +18,13 @@ import { EditIcon } from "lucide-react";
 import { Stars } from "@/backend/validators/reviews";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
-import { PublicReview } from "@/backend/rpc/reviews";
+import { UserPublicReview } from "@/backend/rpc/reviews";
 
 export function UpdateReviewDialog({
   review,
   disable,
 }: {
-  review: ReviewSelect | PublicReview;
+  review: ReviewSelect | UserPublicReview;
   disable?: boolean;
 }) {
   const [rating, setRating] = useState<Stars>(review.rating);

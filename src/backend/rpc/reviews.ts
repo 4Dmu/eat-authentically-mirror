@@ -144,3 +144,5 @@ export const updateReview = authenticatedActionClient
 export type PublicReview = Awaited<
   ReturnType<typeof listReviewsPublic>
 >[number];
+
+export type UserPublicReview = Exclude<PublicReview, { data: object }>;
