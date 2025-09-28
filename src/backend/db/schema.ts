@@ -136,7 +136,7 @@ export const producerChats = sqliteTable(
     createdAt: integer({ mode: "timestamp" }).notNull(),
     updatedAt: integer({ mode: "timestamp" }).notNull(),
   },
-  (t) => [unique().on(t.initiatorUserId, t.producerId, t.producerUserId)],
+  (t) => [unique().on(t.initiatorUserId, t.producerId, t.producerUserId)]
 );
 
 export const producerChatsRelations = relations(
@@ -147,7 +147,7 @@ export const producerChatsRelations = relations(
       fields: [producerChats.producerId],
       references: [producers.id],
     }),
-  }),
+  })
 );
 
 export const producerChatMessages = sqliteTable("producer_chat_messages", {
@@ -168,7 +168,7 @@ export const producerChatMessagesRelations = relations(
       fields: [producerChatMessages.chatId],
       references: [producerChats.id],
     }),
-  }),
+  })
 );
 
 export const reviews = sqliteTable(
@@ -186,7 +186,38 @@ export const reviews = sqliteTable(
   },
   (table) => [
     check("rating_check", sql`${table.rating} >= 0 AND rating <= 5.0`),
-  ],
+  ]
+);
+
+export const importedReviews = sqliteTable(
+  "importedReviews",
+  {
+    id: text().primaryKey(),
+    producerId: text()
+      .notNull()
+      .references(() => producers.id, { onDelete: "cascade" }),
+    rating: real().$type<Stars>().notNull(),
+    data: text({ mode: "json" })
+      .$type<{
+        type: "google-maps";
+        googleMapsReviewName: string;
+        text: { text: string; languageCode: string };
+        originalText: { text: string; languageCode: string };
+        authorAttribution: {
+          displayName: string;
+          uri: string;
+          photoUri: string;
+        };
+        publishTime: string;
+        googleMapsUri: string;
+      }>()
+      .notNull(),
+    createdAt: integer({ mode: "timestamp" }).notNull(),
+    updatedAt: integer({ mode: "timestamp" }).notNull(),
+  },
+  (table) => [
+    check("rating_check", sql`${table.rating} >= 0 AND rating <= 5.0`),
+  ]
 );
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({
@@ -208,7 +239,7 @@ export const certificationsRelations = relations(
   certifications,
   ({ many }) => ({
     certificationsToProducers: many(certificationsToProducers),
-  }),
+  })
 );
 
 export const certificationsToProducers = sqliteTable(
@@ -221,7 +252,7 @@ export const certificationsToProducers = sqliteTable(
       .notNull()
       .references(() => producers.id, { onDelete: "cascade" }),
   },
-  (t) => [primaryKey({ columns: [t.certificationId, t.listingId] })],
+  (t) => [primaryKey({ columns: [t.certificationId, t.listingId] })]
 );
 
 export const certificationsToProducersRelations = relations(
@@ -235,7 +266,7 @@ export const certificationsToProducersRelations = relations(
       fields: [certificationsToProducers.listingId],
       references: [producers.id],
     }),
-  }),
+  })
 );
 
 export const pinboards = sqliteTable("pinboards", {
@@ -267,7 +298,7 @@ export const pins = sqliteTable(
     unique().on(t.pinboardId, t.producerId),
     index("idxPinPinboard").on(t.pinboardId),
     index("idxPinProducer").on(t.producerId),
-  ],
+  ]
 );
 
 export const pinsRelations = relations(pins, ({ one }) => ({
@@ -296,7 +327,7 @@ export const pinLists = sqliteTable(
   (t) => [
     unique().on(t.pinboardId, t.name),
     index("idxPinlistPinboard").on(t.pinboardId),
-  ],
+  ]
 );
 
 export const pinListsRelations = relations(pinLists, ({ one, many }) => ({
@@ -318,7 +349,7 @@ export const pinListItems = sqliteTable(
       .references(() => pins.id, { onDelete: "cascade" }),
     createdAt: integer({ mode: "timestamp" }).notNull(),
   },
-  (t) => [primaryKey({ columns: [t.pinListId, t.pinId] })],
+  (t) => [primaryKey({ columns: [t.pinListId, t.pinId] })]
 );
 
 export const pinListItemsRelations = relations(pinListItems, ({ one }) => ({

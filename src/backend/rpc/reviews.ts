@@ -8,10 +8,11 @@ import {
   updateReviewArgs,
 } from "../validators/reviews";
 import { authenticatedActionClient } from "./helpers/middleware";
-import { producers, reviews } from "../db/schema";
+import { importedReviews, producers, reviews } from "../db/schema";
 import { getSubTier } from "./utils/get-sub-tier";
 import { actionClient } from "./helpers/safe-action";
 import { USER_DATA_KV } from "../kv";
+import { isBefore } from "date-fns";
 
 export const reviewProducer = authenticatedActionClient
   .input(reviewProducerArgs)
@@ -34,13 +35,13 @@ export const reviewProducer = authenticatedActionClient
       const existingReview = await db.query.reviews.findFirst({
         where: and(
           eq(reviews.producerId, producerId),
-          eq(reviews.reviewerUserId, userId),
+          eq(reviews.reviewerUserId, userId)
         ),
       });
 
       if (existingReview) {
         throw new Error(
-          "You can only review a producer once, if your would like to change your review please update it.",
+          "You can only review a producer once, if your would like to change your review please update it."
         );
       }
 
@@ -65,26 +66,38 @@ export const reviewProducer = authenticatedActionClient
         })
         .returning()
         .then((r) => r[0]);
-    },
+    }
   );
 
 export const listReviewsPublic = actionClient
   .input(listReviewsPublicArgs)
   .name("listReviewsPublic")
   .action(async ({ input: { producerId } }) => {
-    const results = await db.query.reviews.findMany({
+    const userR = await db.query.reviews.findMany({
       where: eq(reviews.producerId, producerId),
     });
+
+    const importedR = await db.query.importedReviews.findMany({
+      where: eq(importedReviews.producerId, producerId),
+    });
+
+    const results = [...userR, ...importedR].sort((a, b) =>
+      isBefore(a.createdAt, b.createdAt) ? 1 : 0
+    );
 
     const response = [];
 
     for (const result of results) {
-      const data = await USER_DATA_KV.get(result.reviewerUserId);
-      response.push({
-        ...result,
-        reviewerUserImgUrl: data?.image_url,
-        reviewerUserFirstName: data?.first_name ?? undefined,
-      });
+      if ("data" in result) {
+        response.push(result);
+      } else {
+        const data = await USER_DATA_KV.get(result.reviewerUserId);
+        response.push({
+          ...result,
+          reviewerUserImgUrl: data?.image_url,
+          reviewerUserFirstName: data?.first_name ?? undefined,
+        });
+      }
     }
 
     return response;
