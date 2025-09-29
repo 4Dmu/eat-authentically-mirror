@@ -20,7 +20,13 @@ import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { CreditCard, EditIcon, MailIcon, PinIcon } from "lucide-react";
+import {
+  CreditCard,
+  EditIcon,
+  MailIcon,
+  PinIcon,
+  UserIcon,
+} from "lucide-react";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Badge } from "@/components/ui/badge";
 import { fetchUserProducers, listClaimRequests } from "@/backend/rpc/producers";
@@ -98,134 +104,166 @@ export default async function DashboardPage() {
             </div>
           </CardHeader>
           {match(subTier)
-            .with("Free", () => (
-              <>
-                <Separator />
-                <CardContent>
-                  <Card className="bg-[#DCFCE7] shadow-none">
-                    <CardHeader>
-                      <CardTitle>Upgrade</CardTitle>
-                      <CardDescription>
-                        Upgrade to a payed subscription to unlock our best
-                        features.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className={cn("grid gap-10 grid-cols-2")}>
-                      <div className="flex flex-col gap-2">
-                        <p>
-                          For food enthusiasts who want to connect and engage.
-                        </p>
-                        <Button>
-                          <Link href={"/dashboard/subscribe?mode=community"}>
-                            Upgrade to Community Member
-                          </Link>
-                        </Button>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <p>
-                          For businesses who want to grow their reach and sales.
-                        </p>
-                        <Button variant={"brandGreen"}>
-                          <Link href={"/dashboard/subscribe?mode=producer"}>
-                            Upgrade to Producer tier
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CardContent>
-              </>
-            ))
+            .with("Free", () =>
+              producers.length > 0 ? (
+                <>
+                  <Separator />
+                  <CardContent className="flex flex-col gap-2 justify-center text-center">
+                    <h5 className="font-bold text-lg">
+                      Your producer profile is live
+                    </h5>
+                    <p>
+                      You can manage your profile, update details, and connect
+                      with the community. Upgrade to unlock advanced tools to
+                      grow your reach.
+                    </p>
+                    <div className="gap-5 flex flex-wrap justify-center mt-5">
+                      <Button variant={"brandGreen"}>
+                        <Link
+                          href={
+                            subTier === "Free"
+                              ? "/dashboard/subscribe?mode=producer"
+                              : "/dashboard/billing"
+                          }
+                        >
+                          Upgrade to Producer Pro
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </>
+              ) : (
+                <>
+                  <Separator />
+                  <CardContent className="flex flex-col gap-2 justify-center text-center">
+                    <h5 className="font-bold text-lg">
+                      Welcome to Eat Authentically
+                    </h5>
+                    <p>
+                      Browse farms, ranches, and eateries. Save your favorites
+                      to your Pinboard, or claim a producer listing if it&apos;s
+                      yours.
+                    </p>
+                    <div className="gap-5 flex flex-wrap justify-center mt-5">
+                      <Button>Add A Producer Profile (Free)</Button>
+                      <Button>Claim a Producer Profile</Button>
+                      <Button variant={"brandGreen"}>
+                        <Link
+                          href={
+                            subTier === "Free"
+                              ? "/dashboard/subscribe?mode=community"
+                              : "/dashboard/billing"
+                          }
+                        >
+                          Upgrade to Community Member
+                        </Link>
+                      </Button>
+                      <Button variant={"brandGreen"}>
+                        <Link
+                          href={
+                            subTier === "Free"
+                              ? "/dashboard/subscribe?mode=producer"
+                              : "/dashboard/billing"
+                          }
+                        >
+                          Become a Paid Producer
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </>
+              )
+            )
             .with({ tier: "community" }, () => (
               <>
                 <Separator />
-                <CardContent>
-                  <Card className="bg-[#DCFCE7] shadow-none">
-                    <CardHeader>
-                      <CardTitle>Upgrade</CardTitle>
-                      <CardDescription>
-                        Want more then 1 image or 3 certifications? Upgrade to
-                        the pro tier or higher.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className={"grid gap-10"}>
-                      <div className="flex flex-col gap-2 col-span-2">
-                        <p>Upgrade to the</p>
-                        <Button variant={"brandGreen"}>
-                          <Link
-                            href={
-                              subTier === "Free"
-                                ? "/dashboard/subscribe?mode=producer"
-                                : "/dashboard/billing"
-                            }
-                          >
-                            Upgrade Your Subscription
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <CardContent className="flex flex-col gap-2 justify-center text-center">
+                  <h5 className="font-bold text-lg">
+                    Thanks for supporting the community
+                  </h5>
+                  <p>
+                    You&apos;re enjoying exclusive member benefits and helping
+                    Eat Authentically thrive. Want to represent your own farm,
+                    ranch, or eatery?
+                  </p>
+                  <div className="gap-5 flex flex-wrap justify-center mt-5">
+                    {producers.length === 0 && (
+                      <Button>Add A Producer Profile (Free)</Button>
+                    )}
+                    {producers.length === 0 && (
+                      <Button>Claim a Producer Profile</Button>
+                    )}
+                    <Button variant={"brandGreen"}>
+                      <Link
+                        href={
+                          subTier === "Free"
+                            ? "/dashboard/subscribe?mode=producer"
+                            : "/dashboard/billing"
+                        }
+                      >
+                        Upgrade to Producer Pro
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </>
             ))
-            .with({ tier: "pro" }, () => (
+            .with({ tier: "pro" }, { tier: "premium" }, (t) => (
               <>
                 <Separator />
-                <CardContent>
-                  <Card className="bg-[#DCFCE7] shadow-none">
-                    <CardHeader>
-                      <CardTitle>Upgrade</CardTitle>
-                      <CardDescription>
-                        Want to add more images and certifications, a priority
-                        results slot or a video? Upgrade to the premium tier.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className={"grid gap-10"}>
-                      <div className="flex flex-col gap-2 col-span-2">
-                        <Button variant={"brandGreen"}>
-                          <Link href={"/dashboard/billing"}>
-                            Upgrade Your Subscription
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <CardContent className="flex flex-col gap-2 justify-center text-center">
+                  <h5 className="font-bold text-lg">
+                    You&apos;re a {t.tier} Producer
+                  </h5>
+                  <p>
+                    You have access to advanced producer tools. Keep your
+                    profile fresh and make the most of your subscription.
+                  </p>
+                  <div className="gap-5 flex flex-wrap justify-center mt-5">
+                    <Button variant={"brandGreen"}>
+                      <Link
+                        href={
+                          subTier === "Free"
+                            ? "/dashboard/subscribe?mode=producer"
+                            : "/dashboard/billing"
+                        }
+                      >
+                        Compare Plans / Upgrade
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </>
             ))
-            .with({ tier: "premium" }, () => (
+            .otherwise((t) => (
               <>
                 <Separator />
-                <CardContent>
-                  <Card className="bg-[#DCFCE7] shadow-none">
-                    <CardHeader>
-                      <CardTitle>Upgrade</CardTitle>
-                      <CardDescription>
-                        Need more then one producer? Upgrade to the enterprise
-                        tier to add more than one producer.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className={"grid gap-10"}>
-                      <div className="flex flex-col gap-2 col-span-2">
-                        <Button variant={"brandGreen"}>
-                          <Link href={"/dashboard/billing"}>
-                            Upgrade Your Subscription
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <CardContent className="flex flex-col gap-2 justify-center text-center">
+                  <h5 className="font-bold text-lg">
+                    You&apos;re a {t.tier} Producer
+                  </h5>
+                  <p>
+                    You have access to advanced producer tools. Keep your
+                    profile fresh and make the most of your subscription.
+                  </p>
                 </CardContent>
               </>
-            ))
-            .otherwise(() => (
-              <></>
             ))}
-          <Separator />
-          <CardFooter className="flex gap-5 justify-center items-center w-full flex-wrap">
-            <Button variant={"brandRed"} className="w-32" asChild>
+          <CardFooter className="flex gap-5 justify-center items-center w-full flex-wrap"></CardFooter>
+        </Card>
+
+        <ProducersSection producers={producers} />
+
+        <ClaimRequestsSection claims={claimRequests} />
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Manage</CardTitle>
+          </CardHeader>
+          <CardContent className="flex gap-5 justify-center items-center w-full flex-wrap">
+            <Button className="w-32" asChild>
               <Link href={"/dashboard/account"}>
-                <EditIcon /> Account
+                <UserIcon /> Account
               </Link>
             </Button>
             <Button className="w-32" asChild>
@@ -246,12 +284,8 @@ export default async function DashboardPage() {
                 Pinboard
               </Link>
             </Button>
-          </CardFooter>
+          </CardContent>
         </Card>
-
-        <ProducersSection producers={producers} />
-
-        <ClaimRequestsSection claims={claimRequests} />
       </div>
     </div>
   );
