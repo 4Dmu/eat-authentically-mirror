@@ -18,6 +18,7 @@ import { GridIcon, ListIcon, MapIcon } from "lucide-react";
 import { PinboardMap } from "@/components/pinboard-map";
 import { useThrottleCallback } from "@react-hook/throttle";
 import { UpdateUserPinboardArgs } from "@/backend/validators/pinboard";
+import { Button } from "@/components/ui/button";
 
 export function PinboardPageClient(props: { pinboard: PinboardFull }) {
   const pinboard = useUserPinboardFull({ initialData: props.pinboard });
@@ -30,6 +31,21 @@ export function PinboardPageClient(props: { pinboard: PinboardFull }) {
   const updatePinboardMt = useUpdateUserPinboard({
     onSuccess: async () => await pinboard.refetch(),
   });
+
+  const emptyMessage = (
+    <div className="space-y-2">
+      <h1>
+        It's kind of lonely in here. Why don't you start building your Pinboard
+      </h1>
+      <p className="text-sm">
+        Save your favorite farms, ranches, and eateries here. You&apos;ll be
+        able to view them as a grid, list, or map whenever you want.
+      </p>
+      <Button>
+        <Link href={"/"}>Explore Farms, Ranches and Eateries </Link>
+      </Button>
+    </div>
+  );
 
   return (
     <div className="p-10 h-[calc(100vh_-_100px)]">
@@ -71,7 +87,7 @@ export function PinboardPageClient(props: { pinboard: PinboardFull }) {
                   viewMode: e as "grid",
                 })
               }
-              defaultValue={pinboard.data.viewMode}
+              defaultValue={pinboard.data?.viewMode}
               className="h-full"
             >
               <TabsList>
@@ -85,6 +101,7 @@ export function PinboardPageClient(props: { pinboard: PinboardFull }) {
                   <MapIcon />
                 </TabsTrigger>
               </TabsList>
+              {pinboard.data.pins.length === 0 && emptyMessage}
               <TabsContent value="grid">
                 <div className="grid sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-5">
                   {pinboard.data?.pins.map((p) => (
@@ -112,6 +129,7 @@ export function PinboardPageClient(props: { pinboard: PinboardFull }) {
             </Tabs>
           </>
         )}
+        {!pinboard.data && emptyMessage}
       </div>
     </div>
   );
