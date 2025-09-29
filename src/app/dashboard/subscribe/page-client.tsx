@@ -34,11 +34,11 @@ export function ClientPage(props: {
   mode?: "community" | "producer";
 }) {
   const [tier, setTier] = useState<Tier>(
-    props.mode === "community" ? "community" : "pro",
+    props.mode === "community" ? "community" : "pro"
   );
   const [interval, setInterval] = useState<Interval>("month");
   const [mode, setMode] = useState<"community" | "producer">(
-    props.mode ?? "producer",
+    props.mode ?? "producer"
   );
 
   const createOrgCheckoutSessionMutation = useMutation({
@@ -138,7 +138,7 @@ export function ClientPage(props: {
                     className={cn(
                       "flex gap-1 items-center rounded-full p-2",
                       interval == "month" &&
-                        "text-primary-foreground bg-primary",
+                        "text-primary-foreground bg-primary"
                     )}
                   >
                     1 Month
@@ -148,8 +148,7 @@ export function ClientPage(props: {
                     type="button"
                     className={cn(
                       "flex gap-1 items-center rounded-full p-2",
-                      interval == "year" &&
-                        "text-primary-foreground bg-primary",
+                      interval == "year" && "text-primary-foreground bg-primary"
                     )}
                   >
                     <span>12 Months</span>
@@ -164,9 +163,11 @@ export function ClientPage(props: {
                   select={() => {
                     setTier("community");
                   }}
-                  priceSubtitle="per month"
+                  priceSubtitle={
+                    interval === "month" ? "per month" : "per year"
+                  }
                   name={"Commiunity Member"}
-                  price="$4.99"
+                  price={interval === "month" ? "$4.99" : "$49.00"}
                   badge={{ name: "Commiunity Member" }}
                   pros={COMMUNITY_TIER_PROS}
                   cons={[]}
@@ -182,8 +183,10 @@ export function ClientPage(props: {
                       setTier("pro");
                     }}
                     name="Producer Pro"
-                    price="$29.99"
-                    priceSubtitle="per month"
+                    price={interval === "month" ? "$29.99" : "$299"}
+                    priceSubtitle={
+                      interval === "month" ? "per month" : "per year"
+                    }
                     pros={PRO_TIER_PROS}
                     cons={["Upload video: No"]}
                   />
@@ -195,8 +198,10 @@ export function ClientPage(props: {
                     select={() => {
                       setTier("premium");
                     }}
-                    price="$69.99"
-                    priceSubtitle="per month"
+                    price={interval === "month" ? "$69.99" : "$699"}
+                    priceSubtitle={
+                      interval === "month" ? "per month" : "per year"
+                    }
                     pros={PREMIUM_TIER_PROS}
                     cons={[]}
                   />
