@@ -249,7 +249,7 @@ async function images() {
 
 images();
 
-type Listing = {
+export type Listing = {
   id: string;
   name: string;
   categories: string[];
@@ -262,7 +262,7 @@ type Listing = {
   images: string[];
 };
 
-type GoogleMapsPlace = {
+export type GoogleMapsPlace = {
   name: string;
   id: string;
   types: string[];
@@ -278,14 +278,14 @@ type GoogleMapsPlace = {
   photos: Photo[];
 };
 
-type DisplayName = {
+export type DisplayName = {
   text: string;
   languageCode: LanguageCode;
 };
 
-type LanguageCode = "en";
+export type LanguageCode = "en";
 
-type Photo = {
+export type Photo = {
   name: string;
   widthPx: number;
   heightPx: number;
@@ -294,13 +294,13 @@ type Photo = {
   googleMapsUri: string;
 };
 
-type AuthorAttribution = {
+export type AuthorAttribution = {
   displayName: string;
   uri: string;
   photoUri: string;
 };
 
-type Review = {
+export type Review = {
   name: string;
   relativePublishTimeDescription: string;
   rating: number;
@@ -312,7 +312,7 @@ type Review = {
   googleMapsUri: string;
 };
 
-type Contact = {
+export type Contact = {
   address: string;
   phone: string;
   facebook: string;
@@ -320,22 +320,22 @@ type Contact = {
   website: string;
 };
 
-type Detail = {
+export type Detail = {
   title: string;
   content: string;
 };
 
-type Hour = {
+export type Hour = {
   day: string;
   times: string;
 };
 
-type Map = {
+export type Map = {
   address: string;
   geo: Geo;
 };
 
-type Geo = {
+export type Geo = {
   latitude: string;
   longitude: string;
 };
