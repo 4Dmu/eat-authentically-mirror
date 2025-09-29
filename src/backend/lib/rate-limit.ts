@@ -15,7 +15,7 @@ export const videoRatelimit = new Ratelimit({
 
 export const billingPortalRatelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.slidingWindow(2, "1m"),
+  limiter: Ratelimit.slidingWindow(5, "1m"),
   analytics: true,
   /**
    * Optional prefix for the keys used in redis. This is useful if you want to share a redis
