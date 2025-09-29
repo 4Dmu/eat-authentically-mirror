@@ -27,21 +27,27 @@ export type Video = {
 };
 
 export type BusinessHours = {
-  sun: { open: string; close: string };
-  mon: { open: string; close: string };
-  tue: { open: string; close: string };
-  wed: { open: string; close: string };
-  thu: { open: string; close: string };
-  fri: { open: string; close: string };
-  sat: { open: string; close: string };
+  sun?: { open: string; close: string };
+  mon?: { open: string; close: string };
+  tue?: { open: string; close: string };
+  wed?: { open: string; close: string };
+  thu?: { open: string; close: string };
+  fri?: { open: string; close: string };
+  sat?: { open: string; close: string };
 };
 
-export type ScrapeMeta = {
-  _metaType: "grownby";
-  numFavorites: string;
-  onboardingSteps: OnboardingSteps;
-  status: string;
-};
+export type ScrapeMeta =
+  | {
+      _metaType: "grownby";
+      numFavorites: string;
+      onboardingSteps: OnboardingSteps;
+      status: string;
+    }
+  | {
+      _metaType: "eatwellguide";
+      details: object[];
+      categories: string[];
+    };
 
 export type OnboardingSteps = {
   claim: null;
@@ -79,10 +85,10 @@ export type GoogleMapsPlaceDetails = {
 };
 
 export type ServiceDetails = {
-  takeout: true;
-  delivery: false;
-  dineIn: true;
-  reservable: true;
+  takeout: boolean;
+  delivery: boolean;
+  dineIn: boolean;
+  reservable: boolean;
 };
 
 export const pinboardViewModes = ["grid", "list", "map"] as const;
@@ -388,6 +394,8 @@ export const pinListItemsRelations = relations(pinListItems, ({ one }) => ({
   }),
 }));
 
+export type ProducerInsert = typeof producers.$inferInsert;
+
 export type Certification = typeof certifications.$inferSelect;
 export type ProducerSelect = typeof producers.$inferSelect;
 export type ClaimRequest = typeof claimRequests.$inferSelect & {
@@ -399,3 +407,4 @@ export type Pin = typeof pins.$inferSelect;
 export type Pinboard = typeof pinboards.$inferSelect;
 export type Pinlist = typeof pinLists.$inferSelect;
 export type PinlistItem = typeof pinListItems.$inferSelect;
+export type ImportedReviewInsert = typeof importedReviews.$inferInsert;
