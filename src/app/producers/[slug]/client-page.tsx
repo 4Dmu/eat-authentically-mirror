@@ -185,7 +185,7 @@ export function ProducerPageClient(props: {
             </CardDescription>
           </CardHeader>
           <CardContent className="bg-gray-50 p-5 border-t">
-            <div className="flex flex-wrap gap-5">
+            <div className="grid md:grid-cols-2 gap-5">
               {reviews.data?.map((r) => (
                 <ReviewCard key={r.id} review={r} />
               ))}
@@ -201,7 +201,7 @@ export function ProducerPageClient(props: {
 
   return (
     <div>
-      <div className="p-10 flex flex-col gap-5 max-w-7xl mx-auto">
+      <div className="p-3 sm:p-10 flex flex-col gap-5 max-w-7xl mx-auto">
         <div className="flex gap-5 justify-between">
           <BackButton text="Return Home" href="/" />
           <SignedIn>
