@@ -1,5 +1,5 @@
 "use server";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, isNull, ne, or } from "drizzle-orm";
 import { db } from "../db";
 import {
   deleteReviewArgs,
@@ -46,7 +46,10 @@ export const reviewProducer = authenticatedActionClient
       }
 
       const producer = await db.query.producers.findFirst({
-        where: and(eq(producers.id, producerId), ne(producers.userId, userId)),
+        where: and(
+          eq(producers.id, producerId),
+          or(isNull(producers.userId), ne(producers.userId, userId))
+        ),
       });
 
       if (!producer) {
