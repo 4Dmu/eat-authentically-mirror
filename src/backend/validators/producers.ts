@@ -43,32 +43,32 @@ export const claimProducerVerification = type({
     type({
       method: producerClaimContactPhoneLinkMethod,
       producerContactPhone: "string",
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimDomainDNSLinkMethod,
       domain: "string",
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimManualMethod,
       claimerEmail: "string.email",
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimDomainEmailLinkMethod,
       domainDomainEmailPart: "string",
       domain: "string",
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimSocialPostMethod,
       socialHandle: "string",
-    }),
+    })
   );
 
 export const claimProducerVerificationClient = type({
@@ -77,30 +77,30 @@ export const claimProducerVerificationClient = type({
   .or(
     type({
       method: producerClaimContactPhoneLinkMethod,
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimDomainDNSLinkMethod,
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimManualMethod,
       claimerEmail: "string.email",
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimDomainEmailLinkMethod,
       domainDomainEmailPart: "string",
-    }),
+    })
   )
   .or(
     type({
       method: producerClaimSocialPostMethod,
       socialHandle: "string",
-    }),
+    })
   );
 
 export const contactValidator = type({
@@ -176,6 +176,7 @@ export const producerValidator = type({
   createdAt: "Date",
   updatedAt: "Date",
   socialMedia: socialMediaValidator,
+  googleMapsUrl: "string|undefined",
 });
 
 export const editProducerFormValidator = type({
@@ -204,7 +205,7 @@ export const editProducerFormValidator = type({
         data.items.length > 0 &&
         !data.items.some(
           (i) =>
-            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId,
+            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId
         ))
     ) {
       return ctx.reject({
@@ -242,6 +243,7 @@ export const publicProducerValidator = producerValidator.pick(
   "address",
   "video",
   "socialMedia",
+  "googleMapsUrl"
 );
 
 export const publicProducerLightValidator = producerValidator.pick(
@@ -252,7 +254,7 @@ export const publicProducerLightValidator = producerValidator.pick(
   "claimed",
   "certifications",
   "contact",
-  "address",
+  "address"
 );
 
 export const ipGeoValidator = type({

@@ -6,8 +6,6 @@ import { useAuth } from "@clerk/nextjs";
 import { DeleteReviewDialog } from "./delete-review-dialog";
 import { UpdateReviewDialog } from "./update-review-dialog";
 import { ReviewProducerArgs } from "@/backend/validators/reviews";
-import { Badge } from "./ui/badge";
-import Link from "next/link";
 
 export function ReviewCard({ review }: { review: PublicReview }) {
   const auth = useAuth();
@@ -27,7 +25,7 @@ export function ReviewCard({ review }: { review: PublicReview }) {
         </div>
         <p>{review.data.text.text}</p>
         <StarRatingReadonly rating={review.rating} />
-        <a href={review.data.googleMapsUri}>
+        <a href={review.data.googleMapsUri} className="text-sm text-brand-red">
           *This review was made on Google Maps
         </a>
       </div>

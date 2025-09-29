@@ -13,8 +13,10 @@ import { Button } from "./ui/button";
 
 export function MapCard({
   coordinate,
+  mapUrl,
 }: {
   coordinate: NonNullable<NonNullable<Producer["address"]>["coordinate"]>;
+  mapUrl?: string;
 }) {
   return (
     <Card>
@@ -52,7 +54,10 @@ export function MapCard({
         <Button asChild className="w-full">
           <a
             target="_blank"
-            href={`https://www.google.com/maps/search/?api=1&query=${coordinate.latitude},${coordinate.longitude}`}
+            href={
+              mapUrl ??
+              `https://www.google.com/maps/search/?api=1&query=${coordinate.latitude},${coordinate.longitude}`
+            }
           >
             Open Maps
           </a>

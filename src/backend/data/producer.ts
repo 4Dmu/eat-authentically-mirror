@@ -100,9 +100,9 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
             .select({ listingId: certificationsToProducers.listingId })
             .from(certificationsToProducers)
             .where(
-              inArray(certificationsToProducers.certificationId, args.certs),
-            ),
-        ),
+              inArray(certificationsToProducers.certificationId, args.certs)
+            )
+        )
       );
     }
     if (args.locationSearchArea) {
@@ -110,8 +110,8 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
       queries.push(
         and(
           sql`CAST(json_extract(address, '$.coordinate.latitude') AS INTEGER) BETWEEN ${south} AND ${north}`,
-          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`,
-        ),
+          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`
+        )
       );
     }
 
@@ -137,6 +137,7 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
         address: true,
         video: true,
         socialMedia: true,
+        googleMapsPlaceDetails: true,
       },
       with: {
         certificationsToProducers: {
@@ -162,7 +163,9 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
       ? producersQuery.slice(0, HOME_PAGE_RESULT_LIMIT)
       : producersQuery;
 
-    const result = transformers.withCertifications(paginatedProducers);
+    const result = transformers.withCertifications(
+      transformers.withMapsUrl(paginatedProducers)
+    );
 
     return {
       data: result satisfies PublicProducer[],
@@ -176,7 +179,7 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
 }
 
 export async function listProducersPublicLight(
-  args: ListProducerArgsAfterValidate,
+  args: ListProducerArgsAfterValidate
 ) {
   try {
     const offest = args.page * HOME_PAGE_RESULT_LIMIT;
@@ -199,9 +202,9 @@ export async function listProducersPublicLight(
             .select({ listingId: certificationsToProducers.listingId })
             .from(certificationsToProducers)
             .where(
-              inArray(certificationsToProducers.certificationId, args.certs),
-            ),
-        ),
+              inArray(certificationsToProducers.certificationId, args.certs)
+            )
+        )
       );
     }
     if (args.locationSearchArea) {
@@ -210,8 +213,8 @@ export async function listProducersPublicLight(
       queries.push(
         and(
           sql`CAST(json_extract(address, '$.coordinate.latitude') AS INTEGER) BETWEEN ${south} AND ${north}`,
-          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`,
-        ),
+          sql`CAST(json_extract(address, '$.coordinate.longitude') AS INTEGER)  BETWEEN ${west} AND ${east}`
+        )
       );
     }
 
@@ -279,6 +282,19 @@ export async function getProducerPublic(args: GetProducerArgs) {
   try {
     const listing = await db.query.producers.findFirst({
       where: eq(producers.id, args.id),
+      columns: {
+        id: true,
+        name: true,
+        type: true,
+        about: true,
+        claimed: true,
+        images: true,
+        contact: true,
+        address: true,
+        video: true,
+        socialMedia: true,
+        googleMapsPlaceDetails: true,
+      },
       with: {
         certificationsToProducers: {
           columns: {},
@@ -305,6 +321,7 @@ export async function getProducerPublic(args: GetProducerArgs) {
       address,
       video,
       socialMedia,
+      googleMapsPlaceDetails,
     } = listing;
 
     return {
@@ -319,6 +336,7 @@ export async function getProducerPublic(args: GetProducerArgs) {
       contact,
       video,
       socialMedia,
+      googleMapsUrl: googleMapsPlaceDetails?.googleMapsUri,
     } satisfies PublicProducer;
   } catch (err) {
     console.error(err);

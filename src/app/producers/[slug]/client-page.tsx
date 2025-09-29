@@ -94,7 +94,10 @@ export function ProducerPageClient(props: {
   const mapCard = (
     <>
       {producer && producer.address?.coordinate && (
-        <MapCard coordinate={producer.address.coordinate} />
+        <MapCard
+          mapUrl={producer.googleMapsUrl}
+          coordinate={producer.address.coordinate}
+        />
       )}
     </>
   );
