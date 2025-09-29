@@ -176,7 +176,6 @@ export const producerValidator = type({
   createdAt: "Date",
   updatedAt: "Date",
   socialMedia: socialMediaValidator,
-  googleMapsUrl: "string|undefined",
 });
 
 export const editProducerFormValidator = type({
@@ -231,20 +230,21 @@ export const producerFormBasicValidator = type({
   about: "string|null",
 });
 
-export const publicProducerValidator = producerValidator.pick(
-  "id",
-  "name",
-  "type",
-  "about",
-  "images",
-  "claimed",
-  "certifications",
-  "contact",
-  "address",
-  "video",
-  "socialMedia",
-  "googleMapsUrl"
-);
+export const publicProducerValidator = producerValidator
+  .pick(
+    "id",
+    "name",
+    "type",
+    "about",
+    "images",
+    "claimed",
+    "certifications",
+    "contact",
+    "address",
+    "video",
+    "socialMedia"
+  )
+  .and({ googleMapsUrl: "string|undefined" });
 
 export const publicProducerLightValidator = producerValidator.pick(
   "id",
