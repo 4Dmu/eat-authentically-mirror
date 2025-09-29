@@ -35,7 +35,8 @@ export function PinboardPageClient(props: { pinboard: PinboardFull }) {
   const emptyMessage = (
     <div className="space-y-2">
       <h1>
-        It's kind of lonely in here. Why don't you start building your Pinboard
+        It&apos;s kind of lonely in here. Why don&apos;t you start building your
+        Pinboard
       </h1>
       <p className="text-sm">
         Save your favorite farms, ranches, and eateries here. You&apos;ll be
