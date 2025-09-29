@@ -60,6 +60,15 @@ export function PinboardMap({ pinboard }: PinboardMapProps) {
       }));
   }, [pinboard.pins]);
 
+  if (pinsWithAddresses.length === 0) {
+    return (
+      <div>
+        If any of your pins have an address set you will be able to see them on
+        a map here.
+      </div>
+    );
+  }
+
   return (
     <APIProvider apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_JS_PUBLIC_KEY}>
       <PinboardMapInner pinsWithAddresses={pinsWithAddresses} />
@@ -72,7 +81,12 @@ function PinboardMapInner({
 }: {
   pinsWithAddresses: PinsWithAddress[];
 }) {
-  const defaultCenter = pinsWithAddresses[0].producer.address.coordinate;
+  const defaultCenter:
+    | {
+        latitude: number;
+        longitude: number;
+      }
+    | undefined = pinsWithAddresses[0]?.producer?.address?.coordinate;
   const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
 
   return (
@@ -82,8 +96,8 @@ function PinboardMapInner({
       disableDefaultUI={true}
       defaultZoom={4}
       defaultCenter={{
-        lat: defaultCenter.latitude ?? 36.778259,
-        lng: defaultCenter.longitude ?? -119.417931,
+        lat: defaultCenter?.latitude ?? 36.778259,
+        lng: defaultCenter?.longitude ?? -119.417931,
       }}
     >
       {pinsWithAddresses.map((p) => (
