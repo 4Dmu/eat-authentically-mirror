@@ -18,6 +18,7 @@ import {
 } from "react";
 import { useHomePageStore } from "@/stores";
 import Image from "next/image";
+import { match } from "ts-pattern";
 
 const slides = [
   {
@@ -82,7 +83,7 @@ function SearchBox({ title }: { title: string }) {
 
 export function HeroCarousel() {
   const [api, setApi] = useState<CarouselApi>();
-  const setTypeFilter = useHomePageStore((s) => s.setTypeFilter);
+  const { setTypeFilter, typeFilter } = useHomePageStore();
 
   const handler = useCallback(() => {
     if (!api) return;
@@ -101,6 +102,25 @@ export function HeroCarousel() {
       api.off("select", handler);
     };
   }, [api, handler]);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    const currentIndex = api.selectedScrollSnap();
+
+    const indexForTypeFilter = match(typeFilter)
+      .with(undefined, () => 0)
+      .with("farm", () => 1)
+      .with("ranch", () => 2)
+      .with("eatery", () => 3)
+      .exhaustive();
+
+    if (currentIndex !== indexForTypeFilter) {
+      api.scrollTo(indexForTypeFilter, true);
+    }
+  }, [typeFilter, api]);
 
   return (
     <Carousel

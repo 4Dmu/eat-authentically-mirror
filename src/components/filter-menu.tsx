@@ -17,12 +17,15 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { useHomePageStore } from "@/stores";
 import { LocationFilter } from "./location-filter";
-import { FilterIcon } from "lucide-react";
+import { FilterIcon, XIcon } from "lucide-react";
 import { Switch } from "./ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
+import { SelectValue } from "@radix-ui/react-select";
 
 export function FilterMenu() {
   const certsQuery = useCertificationTypes();
-  const { certs, setCerts, useIpGeo, setUseIpGeo } = useHomePageStore();
+  const { certs, setCerts, useIpGeo, setUseIpGeo, typeFilter, setTypeFilter } =
+    useHomePageStore();
 
   return (
     <Sheet>
@@ -36,6 +39,25 @@ export function FilterMenu() {
           <SheetTitle>Filter And Sort</SheetTitle>
         </SheetHeader>
         <div className="p-5">
+          <div className="mb-5 flex flex-col gap-2">
+            <Label>Filter Type</Label>
+            <Select
+              value={typeFilter === undefined ? "none" : typeFilter}
+              onValueChange={(v) =>
+                setTypeFilter(v === "none" ? undefined : (v as "farm"))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={"Farm..."} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="farm">Farm</SelectItem>
+                <SelectItem value="ranch">Ranch</SelectItem>
+                <SelectItem value="eatery">Eatery</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex flex-col gap-2">
             <Label>Sort by closest to you</Label>
             <Switch checked={useIpGeo} onCheckedChange={setUseIpGeo} />
