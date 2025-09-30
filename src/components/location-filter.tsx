@@ -22,7 +22,7 @@ export function LocationFilter() {
 
 function Comp({ location }: { location: { lat: number; lng: number } | null }) {
   const [bounds, setBounds] = useState<google.maps.LatLngBounds | undefined>(
-    undefined,
+    undefined
   );
   const { locationSearchArea, setLocationSearchArea } = useHomePageStore();
 
@@ -54,7 +54,6 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
   }, [map]);
 
   useEffect(() => {
-    console.log(map, location, "rn");
     if (!map || !location) return;
     const center = map.getCenter();
     if (!center) return;
@@ -72,7 +71,8 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
     <div className="space-y-4">
       <div>
         Filter producers to ones located within this maps bounds (It will
-        automatically center at your location if allowed)
+        automatically center at your location if allowed). Pan and scroll to
+        change.
       </div>
       <Map
         style={{ width: "100%", height: "40vh" }}

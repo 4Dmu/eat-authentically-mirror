@@ -100,7 +100,7 @@ export function FilterMenu() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2" className="w-full h-full">
-              <AccordionTrigger>Map Bounds</AccordionTrigger>
+              <AccordionTrigger>Location</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-2">
                 <LocationFilter />
                 {/* <SignedIn>
