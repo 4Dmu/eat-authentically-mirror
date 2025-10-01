@@ -3,21 +3,29 @@ import { PublicProducerLight } from "@/backend/validators/producers";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-import { AddToPinboardIconButton } from "./pinboard";
+import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
+import { cn } from "@/lib/utils";
 
 export function ProducerCard({
   producer,
   mode = "default",
+  context = "default",
+  className,
 }: {
   producer: Pick<PublicProducerLight, "name" | "images" | "id" | "claimed">;
   mode?: "default" | "list";
+  context?: "default" | "pinboard";
+  className?: string;
 }) {
   if (mode === "list") {
     return (
       <Link
         href={`/producers/${producerSlugFull(producer)}`}
-        className="border rounded-lg overflow-hidden shadow-lg flex"
+        className={cn(
+          "border rounded-lg overflow-hidden shadow-lg flex",
+          className
+        )}
       >
         <div className="relative max-sm:hidden">
           <Image
@@ -36,7 +44,12 @@ export function ProducerCard({
         <div className="p-5 flex gap-3 justify-between items-center w-full">
           <p className="font-bold">{producer.name}</p>
           <SignedIn>
-            <AddToPinboardIconButton producerId={producer.id} />
+            <div className="space-x-2">
+              {context === "pinboard" && (
+                <AddToPinlistIconButton producerId={producer.id} />
+              )}
+              <AddToPinboardIconButton producerId={producer.id} />
+            </div>
           </SignedIn>
         </div>
       </Link>
@@ -46,7 +59,10 @@ export function ProducerCard({
   return (
     <Link
       href={`/producers/${producerSlugFull(producer)}`}
-      className="border rounded-lg overflow-hidden relative shadow-lg"
+      className={cn(
+        "border rounded-lg overflow-hidden relative shadow-lg",
+        className
+      )}
     >
       <Image
         width={1920}
@@ -68,6 +84,12 @@ export function ProducerCard({
           className="absolute top-4 right-4 cursor-pointer"
           producerId={producer.id}
         />
+        {context === "pinboard" && (
+          <AddToPinlistIconButton
+            className="absolute top-4 right-14 cursor-pointer"
+            producerId={producer.id}
+          />
+        )}
       </SignedIn>
     </Link>
   );

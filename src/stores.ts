@@ -3,6 +3,7 @@ import {
   RegisterProducerArgs,
   ProducerTypes,
 } from "@/backend/validators/producers";
+import { atomWithStorage } from "jotai/utils";
 
 type CertificationFilter = {
   id: string;
@@ -21,7 +22,7 @@ export type HomePageState = {
   setQuery: (query: string | undefined) => void;
   setCerts: (certs: CertificationFilter[]) => void;
   setLocationSearchArea: (
-    locationSearchArea: google.maps.LatLngBounds | undefined,
+    locationSearchArea: google.maps.LatLngBounds | undefined
   ) => void;
   useIpGeo: boolean;
   setUseIpGeo: (val: boolean) => void;
@@ -55,3 +56,8 @@ export const useProducerRegisterStore = create<{
   args: undefined,
   setArgs: (args) => set({ args }),
 }));
+
+export const showPinlistDialogAfterPinCreationAtom = atomWithStorage(
+  "showPinlistDialogAfterPinCreation",
+  true
+);

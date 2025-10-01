@@ -8,6 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Header } from "@/components/app-header";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Provider as JotaiProvider } from "jotai";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
@@ -53,8 +54,10 @@ export default function RootLayout({
           <body
             className={`${interSans.variable} ${fraunces.variable} antialiased bg-gray-50`}
           >
-            <Header />
-            {children}
+            <JotaiProvider>
+              <Header />
+              {children}
+            </JotaiProvider>
             <Toaster />
             <SpeedInsights />
             <Analytics />

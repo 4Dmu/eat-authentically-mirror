@@ -1,16 +1,22 @@
 import { Pin, Pinboard } from "@/backend/db/schema";
 import {
   addToPinboard,
+  deletePinList,
   getUserPinboard,
   getUserPinboardFull,
   getUserProducerPin,
+  newPinList,
   PinboardFull,
   removeFromPinboard,
+  syncPinsPinlistMemberships,
   updateUserPinboard,
 } from "@/backend/rpc/pinboard";
 import {
   AddToPinboardArgs,
+  DeletePinListArgs,
+  NewPinListArgs,
   RemoveFromPinboardArgs,
+  SyncPinsPinlistMembershipsArgs,
   UpdateUserPinboardArgs,
 } from "@/backend/validators/pinboard";
 import {
@@ -93,6 +99,19 @@ export function useAddToPinboard(
   });
 }
 
+export function useNewPinlist(
+  opts?: Omit<
+    UseMutationOptions<string, Error, NewPinListArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["new-pinlist"] as const,
+    mutationFn: (args: NewPinListArgs) => newPinList(args),
+  });
+}
+
 export function useRemoveFromPinboard(
   opts?: Omit<
     UseMutationOptions<void, Error, RemoveFromPinboardArgs, unknown>,
@@ -103,5 +122,32 @@ export function useRemoveFromPinboard(
     ...opts,
     mutationKey: ["remove-from-pinboard"] as const,
     mutationFn: (args: RemoveFromPinboardArgs) => removeFromPinboard(args),
+  });
+}
+
+export function useSyncPinsPinlistMemberships(
+  opts?: Omit<
+    UseMutationOptions<void, Error, SyncPinsPinlistMembershipsArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["sync-pins-pin-list-memberships"] as const,
+    mutationFn: (args: SyncPinsPinlistMembershipsArgs) =>
+      syncPinsPinlistMemberships(args),
+  });
+}
+
+export function useDeletePinlist(
+  opts?: Omit<
+    UseMutationOptions<void, Error, DeletePinListArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["delete-pinlist"] as const,
+    mutationFn: (args: DeletePinListArgs) => deletePinList(args),
   });
 }

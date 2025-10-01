@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 export type PinboardMapProps = {
-  pinboard: PinboardFull;
+  pins: PinboardFull["pins"];
 };
 
 type PinsWithAddress = {
@@ -43,9 +43,9 @@ type PinsWithAddress = {
   pinboardId: string;
 };
 
-export function PinboardMap({ pinboard }: PinboardMapProps) {
+export function PinboardMap({ pins }: PinboardMapProps) {
   const pinsWithAddresses = useMemo(() => {
-    return pinboard.pins
+    return pins
       .filter((p) => p.producer.address?.coordinate !== undefined)
       .map((p) => ({
         ...p,
@@ -58,7 +58,7 @@ export function PinboardMap({ pinboard }: PinboardMapProps) {
           },
         },
       }));
-  }, [pinboard.pins]);
+  }, [pins]);
 
   if (pinsWithAddresses.length === 0) {
     return (
