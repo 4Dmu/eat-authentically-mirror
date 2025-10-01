@@ -15,20 +15,22 @@ import {
 } from "@/components/ui/accordion";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
-import { useHomePageStore } from "@/stores";
+import { showFilterMenuAtom, useHomePageStore } from "@/stores";
 import { LocationFilter } from "./location-filter";
 import { FilterIcon, XIcon } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { SelectValue } from "@radix-ui/react-select";
+import { useAtom } from "jotai";
 
 export function FilterMenu() {
   const certsQuery = useCertificationTypes();
   const { certs, setCerts, useIpGeo, setUseIpGeo, typeFilter, setTypeFilter } =
     useHomePageStore();
+  const [showFilterMenu, setShowFilterMenu] = useAtom(showFilterMenuAtom);
 
   return (
-    <Sheet>
+    <Sheet open={showFilterMenu} onOpenChange={setShowFilterMenu}>
       <SheetTrigger asChild>
         <Button variant={"brandGreen"}>
           <FilterIcon /> Filter

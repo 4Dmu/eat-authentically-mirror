@@ -4,6 +4,7 @@ import {
   ProducerTypes,
 } from "@/backend/validators/producers";
 import { atomWithStorage } from "jotai/utils";
+import { atom } from "jotai";
 
 type CertificationFilter = {
   id: string;
@@ -61,3 +62,5 @@ export const showPinlistDialogAfterPinCreationAtom = atomWithStorage(
   "showPinlistDialogAfterPinCreation",
   true
 );
+
+export const showFilterMenuAtom = atom(false);

@@ -7,7 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Input } from "./ui/input";
-import { CompassIcon } from "lucide-react";
+import { CompassIcon, MapIcon, MapPin } from "lucide-react";
 import { PRODUCER_TYPES } from "@/backend/validators/producers";
 import {
   ChangeEvent,
@@ -16,9 +16,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useHomePageStore } from "@/stores";
+import { showFilterMenuAtom, useHomePageStore } from "@/stores";
 import Image from "next/image";
 import { match } from "ts-pattern";
+import { Button } from "./ui/button";
+import { useSetAtom } from "jotai";
 
 const slides = [
   {
@@ -49,6 +51,7 @@ const slides = [
 
 function SearchBox({ title }: { title: string }) {
   const { setQuery, query } = useHomePageStore();
+  const setShowFilterMenu = useSetAtom(showFilterMenuAtom);
 
   function updateQuery(e: ChangeEvent<HTMLInputElement>) {
     setQuery(e.currentTarget.value == "" ? undefined : e.currentTarget.value);
@@ -72,9 +75,16 @@ function SearchBox({ title }: { title: string }) {
             onKeyDown={handleSubmit}
             value={query ?? ""}
             onChange={updateQuery}
-            className="bg-white p-10 rounded-full text-base md:text-2xl pl-13 focus-visible:border-black focus-visible:ring-black"
+            className="bg-white p-10 pr-20 rounded-full text-base md:text-2xl pl-13 focus-visible:border-black focus-visible:ring-black"
             placeholder="Search farms, ranches, eatieries..."
           />
+          <Button
+            onClick={() => setShowFilterMenu(true)}
+            size={"icon"}
+            className="absolute rounded-full top-1/2 -translate-y-1/2 right-5 p-0"
+          >
+            <MapPin />
+          </Button>
         </div>
       </div>
     </div>
