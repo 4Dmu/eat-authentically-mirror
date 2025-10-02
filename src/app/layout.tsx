@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import ReactQueryProvider from "@/components/react-query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import { Header } from "@/components/app-header";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider as JotaiProvider } from "jotai";
 
 const interSans = Inter({
@@ -49,22 +46,16 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <ReactQueryProvider>
-        <html lang="en">
-          <body
-            className={`${interSans.variable} ${fraunces.variable} antialiased bg-gray-50`}
-          >
-            <JotaiProvider>
-              <Header />
-              {children}
-            </JotaiProvider>
-            <Toaster />
-            <SpeedInsights />
-            <Analytics />
-            <ReactQueryDevtools />
-          </body>
-        </html>
-      </ReactQueryProvider>
+      <html lang="en">
+        <body
+          className={`${interSans.variable} ${fraunces.variable} antialiased bg-gray-50`}
+        >
+          <JotaiProvider>{children}</JotaiProvider>
+          <Toaster />
+          <SpeedInsights />
+          <Analytics />
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
