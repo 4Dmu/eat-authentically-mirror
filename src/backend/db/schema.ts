@@ -394,6 +394,19 @@ export const pinListItemsRelations = relations(pinListItems, ({ one }) => ({
   }),
 }));
 
+export const preLaunchProducerWaitlist = sqliteTable(
+  "preLaunchProducerWaitlist",
+  {
+    producerId: text()
+      .notNull()
+      .unique()
+      .references(() => producers.id, { onDelete: "cascade" }),
+    userId: text().notNull(),
+    createdAt: integer({ mode: "timestamp" }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.producerId, t.userId] })]
+);
+
 export type ProducerInsert = typeof producers.$inferInsert;
 
 export type Certification = typeof certifications.$inferSelect;
