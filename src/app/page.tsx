@@ -1,29 +1,28 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { useEffect, useRef, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import { useLayoutEffect, useRef, useState } from "react";
+import { ConsumerForm } from "./_components/consumer-form";
+import { ProducerForm } from "./_components/producer-form";
 
 export default function Home() {
   const [mode, setMode] = useState<"consumer" | "producer" | undefined>(
     undefined
   );
-  const inputRef = useRef<HTMLInputElement>(null);
+  const consumerInputRef = useRef<HTMLInputElement>(null);
+  const producerInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (mode) {
-      inputRef.current?.scrollIntoView();
-      inputRef.current?.focus();
+  function focus() {
+    if (mode === "consumer") {
+      consumerInputRef.current?.scrollIntoView();
+      consumerInputRef.current?.focus();
+    } else if (mode === "producer") {
+      producerInputRef.current?.scrollIntoView();
+      producerInputRef.current?.focus();
     }
-  }, [mode]);
+  }
+
+  useLayoutEffect(() => focus(), [mode]);
 
   return (
     <div className="">
@@ -46,17 +45,17 @@ export default function Home() {
               <p className="text-lg text-shadow-lg">
                 Be the first to Eat Authentically.
               </p>
-              <p>Coming Soon</p>
+              <p className="font-bold">Coming Soon</p>
             </div>
             <div className="flex gap-5 justify-center">
               <Button
                 variant={"brandGreen"}
                 className="w-36 p-5"
                 onClick={() => {
-                  setMode("consumer");
                   if (mode == "consumer") {
-                    inputRef.current?.scrollIntoView();
-                    inputRef.current?.focus();
+                    focus();
+                  } else {
+                    setMode("consumer");
                   }
                 }}
               >
@@ -64,10 +63,10 @@ export default function Home() {
               </Button>
               <Button
                 onClick={() => {
-                  setMode("producer");
                   if (mode == "producer") {
-                    inputRef.current?.focus();
-                    inputRef.current?.focus();
+                    focus();
+                  } else {
+                    setMode("producer");
                   }
                 }}
                 className="w-36 p-5"
@@ -79,85 +78,39 @@ export default function Home() {
         </div>
       </div>
       {mode && (
-        <Tabs value={mode} onValueChange={(e) => setMode(e as "producer")}>
+        <>
           <Separator />
           <div className="w-screen h-screen relative">
             <div className="w-full h-full items-center justify-center flex z-50 p-5 sm:p-10 md:p-20">
               <div className="w-full gap-10 max-w-4xl">
-                <TabsContent value="consumer">
-                  <Card className="w-full" id="consumer">
-                    <CardHeader>
-                      <CardTitle className="text-3xl font-fraunces">
-                        Discover where real food lives
-                      </CardTitle>
-                      <CardDescription>
-                        Be the first to explore authentic farms, ranches, and
-                        eateries near you. Join our wait list and get early
-                        access to Eat Authentically.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <form className=" flex flex-col gap-2">
-                        <Input
-                          ref={inputRef}
-                          placeholder="Email"
-                          type="email"
-                        />
-                        <Button>Submit</Button>
-                      </form>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                {mode === "consumer" && <ConsumerForm ref={consumerInputRef} />}
 
-                <TabsContent value="producer">
-                  <Card className="w-full" id="producer">
-                    <CardHeader>
-                      <CardTitle className="text-3xl font-fraunces">
-                        For those who grow and serve authentic food.
-                      </CardTitle>
-                      <CardDescription>
-                        Connect with conscious eaters who are looking for what
-                        you do best. Add your farm, ranch, or eatery today—if
-                        you’re already on our map, we’ll update your info and
-                        mark your listing as yours.{" "}
-                        <span className="text-xs text-red-500">
-                          * (pending verification)
-                        </span>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <form className=" flex flex-col gap-2">
-                        <Input ref={inputRef} placeholder="Listing name" />
-                        <Input placeholder="Email" type="email" />
-                        <Input placeholder="Phone" type="tel" />
-                        <Input placeholder="Website" type="url" />
-                        <Input placeholder="Address" />
-                        <Button>Submit</Button>
-                      </form>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                {mode === "producer" && <ProducerForm ref={producerInputRef} />}
               </div>
             </div>
 
             <div className="p-10 absolute bottom-0 right-0">
-              <TabsList className="bg-background p-2 rounded-full gap-2 flex">
-                <TabsTrigger
-                  className="data-[state=active]:bg-brand-green font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
+              <div className="bg-background p-2 rounded-full gap-2 flex">
+                <button
+                  onClick={() => setMode("consumer")}
+                  data-state={mode === "consumer" ? "active" : "inactive"}
+                  className="data-[state=active]:bg-brand-green cursor-pointer font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
                   value="consumer"
                 >
                   Waitlist
-                </TabsTrigger>
-                <TabsTrigger
-                  className="data-[state=active]:bg-brand-green font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
+                </button>
+                <button
+                  onClick={() => setMode("producer")}
+                  data-state={mode === "producer" ? "active" : "inactive"}
+                  className="data-[state=active]:bg-brand-green cursor-pointer font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
                   value="producer"
                 >
                   Add Listing
-                </TabsTrigger>
-              </TabsList>
+                </button>
+              </div>
             </div>
           </div>
-        </Tabs>
+        </>
       )}
     </div>
   );

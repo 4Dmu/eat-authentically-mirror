@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Provider as JotaiProvider } from "jotai";
+import { ReactQueryProvider } from "@/components/react-query-provider";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
@@ -46,16 +47,18 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${interSans.variable} ${fraunces.variable} antialiased bg-gray-50`}
-        >
-          <JotaiProvider>{children}</JotaiProvider>
-          <Toaster />
-          <SpeedInsights />
-          <Analytics />
-        </body>
-      </html>
+      <ReactQueryProvider>
+        <html lang="en">
+          <body
+            className={`${interSans.variable} ${fraunces.variable} antialiased bg-gray-50`}
+          >
+            <JotaiProvider>{children}</JotaiProvider>
+            <Toaster />
+            <SpeedInsights />
+            <Analytics />
+          </body>
+        </html>
+      </ReactQueryProvider>
     </ClerkProvider>
   );
 }
