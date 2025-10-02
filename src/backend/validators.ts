@@ -14,7 +14,7 @@ export const submitListingArgs = type({
   email: type("string.email").configure({
     message: "please provide a valid email",
   }),
-  phone: type("string|undefined").narrow((n, ctx) => {
+  phone: type("string | undefined").narrow((n, ctx) => {
     if (n == undefined) {
       return true;
     }
@@ -26,7 +26,7 @@ export const submitListingArgs = type({
 
     return true;
   }),
-  website: type("string.url|undefined"),
+  website: type("string.url | undefined"),
   address: type("string")
     .atLeastLength(3)
     .atMostLength(300)

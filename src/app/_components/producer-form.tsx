@@ -21,6 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
+import { submitListing } from "@/backend/actions";
+import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
 
 export function ProducerForm({
   ref,
@@ -28,13 +32,13 @@ export function ProducerForm({
   ref: RefObject<HTMLInputElement | null>;
 }) {
   const router = useRouter();
-  // const waitlistRegisterMutation = useMutation({
-  //   mutationKey: ["waitlist-register"],
-  //   mutationFn: async (args: typeof waitlistRegisterArgs.infer) =>
-  //     await waitlistRegister(args),
-  //   onError: (e) => toast.error(e.message),
-  //   onSuccess: () => router.push("/waitlist-success"),
-  // });
+  const submitListingMutation = useMutation({
+    mutationKey: ["submit-listing"],
+    mutationFn: async (args: typeof submitListingArgs.inferIn) =>
+      await submitListing(args),
+    onError: (e) => toast.error(e.message),
+    onSuccess: () => router.push("/listing-waitlist-success"),
+  });
 
   const form = useForm({
     defaultValues: {
@@ -47,11 +51,10 @@ export function ProducerForm({
       turnstileToken: undefined as unknown as string,
     },
     validators: {
-      onChange: ({ formApi }) =>
+      onSubmit: ({ formApi }) =>
         formApi.parseValuesWithSchema(submitListingArgs),
     },
-    // onSubmit: ({ value }) => waitlistRegisterMutation.mutate(value),
-    onSubmit: ({ value }) => console.log(value),
+    onSubmit: ({ value }) => submitListingMutation.mutate(value),
     onSubmitInvalid: ({ value }) => console.log(value),
   });
 
@@ -63,8 +66,8 @@ export function ProducerForm({
         </CardTitle>
         <CardDescription>
           Connect with conscious eaters who are looking for what you do best.
-          Add your farm, ranch, or eatery today—if you’re already on our map,
-          we’ll update your info and mark your listing as yours.{" "}
+          Add your farm, ranch, or eatery today—if you&apos;re already on our
+          map, we&apos;ll update your info and mark your listing as yours.{" "}
           <span className="text-xs text-red-500">* (pending verification)</span>
         </CardDescription>
       </CardHeader>
@@ -74,30 +77,17 @@ export function ProducerForm({
             e.preventDefault();
             form.handleSubmit();
           }}
-          className=" flex flex-col gap-2"
+          className=" flex flex-col gap-4"
         >
-          <form.Field name="name">
-            {(field) => (
-              <div>
-                <Input
-                  ref={ref}
-                  placeholder="Listing name"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.currentTarget.value)}
-                />
-                <FieldInfo field={field} />
-              </div>
-            )}
-          </form.Field>
           <form.Field name="type">
             {(field) => (
-              <div>
+              <div className="flex flex-col gap-2">
+                <Label>Listing Type</Label>
                 <Select
                   value={field.state.value}
                   onValueChange={(e) => field.handleChange(e as "farm")}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -110,11 +100,29 @@ export function ProducerForm({
               </div>
             )}
           </form.Field>
+          <form.Field name="name">
+            {(field) => (
+              <div className="flex flex-col gap-2">
+                <Label>Listing Name</Label>
+                <Input
+                  ref={ref}
+                  placeholder="Rocky Mountain Farms"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.currentTarget.value)}
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          </form.Field>
           <form.Field name="email">
             {(field) => (
-              <div>
+              <div className="flex flex-col gap-2">
+                <Label>
+                  Email (This will be used to claim your listing after launch)
+                </Label>
                 <Input
-                  placeholder="Email"
+                  placeholder="johndoe@example.com"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.currentTarget.value)}
@@ -125,9 +133,10 @@ export function ProducerForm({
           </form.Field>
           <form.Field name="phone">
             {(field) => (
-              <div>
+              <div className="flex flex-col gap-2">
+                <Label>Phone (Optional)</Label>
                 <Input
-                  placeholder="Phone"
+                  placeholder="+15554442222"
                   value={field.state.value ?? ""}
                   onBlur={field.handleBlur}
                   onChange={(e) =>
@@ -144,9 +153,10 @@ export function ProducerForm({
           </form.Field>
           <form.Field name="website">
             {(field) => (
-              <div>
+              <div className="flex flex-col gap-2">
+                <Label>Website (Optional)</Label>
                 <Input
-                  placeholder="Website"
+                  placeholder="https://www.example.com"
                   value={field.state.value ?? ""}
                   onBlur={field.handleBlur}
                   onChange={(e) =>
@@ -163,9 +173,10 @@ export function ProducerForm({
           </form.Field>
           <form.Field name="address">
             {(field) => (
-              <div>
+              <div className="flex flex-col gap-2">
+                <Label>Address</Label>
                 <Input
-                  placeholder="Address"
+                  placeholder="192 Farm Road, FunkyTown, Ohio, United States"
                   value={field.state.value ?? ""}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.currentTarget.value)}

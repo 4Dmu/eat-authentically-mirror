@@ -11,7 +11,12 @@ import { GeocodeResponse } from "./types";
 import { headers } from "next/headers";
 import { db } from "./db";
 import { and, eq, isNull, like, or, sql, SQLWrapper } from "drizzle-orm";
-import { ProducerInsert, producers, ProducerSelect } from "./db/schema";
+import {
+  preLaunchProducerWaitlist,
+  ProducerInsert,
+  producers,
+  ProducerSelect,
+} from "./db/schema";
 import { clerk } from "./lib/clerk";
 
 export const waitlistRegister = actionClient
@@ -84,6 +89,8 @@ export const submitListing = actionClient
 
     const data = (await response.json()) as GeocodeResponse;
 
+    console.log(data);
+
     if (
       data.status !== "OK" ||
       data.results === undefined ||
@@ -102,53 +109,69 @@ export const submitListing = actionClient
 
     let listing: ProducerSelect;
 
-    const fromDb = await db.query.producers.findFirst({
-      where: and(
-        isNull(producers.userId),
-        eq(producers.claimed, false),
-        or(
-          like(producers.name, input.name),
-          eq(sql`json_extract(contact, '$.email')`, input.email),
-          and(
-            eq(
-              sql`json_extract(address, '$.coordinate.latitude')`,
-              closestAddressMatch.geometry.location.lat
+    await db.transaction(async (tx) => {
+      const fromDb = await tx.query.producers.findFirst({
+        where: and(
+          isNull(producers.userId),
+          eq(producers.claimed, false),
+          or(
+            like(producers.name, input.name),
+            eq(sql`json_extract(contact, '$.email')`, input.email),
+            and(
+              eq(
+                sql`json_extract(address, '$.coordinate.latitude')`,
+                closestAddressMatch.geometry.location.lat
+              ),
+              eq(
+                sql`json_extract(address, '$.coordinate.longitude')`,
+                closestAddressMatch.geometry.location.lng
+              )
             ),
-            eq(
-              sql`json_extract(address, '$.coordinate.longitude')`,
-              closestAddressMatch.geometry.location.lng
-            )
-          ),
-          ...optional
-        )
-      ),
-    });
+            ...optional
+          )
+        ),
+      });
 
-    if (fromDb) {
-      listing = fromDb;
-    } else {
-      listing = await db
-        .insert(producers)
-        .values({
-          id: crypto.randomUUID(),
-          name: input.name,
-          type: input.type,
+      if (fromDb) {
+        listing = fromDb;
+      } else {
+        listing = await tx
+          .insert(producers)
+          .values({
+            id: crypto.randomUUID(),
+            name: input.name,
+            type: input.type,
+            claimed: true,
+            verified: false,
+            images: { items: [], primaryImgId: null },
+            commodities: [],
+            socialMedia: { facebook: null, twitter: null, instagram: null },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          } satisfies ProducerInsert)
+          .returning()
+          .then((r) => r[0]);
+      }
+
+      const user = await clerk.users.createUser({
+        emailAddress: [input.email],
+        privateMetadata: {
+          producerId: listing.id,
+        },
+      });
+
+      await tx
+        .update(producers)
+        .set({
+          userId: user.id,
           claimed: true,
-          verified: false,
-          images: { items: [], primaryImgId: null },
-          commodities: [],
-          socialMedia: { facebook: null, twitter: null, instagram: null },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } satisfies ProducerInsert)
-        .returning()
-        .then((r) => r[0]);
-    }
+        })
+        .where(eq(producers.id, listing.id));
 
-    const user = await clerk.users.createUser({
-      emailAddress: [input.email],
-      privateMetadata: {
+      await tx.insert(preLaunchProducerWaitlist).values({
         producerId: listing.id,
-      },
+        userId: user.id,
+        createdAt: new Date(),
+      });
     });
   });
