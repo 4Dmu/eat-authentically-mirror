@@ -55,14 +55,24 @@ type SimpleMutationOps<TData, TArgs> = Omit<
  *  - legacy image property
  *  - placeholder unsplash url
  */
-export function primaryImageUrl(producer: Pick<Producer, "images">) {
-  return (
+export function primaryImageUrl(producer: Pick<Producer, "images" | "type">) {
+  const url: string | undefined =
     producer.images?.items.find(
       (i) => i.cloudflareId === producer.images.primaryImgId
-    )?.cloudflareUrl ??
-    producer.images?.items[0]?.cloudflareUrl ??
-    "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"
-  );
+    )?.cloudflareUrl ?? producer.images?.items[0]?.cloudflareUrl;
+
+  if (url !== undefined) {
+    return url;
+  }
+
+  switch (producer.type) {
+    case "eatery":
+      return "/defaults/default-eatery.png";
+    case "ranch":
+      return "/defaults/default-ranch.png";
+    case "farm":
+      return "/defaults/default-farm.png";
+  }
 }
 
 /**
