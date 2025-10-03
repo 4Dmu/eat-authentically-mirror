@@ -156,24 +156,30 @@ export const submitListing = actionClient
       let userId: string | undefined = undefined;
 
       if (input.account) {
-        const user = await clerk.users.createUser({
-          emailAddress: [input.account.email],
-          firstName: input.account.firstName,
-          lastName: input.account.lastName,
-          privateMetadata: {
-            producerId: listing.id,
-          },
-        });
+        try {
+          const user = await clerk.users.createUser({
+            emailAddress: [input.account.email],
+            firstName: input.account.firstName,
+            lastName: input.account.lastName,
+            password: input.account.password,
+            privateMetadata: {
+              producerId: listing.id,
+            },
+            skipPasswordChecks: true,
+          });
+          userId = user.id;
 
-        userId = user.id;
-
-        await tx
-          .update(producers)
-          .set({
-            userId: user.id,
-            claimed: true,
-          })
-          .where(eq(producers.id, listing.id));
+          await tx
+            .update(producers)
+            .set({
+              userId: user.id,
+              claimed: true,
+            })
+            .where(eq(producers.id, listing.id));
+        } catch (err) {
+          console.log(err);
+          throw new Error("Invalid account data");
+        }
       }
 
       await tx.insert(preLaunchProducerWaitlist).values({
