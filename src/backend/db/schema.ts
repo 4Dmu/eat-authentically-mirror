@@ -401,7 +401,8 @@ export const preLaunchProducerWaitlist = sqliteTable(
       .notNull()
       .unique()
       .references(() => producers.id, { onDelete: "cascade" }),
-    userId: text().notNull(),
+    userId: text(),
+    email: text().notNull(),
     createdAt: integer({ mode: "timestamp" }).notNull(),
   },
   (t) => [primaryKey({ columns: [t.producerId, t.userId] })]
