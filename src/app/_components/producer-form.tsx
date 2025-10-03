@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
-import { RefObject, useState } from "react";
+import { RefObject } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { env } from "@/env";
 import {
@@ -25,6 +25,7 @@ import { useMutation } from "@tanstack/react-query";
 import { submitListing } from "@/backend/actions";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function ProducerForm({
   ref,
@@ -44,11 +45,25 @@ export function ProducerForm({
     defaultValues: {
       name: "",
       email: "",
-      phone: undefined as string | undefined,
-      website: undefined as string | undefined,
       address: undefined as unknown as string,
-      type: "farm" as "farm" | "ranch" | "eatery",
+      type: undefined as unknown as "farm" | "ranch" | "eatery",
       turnstileToken: undefined as unknown as string,
+    } as {
+      name: string;
+      email: string;
+      type: "farm" | "ranch" | "eatery";
+      turnstileToken: string;
+      address: string;
+      phone?: string | undefined;
+      website?: string | undefined;
+      account?:
+        | {
+            firstName: string;
+            lastName: string;
+            email: string;
+            password: string;
+          }
+        | undefined;
     },
     validators: {
       onSubmit: ({ formApi }) =>
@@ -79,6 +94,21 @@ export function ProducerForm({
           }}
           className=" flex flex-col gap-4"
         >
+          <form.Field name="name">
+            {(field) => (
+              <div className="flex flex-col gap-2">
+                <Label>Listing Name</Label>
+                <Input
+                  ref={ref}
+                  placeholder="Rocky Mountain Farms"
+                  value={field.state.value ?? ""}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.currentTarget.value)}
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          </form.Field>
           <form.Field name="type">
             {(field) => (
               <div className="flex flex-col gap-2">
@@ -88,29 +118,14 @@ export function ProducerForm({
                   onValueChange={(e) => field.handleChange(e as "farm")}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue placeholder="Type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="farm">Farm</SelectItem>
                     <SelectItem value="ranch">Ranch</SelectItem>
-                    <SelectItem value="eaterie">Eaterie</SelectItem>
+                    <SelectItem value="eatery">Eatery</SelectItem>
                   </SelectContent>
                 </Select>
-                <FieldInfo field={field} />
-              </div>
-            )}
-          </form.Field>
-          <form.Field name="name">
-            {(field) => (
-              <div className="flex flex-col gap-2">
-                <Label>Listing Name</Label>
-                <Input
-                  ref={ref}
-                  placeholder="Rocky Mountain Farms"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.currentTarget.value)}
-                />
                 <FieldInfo field={field} />
               </div>
             )}
@@ -185,6 +200,107 @@ export function ProducerForm({
               </div>
             )}
           </form.Field>
+          <form.Field name="account">
+            {(field) => (
+              <>
+                <Card>
+                  <CardHeader>
+                    <div className="flex gap-2">
+                      <Label>Pre make account</Label>
+                      <Checkbox
+                        checked={field.state.value !== undefined}
+                        onCheckedChange={(e) =>
+                          field.handleChange(
+                            e
+                              ? {
+                                  firstName: undefined as unknown as string,
+                                  lastName: undefined as unknown as string,
+                                  email: undefined as unknown as string,
+                                  password: undefined as unknown as string,
+                                }
+                              : undefined
+                          )
+                        }
+                      />
+                    </div>
+                    <CardDescription>
+                      By pre making your account you can sign in directly after
+                      launch.
+                    </CardDescription>
+                  </CardHeader>
+                  {field.state.value !== undefined && (
+                    <CardContent className="flex flex-col gap-3">
+                      <form.Field name="account.firstName">
+                        {(field) => (
+                          <div className="flex flex-col gap-2">
+                            <Label>First name</Label>
+                            <Input
+                              placeholder="Dave"
+                              value={field.state.value ?? ""}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.currentTarget.value)
+                              }
+                            />
+                            <FieldInfo field={field} />
+                          </div>
+                        )}
+                      </form.Field>
+                      <form.Field name="account.lastName">
+                        {(field) => (
+                          <div className="flex flex-col gap-2">
+                            <Label>Last name</Label>
+                            <Input
+                              placeholder="Swimmer"
+                              value={field.state.value ?? ""}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.currentTarget.value)
+                              }
+                            />
+                            <FieldInfo field={field} />
+                          </div>
+                        )}
+                      </form.Field>
+                      <form.Field name="account.email">
+                        {(field) => (
+                          <div className="flex flex-col gap-2">
+                            <Label>Email</Label>
+                            <Input
+                              type="email"
+                              placeholder="johndoe@example.com"
+                              value={field.state.value ?? ""}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.currentTarget.value)
+                              }
+                            />
+                            <FieldInfo field={field} />
+                          </div>
+                        )}
+                      </form.Field>
+                      <form.Field name="account.password">
+                        {(field) => (
+                          <div className="flex flex-col gap-2">
+                            <Label>Password</Label>
+                            <Input
+                              type="password"
+                              value={field.state.value ?? ""}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.currentTarget.value)
+                              }
+                            />
+                            <FieldInfo field={field} />
+                          </div>
+                        )}
+                      </form.Field>
+                    </CardContent>
+                  )}
+                </Card>
+              </>
+            )}
+          </form.Field>
           <form.Field name="turnstileToken">
             {(field) => (
               <>
@@ -196,7 +312,15 @@ export function ProducerForm({
               </>
             )}
           </form.Field>
-          <Button>Submit</Button>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => (
+              <Button
+                disabled={isSubmitting || submitListingMutation.isPending}
+              >
+                Submit
+              </Button>
+            )}
+          </form.Subscribe>
         </form>
       </CardContent>
     </Card>

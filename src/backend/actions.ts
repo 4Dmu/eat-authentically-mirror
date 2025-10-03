@@ -153,24 +153,33 @@ export const submitListing = actionClient
           .then((r) => r[0]);
       }
 
-      const user = await clerk.users.createUser({
-        emailAddress: [input.email],
-        privateMetadata: {
-          producerId: listing.id,
-        },
-      });
+      let userId: string | undefined = undefined;
 
-      await tx
-        .update(producers)
-        .set({
-          userId: user.id,
-          claimed: true,
-        })
-        .where(eq(producers.id, listing.id));
+      if (input.account) {
+        const user = await clerk.users.createUser({
+          emailAddress: [input.account.email],
+          firstName: input.account.firstName,
+          lastName: input.account.lastName,
+          privateMetadata: {
+            producerId: listing.id,
+          },
+        });
+
+        userId = user.id;
+
+        await tx
+          .update(producers)
+          .set({
+            userId: user.id,
+            claimed: true,
+          })
+          .where(eq(producers.id, listing.id));
+      }
 
       await tx.insert(preLaunchProducerWaitlist).values({
         producerId: listing.id,
-        userId: user.id,
+        userId: userId,
+        email: input.account ? input.account.email : input.email,
         createdAt: new Date(),
       });
     });

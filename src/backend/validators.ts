@@ -14,7 +14,7 @@ export const submitListingArgs = type({
   email: type("string.email").configure({
     message: "please provide a valid email",
   }),
-  phone: type("string | undefined").narrow((n, ctx) => {
+  "phone?": type("string | undefined").narrow((n, ctx) => {
     if (n == undefined) {
       return true;
     }
@@ -26,7 +26,7 @@ export const submitListingArgs = type({
 
     return true;
   }),
-  website: type("string.url | undefined"),
+  "website?": type("string.url | undefined"),
   address: type("string")
     .atLeastLength(3)
     .atMostLength(300)
@@ -36,6 +36,12 @@ export const submitListingArgs = type({
         "must be an address in the following format: street, city, state, zip, country",
     }),
   type: "'farm'|'ranch'|'eatery'",
+  "account?": type({
+    firstName: "string",
+    lastName: "string",
+    email: "string.email",
+    password: type.string.atLeastLength(5),
+  }).or(type.undefined),
   turnstileToken: type("string").configure({
     message: "please complete the captcha",
   }),

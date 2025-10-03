@@ -80,33 +80,32 @@ export default function Home() {
       {mode && (
         <>
           <Separator />
-          <div className="w-screen h-screen relative">
-            <div className="w-full h-full items-center justify-center flex z-50 p-5 sm:p-10 md:p-20">
-              <div className="w-full gap-10 max-w-4xl">
+          <div className="w-screen min-h-screen relative flex flex-col">
+            <div className="w-full flex-1 flex flex-col p-5 md:p-20 justify-center items-center gap-10">
+              <div className="w-full gap-10 max-w-4xl z-50">
                 {mode === "consumer" && <ConsumerForm ref={consumerInputRef} />}
 
                 {mode === "producer" && <ProducerForm ref={producerInputRef} />}
               </div>
-            </div>
-
-            <div className="p-10 absolute bottom-0 right-0">
-              <div className="bg-background p-2 rounded-full gap-2 flex">
-                <button
-                  onClick={() => setMode("consumer")}
-                  data-state={mode === "consumer" ? "active" : "inactive"}
-                  className="data-[state=active]:bg-brand-green cursor-pointer font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
-                  value="consumer"
-                >
-                  Waitlist
-                </button>
-                <button
-                  onClick={() => setMode("producer")}
-                  data-state={mode === "producer" ? "active" : "inactive"}
-                  className="data-[state=active]:bg-brand-green cursor-pointer font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
-                  value="producer"
-                >
-                  Add Listing
-                </button>
+              <div>
+                <div className="bg-background p-2 rounded-full gap-2 flex w-full">
+                  <button
+                    onClick={() => setMode("consumer")}
+                    data-state={mode === "consumer" ? "active" : "inactive"}
+                    className="data-[state=active]:bg-brand-green cursor-pointer font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
+                    value="consumer"
+                  >
+                    Waitlist
+                  </button>
+                  <button
+                    onClick={() => setMode("producer")}
+                    data-state={mode === "producer" ? "active" : "inactive"}
+                    className="data-[state=active]:bg-brand-green cursor-pointer font-bold text-sm transition duration-300 ease-in-out data-[state=active]:text-primary-foreground p-2 rounded-full px-5"
+                    value="producer"
+                  >
+                    Add Listing
+                  </button>
+                </div>
               </div>
             </div>
           </div>
