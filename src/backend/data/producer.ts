@@ -16,19 +16,12 @@ import { USER_PRODUCER_IDS_KV } from "../kv";
 import { HOME_PAGE_RESULT_LIMIT } from "../constants";
 
 const orderProducersByScrapedMetadata = sql`
-  CASE
-    WHEN scrapeMeta IS NOT NULL THEN 1
-    ELSE 0
+  CASE json_array_length(json_extract(images, '$.items')) > 0
+  WHEN true THEN 0
+  ELSE 1
   END,
-  CASE json_extract(scrapeMeta, '$.status')
-      WHEN 'Registered' THEN 0
-      ELSE 1
-    END,
-  CAST(json_extract(scrapeMeta, '$.numFavorites') AS INTEGER) DESC,
-  CASE json_array_length(images) > 0
-    WHEN true THEN 0
-      ELSE 1
-    END`;
+  subscriptionRank DESC,
+  RANDOM()`;
 
 function orderProducerByIpGeo(geo?: IpGeoValidator) {
   if (geo?.longitude === undefined || geo?.latitude === undefined) {
