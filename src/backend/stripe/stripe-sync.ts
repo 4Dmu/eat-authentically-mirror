@@ -1,7 +1,14 @@
 import { env } from "@/env";
 import Stripe from "stripe";
-import { STRIPE_CUSTOMER_SUBSCRIPTIONS_KV } from "../kv";
+import {
+  STRIPE_CUSTOMER_ID_USER_KV,
+  STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
+} from "../kv";
 import stripe from "stripe";
+import { PLANS } from "./subscription-plans";
+import { db } from "../db";
+import { producers } from "../db/schema";
+import { eq } from "drizzle-orm";
 
 export type SubscriptionJSON = {
   subscriptionId: string;
@@ -97,6 +104,30 @@ export async function updateKvWithLatestStripeData(customerId: string) {
     }));
 
     await STRIPE_CUSTOMER_SUBSCRIPTIONS_KV.set(customerId, subs);
+
+    const userId = await STRIPE_CUSTOMER_ID_USER_KV.get(customerId);
+
+    if (userId) {
+      const activeSub = subs?.find((sub) => sub.status === "active");
+      let subscriptionRank = 0;
+      if (activeSub) {
+        const plan = PLANS[activeSub.priceId];
+        if (plan.tier !== "community") {
+          subscriptionRank = plan.rank;
+        }
+      }
+      const result = await db
+        .update(producers)
+        .set({ subscriptionRank: subscriptionRank })
+        .where(eq(producers.userId, userId));
+      console.log(
+        "[STRIPE HOOK] [PROCESS EVENT] [UPDATE PRODUCER SUB RANK] userId:",
+        userId,
+        "updateResult:",
+        result
+      );
+    }
+
     return subs;
   } catch (err) {
     console.error(

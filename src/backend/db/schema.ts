@@ -119,6 +119,7 @@ export const producers = sqliteTable("producers", {
     mode: "json",
   }).$type<GoogleMapsPlaceDetails>(),
   serviceDetails: text({ mode: "json" }).$type<ServiceDetails>(),
+  subscriptionRank: integer().notNull(),
   createdAt: integer({ mode: "timestamp" }).notNull(),
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });

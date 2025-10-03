@@ -19,9 +19,10 @@ async function main() {
         items: [],
         primaryImgId: null,
       },
+      subscriptionRank: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }),
+    })
   );
 }
 

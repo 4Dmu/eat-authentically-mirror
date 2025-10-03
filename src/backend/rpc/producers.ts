@@ -19,6 +19,7 @@ import { db } from "../db";
 import {
   certificationsToProducers,
   claimRequests,
+  ProducerInsert,
   producers,
   Video,
 } from "../db/schema";
@@ -90,9 +91,10 @@ export const registerProducer = authenticatedActionClient
         items: [],
         primaryImgId: null,
       },
+      subscriptionRank: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+    } satisfies ProducerInsert);
 
     await USER_PRODUCER_IDS_KV.push(userId, producerProfileId);
 
@@ -108,7 +110,7 @@ export const fetchUserProducer = producerActionClient
         where: and(
           eq(producers.id, input),
           inArray(producers.id, producerIds),
-          eq(producers.userId, userId),
+          eq(producers.userId, userId)
         ),
         with: {
           certificationsToProducers: {
@@ -125,13 +127,10 @@ export const fetchUserProducer = producerActionClient
 
 export const fetchUserProducers = authenticatedActionClient
   .name("fetchUserProducers")
-  .action(async ({ producerIds, userId }) => {
+  .action(async ({ userId }) => {
     const result = await db.query.producers
       .findMany({
-        where: and(
-          inArray(producers.id, producerIds),
-          eq(producers.userId, userId),
-        ),
+        where: and(eq(producers.userId, userId)),
         with: {
           certificationsToProducers: {
             with: {
@@ -154,7 +153,7 @@ export const fetchUserProducerLight = producerActionClient
         where: and(
           eq(producers.id, input),
           inArray(producers.id, producerIds),
-          eq(producers.userId, userId),
+          eq(producers.userId, userId)
         ),
         with: {
           certificationsToProducers: {
@@ -195,7 +194,7 @@ export const editProducer = producerActionClient
     const producer = await db.query.producers.findFirst({
       where: and(
         eq(producers.id, input.producerId),
-        eq(producers.userId, userId),
+        eq(producers.userId, userId)
       ),
     });
 
@@ -237,7 +236,7 @@ export const editProducer = producerActionClient
         .findFirst({
           where: and(
             eq(producers.id, input.producerId),
-            eq(producers.userId, userId),
+            eq(producers.userId, userId)
           ),
           columns: {},
           with: {
@@ -255,10 +254,10 @@ export const editProducer = producerActionClient
 
       const addedCerts = updatedCertifications.filter(
         (cert) =>
-          !currentCertifications.some((oldCert) => oldCert.id === cert.id),
+          !currentCertifications.some((oldCert) => oldCert.id === cert.id)
       );
       const removedCerts = currentCertifications.filter(
-        (cert) => !updatedCertifications.some((c) => c.id === cert.id),
+        (cert) => !updatedCertifications.some((c) => c.id === cert.id)
       );
 
       const projectedCount =
@@ -266,7 +265,7 @@ export const editProducer = producerActionClient
 
       if (projectedCount > maxCerts) {
         throw new Error(
-          `Your current plan ("${tier}") allows only ${maxCerts} certifications.`,
+          `Your current plan ("${tier}") allows only ${maxCerts} certifications.`
         );
       }
 
@@ -276,15 +275,15 @@ export const editProducer = producerActionClient
             addedCerts.map((cert) => ({
               listingId: producer.id,
               certificationId: cert.id,
-            })),
+            }))
           );
         }
         if (removedCerts.length > 0) {
           await db.delete(certificationsToProducers).where(
             inArray(
               certificationsToProducers.certificationId,
-              removedCerts.map((c) => c.id),
-            ),
+              removedCerts.map((c) => c.id)
+            )
           );
         }
       } catch (err) {
@@ -298,7 +297,7 @@ export const editProducer = producerActionClient
 
       if (input.commodities.length > maxProducts) {
         throw new Error(
-          `Your current plan ("${tier}") allows only ${maxProducts} products.`,
+          `Your current plan ("${tier}") allows only ${maxProducts} products.`
         );
       }
 
@@ -313,7 +312,7 @@ export const editProducer = producerActionClient
           updatedAt: new Date(),
         })
         .where(
-          and(eq(producers.id, producer.id), eq(producers.userId, userId)),
+          and(eq(producers.id, producer.id), eq(producers.userId, userId))
         );
     }
   });
@@ -330,7 +329,7 @@ export const requestUploadUrls = producerActionClient
         .array()
         .atLeastLength(1)
         .atMostLength(10),
-    }),
+    })
   )
   .name("requestUploadUrls")
   .action(
@@ -376,7 +375,7 @@ export const requestUploadUrls = producerActionClient
         form.set("creator", userId);
         form.set(
           "metadata",
-          JSON.stringify({ producerId: producer.id, userId: userId }),
+          JSON.stringify({ producerId: producer.id, userId: userId })
         );
 
         const uploadUrlGeneratorCloudflareResponse = await fetch(
@@ -387,7 +386,7 @@ export const requestUploadUrls = producerActionClient
               Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
             },
             body: form,
-          },
+          }
         );
 
         const uploadUrlGeneratorCloudflareResponseBody =
@@ -414,7 +413,7 @@ export const requestUploadUrls = producerActionClient
         .where(eq(producers.id, producer.id));
 
       return urls;
-    },
+    }
   );
 
 export const requestVideoUploadUrl = producerActionClient
@@ -468,7 +467,7 @@ export const requestVideoUploadUrl = producerActionClient
     form.set("maxDurationSeconds", "120");
     form.set(
       "meta",
-      JSON.stringify({ producerId: producer.id, userId: userId }),
+      JSON.stringify({ producerId: producer.id, userId: userId })
     );
 
     const uploadUrlGeneratorCloudflareResponse = await fetch(
@@ -493,7 +492,7 @@ export const requestVideoUploadUrl = producerActionClient
             userId: userId,
           },
         }),
-      },
+      }
     );
 
     const uploadUrlGeneratorCloudflareResponseBody =
@@ -551,7 +550,7 @@ export const confirmPengingUpload = producerActionClient
           headers: {
             Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
           },
-        },
+        }
       );
 
       const imagesListBody = (await imageListResponse.json()) as {
@@ -636,7 +635,7 @@ export const confirmPendingVideoUpload = producerActionClient
       });
 
       const pendingVideosThatExists = videosPage.result.filter((v) =>
-        producer.pendingVideos?.some((v2) => v.uid === v2),
+        producer.pendingVideos?.some((v2) => v.uid === v2)
       );
 
       for (const video of pendingVideosThatExists) {
@@ -719,11 +718,11 @@ export const updateExistingImages = producerActionClient
     }
 
     const imagesToKeep = producer.images.items.filter((i) =>
-      data.items.some((i2) => i.cloudflareId === i2.cloudflareId),
+      data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
     );
 
     const imagesToDelete = producer.images.items.filter(
-      (i) => !data.items.some((i2) => i.cloudflareId === i2.cloudflareId),
+      (i) => !data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
     );
 
     await db
@@ -734,7 +733,7 @@ export const updateExistingImages = producerActionClient
           primaryImgId:
             data.primaryImgId ??
             imagesToKeep.find(
-              (i) => i.cloudflareId === producer.images.primaryImgId,
+              (i) => i.cloudflareId === producer.images.primaryImgId
             )?.cloudflareId ??
             null,
         },
@@ -744,7 +743,7 @@ export const updateExistingImages = producerActionClient
 
     for (const image of imagesToDelete) {
       console.log(
-        `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by user(${userId})`,
+        `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by user(${userId})`
       );
 
       const response = await cloudflare.images.v1.delete(image.cloudflareId, {
@@ -753,7 +752,7 @@ export const updateExistingImages = producerActionClient
 
       console.log(
         `action [updateExistingImages] - Cloudflare delete image response`,
-        response,
+        response
       );
     }
   });
@@ -780,8 +779,8 @@ export const claimProducer = authenticatedActionClient
         .where(
           and(
             eq(claimRequests.userId, userId),
-            sql`json_extract(${claimRequests.status}, '$.type') = 'waiting'`,
-          ),
+            sql`json_extract(${claimRequests.status}, '$.type') = 'waiting'`
+          )
         )
         .then((r) => r[0].count ?? 0);
 
@@ -797,7 +796,7 @@ export const claimProducer = authenticatedActionClient
         where: and(
           eq(producers.id, producerId),
           isNull(producers.userId),
-          eq(producers.claimed, false),
+          eq(producers.claimed, false)
         ),
       });
 
@@ -808,7 +807,7 @@ export const claimProducer = authenticatedActionClient
       const existingClaim = await db.query.claimRequests.findFirst({
         where: and(
           eq(claimRequests.producerId, producer.id),
-          eq(claimRequests.userId, userId),
+          eq(claimRequests.userId, userId)
         ),
       });
 
@@ -859,7 +858,7 @@ export const claimProducer = authenticatedActionClient
           const website = producer.contact?.website;
           if (!website) {
             throw new Error(
-              "Method invalid: Missing or invalid contact website",
+              "Method invalid: Missing or invalid contact website"
             );
           }
 
@@ -873,7 +872,7 @@ export const claimProducer = authenticatedActionClient
 
           if (!isURL(domain, { require_tld: true, require_host: true })) {
             throw new Error(
-              "Method invalid: Missing or invalid contact website",
+              "Method invalid: Missing or invalid contact website"
             );
           }
 
@@ -1053,7 +1052,7 @@ export const claimProducer = authenticatedActionClient
           break;
         }
       }
-    },
+    }
   );
 
 export const listClaimRequests = authenticatedActionClient
@@ -1092,7 +1091,7 @@ export const listClaimRequests = authenticatedActionClient
                 : requestedVerification.method === "contact-phone-link"
                   ? { ...requestedVerification }
                   : requestedVerification,
-        }) satisfies PublicClaimRequest,
+        }) satisfies PublicClaimRequest
     );
   });
 
@@ -1109,7 +1108,7 @@ export const checkClaimDomainDNS = authenticatedActionClient
     const claimRequest = await db.query.claimRequests.findFirst({
       where: and(
         eq(claimRequests.userId, userId),
-        eq(claimRequests.id, claimRequestId),
+        eq(claimRequests.id, claimRequestId)
       ),
     });
 
@@ -1162,7 +1161,7 @@ export const verifyClaimPhone = authenticatedActionClient
     const claimRequest = await db.query.claimRequests.findFirst({
       where: and(
         eq(claimRequests.userId, userId),
-        eq(claimRequests.id, claimRequestId),
+        eq(claimRequests.id, claimRequestId)
       ),
     });
 
@@ -1199,7 +1198,7 @@ export const regenerateClaimPhoneToken = authenticatedActionClient
     const claimRequest = await db.query.claimRequests.findFirst({
       where: and(
         eq(claimRequests.userId, userId),
-        eq(claimRequests.id, claimRequestId),
+        eq(claimRequests.id, claimRequestId)
       ),
     });
 
@@ -1232,7 +1231,7 @@ export const regenerateClaimPhoneToken = authenticatedActionClient
 
     await sendClaimCodeMessage(
       claimRequest.requestedVerification.producerContactPhone,
-      token.toString(),
+      token.toString()
     );
   });
 
@@ -1253,7 +1252,7 @@ export const deleteProducer = producerActionClient
     }
 
     console.log(
-      `[deleteProducer] Starting deletion proccess - userId: ${userId} producerId: ${producer.id}`,
+      `[deleteProducer] Starting deletion proccess - userId: ${userId} producerId: ${producer.id}`
     );
 
     if (producer.video) {
@@ -1268,7 +1267,7 @@ export const deleteProducer = producerActionClient
         image.cloudflareId,
         {
           account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-        },
+        }
       );
       console.log(`[deleteProducer] deleting image`, imageDelRes);
     }

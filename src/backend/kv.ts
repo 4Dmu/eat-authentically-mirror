@@ -82,7 +82,7 @@ export const USER_MESSAGE_NOTIFICATIONS_KV = {
     await redis.eval(
       this.dcrOneClampScript,
       [this.generatePerChatKey(userId, chatId), this.generateTotalKey(userId)],
-      [],
+      []
     );
   },
 
@@ -136,6 +136,18 @@ export const USER_STRIPE_CUSTOMER_ID_KV = {
   },
   async set(userId: string, stripeCustomerId: string) {
     await redis.set(this.generateKey(userId), stripeCustomerId);
+  },
+};
+
+export const STRIPE_CUSTOMER_ID_USER_KV = {
+  generateKey(customerId: string) {
+    return `stripe-customer.${customerId}`;
+  },
+  async get(customerId: string) {
+    return await redis.get<string>(this.generateKey(customerId));
+  },
+  async set(customerId: string, userId: string) {
+    await redis.set(this.generateKey(customerId), userId);
   },
 };
 
@@ -205,7 +217,7 @@ export const USER_PRODUCER_IDS_KV = {
     const current = (await this.get(userId)) ?? [];
     await this.set(
       userId,
-      current.filter((i) => i !== id),
+      current.filter((i) => i !== id)
     );
   },
   async delete(userId: string) {
@@ -251,7 +263,7 @@ export const STRIPE_CUSTOMER_SUBSCRIPTIONS_KV = {
   },
   async get(stripeCustomerId: string) {
     const data = await redis.get<SubscriptionJSON[]>(
-      this.generateKey(stripeCustomerId),
+      this.generateKey(stripeCustomerId)
     );
     if (data == null) {
       return data;
