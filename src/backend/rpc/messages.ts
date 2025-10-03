@@ -50,7 +50,7 @@ export const sendMessageToProducer = authenticatedActionClient
         eq(producers.id, producerId),
         isNotNull(producers.userId),
         eq(producers.claimed, true),
-        ne(producers.userId, userId),
+        ne(producers.userId, userId)
       ),
       columns: { id: true, userId: true },
     });
@@ -62,7 +62,7 @@ export const sendMessageToProducer = authenticatedActionClient
     let chat = await db.query.producerChats.findFirst({
       where: and(
         eq(producerChats.producerId, producerId),
-        eq(producerChats.initiatorUserId, userId),
+        eq(producerChats.initiatorUserId, userId)
       ),
     });
 
@@ -132,7 +132,7 @@ export const replyToUserMessage = authenticatedActionClient
         where: and(
           eq(producerChats.producerId, producer.id),
           eq(producerChats.producerUserId, userId),
-          eq(producerChats.id, chatId),
+          eq(producerChats.id, chatId)
         ),
       });
 
@@ -163,7 +163,7 @@ export const replyToUserMessage = authenticatedActionClient
         .where(eq(producerChats.id, chat.id));
 
       await USER_MESSAGE_NOTIFICATIONS_KV.incr(chat.initiatorUserId, chat.id);
-    },
+    }
   );
 
 export const blockUserChat = authenticatedActionClient
@@ -192,7 +192,7 @@ export const blockUserChat = authenticatedActionClient
         eq(producerChats.producerId, producer.id),
         eq(producerChats.producerUserId, userId),
         eq(producerChats.id, chatId),
-        isNull(producerChats.producerPreventedMoreMessagesAt),
+        isNull(producerChats.producerPreventedMoreMessagesAt)
       ),
     });
 
@@ -233,7 +233,7 @@ export const unblockUserChat = authenticatedActionClient
         eq(producerChats.producerId, producer.id),
         eq(producerChats.producerUserId, userId),
         isNotNull(producerChats.producerPreventedMoreMessagesAt),
-        eq(producerChats.id, chatId),
+        eq(producerChats.id, chatId)
       ),
     });
 
@@ -261,7 +261,7 @@ export const blockProducerChat = authenticatedActionClient
       where: and(
         eq(producerChats.initiatorUserId, userId),
         eq(producerChats.id, chatId),
-        isNull(producerChats.initiatorPreventedMoreMessagesAt),
+        isNull(producerChats.initiatorPreventedMoreMessagesAt)
       ),
     });
 
@@ -292,7 +292,7 @@ export const unblockProducerChat = authenticatedActionClient
       where: and(
         eq(producerChats.initiatorUserId, userId),
         eq(producerChats.id, chatId),
-        isNotNull(producerChats.initiatorPreventedMoreMessagesAt),
+        isNotNull(producerChats.initiatorPreventedMoreMessagesAt)
       ),
     });
 
@@ -317,12 +317,13 @@ export const getProducerChat = authenticatedActionClient
       where: and(
         eq(producerChats.initiatorUserId, userId),
         eq(producerChats.producerId, producerId),
-        notInArray(producerChats.id, producerIds),
+        notInArray(producerChats.id, producerIds)
       ),
       with: {
         producer: {
           columns: {
             name: true,
+            type: true,
             images: true,
           },
         },
@@ -345,6 +346,7 @@ export const listUserChats = authenticatedActionClient
         producer: {
           columns: {
             name: true,
+            type: true,
             images: true,
           },
         },
@@ -363,12 +365,13 @@ export const listProducerChats = authenticatedActionClient
     const chats = await db.query.producerChats.findMany({
       where: and(
         eq(producerChats.producerId, producerId),
-        eq(producerChats.producerUserId, userId),
+        eq(producerChats.producerUserId, userId)
       ),
       with: {
         producer: {
           columns: {
             name: true,
+            type: true,
             images: true,
           },
         },
@@ -396,12 +399,13 @@ export const listAllProducersChats = authenticatedActionClient
       where: and(
         inArray(producerChats.producerId, producerIds),
         ne(producerChats.initiatorUserId, userId),
-        eq(producerChats.producerUserId, userId),
+        eq(producerChats.producerUserId, userId)
       ),
       with: {
         producer: {
           columns: {
             name: true,
+            type: true,
             images: true,
           },
         },
@@ -430,18 +434,19 @@ export const getUserOrProducerChat = authenticatedActionClient
       where: or(
         and(
           eq(producerChats.initiatorUserId, userId),
-          eq(producerChats.id, chatId),
+          eq(producerChats.id, chatId)
         ),
         and(
           eq(producerChats.producerUserId, userId),
           inArray(producerChats.producerId, producerIds),
-          eq(producerChats.id, chatId),
-        ),
+          eq(producerChats.id, chatId)
+        )
       ),
       with: {
         producer: {
           columns: {
             name: true,
+            type: true,
             images: true,
           },
         },
@@ -472,18 +477,19 @@ export const getUserOrProducerChatMessages = authenticatedActionClient
       where: or(
         and(
           eq(producerChats.initiatorUserId, userId),
-          eq(producerChats.id, chatId),
+          eq(producerChats.id, chatId)
         ),
         and(
           eq(producerChats.producerUserId, userId),
           inArray(producerChats.producerId, producerIds),
-          eq(producerChats.id, chatId),
-        ),
+          eq(producerChats.id, chatId)
+        )
       ),
       with: {
         producer: {
           columns: {
             name: true,
+            type: true,
             images: true,
           },
         },
@@ -516,7 +522,7 @@ export const getUserChatMessageNotificationsCount = authenticatedActionClient
 
     for (const chatId of chatIds) {
       const count = Number(
-        (await USER_MESSAGE_NOTIFICATIONS_KV.getForChat(userId, chatId)) ?? 0,
+        (await USER_MESSAGE_NOTIFICATIONS_KV.getForChat(userId, chatId)) ?? 0
       );
       counts.push({ chatId, count });
     }

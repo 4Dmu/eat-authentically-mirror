@@ -13,7 +13,10 @@ export function ProducerCard({
   context = "default",
   className,
 }: {
-  producer: Pick<PublicProducerLight, "name" | "images" | "id" | "claimed">;
+  producer: Pick<
+    PublicProducerLight,
+    "name" | "images" | "id" | "claimed" | "type"
+  >;
   mode?: "default" | "list";
   context?: "default" | "pinboard";
   className?: string;

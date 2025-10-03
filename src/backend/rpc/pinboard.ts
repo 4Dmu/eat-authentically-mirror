@@ -55,6 +55,7 @@ export const getUserPinboardFull = authenticatedActionClient
             producer: {
               columns: {
                 id: true,
+                type: true,
                 name: true,
                 images: true,
                 claimed: true,
