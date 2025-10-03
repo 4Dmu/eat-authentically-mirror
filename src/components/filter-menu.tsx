@@ -17,7 +17,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { showFilterMenuAtom, useHomePageStore } from "@/stores";
 import { LocationFilter } from "./location-filter";
-import { FilterIcon, XIcon } from "lucide-react";
+import { FilterIcon } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { SelectValue } from "@radix-ui/react-select";

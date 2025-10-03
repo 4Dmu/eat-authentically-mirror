@@ -23,7 +23,6 @@ import { PinboardMap } from "@/components/pinboard-map";
 import { useThrottleCallback } from "@react-hook/throttle";
 import { UpdateUserPinboardArgs } from "@/backend/validators/pinboard";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,

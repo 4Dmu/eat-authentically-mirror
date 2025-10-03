@@ -19,8 +19,6 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Label } from "./ui/label";
-import { Slider } from "./ui/slider";
-import { Switch } from "./ui/switch";
 import { Checkbox } from "./ui/checkbox";
 import { Separator } from "./ui/separator";
 import { useAtom, useAtomValue } from "jotai";

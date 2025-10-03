@@ -7,7 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Input } from "./ui/input";
-import { CompassIcon, MapIcon, MapPin } from "lucide-react";
+import { CompassIcon, MapPin } from "lucide-react";
 import { PRODUCER_TYPES } from "@/backend/validators/producers";
 import {
   ChangeEvent,
