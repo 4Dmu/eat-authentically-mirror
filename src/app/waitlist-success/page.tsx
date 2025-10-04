@@ -20,8 +20,8 @@ export default function Page() {
                 Success!
               </h1>
               <p className="text-3xl text-shadow-lg">
-                You've been added to the waitlist, we'll email you when it's
-                time to Eat Authentically.
+                You&apos;ve been added to the waitlist, we&apos;ll email you
+                when it&apos;s time to Eat Authentically.
               </p>
             </div>
           </section>

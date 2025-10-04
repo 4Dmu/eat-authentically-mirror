@@ -22,7 +22,7 @@ export default function Home() {
     }
   }
 
-  useLayoutEffect(() => focus(), [mode]);
+  useLayoutEffect(() => focus(), [mode, focus]);
 
   return (
     <div className="">

@@ -21,8 +21,8 @@ export default function Page() {
               </h1>
               <p className="text-2xl text-shadow-sm max-w-4xl">
                 Your listing has been created, once EatAuthentically is live
-                you'll receive an email to create your account, if you opted to
-                pre create it you will simply be able to login.
+                you&apos;ll receive an email to create your account, if you
+                opted to pre create it you will simply be able to login.
               </p>
             </div>
           </section>

@@ -148,6 +148,7 @@ export const submitListing = actionClient
             socialMedia: { facebook: null, twitter: null, instagram: null },
             createdAt: new Date(),
             updatedAt: new Date(),
+            subscriptionRank: 0,
           } satisfies ProducerInsert)
           .returning()
           .then((r) => r[0]);

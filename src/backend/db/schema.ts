@@ -47,6 +47,9 @@ export type ScrapeMeta =
       _metaType: "eatwellguide";
       details: object[];
       categories: string[];
+    }
+  | {
+      _metaType: "michelin";
     };
 
 export type OnboardingSteps = {
@@ -119,6 +122,7 @@ export const producers = sqliteTable("producers", {
     mode: "json",
   }).$type<GoogleMapsPlaceDetails>(),
   serviceDetails: text({ mode: "json" }).$type<ServiceDetails>(),
+  subscriptionRank: integer().notNull(),
   createdAt: integer({ mode: "timestamp" }).notNull(),
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
@@ -411,6 +415,9 @@ export const preLaunchProducerWaitlist = sqliteTable(
 export type ProducerInsert = typeof producers.$inferInsert;
 
 export type Certification = typeof certifications.$inferSelect;
+export type CertificationToProducer =
+  typeof certificationsToProducers.$inferSelect;
+export type ImportedReviewSelect = typeof importedReviews.$inferSelect;
 export type ProducerSelect = typeof producers.$inferSelect;
 export type ClaimRequest = typeof claimRequests.$inferSelect & {
   producer: { name: string; id: string };
