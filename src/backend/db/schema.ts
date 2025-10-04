@@ -415,6 +415,9 @@ export const preLaunchProducerWaitlist = sqliteTable(
 export type ProducerInsert = typeof producers.$inferInsert;
 
 export type Certification = typeof certifications.$inferSelect;
+export type CertificationToProducer =
+  typeof certificationsToProducers.$inferSelect;
+export type ImportedReviewSelect = typeof importedReviews.$inferSelect;
 export type ProducerSelect = typeof producers.$inferSelect;
 export type ClaimRequest = typeof claimRequests.$inferSelect & {
   producer: { name: string; id: string };
