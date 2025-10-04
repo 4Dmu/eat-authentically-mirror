@@ -47,6 +47,9 @@ export type ScrapeMeta =
       _metaType: "eatwellguide";
       details: object[];
       categories: string[];
+    }
+  | {
+      _metaType: "michelin";
     };
 
 export type OnboardingSteps = {
