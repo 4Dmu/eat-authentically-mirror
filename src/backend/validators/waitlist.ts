@@ -5,6 +5,9 @@ export const waitlistRegisterArgs = type({
   email: type("string.email").configure({
     message: "please provide a valid email",
   }),
+  turnstileToken: type("string").configure({
+    message: "please complete the captcha",
+  }),
 });
 
 export const submitListingArgs = type({

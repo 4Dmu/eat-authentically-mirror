@@ -15,6 +15,8 @@ import { useRouter } from "next/navigation";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
 import { waitlistRegisterArgs } from "@/backend/validators/waitlist";
 import { waitlistRegister } from "@/backend/rpc/waitlist";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { env } from "@/env";
 
 export function ConsumerForm({
   ref,
@@ -33,6 +35,7 @@ export function ConsumerForm({
   const form = useForm({
     defaultValues: {
       email: "",
+      turnstileToken: undefined as unknown as string,
     },
     validators: {
       onSubmit: ({ formApi }) =>
@@ -58,7 +61,7 @@ export function ConsumerForm({
             e.preventDefault();
             form.handleSubmit();
           }}
-          className=" flex flex-col gap-2"
+          className=" flex flex-col gap-5"
         >
           <form.Field name="email">
             {(field) => (
@@ -73,6 +76,19 @@ export function ConsumerForm({
                 />
                 <FieldInfo field={field} />
               </div>
+            )}
+          </form.Field>
+          <form.Field name="turnstileToken">
+            {(field) => (
+              <>
+                <Turnstile
+                  className="w-full rounded-lg overflow-clip"
+                  options={{ size: "flexible" }}
+                  siteKey={env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                  onSuccess={field.handleChange}
+                />
+                <FieldInfo field={field} />
+              </>
             )}
           </form.Field>
           <Button>Submit</Button>

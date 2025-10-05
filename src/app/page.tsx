@@ -81,7 +81,7 @@ export default function Home() {
         <>
           <Separator />
           <div className="w-screen min-h-screen relative flex flex-col">
-            <div className="w-full flex-1 flex flex-col p-5 md:p-20 justify-center items-center gap-10">
+            <div className="w-full flex-1 flex flex-col p-2 md:p-20 justify-center items-center gap-10">
               <div className="w-full gap-10 max-w-4xl z-50">
                 {mode === "consumer" && <ConsumerForm ref={consumerInputRef} />}
 

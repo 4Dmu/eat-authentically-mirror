@@ -305,6 +305,8 @@ export function ProducerForm({
             {(field) => (
               <>
                 <Turnstile
+                  className="w-full rounded-lg overflow-clip"
+                  options={{ size: "flexible" }}
                   siteKey={env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
                   onSuccess={field.handleChange}
                 />

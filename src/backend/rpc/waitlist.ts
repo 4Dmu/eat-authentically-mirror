@@ -28,7 +28,13 @@ import { validateTurnstileUsingNextApis } from "../lib/cloudflare";
 export const waitlistRegister = actionClient
   .name("waitlistRegister")
   .input(waitlistRegisterArgs)
-  .action(async ({ input: { email } }) => {
+  .action(async ({ input: { email, turnstileToken } }) => {
+    const turnstileValid = await validateTurnstileUsingNextApis(turnstileToken);
+
+    if (!turnstileValid) {
+      throw new Error("Invalid captcha");
+    }
+
     const { success } =
       await waitlistRegisterRatelimit.limit("waitlistRegister");
 
