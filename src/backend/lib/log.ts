@@ -20,6 +20,7 @@ export const logger = {
   },
 } satisfies Record<
   string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (message: string, args?: Record<string | symbol, any>) => void
 >;
 

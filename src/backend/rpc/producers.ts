@@ -1304,7 +1304,7 @@ export const deleteProducer = producerActionClient
 export const suggestProducer = authenticatedActionClient
   .input(suggestProducerArgs)
   .name("suggestProducer")
-  .action(async ({ ctx: { userId, producerIds }, input }) => {
+  .action(async ({ ctx: { userId }, input }) => {
     const subtier = await getSubTier(userId);
 
     if (subtier === "Free") {

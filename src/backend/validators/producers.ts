@@ -2,8 +2,6 @@ import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { LatLangBoundsLiteralValidator } from "./maps";
 import { ClaimRequestStatus } from "../db/schema";
-import { email } from "zod";
-import { ar } from "date-fns/locale";
 import { isMobilePhone } from "validator";
 
 export const PRODUCER_TYPES = [

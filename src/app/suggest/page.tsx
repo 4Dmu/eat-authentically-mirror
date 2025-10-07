@@ -48,8 +48,8 @@ export default function Page() {
         <div className="p-10 flex flex-col gap-5 items-center text-center">
           <h1 className="font-bold text-5xl">Suggest A Producer</h1>
           <p>
-            Know a Farm/Ranch/Eatery that you like but isn't listed here?
-            Suggest it and we'll add it (afer review)
+            Know a Farm/Ranch/Eatery that you like but isn&apos;t listed here?
+            Suggest it and we&apos;ll add it (afer review)
           </p>
         </div>
         <Card>
