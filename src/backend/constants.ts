@@ -56,3 +56,5 @@ export const PRODUCER_PRODUCTS_LIMIT_BY_TIER: Record<
   premium: 999, // effectively unlimited
   enterprise: 999, // effectively unlimited
 };
+
+export const RATELIMIT_ALL = "*" as const;

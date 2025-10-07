@@ -10,7 +10,9 @@
     "lint": "next lint",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
-    "run-file": "dotenv tsx --"
+    "run-file": "dotenv tsx --",
+    "deploy:preview": "vercel deploy",
+    "deploy:dev": "vercel deploy --target=development"
   },
   "dependencies": {
     "@clerk/backend": "^2.9.2",

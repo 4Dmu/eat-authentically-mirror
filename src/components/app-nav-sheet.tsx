@@ -113,6 +113,18 @@ export function AppNavSheet({
               </SheetClose>
             </NotSubbed>
           </SignedIn>
+          <SheetClose asChild>
+            <Button
+              variant={"ghost"}
+              asChild
+              className="flex font-bold items-center justify-start text-sm gap-5"
+            >
+              <Link href="/suggest">
+                <InfoIcon size={20} />
+                <span>Suggest A Farm/Ranch/Eatery</span>
+              </Link>
+            </Button>
+          </SheetClose>
         </div>
       </SheetContent>
     </Sheet>

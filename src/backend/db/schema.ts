@@ -127,6 +127,18 @@ export const producers = sqliteTable("producers", {
   updatedAt: integer({ mode: "timestamp" }).notNull(),
 });
 
+export const suggestedProducers = sqliteTable("suggestedProducers", {
+  id: text().primaryKey(),
+  suggesterUserId: text(),
+  name: text().notNull(),
+  type: text({ enum: PRODUCER_TYPES }).notNull(),
+  address: text({ mode: "json" }).$type<Address>(),
+  email: text(),
+  phone: text(),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  updatedAt: integer({ mode: "timestamp" }).notNull(),
+});
+
 export const producersRelations = relations(producers, ({ many }) => ({
   certificationsToProducers: many(certificationsToProducers),
   claimRequests: many(claimRequests),

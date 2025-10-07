@@ -25,6 +25,7 @@ import {
   getProducerPublic,
   verifyClaimPhone,
   regenerateClaimPhoneToken,
+  suggestProducer,
 } from "@/backend/rpc/producers";
 import {
   ListProducerArgsBeforeValidate,
@@ -38,6 +39,7 @@ import {
   DeleteProducerArgs,
   VerifyClaimPhoneArgs,
   RegenerateClaimPhoneTokenArgs,
+  SuggestProducerArgs,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import { ImageData } from "@/backend/validators/producers";
@@ -475,5 +477,18 @@ export function useRegenerateClaimPhoneToken(
     mutationKey: ["regenerate-claim-phone-token"] as const,
     mutationFn: (args: RegenerateClaimPhoneTokenArgs) =>
       regenerateClaimPhoneToken(args),
+  });
+}
+
+export function useSuggestProducer(
+  opts?: Omit<
+    UseMutationOptions<void, Error, SuggestProducerArgs, unknown>,
+    "mutationFn" | "mutationKey"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["suggest-producer"] as const,
+    mutationFn: (args: SuggestProducerArgs) => suggestProducer(args),
   });
 }

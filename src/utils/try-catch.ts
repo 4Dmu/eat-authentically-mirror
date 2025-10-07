@@ -1,4 +1,4 @@
-type Result<T, E = Error> = { data: T | null; error: E | null };
+type Result<T, E = Error> = { data: T; error: null } | { data: null; error: E };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function tryCatch<TArgs extends any[], TResult, E = Error>(

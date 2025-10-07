@@ -12,6 +12,7 @@ import {
   deleteProducerArgs,
   verifyClaimPhoneArgs,
   regenerateClaimPhoneTokenArgs,
+  suggestProducerArgs,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
@@ -21,6 +22,7 @@ import {
   claimRequests,
   ProducerInsert,
   producers,
+  suggestedProducers,
   Video,
 } from "../db/schema";
 import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
@@ -32,8 +34,11 @@ import { cloudflare } from "../lib/cloudflare";
 import { normalizeAddress } from "../utils/normalize-data";
 import {
   claimProducerRateLimit,
+  geocodeRatelimit,
   producerClaimDnsCheckRatelimit,
   producerClaimVerifyPhoneRatelimit,
+  suggestProducerFreeLimit,
+  suggestProducerProLimit,
   videoRatelimit,
 } from "../lib/rate-limit";
 import { authenticatedActionClient } from "./helpers/middleware";
@@ -51,6 +56,7 @@ import {
   CLAIM_DNS_TXT_RECORD_NAME,
   PRODUCER_CERT_LIMIT_BY_TIER,
   PRODUCER_PRODUCTS_LIMIT_BY_TIER,
+  RATELIMIT_ALL,
 } from "../constants";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
@@ -59,6 +65,8 @@ import crypto from "node:crypto";
 import { sendClaimCodeMessage } from "./helpers/sms";
 import { isMobilePhone, isNumeric } from "validator";
 import { addMinutes, isAfter, isBefore } from "date-fns";
+import { tryCatch } from "@/utils/try-catch";
+import { geocode } from "../lib/google-maps";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -1287,4 +1295,74 @@ export const deleteProducer = producerActionClient
     });
 
     console.log(`[deleteProducer] deletion successfull`, delTxRes);
+  });
+
+export const suggestProducer = authenticatedActionClient
+  .input(suggestProducerArgs)
+  .name("suggestProducer")
+  .action(async ({ ctx: { userId, producerIds }, input }) => {
+    const subtier = await getSubTier(userId);
+
+    if (subtier === "Free") {
+      const result = await suggestProducerFreeLimit.limit(userId);
+      console.log(result);
+
+      if (!result.success) {
+        throw new Error("Free users can only suggest 1 producer per day");
+      }
+    } else {
+      const result = await suggestProducerProLimit.limit(userId);
+      console.log(result);
+
+      if (!result.success) {
+        throw new Error("Pro users can only suggest 3 producers per day");
+      }
+    }
+
+    const { success } = await geocodeRatelimit.limit(RATELIMIT_ALL);
+
+    if (!success) {
+      console.log(
+        "IMPORTANT Suggestion global limit exceeded, please wait and try again later"
+      );
+      throw new Error(
+        "Suggestion global limit exceeded, please wait and try again later"
+      );
+    }
+
+    const { data: geocodeResponse, error: geocodeError } = await tryCatch(
+      geocode
+    )(
+      `${input.address.street}, ${input.address.city}, ${input.address.state}, ${input.address.zip}, ${input.address.country}`
+    );
+
+    if (geocodeResponse == null) {
+      console.log(geocodeError);
+      throw new Error("Invalid address");
+    }
+
+    console.log(geocodeResponse);
+
+    const geocoded = geocodeResponse.results[0];
+
+    await db.insert(suggestedProducers).values({
+      id: crypto.randomUUID(),
+      name: input.name,
+      type: input.type,
+      address: {
+        street: input.address.street,
+        city: input.address.city,
+        state: input.address.state,
+        zip: input.address.zip,
+        country: input.address.country,
+        coordinate: {
+          latitude: geocoded.geometry.location.lat,
+          longitude: geocoded.geometry.location.lng,
+        },
+      },
+      email: input.email,
+      phone: input.phone,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
   });

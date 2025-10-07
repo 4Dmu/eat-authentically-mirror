@@ -2,6 +2,9 @@ import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { LatLangBoundsLiteralValidator } from "./maps";
 import { ClaimRequestStatus } from "../db/schema";
+import { email } from "zod";
+import { ar } from "date-fns/locale";
+import { isMobilePhone } from "validator";
 
 export const PRODUCER_TYPES = [
   "farm",
@@ -119,6 +122,49 @@ export const addressValidator = type({
     latitude: "number",
     longitude: "number",
   }).or(type.undefined),
+});
+
+export const suggestProducerArgs = type({
+  name: type("string").atLeastLength(3).atMostLength(300).configure({
+    expected: "",
+    message: "Name must be between 3 and 300 characters",
+  }),
+  type: producerTypesValidator.configure({
+    expected: "",
+    message: "Type must be farm, ranch or eatery",
+  }),
+  address: type({
+    street: type("string").atLeastLength(1),
+    city: type("string").atLeastLength(1),
+    state: type("string").atLeastLength(1),
+    country: alpha3CountryCodeValidator,
+    zip: type("string.numeric").atLeastLength(2),
+  }),
+  "email?": "string.email|undefined",
+  "phone?": type("string|undefined").narrow((v, ctx) =>
+    v === undefined
+      ? true
+      : isMobilePhone(v)
+        ? true
+        : ctx.mustBe("a valid phone number")
+  ),
+}).narrow((args, ctx) => {
+  if (args.email === undefined && args.phone === undefined) {
+    ctx.reject({
+      expected: "a valid email or phone or both",
+      actual: "",
+      path: ["email"],
+    });
+
+    ctx.reject({
+      expected: "a valid email or phone or both",
+      actual: "",
+      path: ["phone"],
+    });
+
+    return false;
+  }
+  return true;
 });
 
 export const certificationValidator = type({
@@ -439,3 +485,5 @@ export type PublicClaimRequest = {
 export type DeleteProducerArgs = typeof deleteProducerArgs.infer;
 
 export type IpGeoValidator = typeof ipGeoValidator.infer;
+
+export type SuggestProducerArgs = typeof suggestProducerArgs.infer;

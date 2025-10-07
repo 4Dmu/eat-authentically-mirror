@@ -5,21 +5,24 @@ import { match, P } from "ts-pattern";
 export function FieldInfo({
   field,
   otherwise,
+  overrideMessage,
 }: {
   field: AnyFieldApi;
   otherwise?: ReactNode;
+  overrideMessage?: string;
 }) {
   return (
     <>
       {!field.state.meta.isValid ? (
         <em className="text-destructive">
-          {field.state.meta.errors
-            .map((err) =>
-              match(err)
-                .with({ message: P.string }, (v) => v.message)
-                .otherwise((v) => v),
-            )
-            .join(",")}
+          {overrideMessage ??
+            field.state.meta.errors
+              .map((err) =>
+                match(err)
+                  .with({ message: P.string }, (v) => v.message)
+                  .otherwise((v) => v)
+              )
+              .join(",")}
         </em>
       ) : (
         otherwise

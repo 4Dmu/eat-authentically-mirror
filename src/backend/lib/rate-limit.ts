@@ -72,3 +72,39 @@ export const messageRatelimit = new Ratelimit({
    */
   prefix: "@upstash/message-rate-limit",
 });
+
+export const suggestProducerFreeLimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(1, "1d"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/suggest-producer-free-limit",
+});
+
+export const suggestProducerProLimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(3, "1d"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/suggest-producer-pro-limit",
+});
+
+export const geocodeRatelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.fixedWindow(90000, "32d"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/geocode-limit",
+});
