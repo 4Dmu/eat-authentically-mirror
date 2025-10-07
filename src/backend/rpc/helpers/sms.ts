@@ -1,3 +1,4 @@
+import { logger } from "@/backend/lib/log";
 import { client } from "@/backend/lib/twilio";
 import { env } from "@/env";
 
@@ -7,6 +8,5 @@ export async function sendClaimCodeMessage(phone: string, token: string) {
     from: env.TWILIO_NUMBER,
     to: phone,
   });
-  console.log("Send claim code message result:");
-  console.info(result);
+  logger.info("Send claim code message result", { result });
 }

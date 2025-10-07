@@ -111,7 +111,6 @@ export async function listProducersPublic(args: ListProducerArgsAfterValidate) {
     let orderBy = [orderProducersByScrapedMetadata, desc(producers.createdAt)];
 
     const ipGeo = orderProducerByIpGeo(args.userIpGeo);
-    console.log(ipGeo);
 
     if (ipGeo) {
       orderBy = [ipGeo, ...orderBy];

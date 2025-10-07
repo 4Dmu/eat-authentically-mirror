@@ -67,6 +67,7 @@ import { isMobilePhone, isNumeric } from "validator";
 import { addMinutes, isAfter, isBefore } from "date-fns";
 import { tryCatch } from "@/utils/try-catch";
 import { geocode } from "../lib/google-maps";
+import { logger } from "../lib/log";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -295,7 +296,7 @@ export const editProducer = producerActionClient
           );
         }
       } catch (err) {
-        console.log(err);
+        logger.error("Error updating and removing certs", { error: err });
       }
     }
 
@@ -507,7 +508,9 @@ export const requestVideoUploadUrl = producerActionClient
       await uploadUrlGeneratorCloudflareResponse.json();
 
     if (uploadUrlGeneratorCloudflareResponseBody.success === true) {
-      console.log(uploadUrlGeneratorCloudflareResponseBody);
+      logger.info("Cloudflare direct upload response body", {
+        body: uploadUrlGeneratorCloudflareResponseBody,
+      });
 
       await db
         .update(producers)
@@ -522,7 +525,9 @@ export const requestVideoUploadUrl = producerActionClient
 
       return uploadUrlGeneratorCloudflareResponseBody.result.uploadURL;
     } else {
-      console.error(uploadUrlGeneratorCloudflareResponseBody);
+      logger.error("Cloudflare direct upload response error body", {
+        body: uploadUrlGeneratorCloudflareResponseBody,
+      });
       throw new Error("Error generating video url");
     }
   });
@@ -647,7 +652,7 @@ export const confirmPendingVideoUpload = producerActionClient
       );
 
       for (const video of pendingVideosThatExists) {
-        console.log(video);
+        logger.info("video of pendingVideosThatExists", { video: video });
         if (
           !video.status ||
           video.status.state === "error" ||
@@ -750,7 +755,7 @@ export const updateExistingImages = producerActionClient
       .where(eq(producers.id, producer.id));
 
     for (const image of imagesToDelete) {
-      console.log(
+      logger.info(
         `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by user(${userId})`
       );
 
@@ -758,9 +763,9 @@ export const updateExistingImages = producerActionClient
         account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
       });
 
-      console.log(
+      logger.info(
         `action [updateExistingImages] - Cloudflare delete image response`,
-        response
+        { response: response }
       );
     }
   });
@@ -872,9 +877,7 @@ export const claimProducer = authenticatedActionClient
 
           const url = new URL(website);
           let domain = url.hostname;
-          console.log(domain);
           if (/\..*\./.test(domain)) {
-            console.log("match");
             domain = domain.substring(domain.indexOf(".") + 1);
           }
 
@@ -949,8 +952,6 @@ export const claimProducer = authenticatedActionClient
             .split("")
             .filter((c) => isNumeric(c) || c == "+")
             .join("");
-
-          console.log(phone);
 
           if (!isMobilePhone(phone)) {
             throw new Error("Missing or invalid contact phone");
@@ -1130,10 +1131,7 @@ export const checkClaimDomainDNS = authenticatedActionClient
 
     const recordName = `${CLAIM_DNS_TXT_RECORD_NAME}.${claimRequest.requestedVerification.domain}`;
 
-    console.log(recordName);
     const records = await getDnsRecords(recordName, "TXT");
-
-    console.log(records);
 
     const claimDnsRecord = records.find((r) => r.name === recordName);
 
@@ -1259,7 +1257,7 @@ export const deleteProducer = producerActionClient
       throw new Error("Producer not found");
     }
 
-    console.log(
+    logger.info(
       `[deleteProducer] Starting deletion proccess - userId: ${userId} producerId: ${producer.id}`
     );
 
@@ -1267,7 +1265,9 @@ export const deleteProducer = producerActionClient
       const videDelRes = await cloudflare.stream.delete(producer.video.uid, {
         account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
       });
-      console.log(`[deleteProducer] deleting video`, videDelRes);
+      logger.info(`[deleteProducer] deleting video`, {
+        deleteResponse: videDelRes,
+      });
     }
 
     for (const image of producer.images.items) {
@@ -1277,7 +1277,9 @@ export const deleteProducer = producerActionClient
           account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
         }
       );
-      console.log(`[deleteProducer] deleting image`, imageDelRes);
+      logger.info(`[deleteProducer] deleting image`, {
+        imageResponse: imageDelRes,
+      });
     }
 
     const delTxRes = await db.transaction(async (tx) => {
@@ -1294,7 +1296,9 @@ export const deleteProducer = producerActionClient
       return await tx.delete(producers).where(eq(producers.id, producer.id));
     });
 
-    console.log(`[deleteProducer] deletion successfull`, delTxRes);
+    logger.info(`[deleteProducer] deletion successfull`, {
+      deleteProducerTxResponse: delTxRes,
+    });
   });
 
 export const suggestProducer = authenticatedActionClient
@@ -1305,14 +1309,16 @@ export const suggestProducer = authenticatedActionClient
 
     if (subtier === "Free") {
       const result = await suggestProducerFreeLimit.limit(userId);
-      console.log(result);
+      logger.info("suggestProducerFreeLimit ratelimit result", { result });
 
       if (!result.success) {
         throw new Error("Free users can only suggest 1 producer per day");
       }
     } else {
       const result = await suggestProducerProLimit.limit(userId);
-      console.log(result);
+      logger.info("suggestProducerProLimit ratelimit result", {
+        result,
+      });
 
       if (!result.success) {
         throw new Error("Pro users can only suggest 3 producers per day");
@@ -1322,7 +1328,7 @@ export const suggestProducer = authenticatedActionClient
     const { success } = await geocodeRatelimit.limit(RATELIMIT_ALL);
 
     if (!success) {
-      console.log(
+      logger.info(
         "IMPORTANT Suggestion global limit exceeded, please wait and try again later"
       );
       throw new Error(
@@ -1337,11 +1343,9 @@ export const suggestProducer = authenticatedActionClient
     );
 
     if (geocodeResponse == null) {
-      console.log(geocodeError);
+      logger.error("geocoding error", { error: geocodeError });
       throw new Error("Invalid address");
     }
-
-    console.log(geocodeResponse);
 
     const geocoded = geocodeResponse.results[0];
 

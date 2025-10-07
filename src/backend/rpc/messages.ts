@@ -185,8 +185,6 @@ export const blockUserChat = authenticatedActionClient
       throw new Error("Invalid producer");
     }
 
-    console.log(producer.id, userId, chatId);
-
     const chat = await db.query.producerChats.findFirst({
       where: and(
         eq(producerChats.producerId, producer.id),

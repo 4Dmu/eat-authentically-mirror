@@ -9,6 +9,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Header } from "@/components/app-header";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider as JotaiProvider } from "jotai";
+import { WebVitals } from "@/lib/axiom/client";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
@@ -61,6 +62,7 @@ export default function RootLayout({
             <Toaster />
             <SpeedInsights />
             <Analytics />
+            <WebVitals />
             <ReactQueryDevtools />
           </body>
         </html>

@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { env } from "@/env";
+import { logger } from "@/backend/lib/log";
 
 type SuccessWebhookPayload = {
   uid: string;
@@ -37,10 +38,15 @@ type FailureStatus = {
 export async function POST(req: NextRequest) {
   const sigHeader = req.headers.get("Webhook-Signature");
 
-  console.log("[CLOUDFLARE STREAM WEHOOK] received");
-  console.log("[CLOUDFLARE STREAM WEHOOK] Header signature: ", sigHeader);
+  logger.info("[CLOUDFLARE STREAM WEHOOK] received");
+  logger.info("[CLOUDFLARE STREAM WEHOOK] Header signature", {
+    signature: sigHeader,
+  });
 
   if (!sigHeader) {
+    logger.info(
+      "[CLOUDFLARE STREAM WEHOOK] Signature verification failed because of missing signature"
+    );
     return NextResponse.json(
       { message: "Signature verification failed" },
       { status: 401 }
@@ -52,6 +58,9 @@ export async function POST(req: NextRequest) {
   const dangerousSignature = sigParts[1]?.split("=")[1];
 
   if (!time || !dangerousSignature) {
+    logger.info(
+      "[CLOUDFLARE STREAM WEHOOK] Signature verification failed because of missing or invalid signature parts"
+    );
     return NextResponse.json(
       { message: "Signature verification failed" },
       { status: 401 }
@@ -68,6 +77,9 @@ export async function POST(req: NextRequest) {
   const computedSignature = hash.digest("hex");
 
   if (dangerousSignature != computedSignature) {
+    logger.info(
+      "[CLOUDFLARE STREAM WEHOOK] Signature verification failed because of signature was invalid"
+    );
     return NextResponse.json(
       { message: "Signature verification failed" },
       { status: 401 }
@@ -78,7 +90,7 @@ export async function POST(req: NextRequest) {
     | SuccessWebhookPayload
     | FailureWebhookPayload;
 
-  console.log("[CLOUDFLARE STREAM WEHOOK] Body: ", body);
+  logger.info("[CLOUDFLARE STREAM WEHOOK] Body", { body });
 
   const canStream = body.readyToStream && body.status.state === "ready";
 
@@ -96,6 +108,6 @@ export async function POST(req: NextRequest) {
         RETURNING id
         `);
 
-  console.log("[CLOUDFLARE STREAM WEHOOK] Update result: ", result);
+  logger.info("[CLOUDFLARE STREAM WEHOOK] Update result", { result });
   return NextResponse.json({ status: "ok" }, { status: 200 });
 }

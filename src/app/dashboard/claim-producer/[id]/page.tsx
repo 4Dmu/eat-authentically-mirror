@@ -25,7 +25,7 @@ export default async function Page(props: {
     tier.tier === "enterprise" &&
     userProducersCount.length < 3
   ) {
-    console.log("multiple");
+    // console.log("multiple");
   } else if (userProducersCount.length > 0) {
     redirect("/dashboard");
   }
@@ -34,7 +34,7 @@ export default async function Page(props: {
     where: and(
       eq(producers.id, params.id),
       isNull(producers.userId),
-      eq(producers.claimed, false),
+      eq(producers.claimed, false)
     ),
   });
 

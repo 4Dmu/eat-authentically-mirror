@@ -34,12 +34,12 @@ export const ImagesForm = withForm({
       tier === "Free"
         ? 1
         : tier.tier === "community"
-        ? 1
-        : tier.tier === "pro"
-        ? 4
-        : tier.tier === "premium" || tier.tier === "enterprise"
-        ? 5
-        : 1;
+          ? 1
+          : tier.tier === "pro"
+            ? 4
+            : tier.tier === "premium" || tier.tier === "enterprise"
+              ? 5
+              : 1;
 
     return (
       <Card>
@@ -53,12 +53,12 @@ export const ImagesForm = withForm({
               {tier === "Free"
                 ? 1
                 : tier.tier === "community"
-                ? 1
-                : tier.tier === "pro"
-                ? 4
-                : tier.tier === "premium" || tier.tier === "enterprise"
-                ? 5
-                : 1}{" "}
+                  ? 1
+                  : tier.tier === "pro"
+                    ? 4
+                    : tier.tier === "premium" || tier.tier === "enterprise"
+                      ? 5
+                      : 1}{" "}
               Image
             </span>
           </CardDescription>
@@ -201,13 +201,11 @@ export const ImagesForm = withForm({
                       }
                       mimeType="image/*"
                       onSelectMoreFilesThanAllowed={() => {
-                        console.log("ok");
                         toast.error(
                           `Upgrade to select more than ${maxFiles} files.`
                         );
                       }}
                       onSelect={(files) => {
-                        console.log(files);
                         files.forEach((file) =>
                           subField.pushValue({
                             _type: "upload",

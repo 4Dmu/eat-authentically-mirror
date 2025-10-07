@@ -9,6 +9,7 @@ import { PLANS } from "./subscription-plans";
 import { db } from "../db";
 import { producers } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { logger } from "../lib/log";
 
 export type SubscriptionJSON = {
   subscriptionId: string;
@@ -61,10 +62,9 @@ export async function processStripeEvent(event: Stripe.Event) {
 
     return await updateKvWithLatestStripeData(customerId);
   } else {
-    console.log(
-      "[STRIPE HOOK] [PROCESS EVENT] Ignoring event type:",
-      event.type
-    );
+    logger.info("[STRIPE HOOK] [PROCESS EVENT] Ignoring event type", {
+      type: event.type,
+    });
   }
 }
 
@@ -120,19 +120,17 @@ export async function updateKvWithLatestStripeData(customerId: string) {
         .update(producers)
         .set({ subscriptionRank: subscriptionRank })
         .where(eq(producers.userId, userId));
-      console.log(
-        "[STRIPE HOOK] [PROCESS EVENT] [UPDATE PRODUCER SUB RANK] userId:",
+      logger.info("[STRIPE HOOK] [PROCESS EVENT] [UPDATE PRODUCER SUB RANK]", {
         userId,
-        "updateResult:",
-        result
-      );
+        updateResult: result,
+      });
     }
 
     return subs;
   } catch (err) {
-    console.error(
-      "[STRIPE HOOK] [PROCESS EVENT] [UPDATE KV] Error updating Stripe data:",
-      err
+    logger.error(
+      "[STRIPE HOOK] [PROCESS EVENT] [UPDATE KV] Error updating Stripe data",
+      { error: err }
     );
     throw err;
   }

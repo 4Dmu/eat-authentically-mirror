@@ -224,7 +224,6 @@ function VerifyContactPhoneInstructions({
           <form.Field
             validators={{
               onChange: ({ value }) => {
-                console.log(value);
                 const matcher = new RegExp(REGEXP_ONLY_DIGITS);
                 if (value.length !== 6) {
                   return "Code must be six digits";

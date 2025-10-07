@@ -1,4 +1,5 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { logger } from "./log";
 
 type Fn<TPrevious, TNext> = (prev: TPrevious) => TNext | Promise<TNext>;
 
@@ -38,7 +39,7 @@ class InputActionClient<
   ) {
     return async (input: StandardSchemaV1.InferInput<TSchema>) => {
       const actionName = this.client.actionName ?? "anonymous";
-      console.log(`[ACTION ${actionName}] start`);
+      logger.info(`[ACTION ${actionName}] start`);
 
       const ctx = await this.client.resolveCtx();
 
@@ -51,7 +52,7 @@ class InputActionClient<
 
       const response = await fn({ ctx, input: result.value });
 
-      console.log(`[ACTION ${actionName}] end`);
+      logger.info(`[ACTION ${actionName}] end`);
 
       return response;
     };
@@ -90,12 +91,12 @@ export class ActionClient<
   action<TResult>(fn: (ctx: TNextContext) => TResult | Promise<TResult>) {
     return async () => {
       const actionName = this.actionName ?? "anonymous";
-      console.log(`[ACTION ${actionName}] start`);
+      logger.info(`[ACTION ${actionName}] start`);
 
       const ctx = await this.resolveCtx();
       const result = await fn(ctx);
 
-      console.log(`[ACTION ${actionName}] end`);
+      logger.info(`[ACTION ${actionName}] end`);
       return result;
     };
   }

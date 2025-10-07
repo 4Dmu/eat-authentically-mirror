@@ -68,7 +68,6 @@ export function AddToPinboardButton({
         const pinId = pinboard.data
           ? pinboard.data.pins.find((pin) => pin.producerId === producerId)?.id
           : undefined;
-        console.log(pinId);
         if (pinId) {
           remove.mutate({ pinId });
         } else {
@@ -152,7 +151,6 @@ export function AddToPinboardIconButton({
             ? pinboard.data.pins.find((pin) => pin.producerId === producerId)
                 ?.id
             : undefined;
-          console.log(pinId);
           if (pinId) {
             remove.mutate({ pinId });
           } else {

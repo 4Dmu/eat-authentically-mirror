@@ -28,11 +28,13 @@ import {
   PRO_TIER_PROS,
 } from "@/backend/constants";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useLogger } from "@/lib/axiom/client";
 
 export function ClientPage(props: {
   user: UserJSON;
   mode?: "community" | "producer";
 }) {
+  const log = useLogger();
   const [tier, setTier] = useState<Tier>(
     props.mode === "community" ? "community" : "pro"
   );
@@ -49,7 +51,9 @@ export function ClientPage(props: {
       window.location.href = url;
     },
     onError(err) {
-      console.log(err);
+      log.debug("[CLIENT] [createOrgCheckoutSessionMutation] Error", {
+        error: err,
+      });
       toast.error(err.message);
     },
   });

@@ -1,3 +1,4 @@
+import { flushingLogger } from "@/backend/lib/log";
 import { triggerStripeSync } from "@/backend/rpc/stripe";
 import ClientRedirect from "@/components/client-redirect";
 import { tryCatch } from "@/utils/try-catch";
@@ -11,9 +12,12 @@ async function ConfirmStripeSessionComponent({
 }: {
   redirectPath: string;
 }) {
+  const logger = flushingLogger();
   const user = await auth();
   if (!user) return <div>No user</div>;
-  console.log("user", user);
+  logger.info("[stripe/billing/success] [ConfirmStripeSessionComponent]", {
+    user,
+  });
   const { error } = await tryCatch(triggerStripeSync)();
   if (error) return <div>Failed to sync with stripe: {error.message}</div>;
   return <ClientRedirect to={redirectPath} />;
@@ -24,9 +28,12 @@ export default async function SuccessPage({
 }: {
   searchParams: Promise<{ redirect_path: string | undefined }>;
 }) {
+  const logger = flushingLogger();
   const params = await searchParams;
 
-  console.log("[stripe/billing/success] redirect_path", params.redirect_path);
+  logger.info("[stripe/billing/success] Info", {
+    redirectPath: params.redirect_path,
+  });
 
   return (
     <div>

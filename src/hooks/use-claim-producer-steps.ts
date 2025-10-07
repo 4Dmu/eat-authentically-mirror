@@ -68,13 +68,13 @@ export type StepSetter = (step: InputStep) =>
 
 export function useClaimProducerSteps(initialStep?: Step) {
   const [currentStep, setCurrentStep] = useState<Step>(
-    initialStep ?? { mode: "select" },
+    initialStep ?? { mode: "select" }
   );
   const [choosenSocialHandle, setChoosenSocialHandle] = useState<
     string | undefined
   >(undefined);
   const [domainEmailPart, setDomainEmailPart] = useState<string | undefined>(
-    undefined,
+    undefined
   );
   const [manualContactEmail, setManualContactEmail] = useState<
     string | undefined
@@ -100,7 +100,7 @@ export function useClaimProducerSteps(initialStep?: Step) {
         switch (step.verification) {
           case "contact-email-link":
             const email = type("string.email")(
-              step.producer.contact?.email?.trim(),
+              step.producer.contact?.email?.trim()
             );
 
             if (email instanceof type.errors) {
@@ -125,9 +125,7 @@ export function useClaimProducerSteps(initialStep?: Step) {
 
             const url = new URL(website);
             let host = url.hostname;
-            console.log(host);
             if (/\..*\./.test(host)) {
-              console.log("match");
               host = host.substring(host.indexOf(".") + 1);
             }
 

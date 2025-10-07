@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { processStripeEvent } from "@/backend/stripe/stripe-sync";
 import { env } from "@/env";
 import { after, NextRequest, NextResponse } from "next/server";
+import { logger } from "@/backend/lib/log";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -24,10 +25,7 @@ export async function POST(req: NextRequest) {
 
     return Response.json({ success: true });
   } catch (err) {
-    console.log(
-      `[STRIPE HOOK] Signing failed - error: `,
-      err instanceof Error ? err.message : ""
-    );
+    logger.error(`[STRIPE HOOK] Signing failed`, { error: err });
     return Response.json(
       { success: false, error: "Signing Failed" },
       { status: 400 }
