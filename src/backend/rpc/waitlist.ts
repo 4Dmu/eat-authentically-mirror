@@ -7,10 +7,7 @@ import {
   submitListingArgs,
   waitlistRegisterArgs,
 } from "../validators/waitlist";
-import {
-  submitListingRatelimit,
-  waitlistRegisterRatelimit,
-} from "../lib/rate-limit";
+import { geocodeRatelimit, waitlistRegisterRatelimit } from "../lib/rate-limit";
 import { resend } from "../lib/resend";
 import { geocode } from "../lib/google-maps";
 import { tryCatch } from "@/utils/try-catch";
@@ -63,7 +60,7 @@ export const submitListing = actionClient
       throw new Error("Invalid captcha");
     }
 
-    const { success } = await submitListingRatelimit.limit("submitListing");
+    const { success } = await geocodeRatelimit.limit("submitListing");
 
     if (!success) {
       throw new Error("Ratelimit exceeded");

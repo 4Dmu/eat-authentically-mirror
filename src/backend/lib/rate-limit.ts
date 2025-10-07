@@ -85,7 +85,7 @@ export const waitlistRegisterRatelimit = new Ratelimit({
   prefix: "@upstash/waitlist-register-limit",
 });
 
-export const submitListingRatelimit = new Ratelimit({
+export const geocodeRatelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.fixedWindow(90000, "32d"),
   analytics: true,
@@ -94,5 +94,5 @@ export const submitListingRatelimit = new Ratelimit({
    * instance with other applications and want to avoid key collisions. The default prefix is
    * "@upstash/ratelimit"
    */
-  prefix: "@upstash/submit-listing-limit",
+  prefix: "@upstash/geocode-limit",
 });
