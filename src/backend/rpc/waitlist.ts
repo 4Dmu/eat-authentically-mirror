@@ -1,6 +1,5 @@
 "use server";
 import { env } from "@/env";
-import { headers } from "next/headers";
 import { and, eq, isNull, like, or, sql, SQLWrapper } from "drizzle-orm";
 import { actionClient } from "./helpers/safe-action";
 import {
