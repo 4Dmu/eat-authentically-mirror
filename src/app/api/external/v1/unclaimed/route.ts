@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { get } from "../_helpers/request";
+import { handlers } from "../_helpers/request";
 import { type } from "arktype";
 import { db } from "@/backend/db";
 import { and, eq, isNotNull, isNull, sql, SQL } from "drizzle-orm";
 import { producers } from "@/backend/db/schema";
 import { alpha3CountryCodeValidator } from "@/backend/validators/country";
 
-export const GET = get(
+export const GET = handlers.get.search(
   type({
     "limit?": type("string.json.parse").to(type.number.atLeast(1).atMost(200)),
     "offset?": type("string.json.parse").to(type.number.atLeast(1)),

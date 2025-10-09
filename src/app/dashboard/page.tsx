@@ -23,7 +23,7 @@ export default async function DashboardPage() {
   const user = await fetchUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/sign-in");
   }
 
   const producers = await fetchUserProducers();

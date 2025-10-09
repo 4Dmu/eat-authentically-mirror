@@ -14,7 +14,7 @@ export function FieldInfo({
   return (
     <>
       {!field.state.meta.isValid ? (
-        <em className="text-destructive">
+        <em className="text-destructive text-sm">
           {overrideMessage ??
             field.state.meta.errors
               .map((err) =>

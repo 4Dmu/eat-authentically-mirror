@@ -78,6 +78,8 @@ export type ClaimRequestStatus =
       expiredAt: Date;
     };
 
+export type ClaimInvitationStatus = ClaimRequestStatus;
+
 export type GoogleMapsPlaceDetails = {
   name: string;
   id: string;
@@ -160,6 +162,20 @@ export const claimRequests = sqliteTable("claim_requests", {
   claimedAt: integer({ mode: "timestamp" }),
   createdAt: integer({ mode: "timestamp" }).notNull(),
   updatedAt: integer({ mode: "timestamp" }).notNull(),
+});
+
+export const claimInvitations = sqliteTable("claimInvitations", {
+  id: text().primaryKey(),
+  producerId: text()
+    .notNull()
+    .references(() => producers.id, { onDelete: "cascade" }),
+  status: text({ mode: "json" }).$type<ClaimInvitationStatus>().notNull(),
+  claimToken: text().notNull(),
+  claimerEmail: text().notNull(),
+  claimedAt: integer({ mode: "timestamp" }),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  updatedAt: integer({ mode: "timestamp" }).notNull(),
+  expiresAt: integer({ mode: "timestamp" }).notNull(),
 });
 
 export const claimRequestsRelations = relations(claimRequests, ({ one }) => ({
@@ -424,6 +440,13 @@ export const preLaunchProducerWaitlist = sqliteTable(
   (t) => [primaryKey({ columns: [t.producerId, t.userId] })]
 );
 
+export const externalApiKeys = sqliteTable("externalApiKeys", {
+  id: integer().primaryKey({ autoIncrement: true }),
+  apiKey: text().notNull(),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  rolledAt: integer({ mode: "timestamp" }).notNull(),
+});
+
 export type ProducerInsert = typeof producers.$inferInsert;
 
 export type Certification = typeof certifications.$inferSelect;
@@ -441,3 +464,4 @@ export type Pinboard = typeof pinboards.$inferSelect;
 export type Pinlist = typeof pinLists.$inferSelect;
 export type PinlistItem = typeof pinListItems.$inferSelect;
 export type ImportedReviewInsert = typeof importedReviews.$inferInsert;
+export type ExternalApiKeySelect = typeof externalApiKeys.$inferSelect;

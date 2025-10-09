@@ -1,5 +1,6 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "./redis";
+import { env } from "@/env";
 
 export const videoRatelimit = new Ratelimit({
   redis: redis,
@@ -108,3 +109,56 @@ export const geocodeRatelimit = new Ratelimit({
    */
   prefix: "@upstash/geocode-limit",
 });
+
+export const clerkRatelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(
+    process.env.NODE_ENV === "development" ? 50 : 800,
+    "10s"
+  ),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/clerk-limit",
+});
+
+export const allow20RequestsPer1Second = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(20, "1s"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/submit-claim-invitation-account-details",
+});
+
+export const allow1RequestsPer1Second = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(1, "1s"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/submit-claim-invitation-account-details",
+});
+
+export async function multiLimit(limits: [Ratelimit, string][]) {
+  for (const [limit, key] of limits) {
+    const result = await limit.limit(key);
+
+    if (result.success) {
+      continue;
+    }
+
+    return false;
+  }
+
+  return true;
+}
