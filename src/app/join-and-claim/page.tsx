@@ -1,9 +1,7 @@
 import { getValidClaimInvitationByToken } from "@/backend/data/claim-invitations";
-import { internalClaimProducer } from "@/backend/data/producer";
 import { db } from "@/backend/db";
-import { claimInvitations, producers } from "@/backend/db/schema";
-import ClientRedirect from "@/components/client-redirect";
-import { and, eq, sql } from "drizzle-orm";
+import { producers } from "@/backend/db/schema";
+import { eq } from "drizzle-orm";
 import { Loader } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";

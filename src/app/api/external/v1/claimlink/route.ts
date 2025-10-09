@@ -4,9 +4,8 @@ import { NextResponse } from "next/server";
 import { generateToken } from "@/backend/utils/generate-tokens";
 import { env } from "@/env";
 import { db } from "@/backend/db";
-import { claimInvitations, claimRequests } from "@/backend/db/schema";
+import { claimInvitations } from "@/backend/db/schema";
 import { addDays } from "date-fns";
-import { clerk } from "@/backend/lib/clerk";
 
 export const POST = handlers.post.body(
   type({ producerId: "string.uuid", recipientEmail: "string.email" }),

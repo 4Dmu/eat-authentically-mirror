@@ -1,6 +1,5 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "./redis";
-import { env } from "@/env";
 
 export const videoRatelimit = new Ratelimit({
   redis: redis,

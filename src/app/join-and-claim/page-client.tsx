@@ -78,8 +78,8 @@ export function JoinPage({
           Join EatAuthentically
         </h1>
         <p className="text-center">
-          You received and invitation email to claim your listing "
-          {producer.name}" on EatAuthentically, simply setup your account
+          You received and invitation email to claim your listing &quot;
+          {producer.name}&quot; on EatAuthentically, simply setup your account
           details to complete the claim proccess.
         </p>
         <Card>
