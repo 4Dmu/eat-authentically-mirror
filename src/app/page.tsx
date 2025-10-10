@@ -109,7 +109,9 @@ export default function Home() {
             farm-direct food.
           </p>
         </section>
-        <Separator ref={secondCtaRef} />
+
+        <Separator />
+
         <section className="p-10 py-20 bg-[#f5f2ef]">
           <Card>
             <CardHeader className="flex flex-col gap-5 p-10">
@@ -128,7 +130,7 @@ export default function Home() {
             </CardHeader>
           </Card>
         </section>
-        <Separator ref={secondCtaRef} />
+        <Separator />
         <section className="p-10 py-30 bg-[#f9f8f5] flex flex-col gap-10">
           <div className="flex flex-col items-center text-center gap-5">
             <h3 className="text-4xl font-bold">
@@ -181,7 +183,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <Separator ref={secondCtaRef} />
+        <Separator />
         <section className="p-10 py-30 bg-[#f5f2ef] flex flex-col items-center gap-10">
           <h3 className="text-4xl font-bold">Join the Movement</h3>
           <p className="text-lg">
@@ -218,61 +220,6 @@ export default function Home() {
           </div>
         </section>
       </div>
-      {/* <div className="bg-brand-green text-white p-10 sm:p-20 md:p-40">
-        <div className="max-w-3xl text-center mx-auto flex flex-col gap-5 text-xl">
-          <h2 className="font-bold text-3xl text-shadow-sm">
-            Food You Can Trust is Closer Than You Think.
-          </h2>
-          <div>
-            <p>Stop guessing. Start discovering.</p>
-            <p>
-              EatAuthentically is your guide to the world of local, organic, and
-              farm-direct food.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="font-bold text-2xl text-shadow-sm">
-              Are You Tired of the Guesswork?
-            </h4>
-            <p>
-              You want to feed yourself and your family the best. Food
-              that&apos;s free of chemicals, raised with respect, and grown with
-              care. But finding it can feel like a full-time job.
-            </p>
-            <p>
-              What if you had a map? A map that leads you past the confusing
-              labels and directly to the source.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="font-bold text-2xl text-shadow-sm">
-              Your Connection to Conscious Food
-            </h4>
-            <p>
-              EatAuthentically is that map. We are building the most
-              comprehensive directory of the local heroes in the food world—the
-              farmers, ranchers, and chefs dedicated to quality and integrity.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h5 className="font-bold">Our platform helps you:</h5>
-            <ul className="list-disc text-left">
-              <li>
-                <em className="font-bold">FIND</em> nearby farms for fresh
-                organic produce and pasture-raised meats.
-              </li>
-              <li>
-                <em className="font-bold">DISCOVER</em> farm-to-table
-                restaurants that build their menus around the local harvest.
-              </li>
-              <li>
-                <em className="font-bold">CONNECT</em> directly with the people
-                who grow and prepare your food.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div> */}
       {mode && (
         <>
           <Separator />
