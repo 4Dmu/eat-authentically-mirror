@@ -447,6 +447,39 @@ export const externalApiKeys = sqliteTable("externalApiKeys", {
   rolledAt: integer({ mode: "timestamp" }).notNull(),
 });
 
+export const outreachData = sqliteTable("outreachData", {
+  producerId: text()
+    .primaryKey()
+    .references(() => producers.id, { onDelete: "cascade" }),
+  status: text({ enum: ["queued", "sent", "failed"] }).notNull(),
+  providerMessageId: text().notNull(),
+  note: text(),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  updatedAt: integer({ mode: "timestamp" }).notNull(),
+});
+
+export const outreachEvent = sqliteTable("outreachEvent", {
+  id: integer().primaryKey({ autoIncrement: true }),
+  producerId: text()
+    .primaryKey()
+    .references(() => producers.id, { onDelete: "cascade" }),
+  type: text({
+    enum: [
+      "delivered",
+      "opened",
+      "clicked",
+      "bounced",
+      "complained",
+      "unsubscribed",
+    ],
+  }).notNull(),
+  recipient: text().notNull(),
+  providerMessageId: text(),
+  timestamp: integer({ mode: "timestamp" }).notNull(),
+  createdAt: integer({ mode: "timestamp" }).notNull(),
+  meta: text({ mode: "json" }).$type<object>(),
+});
+
 export type ProducerInsert = typeof producers.$inferInsert;
 
 export type Certification = typeof certifications.$inferSelect;

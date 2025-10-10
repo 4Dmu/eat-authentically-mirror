@@ -1,12 +1,30 @@
 import { type } from "arktype";
-import { handlers } from "../_helpers/request";
+
 import { NextResponse } from "next/server";
 import { generateToken } from "@/backend/utils/generate-tokens";
 import { env } from "@/env";
 import { db } from "@/backend/db";
 import { claimInvitations } from "@/backend/db/schema";
 import { addDays } from "date-fns";
+import { handlers } from "../../_helpers/request";
 
+/**
+ * @swagger
+ *
+ * /api/external/v1/outreach/claimlink:
+ *   post:
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: producerId
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: recipientEmail
+ *         in: body
+ *         required: true
+ *         type: string
+ */
 export const POST = handlers.post.body(
   type({ producerId: "string.uuid", recipientEmail: "string.email" }),
   async ({ body }) => {

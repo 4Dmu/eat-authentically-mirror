@@ -1,11 +1,37 @@
 import { NextResponse } from "next/server";
-import { handlers } from "../_helpers/request";
 import { type } from "arktype";
 import { db } from "@/backend/db";
 import { and, eq, isNotNull, isNull, sql, SQL } from "drizzle-orm";
 import { producers } from "@/backend/db/schema";
 import { alpha3CountryCodeValidator } from "@/backend/validators/country";
+import { handlers } from "../../_helpers/request";
 
+/**
+ * @swagger
+ *
+ * /api/external/v1/producers/unclaimed:
+ *   get:
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         required: false
+ *         type: number
+ *       - name: offset
+ *         in: query
+ *         required: false
+ *         type: number
+ *       - name: filter
+ *         in: query
+ *         required: false
+ *         type: object
+ *         properties:
+ *           alpha3CountryCode:
+ *             type: string
+ *             required: false
+ *           hasEmail:
+ *             type: boolean
+ *             required: false
+ */
 export const GET = handlers.get.search(
   type({
     "limit?": type("string.json.parse").to(type.number.atLeast(1).atMost(200)),

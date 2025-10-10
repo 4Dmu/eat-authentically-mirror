@@ -52,6 +52,45 @@ function get_search<T extends StandardSchemaV1>(
   };
 }
 
+const get_ = <TParams extends Record<string, string>>(
+  handler: (input: {
+    params: TParams;
+    req: NextRequest;
+    apiKey: ExternalApiKeySelect;
+  }) => Promise<Response>
+) => {
+  return async (req: NextRequest, ctx: { params: Promise<TParams> }) => {
+    const auth = req.headers.get("Authorization");
+
+    if (!auth) {
+      return NextResponse.json(
+        { message: "Missing auth header" },
+        { status: 401 }
+      );
+    }
+    const apiKey = auth.substring(6).trim();
+
+    if (!auth.startsWith("Bearer ") || apiKey.length === 0) {
+      return NextResponse.json(
+        { message: "Invalid auth header" },
+        { status: 401 }
+      );
+    }
+
+    const token = await db.query.externalApiKeys.findFirst({
+      where: eq(externalApiKeys.apiKey, apiKey),
+    });
+
+    if (!token) {
+      return NextResponse.json({ message: "Invalid api key" }, { status: 401 });
+    }
+
+    const params = await ctx.params;
+
+    return handler({ params, req: req, apiKey: token });
+  };
+};
+
 function post_body<T extends StandardSchemaV1>(
   bodySchema: T,
   handler: (input: {
@@ -100,10 +139,10 @@ function post_body<T extends StandardSchemaV1>(
   };
 }
 
+const get = Object.assign(get_, { search: get_search });
+
 export const handlers = {
-  get: {
-    search: get_search,
-  },
+  get: get,
   post: {
     body: post_body,
   },
