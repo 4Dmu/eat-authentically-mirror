@@ -97,6 +97,18 @@ export const suggestProducerProLimit = new Ratelimit({
   prefix: "@upstash/suggest-producer-pro-limit",
 });
 
+export const waitlistRegisterRatelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(2, "1s"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "@upstash/waitlist-register-limit",
+});
+
 export const geocodeRatelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.fixedWindow(90000, "32d"),
