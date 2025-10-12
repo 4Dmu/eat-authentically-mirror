@@ -461,7 +461,7 @@ export const outreachData = sqliteTable("outreachData", {
 export const outreachEvent = sqliteTable("outreachEvent", {
   id: integer().primaryKey({ autoIncrement: true }),
   producerId: text()
-    .primaryKey()
+    .notNull()
     .references(() => producers.id, { onDelete: "cascade" }),
   type: text({
     enum: [
