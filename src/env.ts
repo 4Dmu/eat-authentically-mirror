@@ -6,6 +6,9 @@ export const env = createEnv({
     TURSO_DB_URL: z.string().min(1),
     TURSO_DB_TOKEN: z.string().min(1),
 
+    NEW_TURSO_DB_URL: z.string().min(1),
+    NEW_TURSO_DB_TOKEN: z.string().min(1),
+
     UPSTASH_REDIS_REST_URL: z.string().min(1),
     UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
 
