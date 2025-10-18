@@ -24,6 +24,7 @@ export const COUNTRIES = [
     alpha2: "bo",
     alpha3: "bol",
     name: "Bolivia, Plurinational State of",
+    aliases: ["Bolivia"],
   },
   { id: 70, alpha2: "ba", alpha3: "bih", name: "Bosnia and Herzegovina" },
   { id: 72, alpha2: "bw", alpha3: "bwa", name: "Botswana" },
@@ -42,12 +43,19 @@ export const COUNTRIES = [
   { id: 156, alpha2: "cn", alpha3: "chn", name: "China" },
   { id: 170, alpha2: "co", alpha3: "col", name: "Colombia" },
   { id: 174, alpha2: "km", alpha3: "com", name: "Comoros" },
-  { id: 178, alpha2: "cg", alpha3: "cog", name: "Congo" },
+  {
+    id: 178,
+    alpha2: "cg",
+    alpha3: "cog",
+    name: "Congo",
+    aliases: ["Republic of the Congo", "Congo-Brazzaville", "Congo Republic"],
+  },
   {
     id: 180,
     alpha2: "cd",
     alpha3: "cod",
     name: "Congo, Democratic Republic of the",
+    aliases: ["Democratic Republic of the Congo", "Congo-Kinshasa"],
   },
   { id: 188, alpha2: "cr", alpha3: "cri", name: "Costa Rica" },
   { id: 384, alpha2: "ci", alpha3: "civ", name: "Côte d'Ivoire" },
@@ -87,7 +95,13 @@ export const COUNTRIES = [
   { id: 352, alpha2: "is", alpha3: "isl", name: "Iceland" },
   { id: 356, alpha2: "in", alpha3: "ind", name: "India" },
   { id: 360, alpha2: "id", alpha3: "idn", name: "Indonesia" },
-  { id: 364, alpha2: "ir", alpha3: "irn", name: "Iran, Islamic Republic of" },
+  {
+    id: 364,
+    alpha2: "ir",
+    alpha3: "irn",
+    name: "Iran, Islamic Republic of",
+    aliases: ["Iran"],
+  },
   { id: 368, alpha2: "iq", alpha3: "irq", name: "Iraq" },
   { id: 372, alpha2: "ie", alpha3: "irl", name: "Ireland" },
   { id: 376, alpha2: "il", alpha3: "isr", name: "Israel" },
@@ -103,8 +117,15 @@ export const COUNTRIES = [
     alpha2: "kp",
     alpha3: "prk",
     name: "Korea, Democratic People's Republic of",
+    aliases: ["North Korea"],
   },
-  { id: 410, alpha2: "kr", alpha3: "kor", name: "Korea, Republic of" },
+  {
+    id: 410,
+    alpha2: "kr",
+    alpha3: "kor",
+    name: "Korea, Republic of",
+    aliases: ["South Korea", "Korea"],
+  },
   { id: 414, alpha2: "kw", alpha3: "kwt", name: "Kuwait" },
   { id: 417, alpha2: "kg", alpha3: "kgz", name: "Kyrgyzstan" },
   {
@@ -112,6 +133,7 @@ export const COUNTRIES = [
     alpha2: "la",
     alpha3: "lao",
     name: "Lao People's Democratic Republic",
+    aliases: ["Laos"],
   },
   { id: 428, alpha2: "lv", alpha3: "lva", name: "Latvia" },
   { id: 422, alpha2: "lb", alpha3: "lbn", name: "Lebanon" },
@@ -136,8 +158,15 @@ export const COUNTRIES = [
     alpha2: "fm",
     alpha3: "fsm",
     name: "Micronesia, Federated States of",
+    aliases: ["Micronesia"],
   },
-  { id: 498, alpha2: "md", alpha3: "mda", name: "Moldova, Republic of" },
+  {
+    id: 498,
+    alpha2: "md",
+    alpha3: "mda",
+    name: "Moldova, Republic of",
+    aliases: ["Moldova"],
+  },
   { id: 492, alpha2: "mc", alpha3: "mco", name: "Monaco" },
   { id: 496, alpha2: "mn", alpha3: "mng", name: "Mongolia" },
   { id: 499, alpha2: "me", alpha3: "mne", name: "Montenegro" },
@@ -166,7 +195,13 @@ export const COUNTRIES = [
   { id: 620, alpha2: "pt", alpha3: "prt", name: "Portugal" },
   { id: 634, alpha2: "qa", alpha3: "qat", name: "Qatar" },
   { id: 642, alpha2: "ro", alpha3: "rou", name: "Romania" },
-  { id: 643, alpha2: "ru", alpha3: "rus", name: "Russian Federation" },
+  {
+    id: 643,
+    alpha2: "ru",
+    alpha3: "rus",
+    name: "Russian Federation",
+    aliases: ["Russia"],
+  },
   { id: 646, alpha2: "rw", alpha3: "rwa", name: "Rwanda" },
   { id: 659, alpha2: "kn", alpha3: "kna", name: "Saint Kitts and Nevis" },
   { id: 662, alpha2: "lc", alpha3: "lca", name: "Saint Lucia" },
@@ -175,10 +210,17 @@ export const COUNTRIES = [
     alpha2: "vc",
     alpha3: "vct",
     name: "Saint Vincent and the Grenadines",
+    aliases: ["Saint Vincent"],
   },
   { id: 882, alpha2: "ws", alpha3: "wsm", name: "Samoa" },
   { id: 674, alpha2: "sm", alpha3: "smr", name: "San Marino" },
-  { id: 678, alpha2: "st", alpha3: "stp", name: "Sao Tome and Principe" },
+  {
+    id: 678,
+    alpha2: "st",
+    alpha3: "stp",
+    name: "Sao Tome and Principe",
+    aliases: ["Sao Tome"],
+  },
   { id: 682, alpha2: "sa", alpha3: "sau", name: "Saudi Arabia" },
   { id: 686, alpha2: "sn", alpha3: "sen", name: "Senegal" },
   { id: 688, alpha2: "rs", alpha3: "srb", name: "Serbia" },
@@ -197,13 +239,20 @@ export const COUNTRIES = [
   { id: 740, alpha2: "sr", alpha3: "sur", name: "Suriname" },
   { id: 752, alpha2: "se", alpha3: "swe", name: "Sweden" },
   { id: 756, alpha2: "ch", alpha3: "che", name: "Switzerland" },
-  { id: 760, alpha2: "sy", alpha3: "syr", name: "Syrian Arab Republic" },
+  {
+    id: 760,
+    alpha2: "sy",
+    alpha3: "syr",
+    name: "Syrian Arab Republic",
+    aliases: ["Syria"],
+  },
   { id: 762, alpha2: "tj", alpha3: "tjk", name: "Tajikistan" },
   {
     id: 834,
     alpha2: "tz",
     alpha3: "tza",
     name: "Tanzania, United Republic of",
+    aliases: ["Tanzania"],
   },
   { id: 764, alpha2: "th", alpha3: "tha", name: "Thailand" },
   { id: 626, alpha2: "tl", alpha3: "tls", name: "Timor-Leste" },
@@ -222,8 +271,15 @@ export const COUNTRIES = [
     alpha2: "gb",
     alpha3: "gbr",
     name: "United Kingdom of Great Britain and Northern Ireland",
+    aliases: ["United Kingdom", "Britain"],
   },
-  { id: 840, alpha2: "us", alpha3: "usa", name: "United States of America" },
+  {
+    id: 840,
+    alpha2: "us",
+    alpha3: "usa",
+    name: "United States of America",
+    aliases: ["United States", "America"],
+  },
   { id: 858, alpha2: "uy", alpha3: "ury", name: "Uruguay" },
   { id: 860, alpha2: "uz", alpha3: "uzb", name: "Uzbekistan" },
   { id: 548, alpha2: "vu", alpha3: "vut", name: "Vanuatu" },
@@ -232,8 +288,15 @@ export const COUNTRIES = [
     alpha2: "ve",
     alpha3: "ven",
     name: "Venezuela, Bolivarian Republic of",
+    aliases: ["Venezuela"],
   },
-  { id: 704, alpha2: "vn", alpha3: "vnm", name: "Viet Nam" },
+  {
+    id: 704,
+    alpha2: "vn",
+    alpha3: "vnm",
+    name: "Viet Nam",
+    aliases: ["Vietnam"],
+  },
   { id: 887, alpha2: "ye", alpha3: "yem", name: "Yemen" },
   { id: 894, alpha2: "zm", alpha3: "zmb", name: "Zambia" },
   { id: 716, alpha2: "zw", alpha3: "zwe", name: "Zimbabwe" },
@@ -242,7 +305,7 @@ export const COUNTRIES = [
 export function countryByAlpha3Code(code: string) {
   const country = COUNTRIES.find((c) => c.alpha3 === code);
   if (!country) {
-    throw new Error(`Country with alpha3 code ${code} not found.`);
+    return null;
   }
   return country;
 }
@@ -250,15 +313,19 @@ export function countryByAlpha3Code(code: string) {
 export function countryByAlpha2Code(code: string) {
   const country = COUNTRIES.find((c) => c.alpha2 === code);
   if (!country) {
-    throw new Error(`Country with alpha2 code ${code} not found.`);
+    return null;
   }
   return country;
 }
 
 export function countryByName(name: string) {
-  const country = COUNTRIES.find((c) => c.name === name);
+  const country = COUNTRIES.find(
+    (c) =>
+      c.name.toLowerCase() === name.toLowerCase() ||
+      c.aliases?.some((al) => al.toLowerCase() === name.toLowerCase())
+  );
   if (!country) {
-    throw new Error(`Country with name ${name} not found.`);
+    return null;
   }
   return country;
 }

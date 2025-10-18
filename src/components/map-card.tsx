@@ -10,14 +10,22 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Button } from "./ui/button";
+import {
+  ProducerLocationSelect,
+  ProducersGoogleMapsPlaceDetailsSelect,
+} from "@/backend/db/schema";
 
 export function MapCard({
-  coordinate,
-  mapUrl,
+  location,
+  maps,
 }: {
-  coordinate: NonNullable<NonNullable<Producer["address"]>["coordinate"]>;
-  mapUrl?: string;
+  location: ProducerLocationSelect;
+  maps: ProducersGoogleMapsPlaceDetailsSelect | null;
 }) {
+  if (!location.latitude || !location.longitude) {
+    return null;
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -37,14 +45,14 @@ export function MapCard({
             defaultZoom={7}
             minZoom={3}
             defaultCenter={{
-              lat: coordinate.latitude,
-              lng: coordinate.longitude,
+              lat: location.latitude,
+              lng: location.longitude,
             }}
           >
             <Marker
               position={{
-                lat: coordinate.latitude,
-                lng: coordinate.longitude,
+                lat: location.latitude,
+                lng: location.longitude,
               }}
             />
           </Map>
@@ -55,8 +63,8 @@ export function MapCard({
           <a
             target="_blank"
             href={
-              mapUrl ??
-              `https://www.google.com/maps/search/?api=1&query=${coordinate.latitude},${coordinate.longitude}`
+              maps?.mapsUri ??
+              `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`
             }
           >
             Open Maps

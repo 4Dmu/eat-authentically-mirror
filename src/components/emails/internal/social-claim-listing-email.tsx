@@ -14,20 +14,7 @@ import {
 import * as React from "react";
 
 export default function SocialClaimListingInternalEmail({
-  producer: {
-    id,
-    userId,
-    name,
-    type,
-    claimed,
-    verified,
-    scrapeMeta,
-    socialMedia,
-    address,
-    createdAt,
-    updatedAt,
-    contact,
-  },
+  producer: { id, userId, name, type, verified, createdAt, updatedAt },
   token,
   socialHandle,
 }: {
@@ -68,17 +55,11 @@ export default function SocialClaimListingInternalEmail({
                     userId,
                     name,
                     type,
-                    claimed,
                     verified,
-                    scrapeMeta,
-                    socialMedia,
-                    address,
-                    createdAt,
                     updatedAt,
-                    contact,
                   },
                   null,
-                  2,
+                  2
                 )}
               </Text>
             </Column>

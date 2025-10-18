@@ -35,6 +35,7 @@ export const getUserPinboard = authenticatedActionClient
       .values({
         id: crypto.randomUUID(),
         userId: userId,
+        name: "Default Pinboard",
         createdAt: new Date(),
         updatedAt: new Date(),
       })
@@ -57,9 +58,15 @@ export const getUserPinboardFull = authenticatedActionClient
                 id: true,
                 type: true,
                 name: true,
-                images: true,
-                claimed: true,
-                address: true,
+                userId: true,
+              },
+              with: {
+                location: true,
+                media: {
+                  with: {
+                    asset: true,
+                  },
+                },
               },
             },
           },
@@ -81,6 +88,7 @@ export const getUserPinboardFull = authenticatedActionClient
       .values({
         id: crypto.randomUUID(),
         userId: userId,
+        name: "Default Pinboard",
         createdAt: new Date(),
         updatedAt: new Date(),
       })
@@ -146,6 +154,7 @@ export const addToPinboard = authenticatedActionClient
       pinboardId: pinboard.id,
       producerId: producerId,
       createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     if (pinListId) {

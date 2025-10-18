@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { PublicProducerLight } from "@/backend/validators/producers";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
@@ -21,6 +20,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { match, P } from "ts-pattern";
 import Link from "next/link";
+import { ProducerWithAll } from "@/backend/db/schema";
 
 const formSchema = type({
   message: type.string.atLeastLength(5).atMostLength(5000),
@@ -30,7 +30,7 @@ export function MessageProducerDialog({
   producer,
   disabled,
 }: {
-  producer: PublicProducerLight;
+  producer: ProducerWithAll;
   disabled: boolean;
 }) {
   const chatQuery = useProducerChat({ producerId: producer.id });

@@ -4,14 +4,22 @@ import { db } from "../db";
 import {
   and,
   eq,
+  getTableColumns,
   inArray,
   isNotNull,
   isNull,
   ne,
   notInArray,
   or,
+  sql,
 } from "drizzle-orm";
-import { producerChatMessages, producerChats, producers } from "../db/schema";
+import {
+  mediaAssets,
+  producerChatMessages,
+  producerChats,
+  producerMedia,
+  producers,
+} from "../db/schema";
 import { messageRatelimit } from "../lib/rate-limit";
 import { getSubTier } from "./utils/get-sub-tier";
 import {
@@ -49,7 +57,6 @@ export const sendMessageToProducer = authenticatedActionClient
       where: and(
         eq(producers.id, producerId),
         isNotNull(producers.userId),
-        eq(producers.claimed, true),
         ne(producers.userId, userId)
       ),
       columns: { id: true, userId: true },
@@ -311,22 +318,39 @@ export const getProducerChat = authenticatedActionClient
   .name("getProducerChat")
   .input(getProducerChatArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { producerId } }) => {
-    const chat = await db.query.producerChats.findFirst({
-      where: and(
-        eq(producerChats.initiatorUserId, userId),
-        eq(producerChats.producerId, producerId),
-        notInArray(producerChats.id, producerIds)
-      ),
-      with: {
-        producer: {
-          columns: {
-            name: true,
-            type: true,
-            images: true,
-          },
-        },
-      },
-    });
+    const chat = await db
+      .select({
+        ...getTableColumns(producerChats),
+        producerName: producers.name,
+        producerType: producers.type,
+        producerThumbnailUrl: sql<string | null>`(
+                SELECT COALESCE(
+                  json_extract(${mediaAssets.variants}, '$.cover'),
+                  ${mediaAssets.url}
+                )
+                FROM ${mediaAssets}
+                WHERE ${mediaAssets.id} = (
+                  SELECT ${producerMedia.assetId}
+                  FROM ${producerMedia}
+                  WHERE ${eq(producerMedia.producerId, producers.id)}
+                  ORDER BY (${producerMedia.role} = 'cover') DESC, ${
+                    producerMedia.position
+                  } ASC
+                  LIMIT 1
+                )
+              )`.as("producerThumbnailUrl"),
+      })
+      .from(producerChats)
+      .leftJoin(producers, eq(producerChats.producerId, producers.id))
+      .where(
+        and(
+          eq(producerChats.initiatorUserId, userId),
+          eq(producerChats.producerId, producerId),
+          notInArray(producerChats.id, producerIds)
+        )
+      )
+      .limit(1)
+      .then((r) => r[0]);
 
     if (!chat) {
       return null;
@@ -338,18 +362,33 @@ export const getProducerChat = authenticatedActionClient
 export const listUserChats = authenticatedActionClient
   .name("listUserChats")
   .action(async ({ userId }) => {
-    return await db.query.producerChats.findMany({
-      where: eq(producerChats.initiatorUserId, userId),
-      with: {
-        producer: {
-          columns: {
-            name: true,
-            type: true,
-            images: true,
-          },
-        },
-      },
-    });
+    const chats = await db
+      .select({
+        ...getTableColumns(producerChats),
+        producerName: producers.name,
+        producerType: producers.type,
+        producerThumbnailUrl: sql<string | null>`(
+                SELECT COALESCE(
+                  json_extract(${mediaAssets.variants}, '$.cover'),
+                  ${mediaAssets.url}
+                )
+                FROM ${mediaAssets}
+                WHERE ${mediaAssets.id} = (
+                  SELECT ${producerMedia.assetId}
+                  FROM ${producerMedia}
+                  WHERE ${eq(producerMedia.producerId, producers.id)}
+                  ORDER BY (${producerMedia.role} = 'cover') DESC, ${
+                    producerMedia.position
+                  } ASC
+                  LIMIT 1
+                )
+              )`.as("producerThumbnailUrl"),
+      })
+      .from(producerChats)
+      .leftJoin(producers, eq(producerChats.producerId, producers.id))
+      .where(eq(producerChats.initiatorUserId, userId));
+
+    return chats;
   });
 
 export const listProducerChats = authenticatedActionClient
@@ -360,21 +399,36 @@ export const listProducerChats = authenticatedActionClient
       return [];
     }
 
-    const chats = await db.query.producerChats.findMany({
-      where: and(
-        eq(producerChats.producerId, producerId),
-        eq(producerChats.producerUserId, userId)
-      ),
-      with: {
-        producer: {
-          columns: {
-            name: true,
-            type: true,
-            images: true,
-          },
-        },
-      },
-    });
+    const chats = await db
+      .select({
+        ...getTableColumns(producerChats),
+        producerName: producers.name,
+        producerType: producers.type,
+        producerThumbnailUrl: sql<string | null>`(
+                SELECT COALESCE(
+                  json_extract(${mediaAssets.variants}, '$.cover'),
+                  ${mediaAssets.url}
+                )
+                FROM ${mediaAssets}
+                WHERE ${mediaAssets.id} = (
+                  SELECT ${producerMedia.assetId}
+                  FROM ${producerMedia}
+                  WHERE ${eq(producerMedia.producerId, producers.id)}
+                  ORDER BY (${producerMedia.role} = 'cover') DESC, ${
+                    producerMedia.position
+                  } ASC
+                  LIMIT 1
+                )
+              )`.as("producerThumbnailUrl"),
+      })
+      .from(producerChats)
+      .leftJoin(producers, eq(producerChats.producerId, producers.id))
+      .where(
+        and(
+          eq(producerChats.producerId, producerId),
+          eq(producerChats.producerUserId, userId)
+        )
+      );
 
     const results = [];
 
@@ -393,22 +447,37 @@ export const listProducerChats = authenticatedActionClient
 export const listAllProducersChats = authenticatedActionClient
   .name("listAllProducersChats")
   .action(async ({ userId, producerIds }) => {
-    const chats = await db.query.producerChats.findMany({
-      where: and(
-        inArray(producerChats.producerId, producerIds),
-        ne(producerChats.initiatorUserId, userId),
-        eq(producerChats.producerUserId, userId)
-      ),
-      with: {
-        producer: {
-          columns: {
-            name: true,
-            type: true,
-            images: true,
-          },
-        },
-      },
-    });
+    const chats = await db
+      .select({
+        ...getTableColumns(producerChats),
+        producerName: producers.name,
+        producerType: producers.type,
+        producerThumbnailUrl: sql<string | null>`(
+                SELECT COALESCE(
+                  json_extract(${mediaAssets.variants}, '$.cover'),
+                  ${mediaAssets.url}
+                )
+                FROM ${mediaAssets}
+                WHERE ${mediaAssets.id} = (
+                  SELECT ${producerMedia.assetId}
+                  FROM ${producerMedia}
+                  WHERE ${eq(producerMedia.producerId, producers.id)}
+                  ORDER BY (${producerMedia.role} = 'cover') DESC, ${
+                    producerMedia.position
+                  } ASC
+                  LIMIT 1
+                )
+              )`.as("producerThumbnailUrl"),
+      })
+      .from(producerChats)
+      .leftJoin(producers, eq(producerChats.producerId, producers.id))
+      .where(
+        and(
+          inArray(producerChats.producerId, producerIds),
+          ne(producerChats.initiatorUserId, userId),
+          eq(producerChats.producerUserId, userId)
+        )
+      );
 
     const results = [];
 
@@ -428,28 +497,45 @@ export const getUserOrProducerChat = authenticatedActionClient
   .name("getUserOrProducerChat")
   .input(getUserOrProducerChatArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { chatId } }) => {
-    const chat = await db.query.producerChats.findFirst({
-      where: or(
-        and(
-          eq(producerChats.initiatorUserId, userId),
-          eq(producerChats.id, chatId)
-        ),
-        and(
-          eq(producerChats.producerUserId, userId),
-          inArray(producerChats.producerId, producerIds),
-          eq(producerChats.id, chatId)
+    const chat = await db
+      .select({
+        ...getTableColumns(producerChats),
+        producerName: producers.name,
+        producerType: producers.type,
+        producerThumbnailUrl: sql<string | null>`(
+                SELECT COALESCE(
+                  json_extract(${mediaAssets.variants}, '$.cover'),
+                  ${mediaAssets.url}
+                )
+                FROM ${mediaAssets}
+                WHERE ${mediaAssets.id} = (
+                  SELECT ${producerMedia.assetId}
+                  FROM ${producerMedia}
+                  WHERE ${eq(producerMedia.producerId, producers.id)}
+                  ORDER BY (${producerMedia.role} = 'cover') DESC, ${
+                    producerMedia.position
+                  } ASC
+                  LIMIT 1
+                )
+              )`.as("producerThumbnailUrl"),
+      })
+      .from(producerChats)
+      .leftJoin(producers, eq(producerChats.producerId, producers.id))
+      .where(
+        or(
+          and(
+            eq(producerChats.initiatorUserId, userId),
+            eq(producerChats.id, chatId)
+          ),
+          and(
+            eq(producerChats.producerUserId, userId),
+            inArray(producerChats.producerId, producerIds),
+            eq(producerChats.id, chatId)
+          )
         )
-      ),
-      with: {
-        producer: {
-          columns: {
-            name: true,
-            type: true,
-            images: true,
-          },
-        },
-      },
-    });
+      )
+      .limit(1)
+      .then((r) => r[0]);
 
     if (!chat) {
       return chat;
@@ -471,28 +557,45 @@ export const getUserOrProducerChatMessages = authenticatedActionClient
   .name("getUserOrProducerChatMessages")
   .input(getUserOrProducerChatArgs)
   .action(async ({ ctx: { userId, producerIds }, input: { chatId } }) => {
-    const chat = await db.query.producerChats.findFirst({
-      where: or(
-        and(
-          eq(producerChats.initiatorUserId, userId),
-          eq(producerChats.id, chatId)
-        ),
-        and(
-          eq(producerChats.producerUserId, userId),
-          inArray(producerChats.producerId, producerIds),
-          eq(producerChats.id, chatId)
+    const chat = await db
+      .select({
+        ...getTableColumns(producerChats),
+        producerName: producers.name,
+        producerType: producers.type,
+        producerThumbnailUrl: sql<string | null>`(
+                SELECT COALESCE(
+                  json_extract(${mediaAssets.variants}, '$.cover'),
+                  ${mediaAssets.url}
+                )
+                FROM ${mediaAssets}
+                WHERE ${mediaAssets.id} = (
+                  SELECT ${producerMedia.assetId}
+                  FROM ${producerMedia}
+                  WHERE ${eq(producerMedia.producerId, producers.id)}
+                  ORDER BY (${producerMedia.role} = 'cover') DESC, ${
+                    producerMedia.position
+                  } ASC
+                  LIMIT 1
+                )
+              )`.as("producerThumbnailUrl"),
+      })
+      .from(producerChats)
+      .leftJoin(producers, eq(producerChats.producerId, producers.id))
+      .where(
+        or(
+          and(
+            eq(producerChats.initiatorUserId, userId),
+            eq(producerChats.id, chatId)
+          ),
+          and(
+            eq(producerChats.producerUserId, userId),
+            inArray(producerChats.producerId, producerIds),
+            eq(producerChats.id, chatId)
+          )
         )
-      ),
-      with: {
-        producer: {
-          columns: {
-            name: true,
-            type: true,
-            images: true,
-          },
-        },
-      },
-    });
+      )
+      .limit(1)
+      .then((r) => r[0]);
 
     if (!chat) {
       return [];

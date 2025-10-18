@@ -41,7 +41,7 @@ export function StarRating({
               className={cn(
                 "w-full h-full hover:fill-yellow-400",
                 first <= selected && "fill-yellow-600 stroke-yellow-600",
-                first <= hovered && "fill-yellow-400",
+                first <= hovered && "fill-yellow-400"
               )}
             />
           </button>
@@ -62,7 +62,7 @@ export function StarRating({
               className={cn(
                 "rotate-y-180 w-full h-full hover:fill-yellow-400",
                 second <= selected && "fill-yellow-600 stroke-yellow-600",
-                second <= hovered && "fill-yellow-400",
+                second <= hovered && "fill-yellow-400"
               )}
             />
           </button>
@@ -73,7 +73,7 @@ export function StarRating({
   );
 }
 
-export function StarRatingReadonly({ rating }: { rating: Stars }) {
+export function StarRatingReadonly({ rating }: { rating: number }) {
   return (
     <div className="flex gap-1 items-center">
       {items.map(([first, second], i) => (
@@ -82,7 +82,7 @@ export function StarRatingReadonly({ rating }: { rating: Stars }) {
             strokeWidth={"1"}
             className={cn(
               "w-full h-full stroke-yellow-600",
-              first <= rating && "fill-yellow-600",
+              first <= rating && "fill-yellow-600"
             )}
           />
 
@@ -90,7 +90,7 @@ export function StarRatingReadonly({ rating }: { rating: Stars }) {
             strokeWidth={"1"}
             className={cn(
               "rotate-y-180 w-full h-full stroke-yellow-600",
-              second <= rating && "fill-yellow-600",
+              second <= rating && "fill-yellow-600"
             )}
           />
         </div>
@@ -116,7 +116,7 @@ function StarHalfIcon(props: LucideProps & { ref?: Ref<SVGSVGElement> }) {
       viewBox="0 0 12 24"
       className={cn(
         "lucide lucide-star-half-icon lucide-star-half",
-        props.className,
+        props.className
       )}
     >
       <path d="M12 18.338a2.1 2.1 0 0 0-.987.244L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.12 2.12 0 0 0 1.597-1.16l2.309-4.679A.53.53 0 0 1 12 2" />

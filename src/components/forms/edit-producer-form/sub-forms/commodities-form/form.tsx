@@ -10,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { PlusIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { emptyOptions, withForm } from "../form";
+import { defaultOptions, withForm } from "./context";
 
-export const ProductsForm = withForm({
-  ...emptyOptions,
+export const Form = withForm({
+  ...defaultOptions,
   render: function Render({ form }) {
+    // @TODO
     const [name, setName] = useState("");
     return (
       <Card>
@@ -23,13 +24,13 @@ export const ProductsForm = withForm({
           <CardDescription>List the products of your farm.</CardDescription>
         </CardHeader>
         <CardContent>
-          {
+          {/* {
             <form.Field name="commodities" mode="array">
               {(field) => (
                 <div className="flex gap-5 flex-col">
                   <div className="flex flex-wrap gap-2">
                     {field.state.value.map((_, i) => (
-                      <form.Field name={`commodities[${i}].name`} key={i}>
+                      <form.Field name={`commodities[${i}]`} key={i}>
                         {(subField) => (
                           <div className="relative" key={i}>
                             <Badge>{subField.state.value}</Badge>
@@ -66,7 +67,7 @@ export const ProductsForm = withForm({
                 </div>
               )}
             </form.Field>
-          }
+          } */}
         </CardContent>
       </Card>
     );

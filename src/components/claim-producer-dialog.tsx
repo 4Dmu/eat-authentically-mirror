@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import {
   useClaimProducer,
   primaryImageUrl,
-  useProducersFull,
+  useProducers,
 } from "@/utils/producers";
 import { useDebounce } from "@uidotdev/usehooks";
 import { Input } from "./ui/input";
@@ -39,21 +39,35 @@ import {
   useClaimProducerSteps,
 } from "@/hooks/use-claim-producer-steps";
 
-function useProducers() {
-  const [page, setPage] = useState(0);
+const LIMIT = 50;
+
+function usePaginatedProducers() {
+  const [offset, setOffset] = useState(0);
   const [query, setQuery] = useState<string | undefined>(undefined);
 
   const debouncedQuery = useDebounce(query, 500);
 
-  const { data, isPlaceholderData } = useProducersFull({
-    page,
-    certs: [],
-    query: debouncedQuery,
-    claimed: false,
+  const page = offset / LIMIT;
+
+  const { data, isPlaceholderData } = useProducers({
+    limit: LIMIT,
+    offset: offset,
+    query: query,
   });
 
+  const setPage = useCallback(
+    (pageOrFn: number | ((old: number) => number)) => {
+      const newPage =
+        typeof pageOrFn === "function" ? pageOrFn(page) : pageOrFn;
+
+      const newOffset = newPage * LIMIT;
+      setOffset(newOffset);
+    },
+    [setOffset]
+  );
+
   useEffect(() => {
-    setPage(0);
+    setOffset(0);
   }, [debouncedQuery]);
 
   return { page, setPage, query, setQuery, data, isPlaceholderData };
@@ -63,7 +77,7 @@ export function ClaimProducerDialog() {
   const [open, setOpen] = useState(false);
   const { step, setStep, submitState } = useClaimProducerSteps();
   const { query, setQuery, page, setPage, data, isPlaceholderData } =
-    useProducers();
+    usePaginatedProducers();
 
   const closeDialog = () => {
     setStep({ mode: "select" });
@@ -152,7 +166,7 @@ export function ClaimProducerDialog() {
               />
               <ScrollArea className="h-52 w-full">
                 <div className="flex flex-col gap-3">
-                  {data?.data.map((p) => (
+                  {data?.items.map((p) => (
                     <button
                       key={p.id}
                       onClick={() => setStep({ mode: "review", producer: p })}
@@ -181,12 +195,12 @@ export function ClaimProducerDialog() {
                   </Button>
                   <Button
                     onClick={() => {
-                      if (!isPlaceholderData && data?.hasNextPage) {
+                      if (!isPlaceholderData && data?.hasMore) {
                         setPage((old) => old + 1);
                       }
                     }}
                     // Disable the Next Page button until we know a next page is available
-                    disabled={isPlaceholderData || !data?.hasNextPage}
+                    disabled={isPlaceholderData || !data?.hasMore}
                   >
                     <ArrowRight />
                   </Button>
@@ -214,18 +228,18 @@ export function ClaimProducerDialog() {
                   </div>
                   <div>
                     <Label>Website</Label>
-                    <p>{step.producer.contact?.website}</p>
+                    <p>{step.producer.contact?.websiteUrl}</p>
                   </div>
                   <div>
                     <Label>Address</Label>
                     <p>
-                      {step.producer.address?.street},{" "}
-                      {step.producer.address?.city},{" "}
-                      {step.producer.address?.state},
-                      {step.producer.address?.zip},{" "}
-                      {step.producer.address?.country
-                        ? countryByAlpha3Code(step.producer.address?.country)
-                            .name
+                      {step.producer.location?.locality},{" "}
+                      {step.producer.location?.city},{" "}
+                      {step.producer.location?.adminArea},
+                      {step.producer.location?.postcode},{" "}
+                      {step.producer.location?.country
+                        ? countryByAlpha3Code(step.producer.location?.country)
+                            ?.name
                         : undefined}
                     </p>
                   </div>
@@ -252,7 +266,7 @@ export function ClaimProducerDialog() {
                         verification="contact-email-link"
                       />
                     )}
-                    {step.producer.contact?.website && (
+                    {step.producer.contact?.websiteUrl && (
                       <>
                         <VerificationCard
                           title="Email link to any email address on producers domain"
@@ -279,9 +293,9 @@ export function ClaimProducerDialog() {
                   </div>
                   <p className="font-bold text-lg">Slow / Human</p>
                   <div className="flex flex-col gap-5">
-                    {(step.producer.socialMedia.facebook ||
-                      step.producer.socialMedia.instagram ||
-                      step.producer.socialMedia.twitter) && (
+                    {(step.producer.social?.facebook ||
+                      step.producer.social?.instagram ||
+                      step.producer.social?.twitter) && (
                       <VerificationCard
                         title="Post code on social media"
                         step={step}

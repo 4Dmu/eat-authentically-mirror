@@ -2,11 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { FieldInfo } from "../../helpers/field-info";
-import { emptyOptions, withForm } from "../form";
+import { FieldInfo } from "../../../helpers/field-info";
+import { defaultOptions, withForm } from "./context";
 
-export const ContactForm = withForm({
-  ...emptyOptions,
+export const Form = withForm({
+  ...defaultOptions,
   render: function ({ form }) {
     return (
       <Card>
@@ -15,7 +15,7 @@ export const ContactForm = withForm({
         </CardHeader>
         <CardContent className="gap-5 flex flex-col">
           <div className="grid grid-cols-2 gap-3">
-            <form.Field name="contact.phone">
+            <form.Field name="phone">
               {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Phone</Label>
@@ -35,7 +35,7 @@ export const ContactForm = withForm({
                 </div>
               )}
             </form.Field>
-            <form.Field name="contact.email">
+            <form.Field name="email">
               {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Business Email</Label>
@@ -56,7 +56,7 @@ export const ContactForm = withForm({
               )}
             </form.Field>
           </div>
-          <form.Field name="contact.website">
+          <form.Field name="websiteUrl">
             {(subField) => (
               <div className="flex flex-col gap-3">
                 <Label>Website</Label>

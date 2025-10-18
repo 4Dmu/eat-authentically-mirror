@@ -7,6 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { auth } from "@clerk/nextjs/server";
 import { ProducerPageClient } from "./client-page";
+import { getFullProducerPublic } from "@/backend/rpc/producers";
 
 export default async function ProducerPage({
   params,
@@ -22,7 +23,7 @@ export default async function ProducerPage({
     ? await getUsersProducerIdsCached(session.userId)
     : [];
 
-  const producer = await getProducerPublic({ id: id });
+  const producer = await getFullProducerPublic({ id: id });
 
   if (!producer) {
     notFound();

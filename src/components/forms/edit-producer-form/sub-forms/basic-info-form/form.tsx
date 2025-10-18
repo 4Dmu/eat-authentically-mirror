@@ -10,11 +10,21 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { FieldInfo } from "../../helpers/field-info";
-import { emptyOptions, withForm } from "../form";
+import { FieldInfo } from "../../../helpers/field-info";
+import { useForm } from "@tanstack/react-form";
+import { useEditUserProducer } from "@/utils/producers";
+import { toast } from "sonner";
+import { UseQueryResult } from "@tanstack/react-query";
+import { ProducerWithAll } from "@/backend/db/schema";
+import {
+  EditProducerArgsV2,
+  editProducerFormValidatorV2,
+} from "@/backend/validators/producers";
+import { defaultOptions, withForm } from "./context";
 
-export const BasicInfoForm = withForm({
-  ...emptyOptions,
+export const Form = withForm({
+  ...defaultOptions,
+
   render: function Render({ form }) {
     return (
       <Card>

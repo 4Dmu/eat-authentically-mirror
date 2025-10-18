@@ -69,7 +69,7 @@ export const submitAccountDetailsForClaimInvitation = actionClient
 
       await db
         .update(producers)
-        .set({ userId: user.id, claimed: true, updatedAt: new Date() })
+        .set({ userId: user.id, updatedAt: new Date() })
         .where(eq(producers.id, claim.producerId));
 
       await db

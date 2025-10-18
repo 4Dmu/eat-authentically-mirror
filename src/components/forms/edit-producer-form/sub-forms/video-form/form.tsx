@@ -8,16 +8,16 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { TemporyFileSelectButton } from "@/components/select-file-button";
 import { FileVideo } from "@/components/file-video";
 import { toast } from "sonner";
 import { RotateCwIcon, XIcon } from "lucide-react";
 import { Stream } from "@cloudflare/stream-react";
-import { emptyOptions, withForm } from "../form";
+import { defaultOptions, withForm } from "./context";
 
-export const VideoForm = withForm({
-  ...emptyOptions,
+export const Form = withForm({
+  ...defaultOptions,
   props: {
     tier: "Free" as SubTier,
   },
@@ -47,9 +47,7 @@ export const VideoForm = withForm({
                           toast.error("File must be less than 200mb")
                         }
                         mimeType="video/*"
-                        onSelect={(v) =>
-                          field.handleChange({ _type: "upload", file: v })
-                        }
+                        onSelect={(v) => field.handleChange({ file: v })}
                       >
                         Add Video
                       </TemporyFileSelectButton>
@@ -65,9 +63,7 @@ export const VideoForm = withForm({
                             toast.error("File must be less than 200mb")
                           }
                           mimeType="video/*"
-                          onSelect={(v) =>
-                            field.handleChange({ _type: "upload", file: v })
-                          }
+                          onSelect={(v) => field.handleChange({ file: v })}
                         >
                           <RotateCwIcon />
                         </TemporyFileSelectButton>
@@ -93,7 +89,7 @@ export const VideoForm = withForm({
                         </Button>
                       </div>
                       {match(field.state.value)
-                        .with({ _type: "upload" }, (val) => (
+                        .with({ file: P.nonNullable }, (val) => (
                           <div className="w-full rounded overflow-hidden border aspect-video">
                             <FileVideo
                               controls
@@ -102,16 +98,16 @@ export const VideoForm = withForm({
                             />
                           </div>
                         ))
-                        .with({ _type: "cloudflare" }, (val) => (
+                        .with({ asset: P.nonNullable }, (val) => (
                           <div className="w-full rounded overflow-hidden border aspect-video">
-                            {val.status === "ready" ? (
+                            {val.asset.videoStatus === "ready" ? (
                               <Stream
                                 responsive={false}
                                 width="100%"
                                 height="100%"
                                 className="object-cover h-full w-full"
                                 controls
-                                src={val.uid}
+                                src={val.asset.cloudflareId ?? ""}
                               />
                             ) : (
                               <div className="p-20 flex flex-col gap-2 w-full h-full justify-center">

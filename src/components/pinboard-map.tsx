@@ -1,3 +1,4 @@
+import { ProducerLocationSelect } from "@/backend/db/schema";
 import { PinboardFull } from "@/backend/rpc/pinboard";
 import { ImageData } from "@/backend/validators/producers";
 import { env } from "@/env";
@@ -18,24 +19,20 @@ export type PinboardMapProps = {
 
 type PinsWithAddress = {
   producer: {
-    address: {
-      coordinate: {
-        latitude: number;
-        longitude: number;
-      };
-      street?: string | undefined;
-      city?: string | undefined;
-      state?: string | undefined;
-      country?: string | undefined;
-      zip?: string | undefined;
-    };
     id: string;
-    name: string;
-    claimed: boolean;
-    images: {
-      primaryImgId: string | null;
-      items: ImageData[];
+    location: {
+      latitude: number;
+      longitude: number;
+      city?: string | null | undefined;
+      country?: string | null | undefined;
+      producerId?: string | undefined;
+      geoId?: number | undefined;
+      locality?: string | null | undefined;
+      postcode?: string | null | undefined;
+      adminArea?: string | null | undefined;
+      geohash?: string | null | undefined;
     };
+    name: string;
   };
   id: string;
   createdAt: Date;
@@ -46,15 +43,18 @@ type PinsWithAddress = {
 export function PinboardMap({ pins }: PinboardMapProps) {
   const pinsWithAddresses = useMemo(() => {
     return pins
-      .filter((p) => p.producer.address?.coordinate !== undefined)
+      .filter(
+        (p) => p.producer.location?.latitude && p.producer.location.longitude
+      )
       .map((p) => ({
         ...p,
         producer: {
           ...p.producer,
-          address: {
-            ...p.producer.address,
+          location: {
+            ...p.producer.location,
             // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-            coordinate: p.producer.address?.coordinate!,
+            latitude: p.producer.location?.latitude!,
+            longitude: p.producer.location?.longitude!,
           },
         },
       }));
@@ -86,7 +86,7 @@ function PinboardMapInner({
         latitude: number;
         longitude: number;
       }
-    | undefined = pinsWithAddresses[0]?.producer?.address?.coordinate;
+    | undefined = pinsWithAddresses[0]?.producer?.location;
   const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
 
   return (
@@ -104,8 +104,8 @@ function PinboardMapInner({
         <div key={p.id}>
           <Marker
             position={{
-              lat: p.producer.address.coordinate.latitude,
-              lng: p.producer.address.coordinate.longitude,
+              lat: p.producer.location.latitude,
+              lng: p.producer.location.longitude,
             }}
             onClick={() => setActivePlaceId(p.id)}
           />
@@ -113,20 +113,22 @@ function PinboardMapInner({
             <InfoWindow
               headerContent={<h3 className="font-bold">{p.producer.name}</h3>}
               position={{
-                lat: p.producer.address.coordinate.latitude,
-                lng: p.producer.address.coordinate.longitude,
+                lat: p.producer.location.latitude,
+                lng: p.producer.location.longitude,
               }}
               onCloseClick={() => setActivePlaceId(null)}
             >
               <div className="space-y-2">
                 <div>
-                  {p.producer.address.street &&
-                    `${p.producer.address.street}, `}
-                  {p.producer.address.city && `${p.producer.address.city}, `}
-                  {p.producer.address.state && `${p.producer.address.state}, `}
-                  {p.producer.address.zip && `${p.producer.address.zip}, `}
-                  {p.producer.address.country &&
-                    countryByAlpha3Code(p.producer.address.country).name}
+                  {p.producer.location.locality &&
+                    `${p.producer.location.locality}, `}
+                  {p.producer.location.city && `${p.producer.location.city}, `}
+                  {p.producer.location.adminArea &&
+                    `${p.producer.location.adminArea}, `}
+                  {p.producer.location.postcode &&
+                    `${p.producer.location.postcode}, `}
+                  {p.producer.location.country &&
+                    countryByAlpha3Code(p.producer.location.country)?.name}
                 </div>
                 <Link
                   className="underline text-brand-green font-bold"

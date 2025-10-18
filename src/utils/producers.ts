@@ -12,12 +12,10 @@ import {
   confirmPendingVideoUpload,
   editProducer,
   listCertificationTypesPublic,
-  listProducersPublicLight,
   requestUploadUrls,
   requestVideoUploadUrl,
   updateExistingImages,
   deleteVideo,
-  listProducersPublic,
   claimProducer,
   checkClaimDomainDNS,
   listClaimRequests,
@@ -26,12 +24,11 @@ import {
   verifyClaimPhone,
   regenerateClaimPhoneToken,
   suggestProducer,
+  listProducers,
+  getFullProducerPublic,
 } from "@/backend/rpc/producers";
 import {
-  ListProducerArgsBeforeValidate,
   Producer,
-  PublicProducerLight,
-  PublicProducer,
   EditProducerArgs,
   ClaimProducerArgs,
   CheckClaimDomainDnsArgs,
@@ -40,10 +37,16 @@ import {
   VerifyClaimPhoneArgs,
   RegenerateClaimPhoneTokenArgs,
   SuggestProducerArgs,
+  ListProducersArgs,
+  EditProducerArgsV2,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
-import { ImageData } from "@/backend/validators/producers";
-import { match, P } from "ts-pattern";
+import {
+  ProducerCardsRow,
+  ProducerSelect,
+  ProducerWith,
+  ProducerWithAll,
+} from "@/backend/db/schema";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -57,11 +60,16 @@ type SimpleMutationOps<TData, TArgs> = Omit<
  *  - legacy image property
  *  - placeholder unsplash url
  */
-export function primaryImageUrl(producer: Pick<Producer, "images" | "type">) {
+export function primaryImageUrl(
+  producer:
+    | Pick<ProducerWith<"media">, "media" | "type">
+    | Pick<ProducerCardsRow, "thumbnailUrl" | "type">
+) {
   const url: string | undefined =
-    producer.images?.items.find(
-      (i) => i.cloudflareId === producer.images.primaryImgId
-    )?.cloudflareUrl ?? producer.images?.items[0]?.cloudflareUrl;
+    "thumbnailUrl" in producer
+      ? producer.thumbnailUrl
+      : (producer.media.find((p) => p.role === "cover")?.asset.url ??
+        producer.media[0]?.asset.url);
 
   if (url !== undefined) {
     return url;
@@ -105,70 +113,12 @@ export function producerSlugFull(producer: Pick<Producer, "name" | "id">) {
   }`;
 }
 
-export function useProducers(
-  args: ListProducerArgsBeforeValidate,
-  initialData?: {
-    data: PublicProducerLight[];
-    hasNextPage: boolean;
-    count: number;
-  }
-) {
-  const gate = match(args)
-    .with(
-      {
-        page: 0,
-        certs: [],
-        type: P.nullish.optional(),
-        query: P.nullish.optional(),
-        locationSearchArea: P.nullish.optional(),
-        claimed: P.nullish.optional(),
-        userIpGeo: P.nullish.optional(),
-      },
-      () => ({ initialData })
-    )
-    .otherwise(() => ({}));
-
-  return useQuery({
-    queryKey: ["producers", args] as const,
-    queryFn: () => listProducersPublicLight(args),
-    placeholderData: keepPreviousData,
-    ...gate,
-  });
-}
-
-export function useProducersFull(
-  args: ListProducerArgsBeforeValidate,
-  initialData?: { data: PublicProducer[]; hasNextPage: boolean; count: number }
-) {
-  const gate = match(args)
-    .with(
-      {
-        page: 0,
-        certs: [],
-        type: P.nullish.optional(),
-        query: P.nullish.optional(),
-        locationSearchArea: P.nullish.optional(),
-        claimed: P.nullish.optional(),
-        userIpGeo: P.nullish.optional(),
-      },
-      () => ({ initialData })
-    )
-    .otherwise(() => ({}));
-
-  return useQuery({
-    queryKey: ["producers", "full", args] as const,
-    queryFn: () => listProducersPublic(args),
-    placeholderData: keepPreviousData,
-    ...gate,
-  });
-}
-
 export function useProducerPublic(
   producerId: string,
   opts?: UseQueryOptions<
-    PublicProducer | undefined,
+    ProducerCardsRow | undefined,
     Error,
-    PublicProducer | undefined,
+    ProducerCardsRow | undefined,
     readonly [string, string]
   >
 ) {
@@ -177,6 +127,46 @@ export function useProducerPublic(
     queryKey: ["producer", producerId] as const,
     queryFn: async () => {
       const producer = await getProducerPublic({ id: producerId });
+      if (!producer) throw new Error("Producer not found");
+      return producer;
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useProducers(
+  args: ListProducersArgs,
+  opts?: UseQueryOptions<
+    { items: ProducerWithAll[]; hasMore: boolean },
+    Error,
+    { items: ProducerWithAll[]; hasMore: boolean },
+    readonly [string, ListProducersArgs]
+  >
+) {
+  return useQuery({
+    ...opts,
+    queryKey: ["producers", args] as const,
+    queryFn: async () => {
+      return await listProducers(args);
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useFullProducerPublic(
+  producerId: string,
+  opts?: UseQueryOptions<
+    ProducerWithAll | undefined,
+    Error,
+    ProducerWithAll | undefined,
+    readonly [string, string]
+  >
+) {
+  return useQuery({
+    ...opts,
+    queryKey: ["producer", producerId] as const,
+    queryFn: async () => {
+      const producer = await getFullProducerPublic({ id: producerId });
       if (!producer) throw new Error("Producer not found");
       return producer;
     },
@@ -195,7 +185,7 @@ export function useCertificationTypes() {
 
 export function useLoggedInUserProducers(
   opts?: Pick<
-    UseQueryOptions<Producer[], Error, Producer[], readonly [string]>,
+    UseQueryOptions<ProducerCardsRow[], Error, Producer[], readonly [string]>,
     | "initialData"
     | "networkMode"
     | "persister"
@@ -217,9 +207,9 @@ export function useLoggedInUserProducer(
   producerId: string,
   opts?: Pick<
     UseQueryOptions<
-      Producer | undefined,
+      ProducerWithAll | null,
       Error,
-      Producer | undefined,
+      ProducerWithAll | null,
       readonly [string]
     >,
     | "initialData"
@@ -259,7 +249,12 @@ export function useListClaimRequests(
 
 export function useFetchUserProducers(
   opts?: Omit<
-    UseQueryOptions<Producer[], Error, Producer[], readonly [string]>,
+    UseQueryOptions<
+      ProducerCardsRow[],
+      Error,
+      ProducerCardsRow[],
+      readonly [string]
+    >,
     "queryFn" | "queryKey"
   >
 ) {
@@ -274,14 +269,14 @@ export function useFetchUserProducers(
 
 export function useEditUserProducer(
   opts?: Omit<
-    UseMutationOptions<void, Error, EditProducerArgs, unknown>,
+    UseMutationOptions<void, Error, EditProducerArgsV2, unknown>,
     "mutationKey" | "mutationFn"
   >
 ) {
   return useMutation({
     ...opts,
     mutationKey: ["edit-producer"] as const,
-    mutationFn: async (args: EditProducerArgs) => {
+    mutationFn: async (args: EditProducerArgsV2) => {
       await editProducer(args);
     },
   });
@@ -294,15 +289,14 @@ export function useUploadImages() {
       toUpload,
       producerId,
     }: {
-      toUpload: { _type: "upload"; file: File; isPrimary: boolean }[];
+      toUpload: { file: File }[];
       producerId: string;
     }) => {
       if (toUpload.length === 0) return;
 
       const uploadUrls = await requestUploadUrls({
         producerId,
-        imageItemParams: toUpload.map(({ isPrimary, file }) => ({
-          isPrimary,
+        imageItemParams: toUpload.map(({ file }) => ({
           type: file.type,
           name: file.name,
         })),
@@ -329,7 +323,7 @@ export function useUploadVideo() {
       toUpload,
     }: {
       producerId: string;
-      toUpload: { _type: "upload"; file: File };
+      toUpload: { file: File };
     }) => {
       const uploadUrl = await requestVideoUploadUrl({ producerId });
       const form = new FormData();
@@ -352,10 +346,7 @@ export function useDeleteVideo() {
 export function useUpdateExistingImages() {
   return useMutation({
     mutationKey: ["update-existing-images"] as const,
-    mutationFn: async (data: {
-      data: { items: ImageData[]; primaryImgId: string | null };
-      producerId: string;
-    }) => {
+    mutationFn: async (data: { data: string[]; producerId: string }) => {
       await updateExistingImages(data);
     },
   });

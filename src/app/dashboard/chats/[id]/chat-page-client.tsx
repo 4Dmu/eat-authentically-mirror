@@ -208,15 +208,17 @@ export function ChatPageClient(props: {
                 .otherwise(() => (
                   <>
                     <Avatar>
-                      <AvatarImage src={primaryImageUrl(data.producer)} />
+                      <AvatarImage
+                        src={data.producerThumbnailUrl ?? undefined}
+                      />
                       <AvatarFallback>
-                        {data.producer.name
-                          .split(" ")
-                          .map((p) => p[0])
-                          .join("")}
+                        {data.producerName
+                          ?.split(" ")
+                          ?.map((p) => p[0])
+                          ?.join("")}
                       </AvatarFallback>
                     </Avatar>
-                    <p>{data.producer.name}</p>
+                    <p>{data.producerName}</p>
                   </>
                 ))}
               {(

@@ -14,15 +14,17 @@ import { Badge } from "@/components/ui/badge";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { Certification } from "@/backend/validators/producers";
 import { useStore } from "@tanstack/react-form";
-import { emptyOptions, withForm } from "../form";
+import { defaultOptions, withForm } from "./context";
+import { CertificationSelect } from "@/backend/db/schema";
 
-export const CertificationsForm = withForm({
-  ...emptyOptions,
+export const Form = withForm({
+  ...defaultOptions,
   props: {
     tier: "Free" as SubTier,
-    certifications: [] as Certification[],
+    certifications: [] as CertificationSelect[],
+    producerId: "" as string,
   },
-  render: function Render({ form, tier, certifications }) {
+  render: function Render({ form, tier, certifications, producerId }) {
     const certificationsFieldValue = useStore(
       form.store,
       (state) => state.values.certifications
@@ -58,7 +60,13 @@ export const CertificationsForm = withForm({
                   <div className="flex flex-wrap gap-2">
                     {field.state.value.map((v, i) => (
                       <div className="relative" key={i}>
-                        <Badge>{v.name}</Badge>
+                        <Badge>
+                          {
+                            certifications.find(
+                              (cert) => cert.id === v.certificationId
+                            )?.name
+                          }
+                        </Badge>
                         <Button
                           onClick={() => field.removeValue(i)}
                           className="absolute -top-1 -right-2 size-4 rounded-full"
@@ -86,7 +94,13 @@ export const CertificationsForm = withForm({
                   <div className="flex flex-wrap">
                     {certifications.map((cert) => (
                       <Button
-                        onClick={() => field.pushValue(cert)}
+                        onClick={() =>
+                          field.pushValue({
+                            certificationId: cert.id,
+                            producerId: producerId,
+                            addedAt: new Date(),
+                          })
+                        }
                         key={cert.id}
                         variant={"ghost"}
                       >

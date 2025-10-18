@@ -6,24 +6,13 @@ import { ProducerCard } from "@/components/producer-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useHomePageStore } from "@/stores";
-import { useProducers } from "@/utils/producers";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { PublicProducerLight } from "@/backend/validators/producers";
 import type { Geo } from "@vercel/functions";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 
-export function Page({
-  initialProducersFromServer,
-  userIpGeo,
-}: {
-  initialProducersFromServer: {
-    data: PublicProducerLight[];
-    hasNextPage: boolean;
-    count: number;
-  };
-  userIpGeo: Geo | undefined;
-}) {
+export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   const {
     typeFilter,
     query,
@@ -34,21 +23,21 @@ export function Page({
     useIpGeo,
   } = useHomePageStore();
 
-  const debouncedQuery = useDebounce(query, 500);
+  // const debouncedQuery = useDebounce(query, 500);
 
-  const { data, isPlaceholderData } = useProducers(
-    {
-      type: typeFilter,
-      page: page,
-      certs: certs.map((cert) => cert.id),
-      locationSearchArea: locationSearchArea
-        ? locationSearchArea.toJSON()
-        : undefined,
-      query: debouncedQuery,
-      userIpGeo: useIpGeo ? userIpGeo : undefined,
-    },
-    initialProducersFromServer
-  );
+  // const { data, isPlaceholderData } = useProducers(
+  //   {
+  //     type: typeFilter,
+  //     page: page,
+  //     certs: certs.map((cert) => cert.id),
+  //     locationSearchArea: locationSearchArea
+  //       ? locationSearchArea.toJSON()
+  //       : undefined,
+  //     query: debouncedQuery,
+  //     userIpGeo: useIpGeo ? userIpGeo : undefined,
+  //   },
+  //   initialProducersFromServer
+  // );
 
   return (
     <div className="flex flex-col gap-10  bg-gray-50">
@@ -80,9 +69,9 @@ export function Page({
                   ))}
                 </Badge>
               )}
-              <p className="text-muted-foreground ml-auto">
+              {/* <p className="text-muted-foreground ml-auto">
                 ({data?.data.length} results)
-              </p>
+              </p> */}
             </div>
           )}
           <div className="flex justify-between gap-5">
@@ -94,7 +83,7 @@ export function Page({
             >
               <ArrowLeft />
             </Button>
-            <Badge variant={"brandBrown"}>
+            {/* <Badge variant={"brandBrown"}>
               Page {page + 1} of{" "}
               {Math.ceil((data?.count ?? 1) / HOME_PAGE_RESULT_LIMIT)}
             </Badge>
@@ -110,13 +99,15 @@ export function Page({
               disabled={isPlaceholderData || !data?.hasNextPage}
             >
               <ArrowRight />
-            </Button>
+            </Button> */}
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/*
+           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {data?.data.map((producer) => (
               <ProducerCard key={producer.id} producer={producer} />
             ))}
           </div>
+         */}
           <div>
             <Button onClick={() => window.scrollTo({ top: 0 })}>
               <ArrowUp /> Back to top

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
+import { ProducerCardsRow, ProducerWith } from "@/backend/db/schema";
 
 export function ProducerCard({
   producer,
@@ -13,10 +14,12 @@ export function ProducerCard({
   context = "default",
   className,
 }: {
-  producer: Pick<
-    PublicProducerLight,
-    "name" | "images" | "id" | "claimed" | "type"
-  >;
+  producer:
+    | Pick<ProducerWith<"media">, "media" | "type" | "userId" | "name" | "id">
+    | Pick<
+        ProducerCardsRow,
+        "name" | "type" | "thumbnailUrl" | "id" | "isClaimed"
+      >;
   mode?: "default" | "list";
   context?: "default" | "pinboard";
   className?: string;
@@ -38,7 +41,9 @@ export function ProducerCard({
             className="object-cover h-full border-b aspect-video"
             src={primaryImageUrl(producer)}
           />
-          {!producer.claimed && (
+          {!("isClaimed" in producer
+            ? producer.isClaimed
+            : producer.userId !== null) && (
             <Badge variant={"brandBrown"} className="absolute top-4 left-4">
               Unclaimed
             </Badge>
@@ -77,7 +82,9 @@ export function ProducerCard({
       <div className="p-5">
         <p className="font-bold">{producer.name}</p>
       </div>
-      {!producer.claimed && (
+      {!("isClaimed" in producer
+        ? producer.isClaimed
+        : producer.userId !== null) && (
         <Badge variant={"brandBrown"} className="absolute top-4 left-4">
           Unclaimed
         </Badge>

@@ -1,7 +1,9 @@
 import { type } from "arktype";
-import { pinboardViewModes } from "../db/schema";
+import { PINBOARD_VIEW_MODES } from "../db/schema";
 
-export const pinboardVideModeValidator = type.enumerated(...pinboardViewModes);
+export const pinboardVideModeValidator = type.enumerated(
+  ...PINBOARD_VIEW_MODES
+);
 
 export const addToPinboardArgs = type({
   producerId: "string.uuid",

@@ -15,13 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FieldInfo } from "../../helpers/field-info";
+import { FieldInfo } from "../../../helpers/field-info";
 import { COUNTRIES } from "@/utils/contries";
-import { emptyOptions, withForm } from "../form";
+import { useForm } from "@tanstack/react-form";
+import { editProducerLocationArgsValidator } from "@/backend/validators/producers";
+import { withForm, defaultOptions } from "./context";
 
-export const AddressForm = withForm({
-  ...emptyOptions,
-  render: function ({ form }) {
+export const Form = withForm({
+  ...defaultOptions,
+  render: function Render({ form }) {
     return (
       <>
         <Card>
@@ -33,7 +35,7 @@ export const AddressForm = withForm({
             </CardDescription>
           </CardHeader>
           <CardContent className="gap-5 flex flex-col">
-            <form.Field name="address.street">
+            <form.Field name="locality">
               {(subField) => (
                 <div className="flex flex-col gap-3">
                   <Label>Street Address</Label>
@@ -51,7 +53,7 @@ export const AddressForm = withForm({
             </form.Field>
 
             <div className="grid grid-cols-2 gap-3">
-              <form.Field name="address.city">
+              <form.Field name="city">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>City</Label>
@@ -67,7 +69,7 @@ export const AddressForm = withForm({
                   </div>
                 )}
               </form.Field>
-              <form.Field name="address.zip">
+              <form.Field name="postcode">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>Postal Code</Label>
@@ -86,7 +88,7 @@ export const AddressForm = withForm({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <form.Field name="address.state">
+              <form.Field name="adminArea">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>State</Label>
@@ -103,13 +105,13 @@ export const AddressForm = withForm({
                 )}
               </form.Field>
 
-              <form.Field name="address.country">
+              <form.Field name="country">
                 {(subField) => (
                   <div className="flex flex-col gap-3">
                     <Label>Country</Label>
                     <Select
                       onValueChange={(e) => subField.handleChange(e as "usa")}
-                      value={subField.state.value}
+                      value={subField.state.value ?? undefined}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select country" />
@@ -141,91 +143,79 @@ export const AddressForm = withForm({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form.Field name="address.coordinate">
-              {(field) => (
-                <div className="grid grid-cols-2 gap-3">
-                  <form.Field name="address.coordinate.latitude">
-                    {(subField) => (
-                      <div className="flex flex-col gap-3">
-                        <Label>Lattitude</Label>
-                        <Input
-                          type="number"
-                          onBlur={subField.handleBlur}
-                          placeholder="12.44"
-                          value={
-                            Number.isNaN(subField.state.value) ||
-                            subField.state.value === undefined
-                              ? ""
-                              : subField.state.value
-                          }
-                          // onChange={(e) => {
-                          //   const value = e.currentTarget.valueAsNumber;
-                          //   field.handleChange({
-                          //     ...field.state.value,
-                          //     latitude: value,
-                          //   });
-                          // }}
-                          onChange={(e) => {
-                            const value = e.currentTarget.valueAsNumber;
+            <div className="grid grid-cols-2 gap-3">
+              <form.Field name="latitude">
+                {(subField) => (
+                  <div className="flex flex-col gap-3">
+                    <Label>Lattitude</Label>
+                    <Input
+                      type="number"
+                      onBlur={subField.handleBlur}
+                      placeholder="12.44"
+                      value={
+                        Number.isNaN(subField.state.value) ||
+                        !subField.state.value
+                          ? ""
+                          : subField.state.value
+                      }
+                      // onChange={(e) => {
+                      //   const value = e.currentTarget.valueAsNumber;
+                      //   field.handleChange({
+                      //     ...field.state.value,
+                      //     latitude: value,
+                      //   });
+                      // }}
+                      onChange={(e) => {
+                        const value = e.currentTarget.valueAsNumber;
 
-                            if (
-                              Number.isNaN(value) &&
-                              (Number.isNaN(field.state.value?.longitude) ||
-                                field.state.value?.longitude === undefined)
-                            ) {
-                              field.handleChange(undefined);
-                            } else {
-                              subField.handleChange(value);
-                            }
-                          }}
-                        />
-                        <FieldInfo field={subField} />
-                      </div>
-                    )}
-                  </form.Field>
-                  <form.Field name="address.coordinate.longitude">
-                    {(subField) => (
-                      <div className="flex flex-col gap-3">
-                        <Label>Longitude</Label>
-                        <Input
-                          type="number"
-                          placeholder="-12.44"
-                          onBlur={subField.handleBlur}
-                          value={
-                            Number.isNaN(subField.state.value) ||
-                            subField.state.value === undefined
-                              ? ""
-                              : subField.state.value
-                          }
-                          onChange={(e) => {
-                            const value = e.currentTarget.valueAsNumber;
-
-                            if (
-                              Number.isNaN(value) &&
-                              (Number.isNaN(field.state.value?.latitude) ||
-                                field.state.value?.latitude === undefined)
-                            ) {
-                              field.handleChange(undefined);
-                            } else {
-                              subField.handleChange(value);
-                            }
-                          }}
-                        />
-                        <FieldInfo field={subField} />
-                      </div>
-                    )}
-                  </form.Field>
-                  <div className="col-span-2">
-                    <FieldInfo field={field} />
-                    <p className="text-sm text-muted-foreground">
-                      If your not sure what your latitude and longitude you can
-                      use the location button to autofill it using your current
-                      location.
-                    </p>
+                        if (
+                          Number.isNaN(value) &&
+                          (Number.isNaN(subField.state.value) ||
+                            subField.state.value === undefined)
+                        ) {
+                          subField.handleChange(undefined);
+                        } else {
+                          subField.handleChange(value);
+                        }
+                      }}
+                    />
+                    <FieldInfo field={subField} />
                   </div>
-                </div>
-              )}
-            </form.Field>
+                )}
+              </form.Field>
+              <form.Field name="longitude">
+                {(subField) => (
+                  <div className="flex flex-col gap-3">
+                    <Label>Longitude</Label>
+                    <Input
+                      type="number"
+                      placeholder="-12.44"
+                      onBlur={subField.handleBlur}
+                      value={
+                        Number.isNaN(subField.state.value) ||
+                        !subField.state.value
+                          ? ""
+                          : subField.state.value
+                      }
+                      onChange={(e) => {
+                        const value = e.currentTarget.valueAsNumber;
+
+                        if (
+                          Number.isNaN(value) &&
+                          (Number.isNaN(subField.state.value) ||
+                            subField.state.value === undefined)
+                        ) {
+                          subField.handleChange(undefined);
+                        } else {
+                          subField.handleChange(value);
+                        }
+                      }}
+                    />
+                    <FieldInfo field={subField} />
+                  </div>
+                )}
+              </form.Field>
+            </div>
           </CardContent>
         </Card>
       </>

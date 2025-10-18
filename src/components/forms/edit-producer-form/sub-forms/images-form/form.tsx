@@ -11,24 +11,36 @@ import { FileImage } from "@/components/file-image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useStore } from "@tanstack/react-form";
-import { FieldInfo } from "../../helpers/field-info";
+import { FieldInfo } from "../../../helpers/field-info";
 import Image from "next/image";
 import {
   SelectFileButton,
   TemporyFilesSelectButton,
 } from "@/components/select-file-button";
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { CheckIcon, RotateCwIcon, XIcon } from "lucide-react";
+import { RotateCwIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
-import { emptyOptions, withForm } from "../form";
+import { defaultOptions, withForm } from "./context";
+import { editProducerMediaFormValidator } from "@/backend/validators/producers";
 
-export const ImagesForm = withForm({
-  ...emptyOptions,
+export function isUpload(
+  value: (typeof editProducerMediaFormValidator.infer)["media"][number]
+): value is Extract<
+  (typeof editProducerMediaFormValidator.infer)["media"][number],
+  { file: File }
+> {
+  if ("file" in value) {
+    return true;
+  }
+  return false;
+}
+
+export const Form = withForm({
+  ...defaultOptions,
   props: {
     tier: "Free" as SubTier,
   },
   render: function Render({ form, tier }) {
-    const images = useStore(form.store, (state) => state.values.images);
+    const media = useStore(form.store, (state) => state.values.media);
 
     const maxFiles =
       tier === "Free"
@@ -45,7 +57,7 @@ export const ImagesForm = withForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            Images ( {images?.items.length ?? 0}/{maxFiles})
+            Images ( {media.length ?? 0}/{maxFiles})
           </CardTitle>
           <CardDescription>
             <span className="capitalize">
@@ -64,15 +76,15 @@ export const ImagesForm = withForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form.Field name="images">
+          <form.Field name="media">
             {(field) => (
               <div className="flex flex-col gap-3">
                 <Label>Add Images</Label>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
-                  {field.state.value?.items.map((value, i) => (
+                  {field.state.value.map((value, i) => (
                     <div className="flex flex-col gap-1 relative" key={i}>
                       <div className="p-2 flex gap-2 justify-end w-full absolute top-2 right-2">
-                        <form.Field name={`images.items[${i}]`}>
+                        {/* <form.Field name={`media[${i}]`}>
                           {(subField) => (
                             <CheckboxPrimitive.Root
                               checked={
@@ -132,9 +144,9 @@ export const ImagesForm = withForm({
                               </CheckboxPrimitive.Indicator>
                             </CheckboxPrimitive.Root>
                           )}
-                        </form.Field>
-                        {value._type === "upload" && (
-                          <form.Field name={`images.items[${i}].file`}>
+                        </form.Field> */}
+                        {isUpload(value) && (
+                          <form.Field name={`media[${i}].file`}>
                             {(subField) => (
                               <SelectFileButton
                                 maxFileSize={200000000}
@@ -151,18 +163,11 @@ export const ImagesForm = withForm({
                             )}
                           </form.Field>
                         )}
-                        <form.Field name="images.items" mode="array">
+                        <form.Field name="media" mode="array">
                           {(subField) => (
                             <Button
                               onClick={() => {
-                                if (field.state.value.items.length == 1) {
-                                  field.handleChange({
-                                    items: [],
-                                    primaryImgId: null,
-                                  });
-                                } else {
-                                  subField.removeValue(i);
-                                }
+                                subField.removeValue(i);
                               }}
                               size={"icon"}
                               variant={"destructive"}
@@ -173,7 +178,7 @@ export const ImagesForm = withForm({
                         </form.Field>
                       </div>
                       <div className="w-full h-[200px] rounded overflow-hidden border">
-                        {value._type === "upload" ? (
+                        {isUpload(value) ? (
                           value.file && (
                             <FileImage
                               className="object-cover h-full w-full"
@@ -182,8 +187,8 @@ export const ImagesForm = withForm({
                           )
                         ) : (
                           <Image
-                            src={value.cloudflareUrl}
-                            alt={value.alt}
+                            src={value.asset.url}
+                            alt={value.caption ?? ""}
                             className="object-cover h-full w-full"
                             width={200}
                             height={200}
@@ -193,12 +198,10 @@ export const ImagesForm = withForm({
                     </div>
                   ))}
                 </div>
-                <form.Field name="images.items" mode="array">
+                <form.Field name="media" mode="array">
                   {(subField) => (
                     <TemporyFilesSelectButton
-                      maxFiles={
-                        maxFiles - (field.state.value?.items.length ?? 0)
-                      }
+                      maxFiles={maxFiles - (field.state.value?.length ?? 0)}
                       mimeType="image/*"
                       onSelectMoreFilesThanAllowed={() => {
                         toast.error(
@@ -208,12 +211,7 @@ export const ImagesForm = withForm({
                       onSelect={(files) => {
                         files.forEach((file) =>
                           subField.pushValue({
-                            _type: "upload",
                             file: file,
-                            isPrimary:
-                              field.state.value === undefined
-                                ? true
-                                : subField.state.value.length === 0,
                           })
                         );
                       }}

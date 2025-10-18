@@ -21,6 +21,7 @@ import { useUser } from "@clerk/nextjs";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { useLoggedInUserProducers } from "@/utils/producers";
 import { useMemo } from "react";
+import { ProducerCardsRow } from "@/backend/db/schema";
 
 export function ProfileSection({
   serverUser,
@@ -28,7 +29,7 @@ export function ProfileSection({
   subTierFromServer,
 }: {
   serverUser: UserJSON;
-  producersFromServer: Producer[];
+  producersFromServer: ProducerCardsRow[];
   subTierFromServer: SubTier;
 }) {
   const { isLoaded, user: clientUser } = useUser();

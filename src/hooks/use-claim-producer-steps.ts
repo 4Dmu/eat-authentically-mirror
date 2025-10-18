@@ -1,3 +1,4 @@
+import { ProducerSelect, ProducerWith } from "@/backend/db/schema";
 import {
   PublicProducer,
   ProducerClaimVerificationMethods,
@@ -5,10 +6,7 @@ import {
 import { type } from "arktype";
 import { useState } from "react";
 
-type NeededProducer = Pick<
-  PublicProducer,
-  "contact" | "id" | "name" | "socialMedia" | "address"
->;
+type NeededProducer = ProducerWith<"contact" | "social" | "location">;
 
 export type InputStep =
   | { mode: "select" }
@@ -118,7 +116,7 @@ export function useClaimProducerSteps(initialStep?: Step) {
             return "success";
           case "domain-dns":
           case "domain-email-link":
-            const website = step.producer.contact?.website;
+            const website = step.producer.contact?.websiteUrl;
             if (!website) {
               return { error: "Missing or invalid website" };
             }
@@ -158,14 +156,14 @@ export function useClaimProducerSteps(initialStep?: Step) {
           case "social-post":
             const profiles: string[] = [];
 
-            if (step.producer.socialMedia.facebook) {
-              profiles.push(step.producer.socialMedia.facebook);
+            if (step.producer.social?.facebook) {
+              profiles.push(step.producer.social.facebook);
             }
-            if (step.producer.socialMedia.instagram) {
-              profiles.push(step.producer.socialMedia.instagram);
+            if (step.producer.social?.instagram) {
+              profiles.push(step.producer.social.instagram);
             }
-            if (step.producer.socialMedia.twitter) {
-              profiles.push(step.producer.socialMedia.twitter);
+            if (step.producer.social?.twitter) {
+              profiles.push(step.producer.social.twitter);
             }
 
             if (profiles.length === 0) {

@@ -1,18 +1,10 @@
 import { type } from "arktype";
 
-export const starsValidator = type.enumerated(
-  0,
-  0.5,
-  1,
-  1.5,
-  2,
-  2.5,
-  3,
-  3.5,
-  4,
-  4.5,
-  5,
-);
+const stars = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+
+export const starsValidator = type.number.narrow((v) => {
+  return stars.includes(v);
+});
 
 export const reviewProducerArgs = type({
   producerId: "string.uuid",

@@ -8,7 +8,12 @@ import {
   updateReviewArgs,
 } from "../validators/reviews";
 import { authenticatedActionClient } from "./helpers/middleware";
-import { importedReviews, producers, reviews } from "../db/schema";
+import {
+  producerImportedReviews,
+  producers,
+  producerReviews,
+  ProducerReviewInsert,
+} from "../db/schema";
 import { getSubTier } from "./utils/get-sub-tier";
 import { actionClient } from "./helpers/safe-action";
 import { USER_DATA_KV } from "../kv";
@@ -32,10 +37,10 @@ export const reviewProducer = authenticatedActionClient
         throw new Error("Cannot review your own producer");
       }
 
-      const existingReview = await db.query.reviews.findFirst({
+      const existingReview = await db.query.producerReviews.findFirst({
         where: and(
-          eq(reviews.producerId, producerId),
-          eq(reviews.reviewerUserId, userId)
+          eq(producerReviews.producerId, producerId),
+          eq(producerReviews.userId, userId)
         ),
       });
 
@@ -57,16 +62,16 @@ export const reviewProducer = authenticatedActionClient
       }
 
       return await db
-        .insert(reviews)
+        .insert(producerReviews)
         .values({
           id: crypto.randomUUID(),
           producerId: producer.id,
-          reviewerUserId: userId,
+          userId: userId,
           rating: stars,
-          content: review,
+          body: review,
           createdAt: new Date(),
           updatedAt: new Date(),
-        })
+        } satisfies ProducerReviewInsert)
         .returning()
         .then((r) => r[0]);
     }
@@ -76,12 +81,12 @@ export const listReviewsPublic = actionClient
   .input(listReviewsPublicArgs)
   .name("listReviewsPublic")
   .action(async ({ input: { producerId } }) => {
-    const userR = await db.query.reviews.findMany({
-      where: eq(reviews.producerId, producerId),
+    const userR = await db.query.producerReviews.findMany({
+      where: eq(producerReviews.producerId, producerId),
     });
 
-    const importedR = await db.query.importedReviews.findMany({
-      where: eq(importedReviews.producerId, producerId),
+    const importedR = await db.query.producerImportedReviews.findMany({
+      where: eq(producerImportedReviews.producerId, producerId),
     });
 
     const results = [...userR, ...importedR].sort((a, b) =>
@@ -94,7 +99,7 @@ export const listReviewsPublic = actionClient
       if ("data" in result) {
         response.push(result);
       } else {
-        const data = await USER_DATA_KV.get(result.reviewerUserId);
+        const data = await USER_DATA_KV.get(result.userId);
         response.push({
           ...result,
           reviewerUserImgUrl: data?.image_url,
@@ -111,8 +116,13 @@ export const deleteReview = authenticatedActionClient
   .name("deleteReview")
   .action(async ({ ctx: { userId }, input: { reviewId } }) => {
     const results = await db
-      .delete(reviews)
-      .where(and(eq(reviews.id, reviewId), eq(reviews.reviewerUserId, userId)))
+      .delete(producerReviews)
+      .where(
+        and(
+          eq(producerReviews.id, reviewId),
+          eq(producerReviews.userId, userId)
+        )
+      )
       .returning();
 
     if (results.length === 0) {
@@ -126,8 +136,11 @@ export const updateReview = authenticatedActionClient
   .input(updateReviewArgs)
   .name("updateReview")
   .action(async ({ ctx: { userId }, input: { content, stars, reviewId } }) => {
-    const review = await db.query.reviews.findFirst({
-      where: and(eq(reviews.id, reviewId), eq(reviews.reviewerUserId, userId)),
+    const review = await db.query.producerReviews.findFirst({
+      where: and(
+        eq(producerReviews.id, reviewId),
+        eq(producerReviews.userId, userId)
+      ),
     });
 
     if (!review) {
@@ -135,13 +148,13 @@ export const updateReview = authenticatedActionClient
     }
 
     await db
-      .update(reviews)
+      .update(producerReviews)
       .set({
         rating: stars,
-        content: content,
+        body: content,
         updatedAt: new Date(),
       })
-      .where(eq(reviews.id, review.id));
+      .where(eq(producerReviews.id, review.id));
   });
 
 export type PublicReview = Awaited<

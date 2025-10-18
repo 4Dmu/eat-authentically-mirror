@@ -11,7 +11,7 @@ import { Button } from "./ui/button";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateReview } from "@/utils/reviews";
-import { ReviewSelect } from "@/backend/db/schema";
+import { ProducerReviewSelect } from "@/backend/db/schema";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { EditIcon } from "lucide-react";
@@ -24,12 +24,12 @@ export function UpdateReviewDialog({
   review,
   disable,
 }: {
-  review: ReviewSelect | UserPublicReview;
+  review: ProducerReviewSelect | UserPublicReview;
   disable?: boolean;
 }) {
-  const [rating, setRating] = useState<Stars>(review.rating);
+  const [rating, setRating] = useState<number>(review.rating);
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState(review.content);
+  const [message, setMessage] = useState(review.body ?? "");
   const queryClient = useQueryClient();
 
   const actualMessage = useMemo(() => message.trim(), [message]);

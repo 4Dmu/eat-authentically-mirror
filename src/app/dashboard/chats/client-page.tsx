@@ -72,16 +72,16 @@ export function ChatsPageClient(props: {
                     <Avatar>
                       <AvatarImage src={v.initiatorUserImgUrl} />
                       <AvatarFallback>
-                        {chat.producer.name
-                          .split(" ")
-                          .map((p) => p[0])
-                          .join("")}
+                        {chat.producerName
+                          ?.split(" ")
+                          ?.map((p) => p[0])
+                          ?.join("")}
                       </AvatarFallback>
                     </Avatar>
                     <p className="font-bold">
                       {v.initiatorUserName}
                       {hasMoreThanOneChatWithSameProducer
-                        ? ` chatting with ${v.producer.name}`
+                        ? ` chatting with ${v.producerName}`
                         : ``}
                     </p>
                   </>
@@ -89,15 +89,17 @@ export function ChatsPageClient(props: {
                 .otherwise(() => (
                   <>
                     <Avatar>
-                      <AvatarImage src={primaryImageUrl(chat.producer)} />
+                      <AvatarImage
+                        src={chat.producerThumbnailUrl ?? undefined}
+                      />
                       <AvatarFallback>
-                        {chat.producer.name
-                          .split(" ")
-                          .map((p) => p[0])
-                          .join("")}
+                        {chat.producerName
+                          ?.split(" ")
+                          ?.map((p) => p[0])
+                          ?.join("")}
                       </AvatarFallback>
                     </Avatar>
-                    <p className="font-bold">{chat.producer.name}</p>
+                    <p className="font-bold">{chat.producerName}</p>
                   </>
                 ))}
               <p className="ml-auto">

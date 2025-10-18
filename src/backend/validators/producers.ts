@@ -1,8 +1,21 @@
 import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { LatLangBoundsLiteralValidator } from "./maps";
-import { ClaimRequestStatus } from "../db/schema";
+import { ClaimRequestStatus, commodities } from "../db/schema";
 import { isMobilePhone } from "validator";
+import {
+  certificationSelectValidator,
+  mediaAssetSelectValidator,
+  producerCertificationsSelectValidator,
+  producerCommoditiesSelectValidator,
+  producerContactSelectValidator,
+  producerInsertValidator,
+  producerLocationInsertValidator,
+  producerLocationSelectValidator,
+  producerMediaSelectValidator,
+  producerSelectValidator,
+  producerSocialSelectValidator,
+} from "../db/contracts";
 
 export const PRODUCER_TYPES = [
   "farm",
@@ -222,51 +235,22 @@ export const producerValidator = type({
   socialMedia: socialMediaValidator,
 });
 
-export const editProducerFormValidator = type({
-  name: "string",
-  type: producerTypesValidator,
-  about: "string|null",
-  address: addressValidator,
-  contact: {
-    "email?": "string.email|null",
-    "phone?": "string|null",
-    "website?": "string.url|null",
-  },
-  images: type({
-    primaryImgId: "string|null",
-    items: type({
-      _type: "'upload'",
-      file: "File",
-      isPrimary: "boolean",
-    })
-      .or(imageDataValidator)
+export const editProducerFormValidator = producerSelectValidator
+  .pick("name", "about", "type")
+  .and({
+    media: producerMediaSelectValidator
+      .and({
+        asset: mediaAssetSelectValidator,
+      })
       .array(),
-  }).narrow((data, ctx) => {
-    if (
-      (data.primaryImgId && data.items.length === 0) ||
-      (data.primaryImgId &&
-        data.items.length > 0 &&
-        !data.items.some(
-          (i) =>
-            i._type === "cloudflare" && i.cloudflareId === data.primaryImgId
-        ))
-    ) {
-      return ctx.reject({
-        message: "Invalid primary image id",
-      });
-    }
-    return true;
-  }),
-  video: videoValidator
-    .or(type({ _type: "'upload'", file: "File" }))
-    .or(type.null),
-  certifications: certificationValidator.array(),
-  commodities: type({
-    name: "string",
-    varieties: type.string.array(),
-  }).array(),
-  socialMedia: socialMediaValidator.or("null"),
-});
+    contact: producerContactSelectValidator.omit("producerId").or(type.null),
+    social: producerSocialSelectValidator.omit("producerId").or(type.null),
+    location: producerLocationSelectValidator
+      .omit("geoId", "geohash", "producerId")
+      .or(type.null),
+    commodities: producerCommoditiesSelectValidator.array(),
+    certifications: producerCertificationsSelectValidator.array(),
+  });
 
 export const producerFormBasicValidator = type({
   name: "string",
@@ -322,15 +306,57 @@ export const ipGeoValidator = type({
   "postalCode?": "string",
 });
 
-export const listProducersArgsValidator = type({
-  "type?": producerTypesValidator,
-  page: "number",
-  "query?": "string",
-  certs: type("string").array(),
-  "locationSearchArea?": LatLangBoundsLiteralValidator,
-  "claimed?": "boolean",
-  "userIpGeo?": ipGeoValidator,
+// export const listProducersArgsValidator = type({
+//   "type?": producerTypesValidator,
+//   page: "number",
+//   "query?": "string",
+//   certs: type("string").array(),
+//   "locationSearchArea?": LatLangBoundsLiteralValidator,
+//   "claimed?": "boolean",
+//   "userIpGeo?": ipGeoValidator,
+// });
+
+export const searchByGeoTextArgsValidator = type({
+  "q?": type("string")
+    .atLeastLength(1)
+    .atMostLength(255)
+    .pipe((v) => v.trim()),
+  center: type({ lat: "number", lon: "number" }),
+  radiusKm: type.number.atLeast(0.1).atMost(1000).default(1000),
+  "bbox?": type({
+    minLat: "number",
+    maxLat: "number",
+    minLon: "number",
+    maxLon: "number",
+  }),
+  limit: type.number.atLeast(1).atMost(50).default(30),
+  offset: type.number.atLeast(0).default(0),
+  "countryHint?": "string",
+  "stateProvinceHint?": "string",
+  "filters?": type({
+    category: type.enumerated(PRODUCER_TYPES).optional(),
+    commodities: type.string.atLeastLength(1).array().optional(),
+    variants: type.string.atLeastLength(1).array().optional(),
+    certifications: type.string.atLeastLength(1).array().optional(),
+    organicOnly: type.boolean.optional(),
+  }).partial(),
 });
+
+export type SearchByGeoTextArgs = typeof searchByGeoTextArgsValidator.infer;
+
+export const geocodePlaceInput = type({
+  place: type.string.atLeastLength(2).atMostLength(300).configure({
+    description: "Partial or complete address or placename to be geocoded",
+  }),
+});
+
+export const listProducersArgsValidator = type({
+  limit: "number",
+  offset: "number",
+  "query?": "string",
+});
+
+export type ListProducersArgs = typeof listProducersArgsValidator.infer;
 
 export const getProducersArgsValidator = type({ id: "string.uuid" });
 
@@ -340,10 +366,10 @@ export const editProducerArgsValidator = type({
   "type?": producerTypesValidator,
   "about?": "string|null",
   contact: editProducerFormValidator.get("contact").optional(),
-  address: editProducerFormValidator.get("address").optional(),
-  certifications: editProducerFormValidator.get("certifications").optional(),
-  commodities: editProducerFormValidator.get("commodities").optional(),
-  socialMedia: editProducerFormValidator.get("socialMedia").optional(),
+  location: editProducerFormValidator.get("location").optional(),
+  certifications: type.string.array().optional(),
+  commodities: type.number.array().optional(),
+  social: editProducerFormValidator.get("social").optional(),
 });
 
 export const registerProducerArgsValidator = type({
@@ -366,13 +392,58 @@ export const verifyClaimPhoneArgs = type({
   code: type("string.numeric").exactlyLength(6),
 });
 
+export const editProducerLocationArgsValidator =
+  producerLocationInsertValidator.omit("producerId", "geoId", "geohash");
+
+export const editProducerArgsValidatorV2 = type({
+  id: producerInsertValidator.get("id"),
+  "name?": producerInsertValidator.get("name"),
+  "type?": producerInsertValidator.get("type"),
+  "about?": producerInsertValidator.get("about"),
+  "summary?": producerInsertValidator.get("summary"),
+});
+
+export const editProducerFormValidatorV2 =
+  editProducerArgsValidatorV2.omit("id");
+
+export const editProducerMediaFormValidator = type({
+  media: producerMediaSelectValidator
+    .and({ asset: mediaAssetSelectValidator })
+    .or(
+      type({
+        file: "File",
+      })
+    )
+    .array(),
+});
+
+export const editProucerVideoFormValidator = type({
+  video: producerMediaSelectValidator
+    .and({ role: "'video'" })
+    .and({ asset: mediaAssetSelectValidator })
+    .or(
+      type({
+        file: "File",
+      })
+    )
+    .or(type.null),
+});
+
+export const editProducerCertificationsFormValidator = type({
+  certifications: producerCertificationsSelectValidator.array(),
+});
+
+export const editProducerCommoditiesFormValidator = type({
+  commodities: producerCommoditiesSelectValidator.array(),
+});
+
+export const editProducerContactFormValditator = type({
+  "email?": producerContactSelectValidator.get("email"),
+  "phone?": producerContactSelectValidator.get("phone"),
+  "websiteUrl?": producerContactSelectValidator.get("websiteUrl"),
+});
+
 export const regenerateClaimPhoneTokenArgs = type({ claimRequestId: "string" });
-
-export type ListProducerArgsBeforeValidate =
-  typeof listProducersArgsValidator.inferIn;
-
-export type ListProducerArgsAfterValidate =
-  typeof listProducersArgsValidator.infer;
 
 export type VerifyClaimPhoneArgs = typeof verifyClaimPhoneArgs.infer;
 
@@ -402,6 +473,8 @@ export type PublicProducerLight = typeof publicProducerLightValidator.infer;
 export type Certification = typeof certificationValidator.infer;
 
 export type EditProducerArgs = typeof editProducerArgsValidator.infer;
+
+export type EditProducerArgsV2 = typeof editProducerArgsValidatorV2.infer;
 
 export type ProducerClaimVerificationMethods =
   typeof producerClaimVerificationMethods.infer;

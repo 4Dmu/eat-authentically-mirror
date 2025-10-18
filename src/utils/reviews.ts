@@ -1,4 +1,4 @@
-import { ReviewSelect } from "@/backend/db/schema";
+import { ProducerReviewSelect } from "@/backend/db/schema";
 import {
   deleteReview,
   listReviewsPublic,
@@ -22,7 +22,12 @@ import {
 
 export function useReviewProducer(
   opts?: Omit<
-    UseMutationOptions<ReviewSelect, Error, ReviewProducerArgs, unknown>,
+    UseMutationOptions<
+      ProducerReviewSelect,
+      Error,
+      ReviewProducerArgs,
+      unknown
+    >,
     "mutationKey" | "mutationFn"
   >
 ) {
@@ -74,9 +79,9 @@ export function useReviewsPublic(
   producerId: string,
   opts?: Omit<
     UseQueryOptions<
-      ReviewSelect[],
+      ProducerReviewSelect[],
       Error,
-      ReviewSelect[],
+      ProducerReviewSelect[],
       readonly [string, string]
     >,
     "queryKey" | "queryFn"

@@ -46,9 +46,9 @@ export function ReviewCard({ review }: { review: PublicReview }) {
         )}
         <p>{review.reviewerUserFirstName}</p>
       </div>
-      <p>{review.content}</p>
+      <p>{review.body}</p>
       <StarRatingReadonly rating={review.rating} />
-      {auth.userId === review.reviewerUserId && (
+      {auth.userId === review.userId && (
         <div className="flex gap-2">
           <UpdateReviewDialog review={review} />
           <DeleteReviewDialog review={review} />

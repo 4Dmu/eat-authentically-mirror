@@ -1,5 +1,5 @@
 "use client";
-import { ProducerSelect } from "@/backend/db/schema";
+import { ProducerSelect, ProducerWith } from "@/backend/db/schema";
 import { ProducerClaimVerificationMethods } from "@/backend/validators/producers";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +28,11 @@ import { ReactNode, useState } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 
-export function ClaimPage({ producer }: { producer: ProducerSelect }) {
+export function ClaimPage({
+  producer,
+}: {
+  producer: ProducerWith<"contact" | "social" | "location">;
+}) {
   const [verification, setVerification] = useState<
     ProducerClaimVerificationMethods | undefined
   >(undefined);
@@ -135,20 +139,20 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                     </p>
                   </div>
                 )}
-                {producer.contact?.website && (
+                {producer.contact?.websiteUrl && (
                   <div className="flex flex-col gap-2">
                     <Label>Website</Label>
                     <p className="md:text-lg h-[unset] p-3">
-                      {producer.contact?.website}
+                      {producer.contact?.websiteUrl}
                     </p>
                   </div>
                 )}
                 <div className="flex flex-col gap-2">
                   <Label>Address</Label>
                   <p className="md:text-lg h-[unset] p-3">
-                    {`${producer.address?.street ?? ""}${producer.address?.city ? `, ${format(producer.address?.city)}` : ""}${format(producer.address?.state) ?? ""}${format(producer.address?.zip) ?? ""}${
-                      producer.address?.country
-                        ? countryByAlpha3Code(producer.address?.country).name
+                    {`${producer.location?.locality ?? ""}${producer.location?.city ? `, ${format(producer.location?.city)}` : ""}${format(producer.location?.adminArea) ?? ""}${format(producer.location?.postcode) ?? ""}${
+                      producer.location?.country
+                        ? countryByAlpha3Code(producer.location.country)?.name
                         : ""
                     }`}
                   </p>
@@ -175,7 +179,7 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                         }
                       />
                     )}
-                    {step.producer.contact?.website && (
+                    {step.producer.contact?.websiteUrl && (
                       <>
                         <VerificationCard
                           title="Email link to any email address on producers domain"
@@ -211,9 +215,9 @@ export function ClaimPage({ producer }: { producer: ProducerSelect }) {
                   </div>
                   <p className="font-bold text-lg">Slow / Human</p>
                   <div className="flex flex-col gap-5 w-full">
-                    {(step.producer.socialMedia.facebook ||
-                      step.producer.socialMedia.instagram ||
-                      step.producer.socialMedia.twitter) && (
+                    {(step.producer.social?.facebook ||
+                      step.producer.social?.instagram ||
+                      step.producer.social?.twitter) && (
                       <VerificationCard
                         title="Post code on social media"
                         checked={verification === "social-post"}

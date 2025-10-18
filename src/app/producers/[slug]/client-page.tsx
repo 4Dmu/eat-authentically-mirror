@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useProducerPublic } from "@/utils/producers";
+import { useFullProducerPublic, useProducerPublic } from "@/utils/producers";
 import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { ClaimProducerCard } from "@/components/claim-producer-card";
 import {
@@ -41,20 +41,22 @@ import {
 import Image from "next/image";
 import { PendingReviewCard, ReviewCard } from "@/components/review-card";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { ProducerWithAll } from "@/backend/db/schema";
+import React from "react";
 
 export function ProducerPageClient(props: {
-  producer: PublicProducer;
+  producer: ProducerWithAll;
   subTier: SubTier;
   userProducerIds: string[];
 }) {
-  const { data: producer } = useProducerPublic(props.producer.id);
+  const { data: producer } = useFullProducerPublic(props.producer.id);
   const reviews = useReviewsPublic(props.producer.id);
   const pendingReviews = useReviewProducerPendingState();
 
   const hasAddress =
     producer &&
-    producer.address !== null &&
-    Object.entries(producer.address).some(
+    producer.location !== null &&
+    Object.entries(producer.location).some(
       (v) => v[1] !== null && v[1] !== undefined
     );
 
@@ -85,7 +87,7 @@ export function ProducerPageClient(props: {
 
   const claimProducerCard = (
     <>
-      {producer && !producer.claimed && (
+      {producer && producer.userId === null && (
         <ClaimProducerCard id={producer.id} name={producer.name} />
       )}
     </>
@@ -93,10 +95,10 @@ export function ProducerPageClient(props: {
 
   const mapCard = (
     <>
-      {producer && producer.address?.coordinate && (
+      {producer && producer.location && (
         <MapCard
-          mapUrl={producer.googleMapsUrl}
-          coordinate={producer.address.coordinate}
+          maps={producer.googleMapsPlaceDetails}
+          location={producer.location}
         />
       )}
     </>
@@ -138,18 +140,18 @@ export function ProducerPageClient(props: {
                 </a>
               </div>
             )}
-            {producer.contact?.website && (
+            {producer.contact?.websiteUrl && (
               <div className="flex flex-col gap-2">
                 <Label>
                   <GlobeIcon size={20} />
                   Website
                 </Label>
-                <a className="underline" href={producer.contact?.website}>
-                  {producer.contact?.website}
+                <a className="underline" href={producer.contact?.websiteUrl}>
+                  {producer.contact?.websiteUrl}
                 </a>
               </div>
             )}
-            {hasAddress && producer.address !== null && (
+            {hasAddress && producer.location !== null && (
               <div className="flex flex-col gap-2">
                 <Label>
                   <MapPin size={20} />
@@ -157,12 +159,15 @@ export function ProducerPageClient(props: {
                 </Label>
                 <div className="flex flex-col gap-2">
                   <div>
-                    {producer.address.street && `${producer.address.street}, `}
-                    {producer.address.city && `${producer.address.city}, `}
-                    {producer.address.state && `${producer.address.state}, `}
-                    {producer.address.zip && `${producer.address.zip}, `}
-                    {producer.address.country &&
-                      countryByAlpha3Code(producer.address.country).name}
+                    {producer.location.locality &&
+                      `${producer.location.locality}, `}
+                    {producer.location.city && `${producer.location.city}, `}
+                    {producer.location.adminArea &&
+                      `${producer.location.adminArea}, `}
+                    {producer.location.postcode &&
+                      `${producer.location.postcode}, `}
+                    {producer.location.country &&
+                      countryByAlpha3Code(producer.location.country)?.name}
                   </div>
                 </div>
               </div>
@@ -219,44 +224,39 @@ export function ProducerPageClient(props: {
               <Card
                 className={cn(
                   "overflow-hidden flex-1",
-                  producer.images.items.length > 0 && "pt-0"
+                  producer.media.length > 0 && "pt-0"
                 )}
               >
-                {producer.images.items.length > 0 && (
+                {producer.media.length > 0 && (
                   <Carousel>
                     <CarouselContent className="">
-                      {producer.images.items
-                        .toSorted((a, b) =>
-                          producer.images.primaryImgId === a.cloudflareId
-                            ? -1
-                            : producer.images.primaryImgId === b.cloudflareId
-                              ? 1
-                              : 0
-                        )
-                        .map((img) => (
-                          <CarouselItem key={img.cloudflareId}>
-                            <Image
-                              priority
-                              alt=""
-                              className="w-full h-full object-cover aspect-video"
-                              width={1920}
-                              height={1080}
-                              src={img.cloudflareUrl}
-                            />
-                          </CarouselItem>
-                        ))}
-                      {producer.video && producer.video.status === "ready" && (
-                        <CarouselItem>
-                          <Stream
-                            responsive={false}
-                            width="100%"
-                            height="100%"
-                            className="object-cover h-full w-full"
-                            controls
-                            src={producer.video.uid}
-                          />
-                        </CarouselItem>
-                      )}
+                      {producer.media.map((item) => (
+                        <React.Fragment key={item.assetId}>
+                          {item.role === "video" ? (
+                            <CarouselItem>
+                              <Stream
+                                responsive={false}
+                                width="100%"
+                                height="100%"
+                                className="object-cover h-full w-full"
+                                controls
+                                src={item.asset.cloudflareId ?? ""}
+                              />
+                            </CarouselItem>
+                          ) : (
+                            <CarouselItem>
+                              <Image
+                                priority
+                                alt=""
+                                className="w-full h-full object-cover aspect-video"
+                                width={1920}
+                                height={1080}
+                                src={item.asset.url}
+                              />
+                            </CarouselItem>
+                          )}
+                        </React.Fragment>
+                      ))}
                     </CarouselContent>
                     <CarouselNext />
                     <CarouselPrevious />

@@ -1,15 +1,15 @@
+import Link from "next/link";
 import { MessageProducerDialog } from "./message-producer-dialog";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { PublicProducer } from "@/backend/validators/producers";
-import Link from "next/link";
 import { ReviewProducerDialog } from "./review-producer-dialog";
+import { ProducerWithAll } from "@/backend/db/schema";
 
 export function CommunityBenefitsCard({
   producer,
   userProducerIds,
 }: {
-  producer: PublicProducer;
+  producer: ProducerWithAll;
   userProducerIds: string[];
 }) {
   const isUserListing = userProducerIds.includes(producer.id);
@@ -25,7 +25,7 @@ export function CommunityBenefitsCard({
         )}
       </CardHeader>
       <CardContent className="flex gap-3">
-        {producer.claimed && (
+        {producer.userId !== null && (
           <MessageProducerDialog disabled={isUserListing} producer={producer} />
         )}
         <ReviewProducerDialog disable={isUserListing} producer={producer} />

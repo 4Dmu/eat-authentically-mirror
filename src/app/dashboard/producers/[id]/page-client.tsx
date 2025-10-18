@@ -1,6 +1,6 @@
 "use client";
 
-import { Certification } from "@/backend/db/schema";
+import { CertificationSelect, ProducerWithAll } from "@/backend/db/schema";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Producer } from "@/backend/validators/producers";
 import { BackButton } from "@/components/back-button";
@@ -20,8 +20,8 @@ export function ProducersPageClient({
   tier,
   allCertifications,
 }: {
-  producer: Producer;
-  allCertifications: Certification[];
+  producer: ProducerWithAll;
+  allCertifications: CertificationSelect[];
   tier: SubTier;
 }) {
   return (

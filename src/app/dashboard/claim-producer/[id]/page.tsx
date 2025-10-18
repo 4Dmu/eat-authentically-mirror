@@ -31,11 +31,12 @@ export default async function Page(props: {
   }
 
   const producer = await db.query.producers.findFirst({
-    where: and(
-      eq(producers.id, params.id),
-      isNull(producers.userId),
-      eq(producers.claimed, false)
-    ),
+    where: and(eq(producers.id, params.id), isNull(producers.userId)),
+    with: {
+      location: true,
+      contact: true,
+      social: true,
+    },
   });
 
   if (!producer) {

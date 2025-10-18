@@ -1,4 +1,4 @@
-import { Pin, Pinboard } from "@/backend/db/schema";
+import { PinSelect, PinboardSelect } from "@/backend/db/schema";
 import {
   addToPinboard,
   deletePinList,
@@ -30,7 +30,7 @@ import {
 
 export function useUserPinboard(
   opts?: Omit<
-    UseQueryOptions<Pinboard, Error, Pinboard, readonly [string]>,
+    UseQueryOptions<PinboardSelect, Error, PinboardSelect, readonly [string]>,
     "queryKey" | "queryFn"
   >
 ) {
@@ -57,7 +57,12 @@ export function useUserPinboardFull(
 export function useUserProducerPin(
   producerId: string,
   opts?: Omit<
-    UseQueryOptions<Pin | null, Error, Pin | null, readonly [string, string]>,
+    UseQueryOptions<
+      PinSelect | null,
+      Error,
+      PinSelect | null,
+      readonly [string, string]
+    >,
     "queryKey" | "queryFn"
   >
 ) {

@@ -4,8 +4,6 @@ import {
   editProducerArgsValidator,
   getProducersArgsValidator,
   Producer,
-  producerImagesValidator,
-  listProducersArgsValidator,
   claimProducerArgs,
   checkClaimDomainDnsArgs,
   PublicClaimRequest,
@@ -13,20 +11,38 @@ import {
   verifyClaimPhoneArgs,
   regenerateClaimPhoneTokenArgs,
   suggestProducerArgs,
+  searchByGeoTextArgsValidator,
+  listProducersArgsValidator,
+  editProducerArgsValidatorV2,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
 import { db } from "../db";
 import {
-  certificationsToProducers,
   claimRequests,
+  mediaAssets,
+  PendingMediaAssetInsert,
+  pendingMediaAssets,
+  producerCards,
+  producerCertifications,
+  producerCommodities,
   ProducerInsert,
+  producerMedia,
   producers,
+  SuggestedProducerInsert,
   suggestedProducers,
-  Video,
 } from "../db/schema";
-import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
-import { withCertifications } from "../utils/transform-data";
+
+import {
+  and,
+  ne,
+  count,
+  eq,
+  inArray,
+  isNull,
+  notInArray,
+  sql,
+} from "drizzle-orm";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
@@ -42,11 +58,7 @@ import {
   videoRatelimit,
 } from "../lib/rate-limit";
 import { authenticatedActionClient } from "./helpers/middleware";
-import {
-  PublicProducerLight,
-  registerProducerArgsValidator,
-} from "../validators/producers";
-import { withCertificationsSingle } from "../utils/transform-data";
+import { registerProducerArgsValidator } from "../validators/producers";
 import isURL from "validator/es/lib/isURL";
 import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
@@ -54,7 +66,6 @@ import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
 import {
   CLAIM_DNS_TXT_RECORD_NAME,
-  PRODUCER_CERT_LIMIT_BY_TIER,
   PRODUCER_PRODUCTS_LIMIT_BY_TIER,
   RATELIMIT_ALL,
 } from "../constants";
@@ -86,21 +97,19 @@ export const registerProducer = authenticatedActionClient
 
     const producerProfileId = crypto.randomUUID();
 
+    let subscriptionRank = 0;
+    if (subTier !== "Free" && subTier.tier !== "community") {
+      subscriptionRank = subTier.rank;
+    }
+
     await db.insert(producers).values({
       id: producerProfileId,
       userId: userId,
       name: input.name,
       type: input.type,
-      claimed: true,
       verified: false,
       about: input.about,
-      commodities: [],
-      socialMedia: { twitter: null, facebook: null, instagram: null },
-      images: {
-        items: [],
-        primaryImgId: null,
-      },
-      subscriptionRank: 0,
+      subscriptionRank: subscriptionRank,
       createdAt: new Date(),
       updatedAt: new Date(),
     } satisfies ProducerInsert);
@@ -114,41 +123,48 @@ export const fetchUserProducer = producerActionClient
   .input(type("string"))
   .name("fetchUserProducer")
   .action(async ({ input, ctx: { producerIds, userId } }) => {
-    const result = await db.query.producers
-      .findFirst({
-        where: and(
-          eq(producers.id, input),
-          inArray(producers.id, producerIds),
-          eq(producers.userId, userId)
-        ),
-        with: {
-          certificationsToProducers: {
-            with: {
-              certification: true,
-            },
+    const result = await db.query.producers.findFirst({
+      where: and(
+        eq(producers.id, input),
+        inArray(producers.id, producerIds),
+        eq(producers.userId, userId)
+      ),
+      with: {
+        media: {
+          with: {
+            asset: true,
           },
         },
-      })
-      .then((r) => (r ? withCertificationsSingle(r) : r));
+        location: true,
+        commodities: true,
+        certifications: true,
+        chats: true,
+        labels: true,
+        hours: true,
+        contact: true,
+        social: true,
+        quality: true,
+        campaigns: true,
+        search: true,
+        reviews: true,
+        importedReviews: true,
+        ratingAgg: true,
+        pins: true,
+        scrapeMeta: true,
+        googleMapsPlaceDetails: true,
+      },
+    });
 
-    return result;
+    return result ?? null;
   });
 
 export const fetchUserProducers = authenticatedActionClient
   .name("fetchUserProducers")
   .action(async ({ userId }) => {
-    const result = await db.query.producers
-      .findMany({
-        where: and(eq(producers.userId, userId)),
-        with: {
-          certificationsToProducers: {
-            with: {
-              certification: true,
-            },
-          },
-        },
-      })
-      .then((r) => (r ? withCertifications(r) : r));
+    const result = await db
+      .select()
+      .from(producerCards)
+      .where(eq(producers.userId, userId));
 
     return result;
   });
@@ -157,54 +173,52 @@ export const fetchUserProducerLight = producerActionClient
   .input(type("string"))
   .name("fetchUserProducerLight")
   .action(async ({ input, ctx: { producerIds, userId } }) => {
-    const result = await db.query.producers
-      .findFirst({
-        where: and(
+    const result = await db
+      .select()
+      .from(producerCards)
+      .where(
+        and(
           eq(producers.id, input),
           inArray(producers.id, producerIds),
           eq(producers.userId, userId)
-        ),
-        with: {
-          certificationsToProducers: {
-            with: {
-              certification: true,
-            },
-          },
-        },
-      })
-      .then((r) => (r ? withCertificationsSingle(r) : r));
+        )
+      )
+      .limit(1)
+      .then((r) => r[0]);
 
-    return result satisfies PublicProducerLight | undefined;
+    return result ?? null;
   });
 
-export const listProducersPublic = actionClient
-  .input(listProducersArgsValidator)
-  .name("listProducersPublic")
-  .action(async ({ input }) => await listing.listProducersPublic(input));
-
-export const listProducersPublicLight = actionClient
-  .input(listProducersArgsValidator)
-  .name("listProducersPublicLight")
-  .action(async ({ input }) => await listing.listProducersPublicLight(input));
+export const searchByGeoText = actionClient
+  .input(searchByGeoTextArgsValidator)
+  .name("searchByGeoText")
+  .action(async ({ input }) => await listing.searchByGeoText(input));
 
 export const listCertificationTypesPublic = actionClient
   .name("listCertificationTypesPublic")
   .action(async () => await listing.listCertificationTypesPublic());
+
+export const listProducers = authenticatedActionClient
+  .input(listProducersArgsValidator)
+  .name("listProducers")
+  .action(async ({ input }) => await listing.listProducers(input));
 
 export const getProducerPublic = actionClient
   .input(getProducersArgsValidator)
   .name("getProducerPublic")
   .action(async ({ input }) => await listing.getProducerPublic(input));
 
+export const getFullProducerPublic = actionClient
+  .input(getProducersArgsValidator)
+  .name("getFullProducerPublic")
+  .action(async ({ input }) => await listing.getFullProducerPublic(input));
+
 export const editProducer = producerActionClient
-  .input(editProducerArgsValidator)
+  .input(editProducerArgsValidatorV2)
   .name("editProducer")
   .action(async ({ input, ctx: { userId } }) => {
     const producer = await db.query.producers.findFirst({
-      where: and(
-        eq(producers.id, input.producerId),
-        eq(producers.userId, userId)
-      ),
+      where: and(eq(producers.id, input.id), eq(producers.userId, userId)),
     });
 
     if (!producer) {
@@ -227,91 +241,79 @@ export const editProducer = producerActionClient
       toUpdate.about = input.about;
     }
 
-    if (input.address) {
-      toUpdate.address = normalizeAddress(input.address);
-    }
+    // if (input.address) {
+    //   toUpdate.address = normalizeAddress(input.address);
+    // }
 
-    if (input.contact) {
-      toUpdate.contact = input.contact;
-    }
+    // if (input.contact) {
+    //   toUpdate.contact = input.contact;
+    // }
 
-    if (input.socialMedia) {
-      toUpdate.socialMedia = input.socialMedia;
-    }
+    // if (input.socialMedia) {
+    //   toUpdate.socialMedia = input.socialMedia;
+    // }
 
-    if (input.certifications && input.certifications) {
-      const updatedCertifications = input.certifications;
-      const currentCertifications = await db.query.producers
-        .findFirst({
-          where: and(
-            eq(producers.id, input.producerId),
-            eq(producers.userId, userId)
-          ),
-          columns: {},
-          with: {
-            certificationsToProducers: {
-              columns: {},
-              with: {
-                certification: true,
-              },
-            },
-          },
-        })
-        .then((r) => withCertifications(r ? [r] : [])[0]?.certifications ?? []);
-      const tier = subTier == "Free" ? "Free" : subTier.tier;
-      const maxCerts = PRODUCER_CERT_LIMIT_BY_TIER[tier];
+    // if (input.certifications && input.certifications) {
+    //   await db
+    //     .delete(producerCertifications)
+    //     .where(
+    //       and(
+    //         eq(producerCertifications.producerId, producer.id),
+    //         notInArray(
+    //           producerCertifications.certificationId,
+    //           input.certifications
+    //         )
+    //       )
+    //     );
 
-      const addedCerts = updatedCertifications.filter(
-        (cert) =>
-          !currentCertifications.some((oldCert) => oldCert.id === cert.id)
-      );
-      const removedCerts = currentCertifications.filter(
-        (cert) => !updatedCertifications.some((c) => c.id === cert.id)
-      );
+    //   await db
+    //     .insert(producerCertifications)
+    //     .values(
+    //       input.certifications.map((id) => ({
+    //         producerId: producer.id,
+    //         certificationId: id,
+    //         addedAt: new Date(),
+    //       }))
+    //     )
+    //     .onConflictDoNothing();
+    // }
 
-      const projectedCount =
-        currentCertifications.length + addedCerts.length - removedCerts.length;
+    // if (input.commodities) {
+    //   await db
+    //     .delete(producerCommodities)
+    //     .where(
+    //       and(
+    //         eq(producerCommodities.producerId, producer.id),
+    //         notInArray(producerCommodities.commodityId, input.commodities)
+    //       )
+    //     );
 
-      if (projectedCount > maxCerts) {
-        throw new Error(
-          `Your current plan ("${tier}") allows only ${maxCerts} certifications.`
-        );
-      }
+    //   const tier = subTier == "Free" ? "Free" : subTier.tier;
+    //   const maxProducts = PRODUCER_PRODUCTS_LIMIT_BY_TIER[tier];
 
-      try {
-        if (addedCerts.length > 0) {
-          await db.insert(certificationsToProducers).values(
-            addedCerts.map((cert) => ({
-              listingId: producer.id,
-              certificationId: cert.id,
-            }))
-          );
-        }
-        if (removedCerts.length > 0) {
-          await db.delete(certificationsToProducers).where(
-            inArray(
-              certificationsToProducers.certificationId,
-              removedCerts.map((c) => c.id)
-            )
-          );
-        }
-      } catch (err) {
-        logger.error("Error updating and removing certs", { error: err });
-      }
-    }
+    //   const totalCommodaties = await db
+    //     .select({ count: count() })
+    //     .from(producerCommodities)
+    //     .where(eq(producerCommodities.producerId, producer.id))
+    //     .then((r) => r[0].count);
 
-    if (input.commodities) {
-      const tier = subTier == "Free" ? "Free" : subTier.tier;
-      const maxProducts = PRODUCER_PRODUCTS_LIMIT_BY_TIER[tier];
+    //   if (totalCommodaties + input.commodities.length > maxProducts) {
+    //     throw new Error(
+    //       `Your current plan ("${tier}") allows only ${maxProducts} products.`
+    //     );
+    //   }
 
-      if (input.commodities.length > maxProducts) {
-        throw new Error(
-          `Your current plan ("${tier}") allows only ${maxProducts} products.`
-        );
-      }
-
-      toUpdate.commodities = input.commodities;
-    }
+    //   await db
+    //     .insert(producerCommodities)
+    //     .values(
+    //       input.commodities.map((id) => ({
+    //         producerId: producer.id,
+    //         commodityId: id,
+    //         updatedAt: new Date(),
+    //       }))
+    //     )
+    //     .onConflictDoNothing();
+    // }
 
     if (Object.keys(toUpdate).length > 0) {
       await db
@@ -331,7 +333,6 @@ export const requestUploadUrls = producerActionClient
     type({
       producerId: "string",
       imageItemParams: type({
-        isPrimary: "boolean",
         type: "string",
         name: "string",
       })
@@ -346,8 +347,15 @@ export const requestUploadUrls = producerActionClient
       const producer = await db.query.producers.findFirst({
         columns: {
           id: true,
-          images: true,
-          pendingImages: true,
+        },
+        with: {
+          media: {
+            with: {
+              asset: {
+                columns: { contentType: true },
+              },
+            },
+          },
         },
         where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
       });
@@ -357,6 +365,12 @@ export const requestUploadUrls = producerActionClient
       }
 
       const tier = await getSubTier(userId);
+
+      const images = producer.media.filter(
+        (m) =>
+          m.asset.contentType === undefined ||
+          m.asset.contentType?.startsWith("image/")
+      );
 
       const maxFiles =
         tier === "Free"
@@ -369,14 +383,14 @@ export const requestUploadUrls = producerActionClient
                 ? 5
                 : 1;
 
-      const remainingFiles = maxFiles - producer.images.items.length;
+      const remainingFiles = maxFiles - images.length;
 
       if (imageItemParams.length > remainingFiles) {
         throw new Error("Number of files exceeds your plan");
       }
 
       const urls: { id: string; uploadURL: string }[] = [];
-      const pending: { id: string; isPrimary: boolean }[] = [];
+      const pending: PendingMediaAssetInsert[] = [];
 
       for (let i = 0; i < imageItemParams.length; i++) {
         const form = new FormData();
@@ -404,8 +418,11 @@ export const requestUploadUrls = producerActionClient
         if (uploadUrlGeneratorCloudflareResponseBody.success === true) {
           urls.push(uploadUrlGeneratorCloudflareResponseBody.result);
           pending.push({
-            id: uploadUrlGeneratorCloudflareResponseBody.result.id,
-            isPrimary: imageItemParams[i].isPrimary,
+            id: crypto.randomUUID(),
+            pendingAssetKey: uploadUrlGeneratorCloudflareResponseBody.result.id,
+            mode: "cloudflare-stream",
+            ownerUserId: userId,
+            createdAt: new Date(),
           });
         } else {
           console.error(uploadUrlGeneratorCloudflareResponseBody);
@@ -416,7 +433,6 @@ export const requestUploadUrls = producerActionClient
       await db
         .update(producers)
         .set({
-          pendingImages: pending,
           updatedAt: new Date(),
         })
         .where(eq(producers.id, producer.id));
@@ -438,8 +454,6 @@ export const requestVideoUploadUrl = producerActionClient
     const producer = await db.query.producers.findFirst({
       columns: {
         id: true,
-        pendingVideos: true,
-        video: true,
       },
       where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
     });
@@ -447,6 +461,13 @@ export const requestVideoUploadUrl = producerActionClient
     if (!producer) {
       throw new Error("Unauthorized");
     }
+
+    const pendingVideo = await db.query.pendingMediaAssets.findFirst({
+      where: and(
+        eq(pendingMediaAssets.ownerUserId, userId),
+        eq(pendingMediaAssets.mode, "cloudflare-stream")
+      ),
+    });
 
     const tier = await getSubTier(userId);
 
@@ -457,17 +478,14 @@ export const requestVideoUploadUrl = producerActionClient
       throw new Error("Must be premium to upload video");
     }
 
-    if (producer.video) {
-      await cloudflare.stream.delete(producer.video.uid, {
+    if (pendingVideo) {
+      await cloudflare.stream.delete(pendingVideo.pendingAssetKey, {
         account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
       });
+
       await db
-        .update(producers)
-        .set({
-          video: null,
-          updatedAt: new Date(),
-        })
-        .where(eq(producers.id, producer.id));
+        .delete(pendingMediaAssets)
+        .where(eq(pendingMediaAssets.id, pendingVideo.id));
     }
 
     const form = new FormData();
@@ -497,7 +515,6 @@ export const requestVideoUploadUrl = producerActionClient
             "*.eatauthentically.app",
           ],
           meta: {
-            producerId: userId,
             userId: userId,
           },
         }),
@@ -512,16 +529,13 @@ export const requestVideoUploadUrl = producerActionClient
         body: uploadUrlGeneratorCloudflareResponseBody,
       });
 
-      await db
-        .update(producers)
-        .set({
-          pendingVideos: [
-            ...(producer.pendingVideos ?? []),
-            uploadUrlGeneratorCloudflareResponseBody.result.uid,
-          ],
-          updatedAt: new Date(),
-        })
-        .where(eq(producers.id, producer.id));
+      await db.insert(pendingMediaAssets).values({
+        id: crypto.randomUUID(),
+        ownerUserId: userId,
+        pendingAssetKey: uploadUrlGeneratorCloudflareResponseBody.result.uid,
+        mode: "cloudflare-stream",
+        createdAt: new Date(),
+      });
 
       return uploadUrlGeneratorCloudflareResponseBody.result.uploadURL;
     } else {
@@ -539,8 +553,6 @@ export const confirmPengingUpload = producerActionClient
     const producer = await db.query.producers.findFirst({
       columns: {
         id: true,
-        images: true,
-        pendingImages: true,
       },
       where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
     });
@@ -549,12 +561,16 @@ export const confirmPengingUpload = producerActionClient
       throw new Error("Unauthorized");
     }
 
-    if (!producer.pendingImages || producer.pendingImages.length === 0) {
+    const pendingImages = await db.query.pendingMediaAssets.findMany({
+      where: and(
+        eq(pendingMediaAssets.ownerUserId, userId),
+        eq(pendingMediaAssets.mode, "cloudflare-image")
+      ),
+    });
+
+    if (!pendingImages || pendingImages.length === 0) {
       throw new Error("No uploads to confirm");
     }
-
-    const pending = [];
-    const images = producer.images;
 
     try {
       const imageListResponse = await fetch(
@@ -576,42 +592,50 @@ export const confirmPengingUpload = producerActionClient
         throw new Error("Error listing images");
       }
 
-      const pendingImagesThatExist = imagesListBody.result.images
-        .filter((ri) => producer.pendingImages?.some((pi) => pi.id === ri.id))
-        .map((i) => ({
-          image: i,
-          pendingData: producer.pendingImages?.find((f) => f.id === i.id),
-        }));
+      for (const pendingImage of pendingImages) {
+        const cloudflareImage = imagesListBody.result.images.find(
+          (img) => img.id === pendingImage.pendingAssetKey
+        );
 
-      for (const { image, pendingData } of pendingImagesThatExist) {
-        // const image = await cloudflare.images.v1.get(imageId, {
-        //   account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-        // });
-        if (Object.hasOwn(image, "draft")) {
-          pending.push(pendingData ?? { id: image.id, isPrimary: false });
+        if (!cloudflareImage) {
           continue;
         }
 
-        if (pendingData?.isPrimary === true) {
-          images.primaryImgId = pendingData.id;
-        }
+        const assetId = crypto.randomUUID();
 
-        images.items.push({
-          _type: "cloudflare",
-          cloudflareId: image.id,
-          cloudflareUrl: `https://imagedelivery.net/${env.SAFE_CLOUDFLARE_ACCOUNT_HASH}/${image.id}/public`,
-          alt: "",
-        });
-      }
-
-      await db
-        .update(producers)
-        .set({
-          images: images,
-          pendingImages: pending,
+        await db.insert(mediaAssets).values({
+          id: assetId,
+          uploadedByType: "user",
+          uploadedById: userId,
+          contentType: "image/*",
+          url: `https://imagedelivery.net/${env.SAFE_CLOUDFLARE_ACCOUNT_HASH}/${cloudflareImage.id}/public`,
+          cloudflareId: cloudflareImage.id,
+          storage: "cloudflare",
+          createdAt: new Date(),
           updatedAt: new Date(),
-        })
-        .where(eq(producers.id, producer.id));
+        });
+
+        const nextPosRow = await db.run(sql`
+          SELECT COALESCE(MAX(position)+1, 0) AS next_pos
+          FROM producer_media
+          WHERE producer_id = ${producerId} AND role = ${"gallery"}
+        `);
+        const nextPos = (nextPosRow.rows[0]?.next_pos ?? 0) as number;
+
+        await db.insert(producerMedia).values({
+          producerId: producer.id,
+          assetId: assetId,
+          role: "gallery",
+          addedByUserId: userId,
+          position: nextPos,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        await db
+          .delete(pendingMediaAssets)
+          .where(eq(pendingMediaAssets.id, pendingImage.id));
+      }
     } catch (err) {
       console.error(err);
       throw new Error("Error generating urls");
@@ -625,7 +649,6 @@ export const confirmPendingVideoUpload = producerActionClient
     const producer = await db.query.producers.findFirst({
       columns: {
         id: true,
-        pendingVideos: true,
       },
       where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
     });
@@ -634,53 +657,77 @@ export const confirmPendingVideoUpload = producerActionClient
       throw new Error("Unauthorized");
     }
 
-    if (!producer.pendingVideos || producer.pendingVideos.length === 0) {
+    const pendingVideos = await db.query.pendingMediaAssets.findMany({
+      where: and(
+        eq(pendingMediaAssets.ownerUserId, userId),
+        eq(pendingMediaAssets.mode, "cloudflare-stream")
+      ),
+    });
+
+    if (!pendingVideos || pendingVideos.length === 0) {
       throw new Error("No video uploads to confirm");
     }
 
     try {
-      const pending = [];
-      let videoData: Video | undefined = undefined;
-
       const videosPage = await cloudflare.stream.list({
         account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
         creator: userId,
       });
 
-      const pendingVideosThatExists = videosPage.result.filter((v) =>
-        producer.pendingVideos?.some((v2) => v.uid === v2)
-      );
+      for (const pendingVideo of pendingVideos) {
+        const cloudflareVideo = videosPage.result.find(
+          (vid) => vid.uid === pendingVideo.pendingAssetKey
+        );
 
-      for (const video of pendingVideosThatExists) {
-        logger.info("video of pendingVideosThatExists", { video: video });
         if (
-          !video.status ||
-          video.status.state === "error" ||
-          video.status.state === "pendingupload"
+          !cloudflareVideo ||
+          !cloudflareVideo.status ||
+          cloudflareVideo.status.state === "error" ||
+          cloudflareVideo.status.state === "pendingupload"
         ) {
-          pending.push(video.uid!);
           continue;
         }
 
-        videoData = {
-          uid: video.uid!,
-          status: video.status.state === "ready" ? "ready" : "pending",
-          url: `https://customer-a80gdw9axz7eg3xk.cloudflarestream.com/${video.uid!}/manifest/video.m3u8`,
-          _type: "cloudflare",
-        };
-      }
+        const assetId = crypto.randomUUID();
 
-      await db
-        .update(producers)
-        .set({
-          pendingVideos: pending,
-          video: videoData,
+        await db.insert(mediaAssets).values({
+          id: assetId,
+          uploadedByType: "user",
+          uploadedById: userId,
+          contentType: "video/*",
+          url: `https://customer-a80gdw9axz7eg3xk.cloudflarestream.com/${cloudflareVideo.uid!}/manifest/video.m3u8`,
+          cloudflareId: cloudflareVideo.uid,
+          videoStatus:
+            cloudflareVideo.status.state === "ready" ? "ready" : "pending",
+          storage: "cloudflare",
+          createdAt: new Date(),
           updatedAt: new Date(),
-        })
-        .where(eq(producers.id, producer.id));
+        });
+
+        const nextPosRow = await db.run(sql`
+          SELECT COALESCE(MAX(position)+1, 0) AS next_pos
+          FROM producer_media
+          WHERE producer_id = ${producerId} AND role = ${"video"}
+        `);
+        const nextPos = (nextPosRow.rows[0]?.next_pos ?? 0) as number;
+
+        await db.insert(producerMedia).values({
+          producerId: producer.id,
+          assetId: assetId,
+          role: "video",
+          addedByUserId: userId,
+          position: nextPos,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        await db
+          .delete(pendingMediaAssets)
+          .where(eq(pendingMediaAssets.id, pendingVideo.id));
+      }
     } catch (err) {
       console.error(err);
-      throw new Error("Error generating urls");
+      throw new Error("Error confirming upload");
     }
   });
 
@@ -691,37 +738,6 @@ export const deleteVideo = producerActionClient
     const producer = await db.query.producers.findFirst({
       columns: {
         id: true,
-        video: true,
-      },
-      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
-    });
-
-    if (!producer || !producer.video) {
-      throw new Error("Unauthorized");
-    }
-
-    await cloudflare.stream.delete(producer.video.uid, {
-      account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-    });
-
-    await db
-      .update(producers)
-      .set({
-        video: null,
-        updatedAt: new Date(),
-      })
-      .where(eq(producers.id, producer.id));
-  });
-
-export const updateExistingImages = producerActionClient
-  .input(type({ producerId: "string", data: producerImagesValidator }))
-  .name("updateExistingImages")
-  .action(async ({ ctx: { userId }, input: { producerId, data } }) => {
-    const producer = await db.query.producers.findFirst({
-      columns: {
-        id: true,
-        images: true,
-        pendingImages: true,
       },
       where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
     });
@@ -730,38 +746,72 @@ export const updateExistingImages = producerActionClient
       throw new Error("Unauthorized");
     }
 
-    const imagesToKeep = producer.images.items.filter((i) =>
-      data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
-    );
+    const video = await db.query.producerMedia.findFirst({
+      where: and(
+        eq(producerMedia.producerId, producerId),
+        eq(producerMedia.role, "video")
+      ),
+      with: { asset: true },
+    });
 
-    const imagesToDelete = producer.images.items.filter(
-      (i) => !data.items.some((i2) => i.cloudflareId === i2.cloudflareId)
-    );
+    if (!video || video.asset.cloudflareId == null) {
+      throw new Error("Video not found");
+    }
 
-    await db
-      .update(producers)
-      .set({
-        images: {
-          items: imagesToKeep,
-          primaryImgId:
-            data.primaryImgId ??
-            imagesToKeep.find(
-              (i) => i.cloudflareId === producer.images.primaryImgId
-            )?.cloudflareId ??
-            null,
+    await cloudflare.stream.delete(video.asset.cloudflareId, {
+      account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+    });
+
+    await db.delete(mediaAssets).where(eq(mediaAssets.id, producer.id));
+  });
+
+export const updateExistingImages = producerActionClient
+  .input(type({ producerId: "string", data: type.string.array() }))
+  .name("updateExistingImages")
+  .action(async ({ ctx: { userId }, input: { producerId, data } }) => {
+    const producer = await db.query.producers.findFirst({
+      columns: {
+        id: true,
+      },
+      where: and(eq(producers.id, producerId), eq(producers.userId, userId)),
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    const imagesToDelete = await db.query.producerMedia.findMany({
+      where: and(
+        eq(producerMedia.producerId, producer.id),
+        ne(producerMedia.role, "video"),
+        notInArray(producerMedia.assetId, data)
+      ),
+      columns: {},
+      with: {
+        asset: {
+          columns: {
+            id: true,
+            cloudflareId: true,
+          },
         },
-        updatedAt: new Date(),
-      })
-      .where(eq(producers.id, producer.id));
+      },
+    });
 
     for (const image of imagesToDelete) {
+      if (!image.asset.cloudflareId) {
+        continue;
+      }
+
       logger.info(
-        `action [updateExistingImages] - Deleting image (${image.cloudflareId}) - run by user(${userId})`
+        `action [updateExistingImages] - Deleting image (${image.asset.cloudflareId}) - run by user(${userId})`
       );
 
-      const response = await cloudflare.images.v1.delete(image.cloudflareId, {
-        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-      });
+      const response = await cloudflare.images.v1.delete(
+        image.asset.cloudflareId,
+        {
+          account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+        }
+      );
 
       logger.info(
         `action [updateExistingImages] - Cloudflare delete image response`,
@@ -806,11 +856,11 @@ export const claimProducer = authenticatedActionClient
       }
 
       const producer = await db.query.producers.findFirst({
-        where: and(
-          eq(producers.id, producerId),
-          isNull(producers.userId),
-          eq(producers.claimed, false)
-        ),
+        where: and(eq(producers.id, producerId), isNull(producers.userId)),
+        with: {
+          contact: true,
+          social: true,
+        },
       });
 
       if (!producer) {
@@ -868,7 +918,7 @@ export const claimProducer = authenticatedActionClient
           break;
         case "domain-dns":
         case "domain-email-link": {
-          const website = producer.contact?.website;
+          const website = producer.contact?.websiteUrl;
           if (!website) {
             throw new Error(
               "Method invalid: Missing or invalid contact website"
@@ -982,14 +1032,14 @@ export const claimProducer = authenticatedActionClient
         case "social-post": {
           const profiles: string[] = [];
 
-          if (producer.socialMedia.facebook) {
-            profiles.push(producer.socialMedia.facebook);
+          if (producer.social?.facebook) {
+            profiles.push(producer.social.facebook);
           }
-          if (producer.socialMedia.instagram) {
-            profiles.push(producer.socialMedia.instagram);
+          if (producer.social?.instagram) {
+            profiles.push(producer.social.instagram);
           }
-          if (producer.socialMedia.twitter) {
-            profiles.push(producer.socialMedia.twitter);
+          if (producer.social?.twitter) {
+            profiles.push(producer.social.twitter);
           }
 
           if (
@@ -1261,40 +1311,45 @@ export const deleteProducer = producerActionClient
       `[deleteProducer] Starting deletion proccess - userId: ${userId} producerId: ${producer.id}`
     );
 
-    if (producer.video) {
-      const videDelRes = await cloudflare.stream.delete(producer.video.uid, {
-        account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-      });
-      logger.info(`[deleteProducer] deleting video`, {
-        deleteResponse: videDelRes,
-      });
-    }
-
-    for (const image of producer.images.items) {
-      const imageDelRes = await cloudflare.images.v1.delete(
-        image.cloudflareId,
-        {
-          account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-        }
-      );
-      logger.info(`[deleteProducer] deleting image`, {
-        imageResponse: imageDelRes,
-      });
-    }
-
-    const delTxRes = await db.transaction(async (tx) => {
-      await tx
-        .delete(certificationsToProducers)
-        .where(eq(certificationsToProducers.listingId, producer.id));
-
-      await tx
-        .delete(claimRequests)
-        .where(eq(claimRequests.producerId, producer.id));
-
-      await USER_PRODUCER_IDS_KV.pop(userId, producer.id);
-
-      return await tx.delete(producers).where(eq(producers.id, producer.id));
+    const media = await db.query.producerMedia.findMany({
+      where: eq(producerMedia.producerId, producer.id),
+      with: {
+        asset: true,
+      },
     });
+
+    for (const item of media) {
+      if (item.asset.storage === "cloudflare" && item.asset.cloudflareId) {
+        if (item.asset.contentType?.startsWith("video/")) {
+          const videDelRes = await cloudflare.stream.delete(
+            item.asset.cloudflareId,
+            {
+              account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+            }
+          );
+          logger.info(`[deleteProducer] deleting video`, {
+            deleteResponse: videDelRes,
+          });
+        } else {
+          const imageDelRes = await cloudflare.images.v1.delete(
+            item.asset.cloudflareId,
+            {
+              account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
+            }
+          );
+          logger.info(`[deleteProducer] deleting image`, {
+            imageResponse: imageDelRes,
+          });
+        }
+      }
+      await db.delete(mediaAssets).where(eq(mediaAssets.id, item.asset.id));
+    }
+
+    const delTxRes = await db
+      .delete(producers)
+      .where(eq(producers.id, producer.id));
+
+    await USER_PRODUCER_IDS_KV.pop(userId, producer.id);
 
     logger.info(`[deleteProducer] deletion successfull`, {
       deleteProducerTxResponse: delTxRes,
@@ -1351,6 +1406,7 @@ export const suggestProducer = authenticatedActionClient
 
     await db.insert(suggestedProducers).values({
       id: crypto.randomUUID(),
+      suggesterUserId: userId,
       name: input.name,
       type: input.type,
       address: {
@@ -1368,5 +1424,5 @@ export const suggestProducer = authenticatedActionClient
       phone: input.phone,
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+    } satisfies SuggestedProducerInsert);
   });

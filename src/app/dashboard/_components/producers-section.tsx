@@ -1,4 +1,5 @@
 "use client";
+import { ProducerCardsRow, ProducerSelect } from "@/backend/db/schema";
 import { Producer } from "@/backend/validators/producers";
 import { AddProducerDialog } from "@/components/add-producer-dialog";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
@@ -26,7 +27,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export function ProducersSection({ producers }: { producers: Producer[] }) {
+export function ProducersSection({
+  producers,
+}: {
+  producers: ProducerCardsRow[];
+}) {
   const [producerDialogOpen, setProducerDialogOpen] = useState(false);
   const searchparams = useSearchParams();
   const router = useRouter();
@@ -76,7 +81,7 @@ export function ProducersSection({ producers }: { producers: Producer[] }) {
           {data?.map((p) => (
             <Card key={p.id} className="rounded-lg overflow-hidden pt-0 gap-0">
               <Image
-                src={primaryImageUrl(p)}
+                src={p.thumbnailUrl}
                 alt=""
                 className="w-full object-cover aspect-video"
                 width={600}

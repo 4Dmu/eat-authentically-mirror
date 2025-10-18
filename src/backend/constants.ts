@@ -58,3 +58,5 @@ export const PRODUCER_PRODUCTS_LIMIT_BY_TIER: Record<
 };
 
 export const RATELIMIT_ALL = "*" as const;
+
+export const PRODUCER_TYPES = ["farm", "ranch", "eatery"] as const;

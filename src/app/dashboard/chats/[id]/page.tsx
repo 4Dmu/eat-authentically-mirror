@@ -85,7 +85,7 @@ export default async function ChatPage({
                       { initiatorUserName: P.nonNullable },
                       (v) => v.initiatorUserName
                     )
-                    .otherwise((c) => c.producer.name)}
+                    .otherwise((c) => c.producerName)}
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>

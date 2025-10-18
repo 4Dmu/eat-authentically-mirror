@@ -1,4 +1,3 @@
-import { PublicProducer } from "@/backend/validators/producers";
 import {
   Dialog,
   DialogClose,
@@ -18,9 +17,10 @@ import { Star } from "lucide-react";
 import { Stars } from "@/backend/validators/reviews";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
+import { ProducerWithAll } from "@/backend/db/schema";
 
 export type ReviewProducerDialogProps = {
-  producer: PublicProducer;
+  producer: ProducerWithAll;
   disable: boolean;
 };
 
