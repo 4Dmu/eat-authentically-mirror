@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3a22db8b-5f98-4152-9fb0-f24e13f338a0",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "ad0240c8-ad98-474d-b646-e747f0f82e3a",
+  "prevId": "beb91b8d-e0be-4c67-8d23-b03622d12ea6",
   "tables": {
     "certifications": {
       "name": "certifications",
@@ -68,6 +68,180 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "claim_invitations": {
+      "name": "claim_invitations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "producer_id": {
+          "name": "producer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claim_token": {
+          "name": "claim_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claimer_email": {
+          "name": "claimer_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claimed_at": {
+          "name": "claimed_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "claim_invitations_producer_id_producers_id_fk": {
+          "name": "claim_invitations_producer_id_producers_id_fk",
+          "tableFrom": "claim_invitations",
+          "tableTo": "producers",
+          "columnsFrom": [
+            "producer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "claim_requests": {
+      "name": "claim_requests",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "producer_id": {
+          "name": "producer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "requested_verification": {
+          "name": "requested_verification",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claim_token": {
+          "name": "claim_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claimed_at": {
+          "name": "claimed_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "claim_requests_producer_id_producers_id_fk": {
+          "name": "claim_requests_producer_id_producers_id_fk",
+          "tableFrom": "claim_requests",
+          "tableTo": "producers",
+          "columnsFrom": [
+            "producer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -253,6 +427,44 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "external_api_keys": {
+      "name": "external_api_keys",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "api_key": {
+          "name": "api_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rolled_at": {
+          "name": "rolled_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "labels": {
       "name": "labels",
       "columns": {
@@ -394,6 +606,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "videoStatus": {
+          "name": "videoStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "alt": {
           "name": "alt",
           "type": "text",
@@ -469,6 +688,152 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "outreach_data": {
+      "name": "outreach_data",
+      "columns": {
+        "producer_id": {
+          "name": "producer_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_message_id": {
+          "name": "provider_message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "outreach_data_producer_id_producers_id_fk": {
+          "name": "outreach_data_producer_id_producers_id_fk",
+          "tableFrom": "outreach_data",
+          "tableTo": "producers",
+          "columnsFrom": [
+            "producer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "outreach_event": {
+      "name": "outreach_event",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "producer_id": {
+          "name": "producer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "recipient": {
+          "name": "recipient",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_message_id": {
+          "name": "provider_message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "meta": {
+          "name": "meta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "outreach_event_producer_id_producers_id_fk": {
+          "name": "outreach_event_producer_id_producers_id_fk",
+          "tableFrom": "outreach_event",
+          "tableTo": "producers",
+          "columnsFrom": [
+            "producer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1125,6 +1490,74 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "pre_launch_producer_waitlist": {
+      "name": "pre_launch_producer_waitlist",
+      "columns": {
+        "producer_id": {
+          "name": "producer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "pre_launch_producer_waitlist_producer_id_unique": {
+          "name": "pre_launch_producer_waitlist_producer_id_unique",
+          "columns": [
+            "producer_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "pre_launch_producer_waitlist_producer_id_producers_id_fk": {
+          "name": "pre_launch_producer_waitlist_producer_id_producers_id_fk",
+          "tableFrom": "pre_launch_producer_waitlist",
+          "tableTo": "producers",
+          "columnsFrom": [
+            "producer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pre_launch_producer_waitlist_producer_id_user_id_pk": {
+          "columns": [
+            "producer_id",
+            "user_id"
+          ],
+          "name": "pre_launch_producer_waitlist_producer_id_user_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "producer_certifications": {
       "name": "producer_certifications",
       "columns": {
@@ -1188,6 +1621,162 @@
           "name": "producer_certifications_producer_id_certification_id_pk"
         }
       },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "producer_chat_messages": {
+      "name": "producer_chat_messages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chat_id": {
+          "name": "chat_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sender_user_id": {
+          "name": "sender_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "producer_chat_messages_chat_id_producer_chats_id_fk": {
+          "name": "producer_chat_messages_chat_id_producer_chats_id_fk",
+          "tableFrom": "producer_chat_messages",
+          "tableTo": "producer_chats",
+          "columnsFrom": [
+            "chat_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "producer_chats": {
+      "name": "producer_chats",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "producer_id": {
+          "name": "producer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "producer_user_id": {
+          "name": "producer_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "initiator_user_id": {
+          "name": "initiator_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "initiator_prevented_more_messages_at": {
+          "name": "initiator_prevented_more_messages_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "producer_prevented_more_messages_at": {
+          "name": "producer_prevented_more_messages_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "producer_chats_initiator_user_id_producer_id_producer_user_id_unique": {
+          "name": "producer_chats_initiator_user_id_producer_id_producer_user_id_unique",
+          "columns": [
+            "initiator_user_id",
+            "producer_id",
+            "producer_user_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "producer_chats_producer_id_producers_id_fk": {
+          "name": "producer_chats_producer_id_producers_id_fk",
+          "tableFrom": "producer_chats",
+          "tableTo": "producers",
+          "columnsFrom": [
+            "producer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
@@ -2718,6 +3307,79 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
+    },
+    "suggested_producers": {
+      "name": "suggested_producers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "suggester_user_id": {
+          "name": "suggester_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "views": {
@@ -2793,6 +3455,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "about": {
+          "name": "about",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "search_labels": {
           "name": "search_labels",
           "type": "text",
@@ -2803,7 +3472,7 @@
       },
       "name": "v_producer_cards",
       "isExisting": false,
-      "definition": "select \"producers\".\"id\", \"producers\".\"name\", \"producers\".\"type\", \"producers\".\"verified\", \"producers\".\"subscription_rank\", \"producer_location\".\"latitude\", \"producer_location\".\"longitude\", \"producer_location\".\"locality\", \"producer_location\".\"admin_area\", \"producer_location\".\"country\", (\n        SELECT COALESCE(\n          json_extract(\"media_assets\".\"variants\", '$.cover'),\n          \"media_assets\".\"url\"\n        )\n        FROM \"media_assets\"\n        WHERE \"media_assets\".\"id\" = (\n          SELECT \"producer_media\".\"asset_id\"\n          FROM \"producer_media\"\n          WHERE \"producer_media\".\"producer_id\" = \"producers\".\"id\"\n          ORDER BY (\"producer_media\".\"role\" = 'cover') DESC, \"producer_media\".\"position\" ASC\n          LIMIT 1\n        )\n      ) as \"thumbnailUrl\", \"producers_search\".\"search_labels\" from \"producers\" left join \"producer_location\" on \"producer_location\".\"producer_id\" = \"producers\".\"id\" left join \"producers_search\" on \"producers_search\".\"producer_id\" = \"producers\".\"id\""
+      "definition": "select \"producers\".\"id\", \"producers\".\"name\", \"producers\".\"type\", \"producers\".\"verified\", CASE WHEN \"producers\".\"user_id\" IS NOT NULL THEN 1 ELSE 0 END as \"isClaimed\", \"producers\".\"subscription_rank\", \"producer_location\".\"latitude\", \"producer_location\".\"longitude\", \"producer_location\".\"locality\", \"producer_location\".\"admin_area\", \"producer_location\".\"country\", \"producers\".\"about\", (\n        SELECT COALESCE(\n          json_extract(\"media_assets\".\"variants\", '$.cover'),\n          \"media_assets\".\"url\"\n        )\n        FROM \"media_assets\"\n        WHERE \"media_assets\".\"id\" = (\n          SELECT \"producer_media\".\"asset_id\"\n          FROM \"producer_media\"\n          WHERE \"producer_media\".\"producer_id\" = \"producers\".\"id\"\n          ORDER BY (\"producer_media\".\"role\" = 'cover') DESC, \"producer_media\".\"position\" ASC\n          LIMIT 1\n        )\n      ) as \"thumbnailUrl\", \"producers_search\".\"search_labels\" from \"producers\" left join \"producer_location\" on \"producer_location\".\"producer_id\" = \"producers\".\"id\" left join \"producers_search\" on \"producers_search\".\"producer_id\" = \"producers\".\"id\""
     },
     "v_producer_rating_scores": {
       "columns": {

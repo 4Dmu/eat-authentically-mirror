@@ -1,5 +1,6 @@
 import type {
   GetProducerArgs,
+  ProducerTypes,
   SearchByGeoTextArgs,
 } from "@/backend/validators/producers";
 import { db } from "../db";
@@ -195,6 +196,7 @@ export async function searchByGeoText({
             p.name,
             p.type,
             p.verified,
+            p.user_id,
             p.subscription_rank,
             l.latitude,
             l.longitude,
@@ -272,6 +274,7 @@ export async function searchByGeoText({
             p.name,
             p.type,
             p.verified,
+            p.user_id,
             p.subscription_rank,
             l.latitude,
             l.longitude,
@@ -358,6 +361,7 @@ export async function searchByGeoText({
           g.id,
           g.name,
           g.type,
+          g.user_id,
           g.verified,
           g.subscription_rank,
           g.latitude,
@@ -459,7 +463,8 @@ export async function searchByGeoText({
     items: items.map((item) => ({
       id: item["id"] as string,
       name: item["name"] as string,
-      type: item["type"] as string,
+      type: item["type"] as ProducerTypes,
+      isClaimed: item["user_id"] !== null,
       verified: Boolean(item["verified"]),
       latitude: item["latitude"] as number,
       longitude: item["longitude"] as number,
@@ -470,7 +475,7 @@ export async function searchByGeoText({
       prod_rel: item["prod_rel"] as number,
       review_rel: item["review_rel"] as number,
       avg_rating: item["avg_rating"] as number | null,
-      cover_url: item["cover_url"] as string | null,
+      thumbnailUrl: item["cover_url"] as string | null,
       certifications_csv: item["certifications_csv"] as string | null,
       commodities_csv: item["commodities_csv"] as string | null,
       commodity_variants_csv: item["commodity_variants_csv"] as string | null,
@@ -484,6 +489,38 @@ export async function searchByGeoText({
     maxDistance: maxDistance.maxDistanceKm,
   };
 }
+
+export type ProducerSearchResultRow = {
+  id: string;
+  name: string;
+  type: ProducerTypes;
+  isClaimed: boolean;
+  verified: boolean;
+  latitude: number;
+  longitude: number;
+  locality: string | null;
+  admin_area: string | null;
+  country: string | null;
+  distance_km: number;
+  prod_rel: number;
+  review_rel: number;
+  avg_rating: number | null;
+  thumbnailUrl: string | null;
+  certifications_csv: string | null;
+  commodities_csv: string | null;
+  commodity_variants_csv: string | null;
+  search_labels: string | null;
+};
+
+export type ProducerSearchResult = {
+  items: ProducerSearchResultRow[];
+  count: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+  nextOffset: number | null;
+  maxDistance: number | null;
+};
 
 export async function getProducerPublic(args: GetProducerArgs) {
   try {

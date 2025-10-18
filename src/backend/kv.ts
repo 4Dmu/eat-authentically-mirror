@@ -1,6 +1,7 @@
 import type { UserJSON } from "@clerk/backend";
 import { redis } from "./lib/redis";
 import { SubscriptionJSON } from "./stripe/stripe-sync";
+import { NominationPlace } from "./validators/nomination-api";
 
 export const USER_DATA_KV = {
   generateKey(userId: string) {
@@ -272,5 +273,17 @@ export const STRIPE_CUSTOMER_SUBSCRIPTIONS_KV = {
   },
   async set(stripeCustomerId: string, subscriptions: SubscriptionJSON[]) {
     await redis.set(this.generateKey(stripeCustomerId), subscriptions);
+  },
+};
+
+export const NominatimGeocodeResponseCache = {
+  generateKey(query: string) {
+    return `nominatim:geocode-response:${query}`;
+  },
+  async set(query: string, response: NominationPlace) {
+    return await redis.set(this.generateKey(query), response);
+  },
+  async get(query: string) {
+    return await redis.get<NominationPlace>(this.generateKey(query));
   },
 };

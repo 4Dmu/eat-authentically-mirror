@@ -51,10 +51,11 @@ const slides = [
 
 function SearchBox({ title }: { title: string }) {
   const { setQuery, query } = useHomePageStore();
+  const [value, setValue] = useState(query ?? "");
   const setShowFilterMenu = useSetAtom(showFilterMenuAtom);
 
   function updateQuery(e: ChangeEvent<HTMLInputElement>) {
-    setQuery(e.currentTarget.value == "" ? undefined : e.currentTarget.value);
+    setValue(e.currentTarget.value);
   }
 
   function handleSubmit(e: KeyboardEvent<HTMLInputElement>) {
@@ -73,18 +74,24 @@ function SearchBox({ title }: { title: string }) {
           <CompassIcon className="absolute text-muted-foreground top-1/2 -translate-y-1/2 left-5" />
           <Input
             onKeyDown={handleSubmit}
-            value={query ?? ""}
+            value={value}
             onChange={updateQuery}
-            className="bg-white p-10 pr-20 rounded-full text-base md:text-2xl pl-13 focus-visible:border-black focus-visible:ring-black"
+            className="bg-white p-10 py-8 pr-20 rounded-full text-base md:text-2xl pl-13 focus-visible:border-black focus-visible:ring-black"
             placeholder="Search farms, ranches, eatieries..."
           />
           <Button
+            onClick={() => setQuery(value)}
+            className="absolute rounded-full top-1/2 -translate-y-1/2 right-0 p-0 h-full px-5"
+          >
+            Search
+          </Button>
+          {/* <Button
             onClick={() => setShowFilterMenu(true)}
             size={"icon"}
             className="absolute rounded-full top-1/2 -translate-y-1/2 right-5 p-0"
           >
             <MapPin />
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

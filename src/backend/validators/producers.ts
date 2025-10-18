@@ -334,7 +334,7 @@ export const searchByGeoTextArgsValidator = type({
   "countryHint?": "string",
   "stateProvinceHint?": "string",
   "filters?": type({
-    category: type.enumerated(PRODUCER_TYPES).optional(),
+    category: type.enumerated(...PRODUCER_TYPES).optional(),
     commodities: type.string.atLeastLength(1).array().optional(),
     variants: type.string.atLeastLength(1).array().optional(),
     certifications: type.string.atLeastLength(1).array().optional(),
@@ -401,6 +401,12 @@ export const editProducerArgsValidatorV2 = type({
   "type?": producerInsertValidator.get("type"),
   "about?": producerInsertValidator.get("about"),
   "summary?": producerInsertValidator.get("summary"),
+});
+
+export const searchProducersArgsValidator = type({
+  "query?": "string|undefined",
+  limit: "number",
+  offset: "number",
 });
 
 export const editProducerFormValidatorV2 =
@@ -558,3 +564,5 @@ export type DeleteProducerArgs = typeof deleteProducerArgs.infer;
 export type IpGeoValidator = typeof ipGeoValidator.infer;
 
 export type SuggestProducerArgs = typeof suggestProducerArgs.infer;
+
+export type SearchProducersArgs = typeof searchProducersArgsValidator.infer;

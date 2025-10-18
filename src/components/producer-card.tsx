@@ -7,6 +7,7 @@ import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { ProducerCardsRow, ProducerWith } from "@/backend/db/schema";
+import { ProducerSearchResultRow } from "@/backend/data/producer";
 
 export function ProducerCard({
   producer,

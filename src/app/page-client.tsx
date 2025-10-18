@@ -11,6 +11,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { PublicProducerLight } from "@/backend/validators/producers";
 import type { Geo } from "@vercel/functions";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
+import { useSearchProducers } from "@/utils/producers";
 
 export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   const {
@@ -23,21 +24,13 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     useIpGeo,
   } = useHomePageStore();
 
-  // const debouncedQuery = useDebounce(query, 500);
+  const debouncedQuery = useDebounce(query, 500);
 
-  // const { data, isPlaceholderData } = useProducers(
-  //   {
-  //     type: typeFilter,
-  //     page: page,
-  //     certs: certs.map((cert) => cert.id),
-  //     locationSearchArea: locationSearchArea
-  //       ? locationSearchArea.toJSON()
-  //       : undefined,
-  //     query: debouncedQuery,
-  //     userIpGeo: useIpGeo ? userIpGeo : undefined,
-  //   },
-  //   initialProducersFromServer
-  // );
+  const { data, isPlaceholderData } = useSearchProducers({
+    limit: HOME_PAGE_RESULT_LIMIT,
+    offset: page * HOME_PAGE_RESULT_LIMIT,
+    query: debouncedQuery,
+  });
 
   return (
     <div className="flex flex-col gap-10  bg-gray-50">
@@ -83,7 +76,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
             >
               <ArrowLeft />
             </Button>
-            {/* <Badge variant={"brandBrown"}>
+            <Badge variant={"brandBrown"}>
               Page {page + 1} of{" "}
               {Math.ceil((data?.count ?? 1) / HOME_PAGE_RESULT_LIMIT)}
             </Badge>
@@ -91,23 +84,23 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
               variant={"brandBrown"}
               size={"icon"}
               onClick={() => {
-                if (!isPlaceholderData && data?.hasNextPage) {
+                if (!isPlaceholderData && data?.hasMore) {
                   setPage((old) => old + 1);
                 }
               }}
               // Disable the Next Page button until we know a next page is available
-              disabled={isPlaceholderData || !data?.hasNextPage}
+              disabled={isPlaceholderData || !data?.hasMore}
             >
               <ArrowRight />
-            </Button> */}
+            </Button>
           </div>
-          {/*
-           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {data?.data.map((producer) => (
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {data?.items.map((producer) => (
               <ProducerCard key={producer.id} producer={producer} />
             ))}
           </div>
-         */}
+
           <div>
             <Button onClick={() => window.scrollTo({ top: 0 })}>
               <ArrowUp /> Back to top

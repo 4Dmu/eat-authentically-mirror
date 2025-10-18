@@ -26,6 +26,8 @@ import {
   suggestProducer,
   listProducers,
   getFullProducerPublic,
+  searchProducers,
+  searchByGeoText,
 } from "@/backend/rpc/producers";
 import {
   Producer,
@@ -39,6 +41,8 @@ import {
   SuggestProducerArgs,
   ListProducersArgs,
   EditProducerArgsV2,
+  SearchProducersArgs,
+  SearchByGeoTextArgs,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
@@ -47,6 +51,7 @@ import {
   ProducerWith,
   ProducerWithAll,
 } from "@/backend/db/schema";
+import type { ProducerSearchResult } from "@/backend/data/producer";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -65,13 +70,14 @@ export function primaryImageUrl(
     | Pick<ProducerWith<"media">, "media" | "type">
     | Pick<ProducerCardsRow, "thumbnailUrl" | "type">
 ) {
-  const url: string | undefined =
+  console.log(producer);
+  const url: string | undefined | null =
     "thumbnailUrl" in producer
       ? producer.thumbnailUrl
-      : (producer.media.find((p) => p.role === "cover")?.asset.url ??
-        producer.media[0]?.asset.url);
+      : (producer.media?.find((p) => p.role === "cover")?.asset.url ??
+        producer.media?.[0]?.asset.url);
 
-  if (url !== undefined) {
+  if (url) {
     return url;
   }
 
@@ -129,6 +135,45 @@ export function useProducerPublic(
       const producer = await getProducerPublic({ id: producerId });
       if (!producer) throw new Error("Producer not found");
       return producer;
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useSearchProducers(
+  params: SearchProducersArgs,
+  opts?: UseQueryOptions<
+    ProducerSearchResult,
+    Error,
+    ProducerSearchResult,
+    readonly [string, SearchProducersArgs]
+  >
+) {
+  return useQuery({
+    ...opts,
+    queryKey: ["search-producers", params] as const,
+    queryFn: async () => {
+      return await searchProducers(params);
+    },
+    enabled: params.query !== undefined,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useSearchByGeoText(
+  params: SearchByGeoTextArgs,
+  opts?: UseQueryOptions<
+    ProducerSearchResult,
+    Error,
+    ProducerSearchResult,
+    readonly [string, SearchProducersArgs]
+  >
+) {
+  return useQuery({
+    ...opts,
+    queryKey: ["search-producer-by-geo-text", params] as const,
+    queryFn: async () => {
+      return await searchByGeoText(params);
     },
     placeholderData: keepPreviousData,
   });

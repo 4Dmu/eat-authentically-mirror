@@ -81,7 +81,7 @@ export function ProducersSection({
           {data?.map((p) => (
             <Card key={p.id} className="rounded-lg overflow-hidden pt-0 gap-0">
               <Image
-                src={p.thumbnailUrl}
+                src={p.thumbnailUrl ?? ""}
                 alt=""
                 className="w-full object-cover aspect-video"
                 width={600}

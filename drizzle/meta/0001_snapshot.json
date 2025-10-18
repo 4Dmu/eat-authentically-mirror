@@ -1,8 +1,8 @@
 {
+  "id": "beb91b8d-e0be-4c67-8d23-b03622d12ea6",
+  "prevId": "3a22db8b-5f98-4152-9fb0-f24e13f338a0",
   "version": "6",
   "dialect": "sqlite",
-  "id": "3a22db8b-5f98-4152-9fb0-f24e13f338a0",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "certifications": {
       "name": "certifications",
@@ -164,28 +164,28 @@
         "commodity_aliases_target_commodity_id_commodities_id_fk": {
           "name": "commodity_aliases_target_commodity_id_commodities_id_fk",
           "tableFrom": "commodity_aliases",
-          "tableTo": "commodities",
           "columnsFrom": [
             "target_commodity_id"
           ],
+          "tableTo": "commodities",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "commodity_aliases_target_variant_id_commodity_variants_id_fk": {
           "name": "commodity_aliases_target_variant_id_commodity_variants_id_fk",
           "tableFrom": "commodity_aliases",
-          "tableTo": "commodity_variants",
           "columnsFrom": [
             "target_variant_id"
           ],
+          "tableTo": "commodity_variants",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -238,15 +238,15 @@
         "commodity_variants_commodity_id_commodities_id_fk": {
           "name": "commodity_variants_commodity_id_commodities_id_fk",
           "tableFrom": "commodity_variants",
-          "tableTo": "commodities",
           "columnsFrom": [
             "commodity_id"
           ],
+          "tableTo": "commodities",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -579,28 +579,28 @@
         "pin_list_items_pin_list_id_pin_lists_id_fk": {
           "name": "pin_list_items_pin_list_id_pin_lists_id_fk",
           "tableFrom": "pin_list_items",
-          "tableTo": "pin_lists",
           "columnsFrom": [
             "pin_list_id"
           ],
+          "tableTo": "pin_lists",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "pin_list_items_pin_id_pins_id_fk": {
           "name": "pin_list_items_pin_id_pins_id_fk",
           "tableFrom": "pin_list_items",
-          "tableTo": "pins",
           "columnsFrom": [
             "pin_id"
           ],
+          "tableTo": "pins",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -706,15 +706,15 @@
         "pin_lists_pinboard_id_pinboards_id_fk": {
           "name": "pin_lists_pinboard_id_pinboards_id_fk",
           "tableFrom": "pin_lists",
-          "tableTo": "pinboards",
           "columnsFrom": [
             "pinboard_id"
           ],
+          "tableTo": "pinboards",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -767,15 +767,15 @@
         "pinboard_collaborators_pinboard_id_pinboards_id_fk": {
           "name": "pinboard_collaborators_pinboard_id_pinboards_id_fk",
           "tableFrom": "pinboard_collaborators",
-          "tableTo": "pinboards",
           "columnsFrom": [
             "pinboard_id"
           ],
+          "tableTo": "pinboards",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -874,28 +874,28 @@
         "pinboard_media_pinboard_id_pinboards_id_fk": {
           "name": "pinboard_media_pinboard_id_pinboards_id_fk",
           "tableFrom": "pinboard_media",
-          "tableTo": "pinboards",
           "columnsFrom": [
             "pinboard_id"
           ],
+          "tableTo": "pinboards",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "pinboard_media_asset_id_media_assets_id_fk": {
           "name": "pinboard_media_asset_id_media_assets_id_fk",
           "tableFrom": "pinboard_media",
-          "tableTo": "media_assets",
           "columnsFrom": [
             "asset_id"
           ],
+          "tableTo": "media_assets",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1097,28 +1097,28 @@
         "pins_pinboard_id_pinboards_id_fk": {
           "name": "pins_pinboard_id_pinboards_id_fk",
           "tableFrom": "pins",
-          "tableTo": "pinboards",
           "columnsFrom": [
             "pinboard_id"
           ],
+          "tableTo": "pinboards",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "pins_producer_id_producers_id_fk": {
           "name": "pins_producer_id_producers_id_fk",
           "tableFrom": "pins",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1155,28 +1155,28 @@
         "producer_certifications_producer_id_producers_id_fk": {
           "name": "producer_certifications_producer_id_producers_id_fk",
           "tableFrom": "producer_certifications",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "producer_certifications_certification_id_certifications_id_fk": {
           "name": "producer_certifications_certification_id_certifications_id_fk",
           "tableFrom": "producer_certifications",
-          "tableTo": "certifications",
           "columnsFrom": [
             "certification_id"
           ],
+          "tableTo": "certifications",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1272,41 +1272,41 @@
         "producer_commodities_producer_id_producers_id_fk": {
           "name": "producer_commodities_producer_id_producers_id_fk",
           "tableFrom": "producer_commodities",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "producer_commodities_commodity_id_commodities_id_fk": {
           "name": "producer_commodities_commodity_id_commodities_id_fk",
           "tableFrom": "producer_commodities",
-          "tableTo": "commodities",
           "columnsFrom": [
             "commodity_id"
           ],
+          "tableTo": "commodities",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "producer_commodities_variant_id_commodity_variants_id_fk": {
           "name": "producer_commodities_variant_id_commodity_variants_id_fk",
           "tableFrom": "producer_commodities",
-          "tableTo": "commodity_variants",
           "columnsFrom": [
             "variant_id"
           ],
+          "tableTo": "commodity_variants",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {
@@ -1359,15 +1359,15 @@
         "producer_contact_producer_id_producers_id_fk": {
           "name": "producer_contact_producer_id_producers_id_fk",
           "tableFrom": "producer_contact",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1419,15 +1419,15 @@
         "producer_hours_producer_id_producers_id_fk": {
           "name": "producer_hours_producer_id_producers_id_fk",
           "tableFrom": "producer_hours",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1511,15 +1511,15 @@
         "producer_imported_reviews_producer_id_producers_id_fk": {
           "name": "producer_imported_reviews_producer_id_producers_id_fk",
           "tableFrom": "producer_imported_reviews",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1569,28 +1569,28 @@
         "producer_label_map_producer_id_producers_id_fk": {
           "name": "producer_label_map_producer_id_producers_id_fk",
           "tableFrom": "producer_label_map",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "producer_label_map_label_id_labels_id_fk": {
           "name": "producer_label_map_label_id_labels_id_fk",
           "tableFrom": "producer_label_map",
-          "tableTo": "labels",
           "columnsFrom": [
             "label_id"
           ],
+          "tableTo": "labels",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1727,15 +1727,15 @@
         "producer_location_producer_id_producers_id_fk": {
           "name": "producer_location_producer_id_producers_id_fk",
           "tableFrom": "producer_location",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1826,28 +1826,28 @@
         "producer_media_producer_id_producers_id_fk": {
           "name": "producer_media_producer_id_producers_id_fk",
           "tableFrom": "producer_media",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "producer_media_asset_id_media_assets_id_fk": {
           "name": "producer_media_asset_id_media_assets_id_fk",
           "tableFrom": "producer_media",
-          "tableTo": "media_assets",
           "columnsFrom": [
             "asset_id"
           ],
+          "tableTo": "media_assets",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1922,15 +1922,15 @@
         "producer_quality_producer_id_producers_id_fk": {
           "name": "producer_quality_producer_id_producers_id_fk",
           "tableFrom": "producer_quality",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1983,15 +1983,15 @@
         "producer_rating_agg_producer_id_producers_id_fk": {
           "name": "producer_rating_agg_producer_id_producers_id_fk",
           "tableFrom": "producer_rating_agg",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2079,15 +2079,15 @@
         "producer_reviews_producer_id_producers_id_fk": {
           "name": "producer_reviews_producer_id_producers_id_fk",
           "tableFrom": "producer_reviews",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2143,15 +2143,15 @@
         "producer_social_producer_id_producers_id_fk": {
           "name": "producer_social_producer_id_producers_id_fk",
           "tableFrom": "producer_social",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2356,15 +2356,15 @@
         "producers_google_maps_place_details_producer_id_producers_id_fk": {
           "name": "producers_google_maps_place_details_producer_id_producers_id_fk",
           "tableFrom": "producers_google_maps_place_details",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2401,15 +2401,15 @@
         "producers_scrape_meta_producer_id_producers_id_fk": {
           "name": "producers_scrape_meta_producer_id_producers_id_fk",
           "tableFrom": "producers_scrape_meta",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2468,15 +2468,15 @@
         "producers_search_producer_id_producers_id_fk": {
           "name": "producers_search_producer_id_producers_id_fk",
           "tableFrom": "producers_search",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2587,41 +2587,41 @@
         "reviews_content_producer_id_producers_id_fk": {
           "name": "reviews_content_producer_id_producers_id_fk",
           "tableFrom": "reviews_content",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "reviews_content_review_id_producer_reviews_id_fk": {
           "name": "reviews_content_review_id_producer_reviews_id_fk",
           "tableFrom": "reviews_content",
-          "tableTo": "producer_reviews",
           "columnsFrom": [
             "review_id"
           ],
+          "tableTo": "producer_reviews",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "reviews_content_imported_review_id_producer_imported_reviews_id_fk": {
           "name": "reviews_content_imported_review_id_producer_imported_reviews_id_fk",
           "tableFrom": "reviews_content",
-          "tableTo": "producer_imported_reviews",
           "columnsFrom": [
             "imported_review_id"
           ],
+          "tableTo": "producer_imported_reviews",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2704,15 +2704,15 @@
         "sponsored_campaigns_producer_id_producers_id_fk": {
           "name": "sponsored_campaigns_producer_id_producers_id_fk",
           "tableFrom": "sponsored_campaigns",
-          "tableTo": "producers",
           "columnsFrom": [
             "producer_id"
           ],
+          "tableTo": "producers",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -2722,6 +2722,7 @@
   },
   "views": {
     "v_producer_cards": {
+      "name": "v_producer_cards",
       "columns": {
         "id": {
           "name": "id",
@@ -2801,11 +2802,11 @@
           "autoincrement": false
         }
       },
-      "name": "v_producer_cards",
-      "isExisting": false,
-      "definition": "select \"producers\".\"id\", \"producers\".\"name\", \"producers\".\"type\", \"producers\".\"verified\", \"producers\".\"subscription_rank\", \"producer_location\".\"latitude\", \"producer_location\".\"longitude\", \"producer_location\".\"locality\", \"producer_location\".\"admin_area\", \"producer_location\".\"country\", (\n        SELECT COALESCE(\n          json_extract(\"media_assets\".\"variants\", '$.cover'),\n          \"media_assets\".\"url\"\n        )\n        FROM \"media_assets\"\n        WHERE \"media_assets\".\"id\" = (\n          SELECT \"producer_media\".\"asset_id\"\n          FROM \"producer_media\"\n          WHERE \"producer_media\".\"producer_id\" = \"producers\".\"id\"\n          ORDER BY (\"producer_media\".\"role\" = 'cover') DESC, \"producer_media\".\"position\" ASC\n          LIMIT 1\n        )\n      ) as \"thumbnailUrl\", \"producers_search\".\"search_labels\" from \"producers\" left join \"producer_location\" on \"producer_location\".\"producer_id\" = \"producers\".\"id\" left join \"producers_search\" on \"producers_search\".\"producer_id\" = \"producers\".\"id\""
+      "definition": "select \"producers\".\"id\", \"producers\".\"name\", \"producers\".\"type\", \"producers\".\"verified\", \"producers\".\"subscription_rank\", \"producer_location\".\"latitude\", \"producer_location\".\"longitude\", \"producer_location\".\"locality\", \"producer_location\".\"admin_area\", \"producer_location\".\"country\", (\n        SELECT COALESCE(\n          json_extract(\"media_assets\".\"variants\", '$.cover'),\n          \"media_assets\".\"url\"\n        )\n        FROM \"media_assets\"\n        WHERE \"media_assets\".\"id\" = (\n          SELECT \"producer_media\".\"asset_id\"\n          FROM \"producer_media\"\n          WHERE \"producer_media\".\"producer_id\" = \"producers\".\"id\"\n          ORDER BY (\"producer_media\".\"role\" = 'cover') DESC, \"producer_media\".\"position\" ASC\n          LIMIT 1\n        )\n      ) as \"thumbnailUrl\", \"producers_search\".\"search_labels\" from \"producers\" left join \"producer_location\" on \"producer_location\".\"producer_id\" = \"producers\".\"id\" left join \"producers_search\" on \"producers_search\".\"producer_id\" = \"producers\".\"id\"",
+      "isExisting": false
     },
     "v_producer_rating_scores": {
+      "name": "v_producer_rating_scores",
       "columns": {
         "producer_id": {
           "name": "producer_id",
@@ -2829,16 +2830,15 @@
           "autoincrement": false
         }
       },
-      "name": "v_producer_rating_scores",
-      "isExisting": false,
-      "definition": "select \"producer_id\", \"review_count\" as \"n\", (\"rating_sum\" * 1.0) / NULLIF(\"review_count\", 0) as \"avgRating\", (20 * 3.8 + \"rating_sum\")\n                    / NULLIF(20 + \"review_count\", 0) as \"bayesAvg\", \"last_review_at\", \"updated_at\" from \"producer_rating_agg\""
+      "definition": "select \"producer_id\", \"review_count\" as \"n\", (\"rating_sum\" * 1.0) / NULLIF(\"review_count\", 0) as \"avgRating\", (20 * 3.8 + \"rating_sum\")\n                    / NULLIF(20 + \"review_count\", 0) as \"bayesAvg\", \"last_review_at\", \"updated_at\" from \"producer_rating_agg\"",
+      "isExisting": false
     }
   },
   "enums": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   },
   "internal": {
     "indexes": {

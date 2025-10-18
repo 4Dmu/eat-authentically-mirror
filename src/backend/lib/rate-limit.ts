@@ -148,6 +148,18 @@ export const allow1RequestsPer1Second = new Ratelimit({
   prefix: "@upstash/submit-claim-invitation-account-details",
 });
 
+export const allow1RequestPer2Seconds = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(1, "2 s"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "ea-concierge:1req-per-2sec",
+});
+
 export async function multiLimit(limits: [Ratelimit, string][]) {
   for (const [limit, key] of limits) {
     const result = await limit.limit(key);

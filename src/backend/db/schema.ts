@@ -972,6 +972,7 @@ export const producerCards = sqliteView("v_producer_cards").as((qb) =>
       id: producers.id,
       name: producers.name,
       type: producers.type,
+      userId: producers.userId,
       verified: producers.verified,
       isClaimed:
         sql<boolean>`CASE WHEN ${producers.userId} IS NOT NULL THEN 1 ELSE 0 END`.as(
@@ -984,7 +985,7 @@ export const producerCards = sqliteView("v_producer_cards").as((qb) =>
       adminArea: producerLocation.adminArea,
       country: producerLocation.country,
       about: producers.about,
-      thumbnailUrl: sql<string>`(
+      thumbnailUrl: sql<string | null>`(
         SELECT COALESCE(
           json_extract(${mediaAssets.variants}, '$.cover'),
           ${mediaAssets.url}

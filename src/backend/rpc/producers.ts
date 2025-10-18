@@ -1,7 +1,6 @@
 "use server";
 import * as listing from "@/backend/data/producer";
 import {
-  editProducerArgsValidator,
   getProducersArgsValidator,
   Producer,
   claimProducerArgs,
@@ -14,6 +13,7 @@ import {
   searchByGeoTextArgsValidator,
   listProducersArgsValidator,
   editProducerArgsValidatorV2,
+  searchProducersArgsValidator,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
@@ -24,8 +24,6 @@ import {
   PendingMediaAssetInsert,
   pendingMediaAssets,
   producerCards,
-  producerCertifications,
-  producerCommodities,
   ProducerInsert,
   producerMedia,
   producers,
@@ -47,7 +45,6 @@ import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
 import { cloudflare } from "../lib/cloudflare";
-import { normalizeAddress } from "../utils/normalize-data";
 import {
   claimProducerRateLimit,
   geocodeRatelimit,
@@ -66,7 +63,7 @@ import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
 import {
   CLAIM_DNS_TXT_RECORD_NAME,
-  PRODUCER_PRODUCTS_LIMIT_BY_TIER,
+  CUSTOM_GEO_HEADER_NAME,
   RATELIMIT_ALL,
 } from "../constants";
 import { USER_PRODUCER_IDS_KV } from "../kv";
@@ -79,6 +76,102 @@ import { addMinutes, isAfter, isBefore } from "date-fns";
 import { tryCatch } from "@/utils/try-catch";
 import { geocode } from "../lib/google-maps";
 import { logger } from "../lib/log";
+import { headers } from "next/headers";
+import { Geo } from "@vercel/functions";
+import {
+  convertToModelMessages,
+  generateText,
+  ModelMessage,
+  stepCountIs,
+  streamText,
+  tool,
+  UIMessage,
+} from "ai";
+import { initTools } from "../llm/tools";
+import { openai } from "@ai-sdk/openai";
+
+export const searchProducers = actionClient
+  .name("searchProducers")
+  .input(searchProducersArgsValidator)
+  .action(async ({ input: { query, limit, offset } }) => {
+    if (!query) {
+      return {
+        items: [],
+        count: 0,
+        page: 0,
+        limit: 0,
+        hasMore: false,
+        nextOffset: null,
+        maxDistance: null,
+      };
+    }
+
+    const headerList = await headers();
+    const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
+    const parsedGeo = rawGeo
+      ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
+      : undefined;
+
+    const tools = initTools({
+      search_by_geo_text: { limit: limit, offset: offset },
+    });
+
+    const messages: ModelMessage[] = [{ role: "user", content: query }];
+
+    const geocodeResult = await generateText({
+      model: openai("gpt-4o-mini"),
+      messages,
+      tools,
+      system:
+        "Extract a location snippet from input prompt and generate a location with the geocode_place tool",
+      toolChoice: "required",
+      activeTools: ["geocode_place"],
+    });
+
+    messages.push(...geocodeResult.response.messages);
+
+    const searchResults = await generateText({
+      model: openai("gpt-4o-mini"),
+      messages,
+      tools,
+      system:
+        "Use geocode_place result and input query to call search_by_geo_text. Always pass bounding box from 'geocode_place'. Pass country and city hints if available. Do NOT output free text.",
+      toolChoice: "required",
+      activeTools: ["search_by_geo_text"],
+    });
+
+    return searchResults.toolResults[0].output as listing.ProducerSearchResult;
+
+    // const result = await generateText({
+    //   model: openai("gpt-4o-mini"), // or gpt-4o, gpt-4.1, etc.
+    //   prompt: query,
+    //   tools,
+    //   stopWhen: stepCountIs(5),
+    //   system: `Use the provided tool to find farms, ranches, and restaurants. Ignore unrelated requests.
+    //   Always use geocode_place tool to find coordinates of place.
+    //   Prefer bounding box if geocode_place was used
+    //   Always pass country hint if geocode_place contains a country.
+    //   Do NOT output free text. When done, you MUST call 'search_by_geo_text'`,
+    // });
+
+    // console.log(result);
+
+    // if (result.finishReason === "stop" && result.text) {
+    //   // treat as error in policy adherence or convert to final
+    //   return {
+    //     items: [],
+    //     count: 0,
+    //     page: 0,
+    //     limit: 0,
+    //     hasMore: false,
+    //     nextOffset: null,
+    //     maxDistance: null,
+    //   };
+    // }
+
+    // const data = result.toolResults[result.toolResults.length - 1].output;
+    // return data as listing.ProducerSearchResult;
+  });
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -164,7 +257,7 @@ export const fetchUserProducers = authenticatedActionClient
     const result = await db
       .select()
       .from(producerCards)
-      .where(eq(producers.userId, userId));
+      .where(eq(producerCards.userId, userId));
 
     return result;
   });
