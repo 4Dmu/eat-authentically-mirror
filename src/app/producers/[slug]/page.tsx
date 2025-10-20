@@ -1,7 +1,4 @@
-import {
-  getProducerPublic,
-  getUsersProducerIdsCached,
-} from "@/backend/data/producer";
+import { getUsersProducerIdsCached } from "@/backend/data/producer";
 import { producerSlug } from "@/utils/producers";
 import { notFound, redirect } from "next/navigation";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";

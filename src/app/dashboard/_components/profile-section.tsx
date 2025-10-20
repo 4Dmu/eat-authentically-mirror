@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Producer } from "@/backend/validators/producers";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

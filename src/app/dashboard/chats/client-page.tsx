@@ -10,7 +10,6 @@ import {
   useAllProducersChats,
   useUserChats,
 } from "@/utils/messages";
-import { primaryImageUrl } from "@/utils/producers";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { useMemo } from "react";

@@ -1,8 +1,5 @@
-import { ProducerSelect, ProducerWith } from "@/backend/db/schema";
-import {
-  PublicProducer,
-  ProducerClaimVerificationMethods,
-} from "@/backend/validators/producers";
+import { ProducerWith } from "@/backend/db/schema";
+import { ProducerClaimVerificationMethods } from "@/backend/validators/producers";
 import { type } from "arktype";
 import { useState } from "react";
 

@@ -14,7 +14,7 @@ import {
 import * as React from "react";
 
 export default function SocialClaimListingInternalEmail({
-  producer: { id, userId, name, type, verified, createdAt, updatedAt },
+  producer: { id, userId, name, type, verified, updatedAt },
   token,
   socialHandle,
 }: {

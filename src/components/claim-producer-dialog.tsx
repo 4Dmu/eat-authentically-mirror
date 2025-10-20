@@ -63,7 +63,7 @@ function usePaginatedProducers() {
       const newOffset = newPage * LIMIT;
       setOffset(newOffset);
     },
-    [setOffset]
+    [setOffset, page]
   );
 
   useEffect(() => {

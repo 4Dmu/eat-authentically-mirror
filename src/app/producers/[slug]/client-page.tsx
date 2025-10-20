@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useFullProducerPublic, useProducerPublic } from "@/utils/producers";
+import { useFullProducerPublic } from "@/utils/producers";
 import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
 import { ClaimProducerCard } from "@/components/claim-producer-card";
 import {
@@ -33,7 +33,6 @@ import {
 } from "@/components/community-benefits-card";
 import { MapCard } from "@/components/map-card";
 import { cn } from "@/lib/utils";
-import { PublicProducer } from "@/backend/validators/producers";
 import {
   useReviewsPublic,
   useReviewProducerPendingState,

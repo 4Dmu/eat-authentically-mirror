@@ -1,6 +1,4 @@
-import { ProducerLocationSelect } from "@/backend/db/schema";
 import { PinboardFull } from "@/backend/rpc/pinboard";
-import { ImageData } from "@/backend/validators/producers";
 import { env } from "@/env";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { producerSlugFull } from "@/utils/producers";
@@ -54,6 +52,7 @@ export function PinboardMap({ pins }: PinboardMapProps) {
             ...p.producer.location,
             // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
             latitude: p.producer.location?.latitude!,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
             longitude: p.producer.location?.longitude!,
           },
         },

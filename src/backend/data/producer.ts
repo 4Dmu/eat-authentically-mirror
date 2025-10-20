@@ -2,15 +2,11 @@ import type {
   GetProducerArgs,
   ProducerTypes,
   SearchByGeoTextArgs,
-  SearchByGeoTextQueryArgs,
 } from "@/backend/validators/producers";
-import { client, db } from "../db";
+import { db } from "../db";
 import { asc, eq, ilike, SQL, sql } from "drizzle-orm";
 import { claimRequests, producerCards, producers } from "../db/schema";
-import {
-  SEARCH_BY_GEO_TEXT_PAGINATION_CACHE,
-  USER_PRODUCER_IDS_KV,
-} from "../kv";
+import { USER_PRODUCER_IDS_KV } from "../kv";
 
 export async function getUsersProducerIdsCached(userId: string) {
   const profileIds = await USER_PRODUCER_IDS_KV.get(userId);
@@ -114,7 +110,7 @@ function maxDistanceFromBBoxHaversine(center: GeoPoint, bbox: BBox): number {
   return maxKm * 1.005; // tiny cushion
 }
 
-export function approximateMaxDistanceKm(args: {
+function approximateMaxDistanceKm(args: {
   center?: GeoPoint; // if omitted with bbox, midpoint is used
   radiusKm?: number | null; // if present, we return it
   bbox?: BBox;
@@ -149,10 +145,7 @@ export function approximateMaxDistanceKm(args: {
   return { center: center ?? null, maxDistanceKm: null, source: "none" };
 }
 
-export async function searchByGeoText(
-  args: SearchByGeoTextArgs,
-  userId?: string
-) {
+export async function searchByGeoText(args: SearchByGeoTextArgs) {
   const { limit, offset } = args;
 
   let rows: Row[] = [];
@@ -164,7 +157,7 @@ export async function searchByGeoText(
       }
     | undefined = undefined;
 
-  const { q, geo, filters, stateProvinceHint, countryHint } = args;
+  const { q, geo, filters, countryHint } = args;
 
   const hardLimit = limit + 1;
 
@@ -1055,8 +1048,6 @@ export async function listProducers(args: {
   if (args.query) {
     where = ilike(producerCards.name, args.query);
   }
-
-  const hardLimit = args.limit + 1;
 
   const rows = await db.query.producers.findMany({
     orderBy: asc(producers.createdAt),

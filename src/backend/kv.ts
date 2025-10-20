@@ -2,8 +2,6 @@ import type { UserJSON } from "@clerk/backend";
 import { redis } from "./lib/redis";
 import { SubscriptionJSON } from "./stripe/stripe-sync";
 import { NominationPlace } from "./validators/nomination-api";
-import { QueryWithTypings, SQL } from "drizzle-orm";
-import { SQLiteSyncDialect } from "drizzle-orm/sqlite-core";
 import { SearchByGeoTextQueryArgs } from "./validators/producers";
 
 export const USER_DATA_KV = {

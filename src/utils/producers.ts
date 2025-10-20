@@ -27,11 +27,9 @@ import {
   listProducers,
   getFullProducerPublic,
   searchProducers,
-  searchByGeoText,
 } from "@/backend/rpc/producers";
 import {
   Producer,
-  EditProducerArgs,
   ClaimProducerArgs,
   CheckClaimDomainDnsArgs,
   PublicClaimRequest,
@@ -41,14 +39,10 @@ import {
   SuggestProducerArgs,
   ListProducersArgs,
   EditProducerArgsV2,
-  SearchProducersArgs,
-  SearchByGeoTextArgs,
-  SearchProducersQueryArgs,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
   ProducerCardsRow,
-  ProducerSelect,
   ProducerWith,
   ProducerWithAll,
 } from "@/backend/db/schema";
@@ -155,7 +149,6 @@ export function useSearchProducers(
     ]
   >
 ) {
-  const queryClient = useQueryClient();
   const search = useHomePageStore();
   return useQuery({
     ...opts,

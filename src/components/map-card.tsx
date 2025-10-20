@@ -1,5 +1,4 @@
 "use client";
-import { Producer } from "@/backend/validators/producers";
 import { env } from "@/env";
 import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
 import {

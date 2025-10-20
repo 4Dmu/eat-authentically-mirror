@@ -1,10 +1,9 @@
 import { Input } from "./ui/input";
 import { CompassIcon } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
-import { showFilterMenuAtom, useHomePageStore } from "@/stores";
+import { useHomePageStore } from "@/stores";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { useSetAtom } from "jotai";
 
 function SearchBox({ title }: { title: string }) {
   const { setQuery, query } = useHomePageStore();
@@ -56,7 +55,7 @@ function SearchBox({ title }: { title: string }) {
 
 export function HeroCarousel() {
   // const [api, setApi] = useState<CarouselApi>();
-  const { setTypeFilter, typeFilter } = useHomePageStore();
+  // const { setTypeFilter, typeFilter } = useHomePageStore();
 
   // const handler = useCallback(() => {
   //   if (!api) return;

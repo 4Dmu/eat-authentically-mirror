@@ -61,17 +61,8 @@ import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
-import {
-  CLAIM_DNS_TXT_RECORD_NAME,
-  CUSTOM_GEO_HEADER_NAME,
-  PRODUCER_TYPES,
-  RATELIMIT_ALL,
-} from "../constants";
-import {
-  SEARCH_BY_GEO_TEXT_PAGINATION_CACHE,
-  SEARCH_BY_GEO_TEXT_QUERIES_CACHE,
-  USER_PRODUCER_IDS_KV,
-} from "../kv";
+import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "../constants";
+import { SEARCH_BY_GEO_TEXT_QUERIES_CACHE, USER_PRODUCER_IDS_KV } from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
 import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
 import crypto from "node:crypto";
@@ -81,25 +72,10 @@ import { addMinutes, isAfter, isBefore } from "date-fns";
 import { tryCatch } from "@/utils/try-catch";
 import { geocode } from "../lib/google-maps";
 import { logger } from "../lib/log";
-import { headers } from "next/headers";
-import { Geo } from "@vercel/functions";
-import {
-  convertToModelMessages,
-  generateObject,
-  generateText,
-  ModelMessage,
-  stepCountIs,
-  streamText,
-  tool,
-  UIMessage,
-} from "ai";
+import { generateObject, generateText, stepCountIs } from "ai";
 import { initTools } from "../llm/tools";
 import { openai } from "@ai-sdk/openai";
 import z from "zod";
-import { geocodePlace } from "../llm/utils/geocode";
-import { NominationPlace } from "../validators/nomination-api";
-import * as R from "remeda";
-import { resetChatNotifications } from "./messages";
 
 export const searchProducers = actionClient
   .name("searchProducers")
@@ -523,8 +499,6 @@ export const editProducer = producerActionClient
     if (!producer) {
       throw new Error("Unauthorized");
     }
-
-    const subTier = await getSubTier(userId);
 
     const toUpdate: Partial<Producer> = {};
 

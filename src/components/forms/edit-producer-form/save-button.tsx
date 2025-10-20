@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { InfoIcon } from "lucide-react";
-import { AnyFormApi, useStore } from "@tanstack/react-form";
+import { AnyFormApi } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 
 export function SaveButton({
@@ -44,7 +44,7 @@ export function SaveButton({
     return () => {
       unsubs.forEach((unsub) => unsub());
     };
-  }, [forms]);
+  }, [forms, formStates]);
 
   return (
     <>

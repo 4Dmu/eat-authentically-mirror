@@ -25,7 +25,6 @@ import {
   useUnblockProducerChat,
   useUnblockUserChat,
 } from "@/utils/messages";
-import { primaryImageUrl } from "@/utils/producers";
 import { format, startOfDay } from "date-fns";
 import { Shield, ShieldOff } from "lucide-react";
 import {

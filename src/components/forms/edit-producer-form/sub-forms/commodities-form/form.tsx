@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,17 +5,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { PlusIcon, XIcon } from "lucide-react";
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { defaultOptions, withForm } from "./context";
 
 export const Form = withForm({
   ...defaultOptions,
-  render: function Render({ form }) {
+  render: function Render() {
     // @TODO
-    const [name, setName] = useState("");
     return (
       <Card>
         <CardHeader>

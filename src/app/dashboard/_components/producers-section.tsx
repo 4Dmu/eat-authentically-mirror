@@ -1,6 +1,5 @@
 "use client";
-import { ProducerCardsRow, ProducerSelect } from "@/backend/db/schema";
-import { Producer } from "@/backend/validators/producers";
+import { ProducerCardsRow } from "@/backend/db/schema";
 import { AddProducerDialog } from "@/components/add-producer-dialog";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
@@ -17,7 +16,6 @@ import {
 import {
   useDeleteProducer,
   useFetchUserProducers,
-  primaryImageUrl,
   producerSlugFull,
 } from "@/utils/producers";
 import { BuildingIcon, EyeIcon, EditIcon, TrashIcon } from "lucide-react";

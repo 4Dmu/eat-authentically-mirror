@@ -1,5 +1,5 @@
 "use client";
-import { ProducerSelect, ProducerWith } from "@/backend/db/schema";
+import { ProducerWith } from "@/backend/db/schema";
 import { ProducerClaimVerificationMethods } from "@/backend/validators/producers";
 import { Button } from "@/components/ui/button";
 import {

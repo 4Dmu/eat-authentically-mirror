@@ -3,8 +3,6 @@ import { getSubTier } from "./backend/rpc/utils/get-sub-tier";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { geolocation } from "@vercel/functions";
 import { CUSTOM_GEO_HEADER_NAME } from "./backend/constants";
-import { logger } from "./lib/axiom/server";
-import { transformMiddlewareRequest } from "@axiomhq/nextjs";
 
 const isPublicRoute = createRouteMatcher([
   "/producers(.*)",

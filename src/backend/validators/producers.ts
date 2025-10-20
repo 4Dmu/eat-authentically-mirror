@@ -1,10 +1,8 @@
 import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
-import { LatLangBoundsLiteralValidator } from "./maps";
-import { ClaimRequestStatus, commodities } from "../db/schema";
+import { ClaimRequestStatus } from "../db/schema";
 import { isMobilePhone } from "validator";
 import {
-  certificationSelectValidator,
   mediaAssetSelectValidator,
   producerCertificationsSelectValidator,
   producerCommoditiesSelectValidator,

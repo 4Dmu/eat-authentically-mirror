@@ -15,7 +15,6 @@ import { ProducerReviewSelect } from "@/backend/db/schema";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { EditIcon } from "lucide-react";
-import { Stars } from "@/backend/validators/reviews";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
 import { UserPublicReview } from "@/backend/rpc/reviews";

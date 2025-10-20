@@ -8,21 +8,13 @@ import { Button } from "@/components/ui/button";
 import { useHomePageStore } from "@/stores";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
-import { PublicProducerLight } from "@/backend/validators/producers";
 import type { Geo } from "@vercel/functions";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 import { useSearchProducers } from "@/utils/producers";
 
-export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
-  const {
-    typeFilter,
-    query,
-    certs,
-    locationSearchArea,
-    page,
-    setPage,
-    useIpGeo,
-  } = useHomePageStore();
+export function Page({}: { userIpGeo: Geo | undefined }) {
+  const { typeFilter, query, certs, locationSearchArea, page, setPage } =
+    useHomePageStore();
 
   const debouncedQuery = useDebounce(query, 500);
 

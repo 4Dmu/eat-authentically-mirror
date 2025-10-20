@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { match, P } from "ts-pattern";
 import { Badge } from "@/components/ui/badge";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
-import { Certification } from "@/backend/validators/producers";
 import { useStore } from "@tanstack/react-form";
 import { defaultOptions, withForm } from "./context";
 import { CertificationSelect } from "@/backend/db/schema";

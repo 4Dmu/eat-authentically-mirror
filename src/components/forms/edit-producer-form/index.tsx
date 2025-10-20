@@ -18,7 +18,6 @@ import {
 import { toast } from "sonner";
 import * as R from "remeda";
 import {
-  EditProducerArgsV2,
   editProducerCertificationsFormValidator,
   editProducerCommoditiesFormValidator,
   editProducerContactFormValditator,
@@ -231,115 +230,6 @@ export function ProducerEditForm(props: {
         formApi.parseValuesWithSchema(editProducerCommoditiesFormValidator),
     },
   });
-
-  async function submit() {
-    const args: EditProducerArgsV2 = { id: props.producer.id };
-
-    // for (const [key, value] of R.entries(form.state.values)) {
-    //   switch (key) {
-    //     case "images":
-    //       if (!R.isDeepEqual(value, producerQuery.data?.images)) {
-    //         const existingImages = form.state.values.images.items.filter(
-    //           (x) => x._type === "cloudflare"
-    //         );
-    //         const toUpload = form.state.values.images.items.filter(
-    //           (x) => x._type === "upload"
-    //         );
-
-    //         const hasExistingImageChanges =
-    //           !R.isDeepEqual(
-    //             existingImages,
-    //             producerQuery.data?.images.items
-    //           ) ||
-    //           producerQuery.data?.images.primaryImgId !==
-    //             form.state.values.images.primaryImgId;
-
-    //         const hasImagesToUpload = toUpload.length > 0;
-
-    //         async function handleImageUpdates() {
-    //           if (hasExistingImageChanges)
-    //             await updateExisingImagesMutation.mutateAsync({
-    //               producerId: props.producer.id,
-    //               data: {
-    //                 items: existingImages,
-    //                 primaryImgId: form.state.values.images.primaryImgId,
-    //               },
-    //             });
-
-    //           if (hasImagesToUpload)
-    //             await uploadImagesMutation.mutateAsync({
-    //               producerId: props.producer.id,
-    //               toUpload,
-    //             });
-    //         }
-
-    //         if (hasExistingImageChanges || hasImagesToUpload) {
-    //           const promise = handleImageUpdates();
-    //           toast.promise(promise, {
-    //             loading: hasImagesToUpload
-    //               ? "Uploading images..."
-    //               : "Updating images...",
-    //             success: hasImagesToUpload
-    //               ? "Uploaded images successfully"
-    //               : "Updating images successfully",
-    //             error: hasImagesToUpload
-    //               ? "Error uploaded images"
-    //               : "Error updating images",
-    //           });
-    //           await promise;
-    //         }
-    //       }
-    //       break;
-    //     case "video":
-    //       if (value !== producerQuery.data?.video) {
-    //         if (value === null) {
-    //           const deletePromise = deleteVideoMutation.mutateAsync({
-    //             producerId: props.producer.id,
-    //           });
-    //           toast.promise(deletePromise, {
-    //             loading: "Deleting video...",
-    //             success: () => "Video deleted successfully.",
-    //             error: () => `Error deleting video.`,
-    //           });
-    //           await deletePromise;
-    //         } else if (value._type === "upload") {
-    //           const videoUploadPromise = uploadVideoMutation.mutateAsync({
-    //             producerId: props.producer.id,
-    //             toUpload: value,
-    //           });
-    //           toast.promise(videoUploadPromise, {
-    //             loading: "Uploading video...",
-    //             success: () => "Video uploaded successfully.",
-    //             error: () => `Error uploading video.`,
-    //           });
-    //           await videoUploadPromise;
-    //         }
-    //       }
-    //       break;
-    //     default:
-    //       if (
-    //         !R.isDeepEqual(form.state.values[key], producerQuery.data?.[key])
-    //       ) {
-    //         (args[key] as EditProducerArgs[typeof key]) =
-    //           form.state.values[key];
-    //       }
-    //       break;
-    //   }
-    // }
-
-    if (R.keys(args).length > 1) {
-      const submitPromise = editUserListingMutation.mutateAsync(args);
-      toast.promise(submitPromise, {
-        loading: "Submiting data...",
-        success: () => "Updated successfully",
-        error: () => `Error updating.`,
-      });
-      await submitPromise;
-    }
-
-    await producerQuery.refetch();
-    basicInfoForm.reset();
-  }
 
   return (
     <div className="w-full flex flex-col gap-10">
