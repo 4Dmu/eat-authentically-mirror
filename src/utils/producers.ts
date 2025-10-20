@@ -43,6 +43,7 @@ import {
   EditProducerArgsV2,
   SearchProducersArgs,
   SearchByGeoTextArgs,
+  SearchProducersQueryArgs,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
@@ -70,7 +71,6 @@ export function primaryImageUrl(
     | Pick<ProducerWith<"media">, "media" | "type">
     | Pick<ProducerCardsRow, "thumbnailUrl" | "type">
 ) {
-  console.log(producer);
   const url: string | undefined | null =
     "thumbnailUrl" in producer
       ? producer.thumbnailUrl
@@ -141,43 +141,79 @@ export function useProducerPublic(
 }
 
 export function useSearchProducers(
-  params: SearchProducersArgs,
+  params: { query: string | undefined },
+  pagination: { limit: number; offset: number },
   opts?: UseQueryOptions<
     ProducerSearchResult,
     Error,
     ProducerSearchResult,
-    readonly [string, SearchProducersArgs]
+    readonly [
+      string,
+      { query: string | undefined },
+      { limit: number; offset: number },
+    ]
   >
 ) {
+  const queryClient = useQueryClient();
   return useQuery({
     ...opts,
-    queryKey: ["search-producers", params] as const,
+    queryKey: ["search-producers", params, pagination] as const,
     queryFn: async () => {
-      return await searchProducers(params);
+      const previous = queryClient.getQueriesData<ProducerSearchResult>({
+        queryKey: ["search-producers", params],
+      })[0][1];
+      console.log("Old data:", previous);
+
+      console.log(previous?.paginationId);
+
+      return await searchProducers(
+        previous?.paginationId
+          ? {
+              paginationId: previous.paginationId,
+              limit: pagination.limit,
+              offset: pagination.offset,
+            }
+          : {
+              query: params.query!,
+              limit: pagination.limit,
+              offset: pagination.offset,
+            }
+      );
     },
     enabled: params.query !== undefined,
     placeholderData: keepPreviousData,
   });
 }
 
-export function useSearchByGeoText(
-  params: SearchByGeoTextArgs,
-  opts?: UseQueryOptions<
-    ProducerSearchResult,
-    Error,
-    ProducerSearchResult,
-    readonly [string, SearchProducersArgs]
-  >
-) {
-  return useQuery({
-    ...opts,
-    queryKey: ["search-producer-by-geo-text", params] as const,
-    queryFn: async () => {
-      return await searchByGeoText(params);
-    },
-    placeholderData: keepPreviousData,
-  });
-}
+// export function useSearchByGeoText(
+//   params: Omit<
+//     Extract<SearchByGeoTextArgs, { mode: "query" }>,
+//     "limit" | "offset"
+//   >,
+//   pagination: Pick<
+//     Extract<SearchByGeoTextArgs, { mode: "query" }>,
+//     "limit" | "offset"
+//   >,
+//   opts?: UseQueryOptions<
+//     ProducerSearchResult,
+//     Error,
+//     ProducerSearchResult,
+//     readonly [
+//       string,
+//       Omit<Extract<SearchByGeoTextArgs, { mode: "query" }>, "limit" | "offset">,
+//       Pick<Extract<SearchByGeoTextArgs, { mode: "query" }>, "limit" | "offset">,
+//     ]
+//   >
+// ) {
+//   return useQuery({
+//     ...opts,
+//     queryKey: ["search-producer-by-geo-text", params, pagination] as const,
+//     queryFn: async () => {
+//       return await searchByGeoText(params);
+//     },
+//     placeholderData: keepPreviousData,
+//   });
+// }
 
 export function useProducers(
   args: ListProducersArgs,

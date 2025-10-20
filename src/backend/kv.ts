@@ -2,6 +2,9 @@ import type { UserJSON } from "@clerk/backend";
 import { redis } from "./lib/redis";
 import { SubscriptionJSON } from "./stripe/stripe-sync";
 import { NominationPlace } from "./validators/nomination-api";
+import { QueryWithTypings, SQL } from "drizzle-orm";
+import { SQLiteSyncDialect } from "drizzle-orm/sqlite-core";
+import { SearchByGeoTextQueryArgs } from "./validators/producers";
 
 export const USER_DATA_KV = {
   generateKey(userId: string) {
@@ -285,5 +288,26 @@ export const NominatimGeocodeResponseCache = {
   },
   async get(query: string) {
     return await redis.get<NominationPlace>(this.generateKey(query));
+  },
+};
+
+export const SEARCH_BY_GEO_TEXT_QUERY_CACHE = {
+  ttlSeconds: 120,
+  dialect: new SQLiteSyncDialect(),
+  generateKey(query: string) {
+    return `search_by_geo_text:query-cache:${query}`;
+  },
+  async set(id: string, query: SearchByGeoTextQueryArgs) {
+    await redis.set(this.generateKey(id), query, {
+      ex: this.ttlSeconds,
+    });
+  },
+  async get(id: string) {
+    const key = this.generateKey(id);
+    const value = await redis.get<SearchByGeoTextQueryArgs>(key);
+    if (value) {
+      await redis.expire(key, this.ttlSeconds);
+    }
+    return value;
   },
 };

@@ -25,9 +25,9 @@ const isSubRoute = createRouteMatcher(["/dashboard/subscribe"]);
 const isHome = createRouteMatcher(["/"]);
 
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
-  logger.info(...transformMiddlewareRequest(request));
+  // logger.info(...transformMiddlewareRequest(request));
 
-  event.waitUntil(logger.flush());
+  // event.waitUntil(logger.flush());
 
   return await clerkMiddleware(async (auth, req) => {
     if (!isPublicRoute(req)) {

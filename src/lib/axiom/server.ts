@@ -9,10 +9,10 @@ export const logger = new Logger({
       axiom: axiomClient,
       dataset: env.NEXT_PUBLIC_AXIOM_DATASET!,
     }),
-    {
-      log: (value) => console.log(...value),
-      flush: () => {},
-    },
+    // {
+    //   log: (value) => console.log(...value),
+    //   flush: () => {},
+    // },
   ],
   formatters: nextJsFormatters,
 });

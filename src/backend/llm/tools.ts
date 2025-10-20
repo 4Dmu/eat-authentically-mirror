@@ -3,19 +3,27 @@ import z from "zod";
 import { PRODUCER_TYPES } from "../constants";
 import { searchByGeoText } from "../data/producer";
 import { geocodePlace } from "./utils/geocode";
+import { SearchByGeoTextArgs } from "../validators/producers";
 
 export const searchByGeoTextInput = z.object({
-  q: z.string().trim().min(1).max(256).optional(),
-  center: z.object({ lat: z.number(), lon: z.number() }),
-  radiusKm: z.number().min(0.1).max(1000).default(1000),
-  bbox: z
+  q: z.string().trim().min(1).max(256).nullable().optional(),
+  geo: z
     .object({
-      minLat: z.number(),
-      maxLat: z.number(),
-      minLon: z.number(),
-      maxLon: z.number(),
+      center: z.object({ lat: z.number(), lon: z.number() }),
+      bbox: z.object({
+        minLat: z.number(),
+        maxLat: z.number(),
+        minLon: z.number(),
+        maxLon: z.number(),
+      }),
     })
-    .optional(),
+    .or(
+      z.object({
+        center: z.object({ lat: z.number(), lon: z.number() }),
+        radiusKm: z.number().min(0.1).max(1000),
+      })
+    )
+    .nullable(),
   limit: z.number().min(1).max(50).default(30),
   offset: z.number().min(0).default(0),
   countryHint: z.string().optional(),
@@ -23,10 +31,25 @@ export const searchByGeoTextInput = z.object({
   filters: z
     .object({
       category: z.enum(PRODUCER_TYPES).optional(),
-      commodities: z.array(z.string().min(1)).optional(),
+      commodities: z
+        .array(z.string().min(1))
+        .optional()
+        .describe("products or dishes not category or certification"),
       variants: z.array(z.string().min(1)).optional(),
       certifications: z.array(z.string().min(1)).optional(),
       organicOnly: z.boolean().optional(),
+      verified: z.boolean().optional(),
+      isClaimed: z.boolean().optional(),
+      locality: z.string().optional(),
+      adminArea: z.string().optional(),
+      subscriptionRankMin: z.number().optional(),
+      subscriptionRankMax: z.number().optional(),
+      minAvgRating: z.number().optional(),
+      minBayesAvg: z.number().optional(),
+      minReviews: z.number().optional(),
+      hasCover: z.boolean().optional(),
+      ids: z.string().array().optional(),
+      excludeIds: z.string().array().optional(),
     })
     .partial()
     .default({}),
@@ -41,22 +64,47 @@ export const geocodePlaceInput = z.object({
 });
 
 export const initTools = ({
+  userId,
   search_by_geo_text,
 }: {
-  search_by_geo_text: { limit: number; offset: number };
+  search_by_geo_text: {
+    limit: number;
+    offset: number;
+    geo?: Extract<SearchByGeoTextArgs, { q?: string | undefined }>["geo"];
+  };
+  userId: string | undefined;
 }) => {
   return {
     search_by_geo_text: tool({
       description: "Search producers by free text and a circular geofence.",
       inputSchema: searchByGeoTextInput,
-      execute: async (args) => {
-        console.log(args);
-        const result = await searchByGeoText({
-          ...args,
+      execute: async (llmArgs) => {
+        const overridedArgs = {
+          ...llmArgs,
+          geo: Object.hasOwn(search_by_geo_text, "geo")
+            ? search_by_geo_text.geo
+            : (llmArgs.geo ?? undefined),
+          q: llmArgs.q ?? undefined,
           limit: search_by_geo_text.limit,
           offset: search_by_geo_text.offset,
-        });
-        console.log(result.count);
+        };
+
+        console.log(JSON.stringify(llmArgs), "llm args");
+        console.log(JSON.stringify(overridedArgs), "overrided args");
+
+        const result = await searchByGeoText(
+          {
+            ...overridedArgs,
+            mode: "query",
+            geo: Object.hasOwn(search_by_geo_text, "geo")
+              ? search_by_geo_text.geo
+              : (overridedArgs.geo ?? undefined),
+            q: overridedArgs.q ?? undefined,
+            limit: search_by_geo_text.limit,
+            offset: search_by_geo_text.offset,
+          },
+          userId
+        );
         return result;
       },
     }),

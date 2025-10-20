@@ -26,11 +26,12 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
 
   const debouncedQuery = useDebounce(query, 500);
 
-  const { data, isPlaceholderData } = useSearchProducers({
-    limit: HOME_PAGE_RESULT_LIMIT,
-    offset: page * HOME_PAGE_RESULT_LIMIT,
-    query: debouncedQuery,
-  });
+  const { data, isPlaceholderData } = useSearchProducers(
+    {
+      query: debouncedQuery,
+    },
+    { offset: page * HOME_PAGE_RESULT_LIMIT, limit: HOME_PAGE_RESULT_LIMIT }
+  );
 
   return (
     <div className="flex flex-col gap-10  bg-gray-50">

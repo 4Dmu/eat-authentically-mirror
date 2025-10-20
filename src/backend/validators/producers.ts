@@ -316,21 +316,25 @@ export const ipGeoValidator = type({
 //   "userIpGeo?": ipGeoValidator,
 // });
 
-export const searchByGeoTextArgsValidator = type({
+const searchByGeoTextQuery = type({
   "q?": type("string")
     .atLeastLength(1)
     .atMostLength(255)
     .pipe((v) => v.trim()),
-  center: type({ lat: "number", lon: "number" }),
-  radiusKm: type.number.atLeast(0.1).atMost(1000).default(1000),
-  "bbox?": type({
-    minLat: "number",
-    maxLat: "number",
-    minLon: "number",
-    maxLon: "number",
-  }),
-  limit: type.number.atLeast(1).atMost(50).default(30),
-  offset: type.number.atLeast(0).default(0),
+  "geo?": type({
+    center: type({ lat: "number", lon: "number" }),
+  }).and(
+    type({ radiusKm: type.number.atLeast(0.1).atMost(1000) }).or(
+      type({
+        bbox: type({
+          minLat: "number",
+          maxLat: "number",
+          minLon: "number",
+          maxLon: "number",
+        }),
+      })
+    )
+  ),
   "countryHint?": "string",
   "stateProvinceHint?": "string",
   "filters?": type({
@@ -339,10 +343,43 @@ export const searchByGeoTextArgsValidator = type({
     variants: type.string.atLeastLength(1).array().optional(),
     certifications: type.string.atLeastLength(1).array().optional(),
     organicOnly: type.boolean.optional(),
+    verified: type.boolean.optional(),
+    isClaimed: type.boolean.optional(),
+    locality: type.string.optional(),
+    adminArea: type.string.optional(),
+    subscriptionRankMin: type.number.optional(),
+    subscriptionRankMax: type.number.optional(),
+    minAvgRating: type.number.optional(),
+    minBayesAvg: type.number.optional(),
+    minReviews: type.number.optional(),
+    hasCover: type.boolean.optional(),
+    ids: type.string.array().optional(),
+    excludeIds: type.string.array().optional(),
   }).partial(),
 });
 
+const searchByGeoTextQueryArgs = searchByGeoTextQuery.and(
+  type({
+    mode: "'query'",
+    limit: type.number.atLeast(1).atMost(50),
+    offset: type.number.atLeast(0),
+  })
+);
+
+const searchByGeoTextPaginateArgs = type({
+  mode: "'paginate'",
+  paginationId: "string",
+  limit: type.number.atLeast(1).atMost(50),
+  offset: type.number.atLeast(0),
+});
+
+export const searchByGeoTextArgsValidator = searchByGeoTextQueryArgs.or(
+  searchByGeoTextPaginateArgs
+);
+
 export type SearchByGeoTextArgs = typeof searchByGeoTextArgsValidator.infer;
+
+export type SearchByGeoTextQueryArgs = typeof searchByGeoTextQuery.infer;
 
 export const geocodePlaceInput = type({
   place: type.string.atLeastLength(2).atMostLength(300).configure({
@@ -404,10 +441,16 @@ export const editProducerArgsValidatorV2 = type({
 });
 
 export const searchProducersArgsValidator = type({
-  "query?": "string|undefined",
+  query: "string",
   limit: "number",
   offset: "number",
-});
+}).or(
+  type({
+    paginationId: "string",
+    limit: "number",
+    offset: "number",
+  })
+);
 
 export const editProducerFormValidatorV2 =
   editProducerArgsValidatorV2.omit("id");
@@ -566,3 +609,9 @@ export type IpGeoValidator = typeof ipGeoValidator.infer;
 export type SuggestProducerArgs = typeof suggestProducerArgs.infer;
 
 export type SearchProducersArgs = typeof searchProducersArgsValidator.infer;
+
+export type SearchProducersQueryArgs = {
+  query?: string;
+  limit: number;
+  offset: number;
+};
