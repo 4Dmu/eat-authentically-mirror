@@ -291,16 +291,18 @@ export const NominatimGeocodeResponseCache = {
   },
 };
 
-export const SEARCH_BY_GEO_TEXT_QUERY_CACHE = {
+export const SEARCH_BY_GEO_TEXT_PAGINATION_CACHE = {
   ttlSeconds: 120,
-  dialect: new SQLiteSyncDialect(),
   generateKey(query: string) {
-    return `search_by_geo_text:query-cache:${query}`;
+    return `search_by_geo_text:query-pagination-cache:${query}`;
   },
   async set(id: string, query: SearchByGeoTextQueryArgs) {
     await redis.set(this.generateKey(id), query, {
       ex: this.ttlSeconds,
     });
+  },
+  async delete(id: string) {
+    await redis.del(this.generateKey(id));
   },
   async get(id: string) {
     const key = this.generateKey(id);
@@ -309,5 +311,25 @@ export const SEARCH_BY_GEO_TEXT_QUERY_CACHE = {
       await redis.expire(key, this.ttlSeconds);
     }
     return value;
+  },
+};
+
+export const SEARCH_BY_GEO_TEXT_QUERIES_CACHE = {
+  ttlSeconds: 60 * 60 * 24 * 5,
+  generateKey(queryStr: string) {
+    return `search_by_geo_text:transformed-query-cache:${queryStr}`;
+  },
+  async set(queryStr: string, queryArgs: SearchByGeoTextQueryArgs) {
+    await redis.set(this.generateKey(queryStr), queryArgs, {
+      ex: this.ttlSeconds,
+    });
+  },
+  async delete(queryStr: string) {
+    await redis.del(this.generateKey(queryStr));
+  },
+  async get(queryStr: string) {
+    return await redis.get<SearchByGeoTextQueryArgs>(
+      this.generateKey(queryStr)
+    );
   },
 };

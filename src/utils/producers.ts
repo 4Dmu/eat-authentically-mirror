@@ -53,6 +53,7 @@ import {
   ProducerWithAll,
 } from "@/backend/db/schema";
 import type { ProducerSearchResult } from "@/backend/data/producer";
+import { useHomePageStore } from "@/stores";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -155,30 +156,25 @@ export function useSearchProducers(
   >
 ) {
   const queryClient = useQueryClient();
+  const search = useHomePageStore();
   return useQuery({
     ...opts,
     queryKey: ["search-producers", params, pagination] as const,
     queryFn: async () => {
-      const previous = queryClient.getQueriesData<ProducerSearchResult>({
-        queryKey: ["search-producers", params],
-      })[0][1];
-      console.log("Old data:", previous);
+      const value = await searchProducers({
+        limit: pagination.limit,
+        offset: pagination.offset,
+        query: params.query ?? "",
+      });
 
-      console.log(previous?.paginationId);
+      console.log(value);
 
-      return await searchProducers(
-        previous?.paginationId
-          ? {
-              paginationId: previous.paginationId,
-              limit: pagination.limit,
-              offset: pagination.offset,
-            }
-          : {
-              query: params.query!,
-              limit: pagination.limit,
-              offset: pagination.offset,
-            }
-      );
+      if (value.offset !== undefined) {
+        console.log(value.offset / value.limit);
+        search.setPage(value.offset / value.limit);
+      }
+
+      return value;
     },
     enabled: params.query !== undefined,
     placeholderData: keepPreviousData,

@@ -4,6 +4,7 @@ import { PRODUCER_TYPES } from "../constants";
 import { searchByGeoText } from "../data/producer";
 import { geocodePlace } from "./utils/geocode";
 import { SearchByGeoTextArgs } from "../validators/producers";
+import { SEARCH_BY_GEO_TEXT_QUERIES_CACHE } from "../kv";
 
 export const searchByGeoTextInput = z.object({
   q: z.string().trim().min(1).max(256).nullable().optional(),
@@ -71,6 +72,7 @@ export const initTools = ({
     limit: number;
     offset: number;
     geo?: Extract<SearchByGeoTextArgs, { q?: string | undefined }>["geo"];
+    originalQuery: string;
   };
   userId: string | undefined;
 }) => {
@@ -89,13 +91,22 @@ export const initTools = ({
           offset: search_by_geo_text.offset,
         };
 
-        console.log(JSON.stringify(llmArgs), "llm args");
-        console.log(JSON.stringify(overridedArgs), "overrided args");
+        await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(
+          search_by_geo_text.originalQuery,
+          {
+            geo: Object.hasOwn(search_by_geo_text, "geo")
+              ? search_by_geo_text.geo
+              : (llmArgs.geo ?? undefined),
+            q: llmArgs.q ?? undefined,
+            filters: llmArgs.filters,
+            stateProvinceHint: llmArgs.stateProvinceHint,
+            countryHint: llmArgs.countryHint,
+          }
+        );
 
         const result = await searchByGeoText(
           {
             ...overridedArgs,
-            mode: "query",
             geo: Object.hasOwn(search_by_geo_text, "geo")
               ? search_by_geo_text.geo
               : (overridedArgs.geo ?? undefined),

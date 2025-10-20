@@ -67,7 +67,11 @@ import {
   PRODUCER_TYPES,
   RATELIMIT_ALL,
 } from "../constants";
-import { USER_PRODUCER_IDS_KV } from "../kv";
+import {
+  SEARCH_BY_GEO_TEXT_PAGINATION_CACHE,
+  SEARCH_BY_GEO_TEXT_QUERIES_CACHE,
+  USER_PRODUCER_IDS_KV,
+} from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
 import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
 import crypto from "node:crypto";
@@ -95,6 +99,7 @@ import z from "zod";
 import { geocodePlace } from "../llm/utils/geocode";
 import { NominationPlace } from "../validators/nomination-api";
 import * as R from "remeda";
+import { resetChatNotifications } from "./messages";
 
 export const searchProducers = actionClient
   .name("searchProducers")
@@ -106,17 +111,18 @@ export const searchProducers = actionClient
     //   ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
     //   : undefined;
 
-    console.log(rest);
+    const params = await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.get(rest.query);
 
-    if ("paginationId" in rest) {
-      const result = await listing.searchByGeoText({
-        paginationId: rest.paginationId,
-        mode: "paginate",
+    if (params) {
+      console.log("Cache hit for query", rest.query, "params", params);
+      return await listing.searchByGeoText({
         limit,
         offset,
+        ...params,
       });
-      return result;
     }
+
+    offset = 0;
 
     // const tools = initTools({
     //   search_by_geo_text: { limit: limit, offset: offset },
@@ -169,7 +175,11 @@ export const searchProducers = actionClient
 
     if (hasLocationSnippet === true) {
       const tools = initTools({
-        search_by_geo_text: { limit: 50, offset: 0 },
+        search_by_geo_text: {
+          limit: limit,
+          offset: offset,
+          originalQuery: rest.query,
+        },
         userId: undefined,
       });
       const result = await generateText({
@@ -203,7 +213,12 @@ export const searchProducers = actionClient
       output = item.output as listing.ProducerSearchResult;
     } else {
       const tools = initTools({
-        search_by_geo_text: { limit: 50, offset: 0, geo: undefined },
+        search_by_geo_text: {
+          limit: limit,
+          offset: offset,
+          geo: undefined,
+          originalQuery: rest.query,
+        },
         userId: undefined,
       });
       const result = await generateText({

@@ -360,22 +360,13 @@ const searchByGeoTextQuery = type({
 
 const searchByGeoTextQueryArgs = searchByGeoTextQuery.and(
   type({
-    mode: "'query'",
     limit: type.number.atLeast(1).atMost(50),
     offset: type.number.atLeast(0),
+    "paginationId?": "string",
   })
 );
 
-const searchByGeoTextPaginateArgs = type({
-  mode: "'paginate'",
-  paginationId: "string",
-  limit: type.number.atLeast(1).atMost(50),
-  offset: type.number.atLeast(0),
-});
-
-export const searchByGeoTextArgsValidator = searchByGeoTextQueryArgs.or(
-  searchByGeoTextPaginateArgs
-);
+export const searchByGeoTextArgsValidator = searchByGeoTextQueryArgs;
 
 export type SearchByGeoTextArgs = typeof searchByGeoTextArgsValidator.infer;
 
@@ -444,13 +435,8 @@ export const searchProducersArgsValidator = type({
   query: "string",
   limit: "number",
   offset: "number",
-}).or(
-  type({
-    paginationId: "string",
-    limit: "number",
-    offset: "number",
-  })
-);
+  "paginationId?": "string",
+});
 
 export const editProducerFormValidatorV2 =
   editProducerArgsValidatorV2.omit("id");

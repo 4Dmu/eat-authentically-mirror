@@ -7,7 +7,10 @@ import type {
 import { client, db } from "../db";
 import { asc, eq, ilike, SQL, sql } from "drizzle-orm";
 import { claimRequests, producerCards, producers } from "../db/schema";
-import { SEARCH_BY_GEO_TEXT_QUERY_CACHE, USER_PRODUCER_IDS_KV } from "../kv";
+import {
+  SEARCH_BY_GEO_TEXT_PAGINATION_CACHE,
+  USER_PRODUCER_IDS_KV,
+} from "../kv";
 
 export async function getUsersProducerIdsCached(userId: string) {
   const profileIds = await USER_PRODUCER_IDS_KV.get(userId);
@@ -147,10 +150,10 @@ export function approximateMaxDistanceKm(args: {
 }
 
 export async function searchByGeoText(
-  inputArgs: SearchByGeoTextArgs,
+  args: SearchByGeoTextArgs,
   userId?: string
 ) {
-  const { limit, offset } = inputArgs;
+  const { limit, offset } = args;
 
   let rows: Row[] = [];
   let maxDistance:
@@ -160,33 +163,6 @@ export async function searchByGeoText(
         source: "radius" | "bbox" | "none";
       }
     | undefined = undefined;
-
-  let args: SearchByGeoTextQueryArgs;
-  let paginationId: string;
-
-  if (inputArgs.mode === "paginate") {
-    paginationId = inputArgs.paginationId;
-    const cachedArgs = await SEARCH_BY_GEO_TEXT_QUERY_CACHE.get(
-      inputArgs.paginationId
-    );
-
-    if (cachedArgs == null) {
-      throw new Error("Paginiation query not found");
-    }
-    args = cachedArgs;
-    paginationId = inputArgs.paginationId;
-  } else {
-    args = {
-      q: inputArgs.q,
-      geo: inputArgs.geo,
-      countryHint: inputArgs.countryHint,
-      stateProvinceHint: inputArgs.stateProvinceHint,
-      filters: inputArgs.filters,
-    };
-
-    paginationId = crypto.randomUUID();
-    await SEARCH_BY_GEO_TEXT_QUERY_CACHE.set(paginationId, args);
-  }
 
   const { q, geo, filters, stateProvinceHint, countryHint } = args;
 
@@ -930,10 +906,10 @@ export async function searchByGeoText(
     count: items.length,
     page: offset / limit,
     limit,
+    offset: offset,
     hasMore,
     nextOffset: hasMore ? offset + limit : null,
     maxDistance: maxDistance?.maxDistanceKm ?? null,
-    paginationId,
   };
 }
 
@@ -967,7 +943,7 @@ export type ProducerSearchResult = {
   hasMore: boolean;
   nextOffset: number | null;
   maxDistance: number | null;
-  paginationId: string;
+  offset: number;
 };
 
 export async function getProducerPublic(args: GetProducerArgs) {

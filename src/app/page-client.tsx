@@ -77,10 +77,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
             >
               <ArrowLeft />
             </Button>
-            <Badge variant={"brandBrown"}>
-              Page {page + 1} of{" "}
-              {Math.ceil((data?.count ?? 1) / HOME_PAGE_RESULT_LIMIT)}
-            </Badge>
+            <Badge variant={"brandBrown"}>Page {page + 1}</Badge>
             <Button
               variant={"brandBrown"}
               size={"icon"}
