@@ -65,7 +65,6 @@ export const geocodePlaceInput = z.object({
 });
 
 export const initTools = ({
-  userId,
   search_by_geo_text,
 }: {
   search_by_geo_text: {
@@ -104,18 +103,15 @@ export const initTools = ({
           }
         );
 
-        const result = await searchByGeoText(
-          {
-            ...overridedArgs,
-            geo: Object.hasOwn(search_by_geo_text, "geo")
-              ? search_by_geo_text.geo
-              : (overridedArgs.geo ?? undefined),
-            q: overridedArgs.q ?? undefined,
-            limit: search_by_geo_text.limit,
-            offset: search_by_geo_text.offset,
-          },
-          userId
-        );
+        const result = await searchByGeoText({
+          ...overridedArgs,
+          geo: Object.hasOwn(search_by_geo_text, "geo")
+            ? search_by_geo_text.geo
+            : (overridedArgs.geo ?? undefined),
+          q: overridedArgs.q ?? undefined,
+          limit: search_by_geo_text.limit,
+          offset: search_by_geo_text.offset,
+        });
         return result;
       },
     }),
