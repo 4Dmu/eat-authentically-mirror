@@ -317,7 +317,12 @@ export const SEARCH_BY_GEO_TEXT_QUERIES_CACHE = {
   generateKey(queryStr: string) {
     return `search_by_geo_text:transformed-query-cache:${queryStr}`;
   },
-  async set(queryStr: string, queryArgs: SearchByGeoTextQueryArgs) {
+  async set(
+    queryStr: string,
+    queryArgs: SearchByGeoTextQueryArgs & {
+      userRequestsUsingTheirLocation?: boolean;
+    }
+  ) {
     await redis.set(this.generateKey(queryStr), queryArgs, {
       ex: this.ttlSeconds,
     });
@@ -326,8 +331,8 @@ export const SEARCH_BY_GEO_TEXT_QUERIES_CACHE = {
     await redis.del(this.generateKey(queryStr));
   },
   async get(queryStr: string) {
-    return await redis.get<SearchByGeoTextQueryArgs>(
-      this.generateKey(queryStr)
-    );
+    return await redis.get<
+      SearchByGeoTextQueryArgs & { userRequestsUsingTheirLocation?: boolean }
+    >(this.generateKey(queryStr));
   },
 };

@@ -5,12 +5,13 @@ import { HeroCarousel } from "@/components/hero-carousel";
 import { ProducerCard } from "@/components/producer-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useHomePageStore } from "@/stores";
+import { useGeolocationStore, useHomePageStore } from "@/stores";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import type { Geo } from "@vercel/functions";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 import { useSearchProducers } from "@/utils/producers";
+import { RequestLocation } from "@/components/request-location";
 
 export function Page({}: { userIpGeo: Geo | undefined }) {
   const { typeFilter, query, certs, locationSearchArea, page, setPage } =
@@ -18,15 +19,19 @@ export function Page({}: { userIpGeo: Geo | undefined }) {
 
   const debouncedQuery = useDebounce(query, 500);
 
+  const userLocation = useGeolocationStore((s) => s.state);
+
   const { data, isPlaceholderData } = useSearchProducers(
     {
       query: debouncedQuery,
     },
-    { offset: page * HOME_PAGE_RESULT_LIMIT, limit: HOME_PAGE_RESULT_LIMIT }
+    { offset: page * HOME_PAGE_RESULT_LIMIT, limit: HOME_PAGE_RESULT_LIMIT },
+    { position: userLocation?.position }
   );
 
   return (
     <div className="flex flex-col gap-10  bg-gray-50">
+      <RequestLocation yes={data?.userRequestsUsingTheirLocation} />
       <HeroCarousel />
       <div className="p-5">
         <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
@@ -74,19 +79,19 @@ export function Page({}: { userIpGeo: Geo | undefined }) {
               variant={"brandBrown"}
               size={"icon"}
               onClick={() => {
-                if (!isPlaceholderData && data?.hasMore) {
+                if (!isPlaceholderData && data?.result.hasMore) {
                   setPage((old) => old + 1);
                 }
               }}
               // Disable the Next Page button until we know a next page is available
-              disabled={isPlaceholderData || !data?.hasMore}
+              disabled={isPlaceholderData || !data?.result.hasMore}
             >
               <ArrowRight />
             </Button>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {data?.items.map((producer) => (
+            {data?.result.items.map((producer) => (
               <ProducerCard key={producer.id} producer={producer} />
             ))}
           </div>

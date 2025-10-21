@@ -138,33 +138,42 @@ export function useProducerPublic(
 export function useSearchProducers(
   params: { query: string | undefined },
   pagination: { limit: number; offset: number },
+  location: { position: GeolocationPosition | undefined },
   opts?: UseQueryOptions<
-    ProducerSearchResult,
+    {
+      result: ProducerSearchResult;
+      userRequestsUsingTheirLocation: undefined | boolean;
+    },
     Error,
-    ProducerSearchResult,
+    {
+      result: ProducerSearchResult;
+      userRequestsUsingTheirLocation: undefined | boolean;
+    },
     readonly [
       string,
       { query: string | undefined },
       { limit: number; offset: number },
+      { position: GeolocationPosition | undefined },
     ]
   >
 ) {
   const search = useHomePageStore();
   return useQuery({
     ...opts,
-    queryKey: ["search-producers", params, pagination] as const,
+    queryKey: ["search-producers", params, pagination, location] as const,
     queryFn: async () => {
       const value = await searchProducers({
         limit: pagination.limit,
         offset: pagination.offset,
         query: params.query ?? "",
+        userLocation: location.position?.toJSON(),
       });
 
       console.log(value);
 
-      if (value.offset !== undefined) {
-        console.log(value.offset / value.limit);
-        search.setPage(value.offset / value.limit);
+      if (value.result.offset !== undefined) {
+        console.log(value.result.offset / value.result.limit);
+        search.setPage(value.result.offset / value.result.limit);
       }
 
       return value;

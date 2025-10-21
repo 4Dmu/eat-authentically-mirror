@@ -148,6 +148,8 @@ function approximateMaxDistanceKm(args: {
 export async function searchByGeoText(args: SearchByGeoTextArgs) {
   const { limit, offset } = args;
 
+  console.log(args);
+
   let rows: Row[] = [];
   let maxDistance:
     | {

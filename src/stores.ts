@@ -5,6 +5,7 @@ import {
 } from "@/backend/validators/producers";
 import { atomWithStorage } from "jotai/utils";
 import { atom } from "jotai";
+import { boolean } from "zod";
 
 type CertificationFilter = {
   id: string;
@@ -48,6 +49,82 @@ export const useHomePageStore = create<HomePageState>((set, get) => ({
   setLocationSearchArea: (locationSearchArea) => set({ locationSearchArea }),
   useIpGeo: false,
   setUseIpGeo: (useIpGeo) => set({ useIpGeo }),
+}));
+
+export type GeolocationState =
+  | undefined
+  | {
+      geolocationSupported: boolean;
+      location: undefined | GeolocationPosition | GeolocationPositionError;
+      position: GeolocationPosition | undefined;
+      positionError: GeolocationPositionError | undefined;
+    };
+
+const isPosition = (
+  value: GeolocationPosition | GeolocationPositionError
+): value is GeolocationPosition => {
+  console.log(Object.hasOwn(value, "coords"), "isPosition");
+  return (
+    Object.hasOwn(value, "coords") &&
+    (value as GeolocationPosition)?.coords !== undefined
+  );
+};
+
+export const alreadyRequestedGeoAtom = atomWithStorage(
+  "already-requested-geo",
+  false
+);
+
+export const useGeolocationStore = create<{
+  state: GeolocationState;
+  setLocationSupported: (value: boolean) => void;
+  setPosition: (value: undefined | GeolocationPosition) => void;
+  setPositionError: (value: undefined | GeolocationPositionError) => void;
+}>((set) => ({
+  state: undefined,
+  setLocationSupported: (value) =>
+    set(({ state }) => ({
+      state: state
+        ? { ...state, geolocationSupported: value }
+        : {
+            geolocationSupported: value,
+            location: undefined,
+            position: undefined,
+            positionError: undefined,
+          },
+    })),
+  setPosition: (value) =>
+    set(({ state }) => ({
+      state: state
+        ? {
+            ...state,
+            location: value,
+            position: value,
+            positionError: undefined,
+          }
+        : {
+            geolocationSupported: true,
+            location: value,
+            position: value,
+            positionError: undefined,
+          },
+    })),
+  setPositionError: (value) =>
+    set(({ state }) => ({
+      state: state
+        ? {
+            ...state,
+            location: value,
+            position: undefined,
+            positionError: value,
+          }
+        : {
+            geolocationSupported: true,
+            location: value,
+            position: undefined,
+            positionError: value,
+          },
+    })),
 }));
 
 export const useProducerRegisterStore = create<{

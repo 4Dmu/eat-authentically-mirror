@@ -72,6 +72,7 @@ export const initTools = ({
     offset: number;
     geo?: Extract<SearchByGeoTextArgs, { q?: string | undefined }>["geo"];
     originalQuery: string;
+    userRequestsUsingTheirLocation?: boolean;
   };
   userId: string | undefined;
 }) => {
@@ -80,11 +81,13 @@ export const initTools = ({
       description: "Search producers by free text and a circular geofence.",
       inputSchema: searchByGeoTextInput,
       execute: async (llmArgs) => {
+        const overridedGeo = Object.hasOwn(search_by_geo_text, "geo")
+          ? search_by_geo_text.geo
+          : (llmArgs.geo ?? undefined);
+
         const overridedArgs = {
           ...llmArgs,
-          geo: Object.hasOwn(search_by_geo_text, "geo")
-            ? search_by_geo_text.geo
-            : (llmArgs.geo ?? undefined),
+          geo: overridedGeo,
           q: llmArgs.q ?? undefined,
           limit: search_by_geo_text.limit,
           offset: search_by_geo_text.offset,
@@ -93,13 +96,15 @@ export const initTools = ({
         await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(
           search_by_geo_text.originalQuery,
           {
-            geo: Object.hasOwn(search_by_geo_text, "geo")
-              ? search_by_geo_text.geo
-              : (llmArgs.geo ?? undefined),
+            geo: search_by_geo_text.userRequestsUsingTheirLocation
+              ? undefined
+              : overridedGeo,
             q: llmArgs.q ?? undefined,
             filters: llmArgs.filters,
             stateProvinceHint: llmArgs.stateProvinceHint,
             countryHint: llmArgs.countryHint,
+            userRequestsUsingTheirLocation:
+              search_by_geo_text.userRequestsUsingTheirLocation,
           }
         );
 

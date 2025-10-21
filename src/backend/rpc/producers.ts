@@ -61,7 +61,11 @@ import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
-import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "../constants";
+import {
+  CLAIM_DNS_TXT_RECORD_NAME,
+  CUSTOM_GEO_HEADER_NAME,
+  RATELIMIT_ALL,
+} from "../constants";
 import { SEARCH_BY_GEO_TEXT_QUERIES_CACHE, USER_PRODUCER_IDS_KV } from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
 import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
@@ -76,80 +80,79 @@ import { generateObject, generateText, stepCountIs } from "ai";
 import { initTools } from "../llm/tools";
 import { openai } from "@ai-sdk/openai";
 import z from "zod";
+import { headers } from "next/headers";
+import { Geo } from "@vercel/functions";
 
 export const searchProducers = actionClient
   .name("searchProducers")
   .input(searchProducersArgsValidator)
-  .action(async ({ input: { limit, offset, ...rest } }) => {
-    // const headerList = await headers();
-    // const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
-    // const parsedGeo = rawGeo
-    //   ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
-    //   : undefined;
+  .action(async ({ input: { limit, offset, userLocation, ...rest } }) => {
+    const headerList = await headers();
+    const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
+    const parsedGeo = rawGeo
+      ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
+      : undefined;
+
+    const ipGeo =
+      parsedGeo?.latitude && parsedGeo.longitude
+        ? { lat: Number(parsedGeo.latitude), lon: Number(parsedGeo.longitude) }
+        : undefined;
+
+    const userGeo = userLocation
+      ? {
+          lat: userLocation.coords.latitude,
+          lon: userLocation.coords.longitude,
+        }
+      : ipGeo;
 
     const params = await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.get(rest.query);
 
     if (params) {
       console.log("Cache hit for query", rest.query, "params", params);
-      return await listing.searchByGeoText({
+
+      const geo =
+        params.userRequestsUsingTheirLocation === true
+          ? {
+              center: userGeo!,
+              radiusKm: 100,
+            }
+          : undefined;
+
+      const result = await listing.searchByGeoText({
+        ...params,
         limit,
         offset,
-        ...params,
+        geo: geo ?? params.geo,
       });
+
+      return {
+        result: result,
+        userRequestsUsingTheirLocation: params.userRequestsUsingTheirLocation,
+      };
     }
 
+    // Query is not cached so pagination is invalid
     offset = 0;
 
-    // const tools = initTools({
-    //   search_by_geo_text: { limit: limit, offset: offset },
-    // });
-    // const geocodeResult = await generateText({
-    //   model: openai("gpt-4o-mini"),
-    //   prompt: query,
-    //   tools,
-    //   stopWhen: stepCountIs(2),
-    //   toolChoice: "required",
-    //   system: `Check if input contains partial of full location snippet, if so call the 'geocode_place' tool.
-    //     Finally call the 'search_by_geo_text' tool, use the provided tool to find farms, ranches, and restaurants.
-    //     Always pass bounding box if geocode_place was used.
-    //     Always pass country hint if geocode_place contains a country.
-    //     Extract filters from query when possible, only pass q when filters are extracted and parts remain.
-    //     Only pass commodities filter when looking for farms and the query contains specific products.
-    //      `,
-    // });
-
-    // if (geocodeResult.finishReason === "stop" && geocodeResult.text) {
-    //   console.log(geocodeResult);
-    //   // treat as error in policy adherence or convert to final
-    //   return {
-    //     items: [],
-    //     count: 0,
-    //     page: 0,
-    //     limit: 0,
-    //     hasMore: false,
-    //     nextOffset: null,
-    //     maxDistance: null,
-    //   };
-    // }
-
-    // console.log(geocodeResult.toolResults);
-
-    // const item =
-    //   geocodeResult.toolResults[geocodeResult.toolResults.length - 1];
-    // console.log(item);
-
     const {
-      object: { hasLocationSnippet },
+      object: { hasLocationSnippet, userRequestsUsingTheirLocation },
     } = await generateObject({
       model: openai("gpt-4o-mini"),
-      schema: z.object({ hasLocationSnippet: z.boolean() }),
+      schema: z.object({
+        hasLocationSnippet: z.boolean(),
+        userRequestsUsingTheirLocation: z.boolean(),
+      }),
       prompt: rest.query,
-      system: "Check if input contains a location snippet",
+      system:
+        "Check if input contains a location snippet and if the prompter requests to use their location",
     });
 
     let output: listing.ProducerSearchResult;
 
-    if (hasLocationSnippet === true) {
+    if (
+      hasLocationSnippet === true &&
+      userRequestsUsingTheirLocation !== true
+    ) {
       const tools = initTools({
         search_by_geo_text: {
           limit: limit,
@@ -192,8 +195,15 @@ export const searchProducers = actionClient
         search_by_geo_text: {
           limit: limit,
           offset: offset,
-          geo: undefined,
+          geo:
+            userRequestsUsingTheirLocation === true && userGeo !== undefined
+              ? {
+                  center: userGeo!,
+                  radiusKm: 50,
+                }
+              : undefined,
           originalQuery: rest.query,
+          userRequestsUsingTheirLocation,
         },
         userId: undefined,
       });
@@ -212,147 +222,10 @@ export const searchProducers = actionClient
       output = item.output as listing.ProducerSearchResult;
     }
 
-    return output;
-
-    // const tools = initTools({
-    //   search_by_geo_text: { limit: limit, offset: offset },
-    // });
-
-    // const messages: ModelMessage[] = [{ role: "user", content: query }];
-
-    // const nextSteps = await generateObject({
-    //   model: openai("gpt-4o-mini"),
-    //   schema: z.object({
-    //     locationSnippet: z.string().nullable(),
-    //     searchQuery: z.string(),
-    //     filters: z
-    //       .object({
-    //         category: z
-    //           .enum(PRODUCER_TYPES)
-    //           .nullable()
-    //           .describe("Must be either farm, ranch or eatery"),
-    //         commodities: z
-    //           .string()
-    //           .min(1)
-    //           .nullable()
-    //           .describe("Comma seperated list of products to search for"),
-    //         variants: z
-    //           .string()
-    //           .min(1)
-    //           .nullable()
-    //           .describe(
-    //             "Comma seperated list of product variants to search for"
-    //           ),
-    //         certifications: z
-    //           .string()
-    //           .array()
-    //           .min(1)
-    //           .nullable()
-    //           .describe("Array of certifications to search for"),
-    //         organicOnly: z.boolean().nullable(),
-    //       })
-    //       .nullable(),
-    //   }),
-    //   system:
-    //     "Strip locationSnippet and filters from input and return them and the remaining query as searchQuery",
-    //   prompt: query,
-    // });
-
-    // let location:
-    //   | {
-    //       status: "error";
-    //       error: string;
-    //     }
-    //   | {
-    //       status: "success";
-    //       data: NominationPlace;
-    //     }
-    //   | undefined = undefined;
-
-    // console.log(nextSteps.object);
-
-    // if (nextSteps.object.locationSnippet) {
-    //   location = await geocodePlace({
-    //     place: nextSteps.object.locationSnippet,
-    //   });
-    // }
-
-    // console.log(location);
-
-    // const props = {
-    //   q: nextSteps.object.searchQuery,
-    //   geo:
-    //     location?.status === "success"
-    //       ? {
-    //           center: {
-    //             lat: Number(location.data.lat),
-    //             lon: Number(location.data.lon),
-    //           },
-    //           bbox: location.data.boundingbox,
-    //         }
-    //       : undefined,
-    //   limit: limit,
-    //   offset: offset,
-    // };
-
-    // console.log(props);
-
-    // const result = await listing.searchByGeoText(props);
-
-    // return result;
-
-    // const geocodeResult = await generateText({
-    //   model: openai("gpt-4o-mini"),
-    //   messages,
-    //   tools,
-    //   system:
-    //     "Generate input for the search_by_geo_text tool, if prompt contains location use the geocode_place tool and include its output in your output.",
-    //   activeTools: ["geocode_place"],
-    // });
-
-    // messages.push(...geocodeResult.response.messages);
-
-    // const searchResults = await generateText({
-    //   model: openai("gpt-4o-mini"),
-    //   messages,
-    //   tools,
-    //   system:
-    //     "Use geocode_place result and input query to call search_by_geo_text. Always pass bounding box from 'geocode_place'. Pass country and city hints if available. Do NOT output free text.",
-    //   toolChoice: "required",
-    //   activeTools: ["search_by_geo_text"],
-    // });
-
-    // return searchResults.toolResults[0].output as listing.ProducerSearchResult;
-
-    // const result = await generateText({
-    //   model: openai("gpt-4o-mini"), // or gpt-4o, gpt-4.1, etc.
-    //   prompt: query,
-    //   tools,
-    //   stopWhen: stepCountIs(5),
-    //   system: `Use the provided tool to find farms, ranches, and restaurants. Ignore unrelated requests.
-    //   Always use geocode_place tool to find coordinates of place.
-    //   Prefer bounding box if geocode_place was used
-    //   Always pass country hint if geocode_place contains a country.
-    //   Do NOT output free text. When done, you MUST call 'search_by_geo_text'`,
-    // });
-
-    // console.log(result);
-
-    // if (result.finishReason === "stop" && result.text) {
-    //   // treat as error in policy adherence or convert to final
-    //   return {
-    //     items: [],
-    //     count: 0,
-    //     page: 0,
-    //     limit: 0,
-    //     hasMore: false,
-    //     nextOffset: null,
-    //     maxDistance: null,
-    //   };
-    // }
-
-    // const data = result.toolResults[result.toolResults.length - 1].output;
-    // return data as listing.ProducerSearchResult;
+    return {
+      result: output,
+      userRequestsUsingTheirLocation,
+    };
   });
 
 export const registerProducer = authenticatedActionClient

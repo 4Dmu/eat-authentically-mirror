@@ -1,4 +1,4 @@
-import { type } from "arktype";
+import { type, declare } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { ClaimRequestStatus } from "../db/schema";
 import { isMobilePhone } from "validator";
@@ -433,7 +433,17 @@ export const searchProducersArgsValidator = type({
   query: "string",
   limit: "number",
   offset: "number",
-  "paginationId?": "string",
+  "userLocation?": type({
+    coords: type({
+      accuracy: "number",
+      altitude: "number|null",
+      altitudeAccuracy: "number|null",
+      heading: "number|null",
+      latitude: "number",
+      longitude: "number",
+      speed: "number|null",
+    }),
+  }).or(type.undefined),
 });
 
 export const editProducerFormValidatorV2 =
