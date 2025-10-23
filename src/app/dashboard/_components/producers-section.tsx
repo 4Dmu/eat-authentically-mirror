@@ -88,7 +88,7 @@ export function ProducersSection({
               <CardContent className="p-5 flex flex-col gap-2">
                 <p className="font-fraunces text-lg">{p.name}</p>
                 <Badge>{p.type}</Badge>
-                <p>{p.about}</p>
+                <p>{p.summary}</p>
               </CardContent>
               <CardFooter className="grid grid-cols-3 gap-2 mt-auto">
                 <Button variant={"outline"} asChild>

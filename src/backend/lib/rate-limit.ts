@@ -160,6 +160,42 @@ export const allow1RequestPer2Seconds = new Ratelimit({
   prefix: "ea-concierge:1req-per-2sec",
 });
 
+export const allow10RequestPer30Minutes = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(10, "30 m"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "ea-concierge:10req-per-30min",
+});
+
+export const allow25RequestPer30Min = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(25, "30 m"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "ea-concierge:25req-per-30min",
+});
+
+export const allow100RequestPer30Min = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(100, "30 m"),
+  analytics: true,
+  /**
+   * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+   * instance with other applications and want to avoid key collisions. The default prefix is
+   * "@upstash/ratelimit"
+   */
+  prefix: "ea-concierge:100req-per-30min",
+});
+
 export async function multiLimit(limits: [Ratelimit, string][]) {
   for (const [limit, key] of limits) {
     const result = await limit.limit(key);

@@ -46,6 +46,9 @@ import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
 import { cloudflare } from "../lib/cloudflare";
 import {
+  allow100RequestPer30Min,
+  allow10RequestPer30Minutes,
+  allow25RequestPer30Min,
   claimProducerRateLimit,
   geocodeRatelimit,
   producerClaimDnsCheckRatelimit,
@@ -82,11 +85,45 @@ import { openai } from "@ai-sdk/openai";
 import z from "zod";
 import { headers } from "next/headers";
 import { Geo } from "@vercel/functions";
+import { auth } from "@clerk/nextjs/server";
 
 export const searchProducers = actionClient
   .name("searchProducers")
   .input(searchProducersArgsValidator)
   .action(async ({ input: { limit, offset, userLocation, ...rest } }) => {
+    const { userId } = await auth();
+
+    if (!userId) {
+      const { success } = await allow10RequestPer30Minutes.limit(
+        "searchProducers:global"
+      );
+
+      if (!success) {
+        throw new Error(
+          "Global ratelimit exceeded. Create an account to make more searches"
+        );
+      }
+    } else {
+      const subTier = await getSubTier(userId);
+      if (subTier === "Free") {
+        const { success } = await allow25RequestPer30Min.limit(
+          `searchProducers:user:${userId}`
+        );
+
+        if (!success) {
+          throw new Error("Ratelimit exceeded");
+        }
+      } else {
+        const { success } = await allow100RequestPer30Min.limit(
+          `searchProducers:user:${userId}`
+        );
+
+        if (!success) {
+          throw new Error("Ratelimit exceeded");
+        }
+      }
+    }
+
     const headerList = await headers();
     const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
     const parsedGeo = rawGeo
