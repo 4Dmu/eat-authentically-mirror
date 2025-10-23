@@ -1,5 +1,11 @@
 "use client";
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import React, {
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
   Dialog,
   DialogClose,
@@ -73,7 +79,7 @@ function usePaginatedProducers() {
   return { page, setPage, query, setQuery, data, isPlaceholderData };
 }
 
-export function ClaimProducerDialog() {
+export function ClaimProducerDialog(props: PropsWithChildren) {
   const [open, setOpen] = useState(false);
   const { step, setStep, submitState } = useClaimProducerSteps();
   const { query, setQuery, page, setPage, data, isPlaceholderData } =
@@ -134,11 +140,12 @@ export function ClaimProducerDialog() {
         setOpen(e);
       }}
     >
-      <DialogTrigger asChild>
-        <Button variant={"outline"}>Claim</Button>
-      </DialogTrigger>
-      <DialogContent showCloseButton={false} className="sm:max-w-3xl">
-        <Tabs value={step.mode}>
+      <DialogTrigger asChild>{props.children}</DialogTrigger>
+      <DialogContent
+        showCloseButton={false}
+        className="sm:max-w-3xl h-[95%] flex flex-col"
+      >
+        <Tabs value={step.mode} className="h-full flex flex-col">
           <DialogHeader>
             <div className="flex justify-between items-center">
               <DialogTitle>Claim Producer</DialogTitle>
@@ -151,8 +158,8 @@ export function ClaimProducerDialog() {
             </div>
           </DialogHeader>
 
-          <TabsContent value="select" className="p-5">
-            <div className="flex flex-col gap-5">
+          <TabsContent value="select" className="p-5 flex-1 min-h-0">
+            <div className="flex flex-col gap-5 h-full min-h-0">
               <Input
                 placeholder="Search producers"
                 value={query ?? ""}
@@ -164,7 +171,7 @@ export function ClaimProducerDialog() {
                   )
                 }
               />
-              <ScrollArea className="h-52 w-full">
+              <div className="h-full w-full flex-1 overflow-auto">
                 <div className="flex flex-col gap-3">
                   {data?.items.map((p) => (
                     <button
@@ -175,7 +182,7 @@ export function ClaimProducerDialog() {
                       <Image
                         src={primaryImageUrl(p)}
                         alt=""
-                        className="border-r"
+                        className="border-r aspect-[4/3] object-cover"
                         width={100}
                         height={100}
                       />
@@ -183,7 +190,8 @@ export function ClaimProducerDialog() {
                     </button>
                   ))}
                 </div>
-              </ScrollArea>
+              </div>
+
               <div className="flex justify-between gap-5">
                 <span>Current Page: {page + 1}</span>
                 <div className="flex gap-2">

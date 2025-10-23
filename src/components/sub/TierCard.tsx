@@ -48,12 +48,14 @@ export function TierCard({
           select();
         }
       }}
+      data-selected={selected}
+      data-color={color}
       className={cn(
-        "border-2 relative",
-        !selected && "hover:border-black/50",
-        selected && color === "blue" && "border-blue-500 bg-blue-500/5",
-        selected && color === "green" && "border-green-500 bg-green-500/5",
-        selected && color === "purple" && "border-purple-500 bg-purple-500/5"
+        `border-2 relative 
+        data-[selected=true]:data-[color=blue]:border-secondary data-[selected=true]:data-[color=blue]:bg-secondary/5 data-[selected=false]:data-[color=blue]:hover:border-secondary
+        data-[selected=true]:data-[color=green]:border-primary data-[selected=true]:data-[color=green]:bg-primary/5 data-[selected=false]:data-[color=green]:hover:border-primary
+        data-[selected=true]:data-[color=purple]:border-teal-400 data-[selected=true]:data-[color=purple]:bg-teal-500/5 data-[selected=false]:data-[color=purple]:hover:border-teal-400`,
+        !selected && "hover:border-black/50"
       )}
     >
       {badge && (

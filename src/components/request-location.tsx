@@ -19,7 +19,7 @@ export function RequestLocation() {
     } else {
       locationStore.setLocationSupported(false);
     }
-  }, [locationStore]);
+  }, []);
 
   return null;
 }

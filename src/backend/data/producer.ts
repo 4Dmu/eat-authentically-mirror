@@ -4,7 +4,7 @@ import type {
   SearchByGeoTextArgs,
 } from "@/backend/validators/producers";
 import { db } from "../db";
-import { asc, eq, ilike, SQL, sql } from "drizzle-orm";
+import { asc, eq, ilike, like, SQL, sql } from "drizzle-orm";
 import { claimRequests, producerCards, producers } from "../db/schema";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 
@@ -1068,14 +1068,14 @@ export async function listProducers(args: {
   let where: SQL<unknown> | undefined = undefined;
 
   if (args.query) {
-    where = ilike(producerCards.name, args.query);
+    where = like(producerCards.name, `%${args.query}%`);
   }
 
   const rows = await db.query.producers.findMany({
     orderBy: asc(producers.createdAt),
     where: where,
     offset: args.offset,
-    limit: args.limit,
+    limit: args.limit + 1,
     with: {
       media: {
         with: {

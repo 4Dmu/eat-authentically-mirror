@@ -1,8 +1,10 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
+import type { UserJSON } from "@clerk/backend";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { match } from "ts-pattern";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -13,14 +15,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import type { UserJSON } from "@clerk/backend";
 import { useUser } from "@clerk/nextjs";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { useLoggedInUserProducers } from "@/utils/producers";
 import { useMemo } from "react";
 import { ProducerCardsRow } from "@/backend/db/schema";
+import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
+import {
+  AddProducerDialog,
+  producerDialogAtom,
+} from "@/components/add-producer-dialog";
+import { useAtom } from "jotai";
 
 export function ProfileSection({
   serverUser,
@@ -31,6 +37,8 @@ export function ProfileSection({
   producersFromServer: ProducerCardsRow[];
   subTierFromServer: SubTier;
 }) {
+  const [producerDialogOpen, setProducerDialogOpen] =
+    useAtom(producerDialogAtom);
   const { isLoaded, user: clientUser } = useUser();
   const { subTier } = useSubTier({ initialData: subTierFromServer });
   const user = isLoaded ? clientUser : serverUser;
@@ -131,9 +139,18 @@ export function ProfileSection({
                   your Pinboard, or claim a producer listing if it&apos;s yours.
                 </p>
                 <div className="gap-5 flex flex-wrap justify-center mt-5">
-                  <Button>Add A Producer Profile (Free)</Button>
-                  <Button>Claim a Producer Profile</Button>
-                  <Button variant={"brandGreen"}>
+                  <AddProducerDialog
+                    open={producerDialogOpen}
+                    onOpenChange={setProducerDialogOpen}
+                  >
+                    <Button>Add A Producer Profile (Free)</Button>
+                  </AddProducerDialog>
+                  <ClaimProducerDialog>
+                    <Button variant={"default"}>
+                      Claim a Producer Profile
+                    </Button>
+                  </ClaimProducerDialog>
+                  <Button>
                     <Link
                       href={
                         subTier === "Free"
@@ -144,7 +161,7 @@ export function ProfileSection({
                       Upgrade to Community Member
                     </Link>
                   </Button>
-                  <Button variant={"brandGreen"}>
+                  <Button>
                     <Link
                       href={
                         subTier === "Free"
@@ -174,9 +191,20 @@ export function ProfileSection({
               </p>
               <div className="gap-5 flex flex-wrap justify-center mt-5">
                 {!hasProducers && (
-                  <Button>Add A Producer Profile (Free)</Button>
+                  <AddProducerDialog
+                    open={producerDialogOpen}
+                    onOpenChange={setProducerDialogOpen}
+                  >
+                    <Button>Add A Producer Profile (Free)</Button>
+                  </AddProducerDialog>
                 )}
-                {!hasProducers && <Button>Claim a Producer Profile</Button>}
+                {!hasProducers && (
+                  <ClaimProducerDialog>
+                    <Button variant={"default"}>
+                      Claim a Producer Profile
+                    </Button>
+                  </ClaimProducerDialog>
+                )}
                 <Button variant={"brandGreen"}>
                   <Link
                     href={

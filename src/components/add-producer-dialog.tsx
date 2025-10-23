@@ -28,14 +28,19 @@ import {
   SelectValue,
 } from "./ui/select";
 import { toast } from "sonner";
+import { PropsWithChildren } from "react";
+import { atom } from "jotai";
+
+export const producerDialogAtom = atom(false);
 
 export function AddProducerDialog({
   open,
   onOpenChange,
-}: {
+  children,
+}: PropsWithChildren<{
   open?: boolean;
   onOpenChange?: (val: boolean) => void;
-}) {
+}>) {
   const client = useQueryClient();
   const registerProducerMutation = useMutation({
     mutationKey: ["register-producer"],
@@ -77,9 +82,7 @@ export function AddProducerDialog({
         onOpenChange?.(e);
       }}
     >
-      <DialogTrigger asChild>
-        <Button>Add New</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:w-[90%] sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Become a Producer</DialogTitle>

@@ -1,6 +1,9 @@
 "use client";
 import { ProducerCardsRow } from "@/backend/db/schema";
-import { AddProducerDialog } from "@/components/add-producer-dialog";
+import {
+  AddProducerDialog,
+  producerDialogAtom,
+} from "@/components/add-producer-dialog";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +21,7 @@ import {
   useFetchUserProducers,
   producerSlugFull,
 } from "@/utils/producers";
+import { useAtom } from "jotai";
 import { BuildingIcon, EyeIcon, EditIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,7 +34,8 @@ export function ProducersSection({
 }: {
   producers: ProducerCardsRow[];
 }) {
-  const [producerDialogOpen, setProducerDialogOpen] = useState(false);
+  const [producerDialogOpen, setProducerDialogOpen] =
+    useAtom(producerDialogAtom);
   const searchparams = useSearchParams();
   const router = useRouter();
   const deleteProducer = useDeleteProducer();
@@ -70,8 +75,12 @@ export function ProducersSection({
           <AddProducerDialog
             open={producerDialogOpen}
             onOpenChange={setProducerDialogOpen}
-          />
-          <ClaimProducerDialog />
+          >
+            <Button variant={"secondary"}>Add New</Button>
+          </AddProducerDialog>
+          <ClaimProducerDialog>
+            <Button variant={"outline"}>Claim</Button>
+          </ClaimProducerDialog>
         </CardAction>
       </CardHeader>
       {(data?.length ?? 0) > 0 && (
