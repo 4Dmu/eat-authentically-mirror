@@ -336,3 +336,21 @@ export const SEARCH_BY_GEO_TEXT_QUERIES_CACHE = {
     >(this.generateKey(queryStr));
   },
 };
+
+export const PRODUCER_COUNTRIES_CACHE = {
+  ttlSeconds: 60 * 10,
+  generateKey() {
+    return `producer:countries-cache`;
+  },
+  async set(countries: string[]) {
+    await redis.set(this.generateKey(), countries, {
+      ex: this.ttlSeconds,
+    });
+  },
+  async delete() {
+    await redis.del(this.generateKey());
+  },
+  async get() {
+    return await redis.get<string[]>(this.generateKey());
+  },
+};

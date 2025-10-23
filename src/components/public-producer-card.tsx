@@ -12,6 +12,10 @@ import { useGeolocationStore } from "@/stores";
 import { useMemo } from "react";
 import { Button } from "./ui/button";
 import type { Geo } from "@vercel/functions";
+import {
+  ButtonGroup,
+  ButtonGroupSeparator,
+} from "@/components/ui/button-group";
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -21,7 +25,7 @@ export function PublicProducerCard({
   userIpGeo,
 }: {
   producer:
-    | ProducerWith<"media" | "ratingAgg" | "location">
+    | ProducerWith<"media" | "ratingAgg" | "location" | "search">
     | Omit<
         ProducerCardsRow,
         "userId" | "subscriptionRank" | "reviewCount" | "ratingSum"
@@ -84,7 +88,7 @@ export function PublicProducerCard({
       <Link
         prefetch={true}
         href={`/producers/${producerSlugFull(producer)}`}
-        className="overflow-hidden"
+        className="overflow-hidden relative"
       >
         <Image
           width={1920}
@@ -98,7 +102,7 @@ export function PublicProducerCard({
         <div className="flex gap-5 justify-between">
           <p className="font-bold">{producer.name}</p>
           <div>
-            <Badge>{producer.type}</Badge>
+            <Badge variant={"secondary-light"}>{producer.type}</Badge>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -116,24 +120,29 @@ export function PublicProducerCard({
           </div>
         </div>
         <p className="text-sm">{producer.summary?.substring(0, 100)}...</p>
-        <Button asChild className="mt-auto">
-          <Link
-            prefetch={true}
-            href={`/producers/${producerSlugFull(producer)}`}
-          >
-            View Details
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant={"default"} asChild className="flex-1">
+            <Link
+              prefetch={true}
+              href={`/producers/${producerSlugFull(producer)}`}
+            >
+              View Details
+            </Link>
+          </Button>
+          <SignedIn>
+            <AddToPinboardIconButton producerId={producer.id} />
+          </SignedIn>
+        </div>
       </div>
       {!("isClaimed" in producer
         ? producer.isClaimed
         : producer.userId !== null) && (
-        <Badge variant={"brandBrown"} className="absolute top-4 left-4">
+        <Badge variant={"secondary"} className="absolute top-4 left-4">
           Unclaimed
         </Badge>
       )}
       <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 backdrop-blur-sm">
-        <StarIcon className="h-4 w-4 fill-orange-300 text-primary" />
+        <StarIcon className="h-4 w-4 fill-secondary text-secondary" />
         <p className="text-sm font-semibold">
           {"ratingAgg" in producer
             ? producer.ratingAgg
@@ -145,12 +154,6 @@ export function PublicProducerCard({
             : (producer.bayesAvg?.toPrecision(2) ?? "0.0")}
         </p>
       </div>
-      <SignedIn>
-        <AddToPinboardIconButton
-          className="absolute top-4 right-4 cursor-pointer"
-          producerId={producer.id}
-        />
-      </SignedIn>
     </div>
   );
 }

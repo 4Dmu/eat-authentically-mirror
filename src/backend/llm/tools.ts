@@ -73,6 +73,7 @@ export const initTools = ({
     geo?: Extract<SearchByGeoTextArgs, { q?: string | undefined }>["geo"];
     originalQuery: string;
     userRequestsUsingTheirLocation?: boolean;
+    countryHint?: string | undefined;
   };
   userId: string | undefined;
 }) => {
@@ -91,6 +92,9 @@ export const initTools = ({
           q: llmArgs.q ?? undefined,
           limit: search_by_geo_text.limit,
           offset: search_by_geo_text.offset,
+          countryHint: search_by_geo_text.countryHint
+            ? search_by_geo_text.countryHint
+            : llmArgs.countryHint,
         };
 
         await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(

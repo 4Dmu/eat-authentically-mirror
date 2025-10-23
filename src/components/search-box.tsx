@@ -1,6 +1,12 @@
 import { Input } from "./ui/input";
-import { CompassIcon, SearchIcon } from "lucide-react";
-import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
+import { CompassIcon, SearchIcon, XIcon } from "lucide-react";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  PropsWithChildren,
+  useEffect,
+  useState,
+} from "react";
 import { useHomePageStore } from "@/stores";
 import { Button } from "./ui/button";
 
@@ -39,9 +45,9 @@ function useAnimatePlaceholder() {
   return placeholder;
 }
 
-export function SearchBox() {
+export function SearchBox(props: PropsWithChildren) {
   const placeholder = useAnimatePlaceholder();
-  const { setQuery, query } = useHomePageStore();
+  const { setQuery, query, resetFilters } = useHomePageStore();
   const [value, setValue] = useState(query ?? "");
 
   function updateQuery(e: ChangeEvent<HTMLInputElement>) {
@@ -83,7 +89,22 @@ export function SearchBox() {
           >
             Search
           </Button>
+          {query !== undefined && (
+            <Button
+              onClick={() => {
+                setQuery(undefined);
+                setValue("");
+                resetFilters();
+              }}
+              variant={"secondary"}
+              size={"lg"}
+              className="self-center rounded-xl"
+            >
+              <XIcon className="" />
+            </Button>
+          )}
         </div>
+        {props.children}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           {[
             "Organic farms near me",

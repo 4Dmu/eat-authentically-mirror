@@ -444,6 +444,12 @@ export const searchProducersArgsValidator = type({
       speed: "number|null",
     }),
   }).or(type.undefined),
+  "customUserLocationRadius?": "number | undefined",
+  "customFilterOverrides?": type({
+    "country?": "string|undefined",
+    "category?": producerTypesValidator.or(type.undefined),
+    "certifications?": type.string.array().or(type.undefined),
+  }).or(type.undefined),
 });
 
 export const editProducerFormValidatorV2 =

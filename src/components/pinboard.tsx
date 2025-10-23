@@ -24,6 +24,11 @@ import { Separator } from "./ui/separator";
 import { useAtom, useAtomValue } from "jotai";
 import { showPinlistDialogAfterPinCreationAtom } from "@/stores";
 import * as R from "remeda";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function AddToPinboardButton({
   producerId,
@@ -141,34 +146,39 @@ export function AddToPinboardIconButton({
   ]);
 
   return (
-    <>
-      <Button
-        className={className}
-        disabled={add.isPending || remove.isPending}
-        onClick={(e) => {
-          e.preventDefault();
-          const pinId = pinboard.data
-            ? pinboard.data.pins.find((pin) => pin.producerId === producerId)
-                ?.id
-            : undefined;
-          if (pinId) {
-            remove.mutate({ pinId });
-          } else {
-            add.mutate({ producerId });
-          }
-        }}
-        variant={isPinned ? "brandGreen" : "default"}
-        size={"icon"}
-      >
-        {isPinned ? <PinIcon /> : <MapPin />}
-      </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          className={className}
+          disabled={add.isPending || remove.isPending}
+          onClick={(e) => {
+            e.preventDefault();
+            const pinId = pinboard.data
+              ? pinboard.data.pins.find((pin) => pin.producerId === producerId)
+                  ?.id
+              : undefined;
+            if (pinId) {
+              remove.mutate({ pinId });
+            } else {
+              add.mutate({ producerId });
+            }
+          }}
+          variant={isPinned ? "secondary" : "tertiary"}
+          size={"icon"}
+        >
+          {isPinned ? <PinIcon /> : <MapPin />}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" align="end">
+        <p>Add listing to pinlist.</p>
+      </TooltipContent>
       <AddPinToPinlistDialog
         context="newPin"
         open={open}
         setOpen={setOpen}
         producerId={producerId}
       />
-    </>
+    </Tooltip>
   );
 }
 

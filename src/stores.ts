@@ -15,19 +15,24 @@ type CertificationFilter = {
 
 export type HomePageState = {
   page: number;
-  typeFilter: ProducerTypes | undefined;
+  categoryFilter: ProducerTypes | undefined;
   query: string | undefined;
-  certs: CertificationFilter[];
+  certsFilter: CertificationFilter[];
   locationSearchArea: google.maps.LatLngBounds | undefined;
   setPage: (page: number | ((current: number) => number)) => void;
-  setTypeFilter: (type: ProducerTypes | undefined) => void;
+  setCategoryFilter: (type: ProducerTypes | undefined) => void;
   setQuery: (query: string | undefined) => void;
-  setCerts: (certs: CertificationFilter[]) => void;
+  setCertsFilter: (certs: CertificationFilter[]) => void;
   setLocationSearchArea: (
     locationSearchArea: google.maps.LatLngBounds | undefined
   ) => void;
   useIpGeo: boolean;
   setUseIpGeo: (val: boolean) => void;
+  countryFilter: undefined | string;
+  setCountryFilter: (country: undefined | string) => void;
+  customUserLocationRadius: number[] | undefined;
+  setCustomUserLocationRadius: (value: number[] | undefined) => void;
+  resetFilters: () => void;
 };
 
 export const useHomePageStore = create<HomePageState>((set, get) => ({
@@ -39,12 +44,24 @@ export const useHomePageStore = create<HomePageState>((set, get) => ({
       set({ page: page(get().page) });
     }
   },
-  typeFilter: undefined,
-  setTypeFilter: (typeFilter) => set({ typeFilter: typeFilter, page: 0 }),
   query: undefined,
   setQuery: (query) => set({ query }),
-  certs: [],
-  setCerts: (certs) => set({ certs }),
+  categoryFilter: undefined,
+  setCategoryFilter: (typeFilter) =>
+    set({ categoryFilter: typeFilter, page: 0 }),
+  certsFilter: [],
+  setCertsFilter: (certs) => set({ certsFilter: certs }),
+  countryFilter: undefined,
+  setCountryFilter: (country) => set({ countryFilter: country }),
+  resetFilters: () => {
+    set({
+      categoryFilter: undefined,
+      certsFilter: [],
+      countryFilter: undefined,
+    });
+  },
+  customUserLocationRadius: undefined,
+  setCustomUserLocationRadius: (val) => set({ customUserLocationRadius: val }),
   locationSearchArea: undefined,
   setLocationSearchArea: (locationSearchArea) => set({ locationSearchArea }),
   useIpGeo: false,

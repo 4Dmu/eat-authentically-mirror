@@ -400,7 +400,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         SELECT s.producer_id, bm25(producers_fts) AS prod_rel
         FROM producers_search s
         JOIN producers_fts ON producers_fts.rowid = s.rowid
-        WHERE producers_fts MATCH ${q.trim()}
+        WHERE producers_fts MATCH ${`"${q.trim()}"`}
       ),
       rev_fts AS (
         SELECT t.producer_id, MIN(t.rank) AS review_rel
@@ -408,7 +408,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           SELECT rc.producer_id, reviews_fts.rank AS rank
           FROM reviews_fts
           JOIN reviews_content rc ON rc.docid = reviews_fts.rowid
-          WHERE reviews_fts MATCH ${q.trim()}
+          WHERE reviews_fts MATCH ${`"${q.trim()}"`}
         ) AS t
         GROUP BY t.producer_id
       ),

@@ -25,6 +25,7 @@ import {
   pendingMediaAssets,
   producerCards,
   ProducerInsert,
+  producerLocation,
   producerMedia,
   producers,
   SuggestedProducerInsert,
@@ -40,6 +41,7 @@ import {
   isNull,
   notInArray,
   sql,
+  isNotNull,
 } from "drizzle-orm";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
@@ -69,7 +71,11 @@ import {
   CUSTOM_GEO_HEADER_NAME,
   RATELIMIT_ALL,
 } from "../constants";
-import { SEARCH_BY_GEO_TEXT_QUERIES_CACHE, USER_PRODUCER_IDS_KV } from "../kv";
+import {
+  PRODUCER_COUNTRIES_CACHE,
+  SEARCH_BY_GEO_TEXT_QUERIES_CACHE,
+  USER_PRODUCER_IDS_KV,
+} from "../kv";
 import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
 import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
 import crypto from "node:crypto";
@@ -90,182 +96,230 @@ import { auth } from "@clerk/nextjs/server";
 export const searchProducers = actionClient
   .name("searchProducers")
   .input(searchProducersArgsValidator)
-  .action(async ({ input: { limit, offset, userLocation, ...rest } }) => {
-    const { userId } = await auth();
+  .action(
+    async ({
+      input: {
+        limit,
+        offset,
+        userLocation,
+        customUserLocationRadius,
+        customFilterOverrides,
+        ...rest
+      },
+    }) => {
+      const { userId } = await auth();
 
-    if (!userId) {
-      const { success } = await allow10RequestPer30Minutes.limit(
-        "searchProducers:global"
-      );
-
-      if (!success) {
-        throw new Error(
-          "Global ratelimit exceeded. Create an account to make more searches"
-        );
-      }
-    } else {
-      const subTier = await getSubTier(userId);
-      if (subTier === "Free") {
-        const { success } = await allow25RequestPer30Min.limit(
-          `searchProducers:user:${userId}`
-        );
-
-        if (!success) {
-          throw new Error("Ratelimit exceeded");
-        }
-      } else {
-        const { success } = await allow100RequestPer30Min.limit(
-          `searchProducers:user:${userId}`
-        );
-
-        if (!success) {
-          throw new Error("Ratelimit exceeded");
-        }
-      }
-    }
-
-    const headerList = await headers();
-    const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
-    const parsedGeo = rawGeo
-      ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
-      : undefined;
-
-    const ipGeo =
-      parsedGeo?.latitude && parsedGeo.longitude
-        ? { lat: Number(parsedGeo.latitude), lon: Number(parsedGeo.longitude) }
+      const headerList = await headers();
+      const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
+      const parsedGeo = rawGeo
+        ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
         : undefined;
 
-    const userGeo = userLocation
-      ? {
-          lat: userLocation.coords.latitude,
-          lon: userLocation.coords.longitude,
-        }
-      : ipGeo;
-
-    const params = await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.get(rest.query);
-
-    if (params) {
-      console.log("Cache hit for query", rest.query, "params", params);
-
-      const geo =
-        params.userRequestsUsingTheirLocation === true
+      const ipGeo =
+        parsedGeo?.latitude && parsedGeo.longitude
           ? {
-              center: userGeo!,
-              radiusKm: 100,
+              lat: Number(parsedGeo.latitude),
+              lon: Number(parsedGeo.longitude),
             }
           : undefined;
 
-      const result = await listing.searchByGeoText({
-        ...params,
-        limit,
-        offset,
-        geo: geo ?? params.geo,
-      });
-
-      return {
-        result: result,
-        userRequestsUsingTheirLocation: params.userRequestsUsingTheirLocation,
-      };
-    }
-
-    // Query is not cached so pagination is invalid
-    offset = 0;
-
-    const {
-      object: { hasLocationSnippet, userRequestsUsingTheirLocation },
-    } = await generateObject({
-      model: openai("gpt-4o-mini"),
-      schema: z.object({
-        hasLocationSnippet: z.boolean(),
-        userRequestsUsingTheirLocation: z.boolean(),
-      }),
-      prompt: rest.query,
-      system:
-        "Check if input contains a location snippet and if the prompter requests to use their location",
-    });
-
-    let output: listing.ProducerSearchResult;
-
-    console.log(hasLocationSnippet, userRequestsUsingTheirLocation);
-
-    if (
-      hasLocationSnippet === true &&
-      userRequestsUsingTheirLocation !== true
-    ) {
-      const tools = initTools({
-        search_by_geo_text: {
-          limit: limit,
-          offset: offset,
-          originalQuery: rest.query,
-        },
-        userId: undefined,
-      });
-      const result = await generateText({
-        model: openai("gpt-4o-mini"),
-        prompt: rest.query,
-        tools,
-        stopWhen: stepCountIs(2),
-        prepareStep: async ({ stepNumber }) => {
-          if (stepNumber === 0) {
-            return {
-              toolChoice: { type: "tool", toolName: "geocode_place" },
-              activeTools: ["geocode_place"],
-            };
-          } else if (stepNumber === 1) {
-            return {
-              toolChoice: { type: "tool", toolName: "search_by_geo_text" },
-              activeTools: ["search_by_geo_text"],
-            };
+      const userGeo = userLocation
+        ? {
+            lat: userLocation.coords.latitude,
+            lon: userLocation.coords.longitude,
           }
-        },
-        toolChoice: "required",
-        system: `Extract partial of full location snippet from input and call the 'geocode_place' tool.
+        : ipGeo;
+
+      const userLocationRadius = customUserLocationRadius ?? 100;
+
+      const params = await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.get(rest.query);
+
+      if (params) {
+        console.log("Cache hit for query", rest.query, "params", params);
+
+        const geo =
+          params.userRequestsUsingTheirLocation === true
+            ? {
+                center: userGeo!,
+                radiusKm: userLocationRadius,
+              }
+            : undefined;
+
+        if (customFilterOverrides?.category) {
+          params.filters = params.filters
+            ? { ...params.filters, category: customFilterOverrides.category }
+            : { category: customFilterOverrides.category };
+        }
+
+        if (
+          customFilterOverrides?.certifications &&
+          customFilterOverrides.certifications.length > 0
+        ) {
+          params.filters = params.filters
+            ? {
+                ...params.filters,
+                certifications: customFilterOverrides.certifications,
+              }
+            : { certifications: customFilterOverrides.certifications };
+        }
+
+        const result = await listing.searchByGeoText({
+          ...params,
+          limit,
+          offset,
+          geo: geo ?? params.geo,
+          countryHint: customFilterOverrides?.country
+            ? customFilterOverrides.country
+            : params.countryHint,
+        });
+
+        return {
+          result: result,
+          userLocation: {
+            userRequestsUsingTheirLocation:
+              params.userRequestsUsingTheirLocation,
+            searchRadius: userLocationRadius,
+          },
+        };
+      }
+
+      if (!userId) {
+        const { success } = await allow10RequestPer30Minutes.limit(
+          "searchProducers:global"
+        );
+
+        if (!success) {
+          throw new Error(
+            "Global ratelimit exceeded. Create an account to make more searches"
+          );
+        }
+      } else {
+        const subTier = await getSubTier(userId);
+        if (subTier === "Free") {
+          const { success } = await allow25RequestPer30Min.limit(
+            `searchProducers:user:${userId}`
+          );
+
+          if (!success) {
+            throw new Error("Ratelimit exceeded");
+          }
+        } else {
+          const { success } = await allow100RequestPer30Min.limit(
+            `searchProducers:user:${userId}`
+          );
+
+          if (!success) {
+            throw new Error("Ratelimit exceeded");
+          }
+        }
+      }
+
+      // Query is not cached so pagination is invalid
+      offset = 0;
+
+      const {
+        object: { hasLocationSnippet, userRequestsUsingTheirLocation },
+      } = await generateObject({
+        model: openai("gpt-4o-mini"),
+        schema: z.object({
+          hasLocationSnippet: z.boolean(),
+          userRequestsUsingTheirLocation: z.boolean(),
+        }),
+        prompt: rest.query,
+        system:
+          "Check if input contains a location snippet and if the prompter requests to use their location",
+      });
+
+      let output: listing.ProducerSearchResult;
+
+      console.log(hasLocationSnippet, userRequestsUsingTheirLocation);
+
+      if (
+        hasLocationSnippet === true &&
+        userRequestsUsingTheirLocation !== true
+      ) {
+        const tools = initTools({
+          search_by_geo_text: {
+            limit: limit,
+            offset: offset,
+            originalQuery: rest.query,
+            countryHint: customFilterOverrides?.country,
+          },
+          userId: undefined,
+        });
+        const result = await generateText({
+          model: openai("gpt-4o-mini"),
+          prompt: rest.query,
+          tools,
+          stopWhen: stepCountIs(2),
+          prepareStep: async ({ stepNumber }) => {
+            if (stepNumber === 0) {
+              return {
+                toolChoice: { type: "tool", toolName: "geocode_place" },
+                activeTools: ["geocode_place"],
+              };
+            } else if (stepNumber === 1) {
+              return {
+                toolChoice: { type: "tool", toolName: "search_by_geo_text" },
+                activeTools: ["search_by_geo_text"],
+              };
+            }
+          },
+          toolChoice: "required",
+          system: `Extract partial of full location snippet from input and call the 'geocode_place' tool.
         Finally call the 'search_by_geo_text' tool, use the provided tool to find farms, ranches, and restaurants.
         Always pass bounding box if geocode_place was used.
         Always pass country hint if geocode_place contains a country.
         Extract filters from query when possible, only pass q when filters are extracted and parts remain.
-        Only pass commodities filter when looking for farms and the query contains specific products.`,
-      });
+        Only pass commodities filter when looking for farms and the query contains specific products.
+         Only pass category filter if the query contains or implies a category`,
+        });
 
-      const item = result.toolResults[result.toolResults.length - 1];
-      output = item.output as listing.ProducerSearchResult;
-    } else {
-      const tools = initTools({
-        search_by_geo_text: {
-          limit: limit,
-          offset: offset,
-          geo:
-            userRequestsUsingTheirLocation === true && userGeo !== undefined
-              ? {
-                  center: userGeo!,
-                  radiusKm: 50,
-                }
-              : undefined,
-          originalQuery: rest.query,
-          userRequestsUsingTheirLocation,
-        },
-        userId: undefined,
-      });
-      const result = await generateText({
-        model: openai("gpt-4o-mini"),
-        prompt: rest.query,
-        tools,
-        activeTools: ["search_by_geo_text"],
-        toolChoice: "required",
-        system: `Call the 'search_by_geo_text' tool, use the provided tool to find farms, ranches, and restaurants.
+        const item = result.toolResults[result.toolResults.length - 1];
+        output = item.output as listing.ProducerSearchResult;
+      } else {
+        const tools = initTools({
+          search_by_geo_text: {
+            limit: limit,
+            offset: offset,
+            geo:
+              userRequestsUsingTheirLocation === true && userGeo !== undefined
+                ? {
+                    center: userGeo!,
+                    radiusKm: userLocationRadius,
+                  }
+                : undefined,
+            originalQuery: rest.query,
+            userRequestsUsingTheirLocation,
+            countryHint: customFilterOverrides?.country,
+          },
+          userId: undefined,
+        });
+        const result = await generateText({
+          model: openai("gpt-4o-mini"),
+          prompt: rest.query,
+          tools,
+          activeTools: ["search_by_geo_text"],
+          toolChoice: "required",
+          system: `Call the 'search_by_geo_text' tool, use the provided tool to find farms, ranches, and restaurants.
         Extract filters from query when possible, only pass q when filters are extracted and parts remain.
-        Only pass commodities filter when looking for farms and the query contains specific products.`,
-      });
+        Only pass commodities filter when looking for farms and the query contains specific products.
+        Only pass category filter if the query contains or implies a category`,
+        });
 
-      const item = result.toolResults[result.toolResults.length - 1];
-      output = item.output as listing.ProducerSearchResult;
+        const item = result.toolResults[result.toolResults.length - 1];
+        output = item.output as listing.ProducerSearchResult;
+      }
+
+      return {
+        result: output,
+        userLocation: {
+          userRequestsUsingTheirLocation: userRequestsUsingTheirLocation,
+          searchRadius: userLocationRadius,
+        },
+      };
     }
-
-    return {
-      result: output,
-      userRequestsUsingTheirLocation,
-    };
-  });
+  );
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -343,6 +397,29 @@ export const fetchUserProducer = producerActionClient
     });
 
     return result ?? null;
+  });
+
+export const listProducerContries = actionClient
+  .name("listProducerContries")
+  .action(async () => {
+    const cached = await PRODUCER_COUNTRIES_CACHE.get();
+
+    if (cached) {
+      return cached;
+    }
+
+    const result = await db
+      .selectDistinct({ country: producerLocation.country })
+      .from(producerLocation)
+      .where(isNotNull(producerLocation.country));
+
+    const value = result
+      .filter((r): r is { country: string } => r.country !== null)
+      .map((r) => r.country);
+
+    await PRODUCER_COUNTRIES_CACHE.set(value);
+
+    return value;
   });
 
 export const fetchUserProducers = authenticatedActionClient

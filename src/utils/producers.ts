@@ -27,6 +27,7 @@ import {
   listProducers,
   getFullProducerPublic,
   searchProducers,
+  listProducerContries,
 } from "@/backend/rpc/producers";
 import {
   Producer,
@@ -39,6 +40,7 @@ import {
   SuggestProducerArgs,
   ListProducersArgs,
   EditProducerArgsV2,
+  ProducerTypes,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
@@ -144,38 +146,66 @@ export function useProducerPublic(
 export function useSearchProducers(
   params: { query: string | undefined },
   pagination: { limit: number; offset: number },
-  location: { position: GeolocationPosition | undefined },
+  location: {
+    position: GeolocationPosition | undefined;
+    radius: number | undefined;
+  },
+  clientFilterOverrides: {
+    country: string | undefined;
+    category: ProducerTypes | undefined;
+    certifications: string[] | undefined;
+  },
   opts?: UseQueryOptions<
     {
       result: ProducerSearchResult;
-      userRequestsUsingTheirLocation: undefined | boolean;
+      userLocation: {
+        userRequestsUsingTheirLocation: boolean | undefined;
+        searchRadius: number;
+      };
     },
     Error,
     {
       result: ProducerSearchResult;
-      userRequestsUsingTheirLocation: undefined | boolean;
+      userLocation: {
+        userRequestsUsingTheirLocation: boolean | undefined;
+        searchRadius: number;
+      };
     },
     readonly [
       string,
       { query: string | undefined },
       { limit: number; offset: number },
-      { position: GeolocationPosition | undefined },
+      { position: GeolocationPosition | undefined; radius: number | undefined },
+      {
+        country: string | undefined;
+        category: ProducerTypes | undefined;
+        certifications: string[] | undefined;
+      },
     ]
   >
 ) {
   const search = useHomePageStore();
+
   return useQuery({
     ...opts,
-    queryKey: ["search-producers", params, pagination, location] as const,
+    queryKey: [
+      "search-producers",
+      params,
+      pagination,
+      location,
+      clientFilterOverrides,
+    ] as const,
     queryFn: async () => {
       const value = await searchProducers({
         limit: pagination.limit,
         offset: pagination.offset,
         query: params.query ?? "",
         userLocation: location.position?.toJSON(),
+        customUserLocationRadius: location.radius,
+        customFilterOverrides: clientFilterOverrides,
       });
 
-      console.log(value);
+      console.log(clientFilterOverrides);
 
       if (value.result.offset !== undefined) {
         console.log(value.result.offset / value.result.limit);
@@ -235,6 +265,15 @@ export function useProducers(
       return await listProducers(args);
     },
     placeholderData: keepPreviousData,
+  });
+}
+
+export function useProducerCountries() {
+  return useQuery({
+    queryKey: ["producer-countries"],
+    queryFn: async () => {
+      return await listProducerContries();
+    },
   });
 }
 

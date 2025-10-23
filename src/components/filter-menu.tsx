@@ -1,12 +1,13 @@
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
-import { useCertificationTypes } from "@/utils/producers";
+import { useCertificationTypes, useProducerCountries } from "@/utils/producers";
 import {
   Accordion,
   AccordionContent,
@@ -22,12 +23,26 @@ import { Switch } from "./ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { useAtom } from "jotai";
+import { COUNTRIES } from "@/utils/contries";
 
 export function FilterMenu() {
   const certsQuery = useCertificationTypes();
-  const { certs, setCerts, useIpGeo, setUseIpGeo, typeFilter, setTypeFilter } =
-    useHomePageStore();
+  const {
+    certsFilter: certs,
+    setCertsFilter: setCerts,
+    useIpGeo,
+    setUseIpGeo,
+    categoryFilter: typeFilter,
+    setCategoryFilter: setTypeFilter,
+    countryFilter: country,
+    setCountryFilter: setCountry,
+  } = useHomePageStore();
   const [showFilterMenu, setShowFilterMenu] = useAtom(showFilterMenuAtom);
+  const producerCountries = useProducerCountries();
+
+  const countries = COUNTRIES.filter((c) =>
+    producerCountries.data?.some((cr) => c.alpha3 === cr)
+  );
 
   return (
     <Sheet open={showFilterMenu} onOpenChange={setShowFilterMenu}>
@@ -38,11 +53,15 @@ export function FilterMenu() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Filter And Sort</SheetTitle>
+          <SheetTitle>Filter Overrides</SheetTitle>
+          <SheetDescription>
+            If your search isn't quite getting the results you expect, you can
+            set aspects specifically to avoid confusion
+          </SheetDescription>
         </SheetHeader>
         <div className="p-5">
           <div className="mb-5 flex flex-col gap-2">
-            <Label>Filter Type</Label>
+            <Label>Bussiness Type</Label>
             <Select
               value={typeFilter === undefined ? "none" : typeFilter}
               onValueChange={(v) =>
@@ -60,10 +79,10 @@ export function FilterMenu() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <Label>Sort by closest to you</Label>
             <Switch checked={useIpGeo} onCheckedChange={setUseIpGeo} />
-          </div>
+          </div> */}
           <Accordion
             about=""
             className="h-full"
@@ -104,7 +123,38 @@ export function FilterMenu() {
             <AccordionItem value="item-2" className="w-full h-full">
               <AccordionTrigger>Location</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-2">
-                <LocationFilter />
+                {/* <LocationFilter /> */}
+                <div className="flex flex-col gap-3">
+                  <Label>Country</Label>
+                  {countries.length > 0 && (
+                    <div className="flex gap-2">
+                      <Select
+                        onValueChange={(e) => setCountry(e)}
+                        value={country}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {countries.map((country) => (
+                            <SelectItem
+                              key={country.alpha3}
+                              value={country.alpha3}
+                            >
+                              {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        disabled={country === undefined}
+                        onClick={() => setCountry(undefined)}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  )}
+                </div>
                 {/* <SignedIn>
                 </SignedIn>
                 <SignedOut>
