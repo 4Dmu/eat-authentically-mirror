@@ -213,10 +213,12 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
             p.type,
             p.verified,
             p.user_id,
+            p.summary,
             p.subscription_rank,
             l.latitude,
             l.longitude,
             l.locality,
+            l.city,
             l.admin_area,
             l.country,
             2 * 6371 * ASIN(
@@ -300,6 +302,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           g.name,
           g.type,
           g.user_id,
+          g.summary,
           g.verified,
           g.subscription_rank,
           g.latitude,
@@ -307,6 +310,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           g.locality,
           g.admin_area,
           g.country,
+          g.city,
           g.distance_km,
           COALESCE(prod_fts.prod_rel, 10.0)  AS prod_rel,
           COALESCE(rev_fts.review_rel, 10.0) AS review_rel,
@@ -450,11 +454,13 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         p.type,
         p.user_id,
         p.verified,
+        p.summary,
         p.subscription_rank,
         l.latitude,
         l.longitude,
         l.locality,
         l.admin_area,
+        l.city,
         l.country,
         COALESCE(prod_fts.prod_rel, 10.0)  AS prod_rel,
         COALESCE(rev_fts.review_rel, 10.0) AS review_rel,
@@ -578,6 +584,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         SELECT
           p.id,
           p.name,
+          p.summary,
           p.type,
           p.verified,
           p.user_id,
@@ -585,6 +592,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           l.latitude,
           l.longitude,
           l.locality,
+          l.city,
           l.admin_area,
           l.country,
           CASE
@@ -616,6 +624,8 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         g.id,
         g.name,
         g.type,
+        g.summary,
+        g.city,
         g.user_id,
         g.verified,
         g.subscription_rank,
@@ -679,12 +689,14 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         p.type,
         p.user_id,
         p.verified,
+        p.summary,
         p.subscription_rank,
         l.latitude,
         l.longitude,
         l.locality,
         l.admin_area,
         l.country,
+        l.city,
         rs.n,
         rs.avg_rating,
         rs.bayes_avg,
@@ -838,10 +850,12 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         p.type,
         p.user_id,
         p.verified,
+        p.summary,
         p.subscription_rank,
         l.latitude,
         l.longitude,
         l.locality,
+        l.city,
         l.admin_area,
         l.country,
         rs.n,
@@ -881,22 +895,25 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
       id: item["id"] as string,
       name: item["name"] as string,
       type: item["type"] as ProducerTypes,
+      summary: item["summary"] as string | null,
       isClaimed: item["user_id"] !== null,
       verified: Boolean(item["verified"]),
       latitude: item["latitude"] as number,
       longitude: item["longitude"] as number,
       locality: item["locality"] as string | null,
-      admin_area: item["admin_area"] as string | null,
+      adminArea: item["admin_area"] as string | null,
       country: item["country"] as string | null,
-      distance_km: item["distance_km"] as number,
-      prod_rel: item["prod_rel"] as number,
-      review_rel: item["review_rel"] as number,
-      avg_rating: item["avg_rating"] as number | null,
+      city: item["city"] as string | null,
+      distanceKm: item["distance_km"] as number,
+      prodRel: item["prod_rel"] as number,
+      reviewRel: item["review_rel"] as number,
+      avgRating: item["avg_rating"] as number | null,
+      bayesAvg: item["bayes_avg"] as number | null,
       thumbnailUrl: item["cover_url"] as string | null,
-      certifications_csv: item["certifications_csv"] as string | null,
-      commodities_csv: item["commodities_csv"] as string | null,
-      commodity_variants_csv: item["commodity_variants_csv"] as string | null,
-      search_labels: item["search_labels"] as string | null,
+      certificationsCsv: item["certifications_csv"] as string | null,
+      commoditiesCsv: item["commodities_csv"] as string | null,
+      commodityVariantsCsv: item["commodity_variants_csv"] as string | null,
+      searchLabels: item["search_labels"] as string | null,
     })),
     count: items.length,
     page: offset / limit,
@@ -913,21 +930,24 @@ export type ProducerSearchResultRow = {
   name: string;
   type: ProducerTypes;
   isClaimed: boolean;
+  summary: string | null;
   verified: boolean;
   latitude: number;
   longitude: number;
   locality: string | null;
-  admin_area: string | null;
+  city: string | null;
+  adminArea: string | null;
   country: string | null;
-  distance_km: number;
-  prod_rel: number;
-  review_rel: number;
-  avg_rating: number | null;
+  distanceKm: number;
+  prodRel: number;
+  reviewRel: number;
+  avgRating: number | null;
+  bayesAvg: number | null;
   thumbnailUrl: string | null;
-  certifications_csv: string | null;
-  commodities_csv: string | null;
-  commodity_variants_csv: string | null;
-  search_labels: string | null;
+  certificationsCsv: string | null;
+  commoditiesCsv: string | null;
+  commodityVariantsCsv: string | null;
+  searchLabels: string | null;
 };
 
 export type ProducerSearchResult = {

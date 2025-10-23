@@ -37,7 +37,7 @@ export function ProducerCard({
             width={200}
             height={200}
             alt=""
-            className="object-cover h-full border-b aspect-video"
+            className="object-cover h-full border-b aspect-square"
             src={primaryImageUrl(producer)}
           />
           {!("isClaimed" in producer
@@ -75,12 +75,22 @@ export function ProducerCard({
         width={1920}
         height={1080}
         alt=""
-        className="w-full grow object-cover aspect-video border-b"
+        className="w-full grow object-cover aspect-[4/3] border-b"
         src={primaryImageUrl(producer)}
       />
-      <div className="p-5">
+      <div className="p-5 flex gap-5 justify-between">
         <p className="font-bold">{producer.name}</p>
+        <div>
+          <Badge>{producer.type}</Badge>
+        </div>
       </div>
+      {!("isClaimed" in producer
+        ? producer.isClaimed
+        : producer.userId !== null) && (
+        <Badge variant={"brandBrown"} className="absolute top-4 left-4">
+          Unclaimed
+        </Badge>
+      )}
       {!("isClaimed" in producer
         ? producer.isClaimed
         : producer.userId !== null) && (

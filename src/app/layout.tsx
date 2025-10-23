@@ -10,14 +10,10 @@ import { Header } from "@/components/app-header";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider as JotaiProvider } from "jotai";
 import { WebVitals } from "@/lib/axiom/client";
+import { format, getYear } from "date-fns";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
-  subsets: ["latin"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
@@ -52,12 +48,14 @@ export default function RootLayout({
     <ClerkProvider>
       <ReactQueryProvider>
         <html lang="en">
-          <body
-            className={`${interSans.variable} ${fraunces.variable} antialiased bg-gray-50`}
-          >
+          <body className={`${interSans.variable} antialiased bg-gray-50`}>
             <JotaiProvider>
               <Header />
               {children}
+              <div className="p-10 bg-primary text-primary-foreground">
+                © {format(new Date(), "yyyy")} Eat Authentically. Discover
+                authentic food experiences.
+              </div>
             </JotaiProvider>
             <Toaster />
             <SpeedInsights />

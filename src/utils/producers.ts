@@ -48,6 +48,8 @@ import {
 } from "@/backend/db/schema";
 import type { ProducerSearchResult } from "@/backend/data/producer";
 import { useHomePageStore } from "@/stores";
+import { urls } from "./default-urls";
+import { hashToIndex } from "@/lib/image-fallback";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -63,8 +65,8 @@ type SimpleMutationOps<TData, TArgs> = Omit<
  */
 export function primaryImageUrl(
   producer:
-    | Pick<ProducerWith<"media">, "media" | "type">
-    | Pick<ProducerCardsRow, "thumbnailUrl" | "type">
+    | Pick<ProducerWith<"media">, "media" | "type" | "id">
+    | Pick<ProducerCardsRow, "thumbnailUrl" | "type" | "id">
 ) {
   const url: string | undefined | null =
     "thumbnailUrl" in producer
@@ -76,13 +78,17 @@ export function primaryImageUrl(
     return url;
   }
 
+  let i: number;
   switch (producer.type) {
     case "eatery":
-      return "/defaults/default-eatery.png";
+      i = hashToIndex(producer.id, urls.eateries.photos.length);
+      return urls.eateries.photos[i];
     case "ranch":
-      return "/defaults/default-ranch.png";
+      i = hashToIndex(producer.id, urls.ranches.photos.length);
+      return urls.ranches.photos[i];
     case "farm":
-      return "/defaults/default-farm.png";
+      i = hashToIndex(producer.id, urls.farms.photos.length);
+      return urls.farms.photos[i];
   }
 }
 

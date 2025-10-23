@@ -48,10 +48,8 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     if (isHome(req)) {
       const geo = geolocation(req);
       if (process.env.NODE_ENV === "development") {
-        // geo.latitude = "38.581650486149975";
-        // geo.longitude = "-121.36493918991683";
-        geo.latitude = "39.7254074";
-        geo.longitude = "-104.9514507";
+        geo.latitude = "38.581650486149975";
+        geo.longitude = "-121.36493918991683";
       }
 
       const encodedGeo = Buffer.from(JSON.stringify(geo)).toString("base64");

@@ -149,6 +149,8 @@ export const searchProducers = actionClient
 
     let output: listing.ProducerSearchResult;
 
+    console.log(hasLocationSnippet, userRequestsUsingTheirLocation);
+
     if (
       hasLocationSnippet === true &&
       userRequestsUsingTheirLocation !== true

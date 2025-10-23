@@ -1,19 +1,20 @@
 "use client";
 
 import { FilterMenu } from "@/components/filter-menu";
-import { HeroCarousel } from "@/components/hero-carousel";
-import { ProducerCard } from "@/components/producer-card";
+import { SearchBox } from "@/components/search-box";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useGeolocationStore, useHomePageStore } from "@/stores";
-import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import type { Geo } from "@vercel/functions";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 import { useSearchProducers } from "@/utils/producers";
 import { RequestLocation } from "@/components/request-location";
+import { PublicProducerCard } from "@/components/public-producer-card";
+import { omit } from "remeda";
 
-export function Page({}: { userIpGeo: Geo | undefined }) {
+export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   const { typeFilter, query, certs, locationSearchArea, page, setPage } =
     useHomePageStore();
 
@@ -21,7 +22,7 @@ export function Page({}: { userIpGeo: Geo | undefined }) {
 
   const userLocation = useGeolocationStore((s) => s.state);
 
-  const { data, isPlaceholderData } = useSearchProducers(
+  const { data, isPlaceholderData, isEnabled, isPending } = useSearchProducers(
     {
       query: debouncedQuery,
     },
@@ -31,78 +32,75 @@ export function Page({}: { userIpGeo: Geo | undefined }) {
 
   return (
     <div className="flex flex-col gap-10  bg-gray-50">
-      <RequestLocation yes={data?.userRequestsUsingTheirLocation} />
-      <HeroCarousel />
-      <div className="p-5">
-        <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
-          <div className="flex gap-5 justify-between items-center">
-            <h2 className="font-bold text-3xl md:text-4xl text-gray-900">
-              Find Real Food Producers
-            </h2>
-            <FilterMenu />
-          </div>
-          <p className="font-inter text-lg text-gray-600 max-w-2xl">
-            Find sustainable farms, ranches, and eateries committed to real food
-          </p>
-          {(certs.length > 0 || typeFilter || query || locationSearchArea) && (
-            <div className="flex flex-wrap bg-white gap-3 border p-5 rounded-lg">
-              <p>Active filters:</p>
-              {typeFilter && <Badge>Type: {typeFilter}</Badge>}
-              {query && <Badge>Name Search: {query}</Badge>}
-              {locationSearchArea && (
-                <Badge>Location Filter: Your Selected Area</Badge>
-              )}
-              {certs.length > 0 && (
-                <Badge className="flex-wrap">
-                  Cert:{" "}
-                  {certs.map((cert) => (
-                    <span key={cert.name}>{cert.name}</span>
-                  ))}
-                </Badge>
-              )}
-              {/* <p className="text-muted-foreground ml-auto">
-                ({data?.data.length} results)
-              </p> */}
+      <RequestLocation />
+      <div className="h-[70vh] min-h-[500px] w-full relative">
+        <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Home.jpg)] animate-[fade1_150s_infinite]" />
+        <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Eaterie_Default.jpg)] animate-[fade2_150s_infinite]" />
+        <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Ranch_Default.jpg)] animate-[fade3_150s_infinite]" />
+        <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/Ranch_Default2.jpg)] animate-[fade4_150s_infinite]" />
+        <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/tomatoesontable.jpg)] animate-[fade5_150s_infinite]" />
+        {/* <div className="w-full h-full absolute top-0 left-0 bg-[url(/hero/FRF_Eaterie_Default.jpg)] bg-cover bg-center" /> */}
+        {/* <div className="w-full h-full absolute top-0 left-0 bg-[url(https://images.unsplash.com/photo-1595855759920-86582396756a?w=1600&q=80)] bg-cover bg-center" /> */}
+        <div className="w-full h-full absolute top-0 left-0 bg-linear-to-b from-teal-200/50 to-green-700/50" />
+        <div className="absolute top-0 left-0 w-full bg-black/10 h-full" />
+        <SearchBox />
+      </div>
+      {isEnabled && !isPending && (
+        <div className="p-5">
+          <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
+            <div className="flex justify-between">
+              <div>
+                <h2 className="mb-2 text-3xl font-bold text-foreground">
+                  Search Results
+                </h2>
+                <p className="text-muted-foreground">
+                  Found {data?.result.count} for{" "}
+                  <span className="font-semibold text-primary">
+                    "{debouncedQuery}"
+                  </span>
+                </p>
+              </div>
+              <FilterMenu />
             </div>
-          )}
-          <div className="flex justify-between gap-5">
-            <Button
-              variant={"brandBrown"}
-              size={"icon"}
-              onClick={() => setPage((old) => Math.max(old - 1, 0))}
-              disabled={page === 0}
-            >
-              <ArrowLeft />
-            </Button>
-            <Badge variant={"brandBrown"}>Page {page + 1}</Badge>
-            <Button
-              variant={"brandBrown"}
-              size={"icon"}
-              onClick={() => {
-                if (!isPlaceholderData && data?.result.hasMore) {
-                  setPage((old) => old + 1);
-                }
-              }}
-              // Disable the Next Page button until we know a next page is available
-              disabled={isPlaceholderData || !data?.result.hasMore}
-            >
-              <ArrowRight />
-            </Button>
-          </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {data?.result.items.map((producer) => (
-              <ProducerCard key={producer.id} producer={producer} />
-            ))}
-          </div>
-
-          <div>
-            <Button onClick={() => window.scrollTo({ top: 0 })}>
-              <ArrowUp /> Back to top
-            </Button>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {data?.result.items.map((producer) => (
+                <PublicProducerCard
+                  userIpGeo={userIpGeo}
+                  key={producer.id}
+                  producer={producer}
+                />
+              ))}
+            </div>
+            {(data?.result.hasMore || (data?.result.offset ?? 0) > 0) && (
+              <div className="flex justify-between gap-5">
+                <Button
+                  variant={"brandBrown"}
+                  size={"icon"}
+                  onClick={() => setPage((old) => Math.max(old - 1, 0))}
+                  disabled={page === 0}
+                >
+                  <ArrowLeft />
+                </Button>
+                <Badge variant={"brandBrown"}>Page {page + 1}</Badge>
+                <Button
+                  variant={"brandBrown"}
+                  size={"icon"}
+                  onClick={() => {
+                    if (!isPlaceholderData && data?.result.hasMore) {
+                      setPage((old) => old + 1);
+                    }
+                  }}
+                  // Disable the Next Page button until we know a next page is available
+                  disabled={isPlaceholderData || !data?.result.hasMore}
+                >
+                  <ArrowRight />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

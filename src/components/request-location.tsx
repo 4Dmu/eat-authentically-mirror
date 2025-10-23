@@ -2,17 +2,7 @@ import { alreadyRequestedGeoAtom, useGeolocationStore } from "@/stores";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 
-export function RequestLocation({ yes }: { yes?: boolean }) {
-  const already = useAtomValue(alreadyRequestedGeoAtom);
-
-  if (yes || already) {
-    return <RL />;
-  }
-
-  return null;
-}
-
-function RL() {
+export function RequestLocation() {
   const locationStore = useGeolocationStore();
   const setAlready = useSetAtom(alreadyRequestedGeoAtom);
 

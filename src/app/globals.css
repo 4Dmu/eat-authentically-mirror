@@ -152,13 +152,50 @@
   }
 }
 
-h1,
-h2,
-h3,
-h4 {
-  @apply font-fraunces;
-}
-
 .label {
   translate: 0px -20px;
+}
+
+
+@keyframes fade1 {
+  0%       { opacity: 0; }
+  0.67%    { opacity: 1; }
+  18.67%   { opacity: 1; }
+  20%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+
+@keyframes fade2 {
+  0%, 19.99%  { opacity: 0; }
+  20%         { opacity: 0; }
+  20.67%      { opacity: 1; }
+  38.67%      { opacity: 1; }
+  40%         { opacity: 0; }
+  100%        { opacity: 0; }
+}
+
+@keyframes fade3 {
+  0%, 39.99%  { opacity: 0; }
+  40%         { opacity: 0; }
+  40.67%      { opacity: 1; }
+  58.67%      { opacity: 1; }
+  60%         { opacity: 0; }
+  100%        { opacity: 0; }
+}
+
+@keyframes fade4 {
+  0%, 59.99%  { opacity: 0; }
+  60%         { opacity: 0; }
+  60.67%      { opacity: 1; }
+  78.67%      { opacity: 1; }
+  80%         { opacity: 0; }
+  100%        { opacity: 0; }
+}
+
+@keyframes fade5 {
+  0%, 79.99%  { opacity: 0; }
+  80%         { opacity: 0; }
+  80.67%      { opacity: 1; }
+  98.67%      { opacity: 1; }
+  100%        { opacity: 0; }
 }

@@ -29,6 +29,34 @@
       "when": 1760820811451,
       "tag": "0003_peaceful_giant_man",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1761157787340,
+      "tag": "0004_fast_proudstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1761158053554,
+      "tag": "0005_brave_the_stranger",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1761159120816,
+      "tag": "0006_rich_doomsday",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1761160334446,
+      "tag": "0007_flowery_shotgun",
+      "breakpoints": true
     }
   ]
 }

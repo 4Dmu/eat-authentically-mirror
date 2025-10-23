@@ -982,9 +982,23 @@ export const producerCards = sqliteView("v_producer_cards").as((qb) =>
       latitude: producerLocation.latitude,
       longitude: producerLocation.longitude,
       locality: producerLocation.locality,
+      city: producerLocation.city,
       adminArea: producerLocation.adminArea,
+      reviewCount: producerRatingAgg.reviewCount,
+      ratingSum: producerRatingAgg.ratingSum,
       country: producerLocation.country,
-      about: producers.about,
+      avgRating: sql<number | null>`
+        CASE
+          WHEN ${producerRatingAgg.reviewCount} > 0
+          THEN ${producerRatingAgg.ratingSum} * 1.0 / ${producerRatingAgg.reviewCount}
+          ELSE NULL
+        END
+      `.as("avgRating"),
+      bayesAvg: sql<number | null>`
+        (${producerRatingAgg.ratingSum} + 10 * 4.2) * 1.0 /
+        (${producerRatingAgg.reviewCount} + 10)
+      `.as("bayesAvg"),
+      summary: producers.summary,
       thumbnailUrl: sql<string | null>`(
         SELECT COALESCE(
           json_extract(${mediaAssets.variants}, '$.cover'),
@@ -1006,6 +1020,7 @@ export const producerCards = sqliteView("v_producer_cards").as((qb) =>
     .from(producers)
     .leftJoin(producerLocation, eq(producerLocation.producerId, producers.id))
     .leftJoin(producersSearch, eq(producersSearch.producerId, producers.id))
+    .leftJoin(producerRatingAgg, eq(producerRatingAgg.producerId, producers.id))
 );
 
 const PRIOR_MEAN = 3.8; // global mean
