@@ -5,7 +5,6 @@ import {
 } from "@/backend/validators/producers";
 import { atomWithStorage } from "jotai/utils";
 import { atom } from "jotai";
-import { boolean } from "zod";
 
 type CertificationFilter = {
   id: string;
@@ -76,16 +75,6 @@ export type GeolocationState =
       position: GeolocationPosition | undefined;
       positionError: GeolocationPositionError | undefined;
     };
-
-const isPosition = (
-  value: GeolocationPosition | GeolocationPositionError
-): value is GeolocationPosition => {
-  console.log(Object.hasOwn(value, "coords"), "isPosition");
-  return (
-    Object.hasOwn(value, "coords") &&
-    (value as GeolocationPosition)?.coords !== undefined
-  );
-};
 
 export const alreadyRequestedGeoAtom = atomWithStorage(
   "already-requested-geo",

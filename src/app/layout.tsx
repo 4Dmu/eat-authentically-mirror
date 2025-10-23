@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import ReactQueryProvider from "@/components/react-query-provider";
@@ -10,7 +10,7 @@ import { Header } from "@/components/app-header";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider as JotaiProvider } from "jotai";
 import { WebVitals } from "@/lib/axiom/client";
-import { format, getYear } from "date-fns";
+import { format } from "date-fns";
 
 const interSans = Inter({
   variable: "--font-inter-sans",

@@ -1,5 +1,5 @@
 import { Input } from "./ui/input";
-import { CompassIcon, SearchIcon, XIcon } from "lucide-react";
+import { SearchIcon, XIcon } from "lucide-react";
 import {
   ChangeEvent,
   KeyboardEvent,

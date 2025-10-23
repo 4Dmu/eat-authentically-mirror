@@ -1,4 +1,4 @@
-import { type, declare } from "arktype";
+import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { ClaimRequestStatus } from "../db/schema";
 import { isMobilePhone } from "validator";

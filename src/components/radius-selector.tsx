@@ -2,11 +2,7 @@ import { MapPin } from "lucide-react";
 import { Slider } from "./ui/slider";
 import { useHomePageStore } from "@/stores";
 
-export default function RadiusSelector({
-  defaultRadius,
-}: {
-  defaultRadius: number;
-}) {
+export function RadiusSelector({ defaultRadius }: { defaultRadius: number }) {
   const store = useHomePageStore();
   return (
     <div className="rounded-2xl bg-white/95 p-4 shadow-xl backdrop-blur-sm w-full max-w-3xl">

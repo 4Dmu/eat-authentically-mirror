@@ -17,9 +17,7 @@ import {
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { showFilterMenuAtom, useHomePageStore } from "@/stores";
-import { LocationFilter } from "./location-filter";
 import { FilterIcon } from "lucide-react";
-import { Switch } from "./ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { useAtom } from "jotai";
@@ -30,8 +28,6 @@ export function FilterMenu() {
   const {
     certsFilter: certs,
     setCertsFilter: setCerts,
-    useIpGeo,
-    setUseIpGeo,
     categoryFilter: typeFilter,
     setCategoryFilter: setTypeFilter,
     countryFilter: country,
@@ -55,8 +51,8 @@ export function FilterMenu() {
         <SheetHeader>
           <SheetTitle>Filter Overrides</SheetTitle>
           <SheetDescription>
-            If your search isn't quite getting the results you expect, you can
-            set aspects specifically to avoid confusion
+            If your search isn&apos;t quite getting the results you expect, you
+            can set aspects specifically to avoid confusion
           </SheetDescription>
         </SheetHeader>
         <div className="p-5">

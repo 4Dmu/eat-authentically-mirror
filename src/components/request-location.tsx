@@ -1,13 +1,10 @@
-import { alreadyRequestedGeoAtom, useGeolocationStore } from "@/stores";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useGeolocationStore } from "@/stores";
 import { useEffect } from "react";
 
 export function RequestLocation() {
   const locationStore = useGeolocationStore();
-  const setAlready = useSetAtom(alreadyRequestedGeoAtom);
 
   useEffect(() => {
-    setAlready(true);
     if (navigator.geolocation) {
       locationStore.setLocationSupported(true);
       navigator.geolocation.getCurrentPosition(
@@ -22,11 +19,7 @@ export function RequestLocation() {
     } else {
       locationStore.setLocationSupported(false);
     }
-  }, []);
-
-  useEffect(() => {
-    console.log(locationStore.state);
-  }, [locationStore.state]);
+  }, [locationStore]);
 
   return null;
 }

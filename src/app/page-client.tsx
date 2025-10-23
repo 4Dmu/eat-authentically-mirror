@@ -1,22 +1,20 @@
 "use client";
 
+import type { Geo } from "@vercel/functions";
 import { FilterMenu } from "@/components/filter-menu";
 import { SearchBox } from "@/components/search-box";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useGeolocationStore, useHomePageStore } from "@/stores";
-import { ArrowLeft, ArrowRight, LoaderIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
-import type { Geo } from "@vercel/functions";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 import { useSearchProducers } from "@/utils/producers";
 import { RequestLocation } from "@/components/request-location";
 import { PublicProducerCard } from "@/components/public-producer-card";
-import { omit } from "remeda";
-import RadiusSelector from "@/components/radius-selector";
+import { RadiusSelector } from "@/components/radius-selector";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { match, P } from "ts-pattern";
-import { useMemo } from "react";
 
 export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   const {
@@ -85,7 +83,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                 <p className="text-muted-foreground">
                   Found {data?.result.count} for{" "}
                   <span className="font-semibold text-primary">
-                    "{debouncedQuery}"
+                    &quot;{debouncedQuery}&quot;
                   </span>
                   {(data?.userLocation.userRequestsUsingTheirLocation ||
                     certs.length > 0 ||

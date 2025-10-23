@@ -1,8 +1,8 @@
-import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
-import { Badge } from "./ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";
+import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
+import { Badge } from "./ui/badge";
+import { AddToPinboardIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { ProducerCardsRow, ProducerWith } from "@/backend/db/schema";
@@ -12,10 +12,6 @@ import { useGeolocationStore } from "@/stores";
 import { useMemo } from "react";
 import { Button } from "./ui/button";
 import type { Geo } from "@vercel/functions";
-import {
-  ButtonGroup,
-  ButtonGroupSeparator,
-} from "@/components/ui/button-group";
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -76,7 +72,7 @@ export function PublicProducerCard({
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return Math.round(R * c);
-  }, [location, producer]);
+  }, [location, producer, userIpGeo]);
 
   return (
     <div
