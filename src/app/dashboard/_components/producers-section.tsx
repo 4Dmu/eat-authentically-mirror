@@ -87,13 +87,17 @@ export function ProducersSection({
         <CardContent className="grid md:grid-cols-2 gap-10">
           {data?.map((p) => (
             <Card key={p.id} className="rounded-lg overflow-hidden pt-0 gap-0">
-              <Image
-                src={p.thumbnailUrl ?? ""}
-                alt=""
-                className="w-full object-cover aspect-video"
-                width={600}
-                height={600}
-              />
+              {p.thumbnailUrl ? (
+                <Image
+                  src={p.thumbnailUrl}
+                  alt=""
+                  className="w-full object-cover aspect-video"
+                  width={600}
+                  height={600}
+                />
+              ) : (
+                <div></div>
+              )}
               <CardContent className="p-5 flex flex-col gap-2">
                 <p className="font-fraunces text-lg">{p.name}</p>
                 <Badge>{p.type}</Badge>
