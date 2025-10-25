@@ -1,45 +1,31 @@
 import { db } from "@/backend/db";
-import { producerMedia } from "@/backend/db/schema";
+import { mediaAssets, producerMedia } from "@/backend/db/schema";
 import { and, eq } from "drizzle-orm";
 
 async function main() {
   const limit = 50;
   let offset = 50;
   while (true) {
-    const producers = await db.query.producers.findMany({
-      with: {
-        media: {
-          columns: { createdAt: true, producerId: true, assetId: true },
-        },
-      },
-      columns: {},
+    const images = await db.query.mediaAssets.findMany({
+      columns: { id: true, url: true },
       limit: limit,
       offset: offset,
     });
 
-    if (producers.length === 0) {
+    if (images.length === 0) {
       break;
     }
 
     await db.transaction(async (tx) => {
-      for (const producer of producers) {
-        for (let i = 0; i < producer.media.length; i++) {
-          const media = producer.media[i];
-
-          await tx
-            .update(producerMedia)
-            .set({
-              updatedAt: media.createdAt,
-              role: i === 0 ? "cover" : "gallery",
-              position: i,
-            })
-            .where(
-              and(
-                eq(producerMedia.producerId, media.producerId),
-                eq(producerMedia.assetId, media.assetId)
-              )
-            );
-        }
+      for (const img of images) {
+        const value = img.url.split("/");
+        console.log(value[4]);
+        await tx
+          .update(mediaAssets)
+          .set({
+            cloudflareId: value[4],
+          })
+          .where(eq(mediaAssets.id, img.id));
       }
     });
 

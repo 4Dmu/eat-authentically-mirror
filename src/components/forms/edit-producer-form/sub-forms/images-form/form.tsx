@@ -84,7 +84,6 @@ export const Form = withForm({
             {(field) => (
               <div className="flex flex-col gap-3">
                 <Label>Add Images</Label>
-                {JSON.stringify(field.state.value.map((r) => r.position))}
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
                   <DragDropProvider
                     onDragOver={(event) => {
@@ -121,8 +120,8 @@ export const Form = withForm({
                       sourceValue.position = targetValue.position;
                       targetValue.position = position;
 
-                      field.replaceValue(targetValueIndex, targetValue);
-                      field.replaceValue(sourceValueIndex, sourceValue);
+                      field.replaceValue(targetValueIndex, { ...targetValue });
+                      field.replaceValue(sourceValueIndex, { ...sourceValue });
                     }}
                   >
                     {field.state.value.map((value, i) => (
@@ -243,6 +242,14 @@ const SortableImage = withForm({
               <Button
                 onClick={() => {
                   subField.removeValue(index);
+                  for (let i = index; i < subField.state.value.length; i++) {
+                    const value = subField.state.value[i];
+                    if (!value) continue;
+                    subField.replaceValue(i, {
+                      ...value,
+                      position: value.position - 1,
+                    });
+                  }
                 }}
                 size={"icon"}
                 variant={"destructive"}

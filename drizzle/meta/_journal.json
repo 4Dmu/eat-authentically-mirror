@@ -57,6 +57,20 @@
       "when": 1761160334446,
       "tag": "0007_flowery_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1761377781696,
+      "tag": "0008_quiet_scarlet_spider",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1761379998468,
+      "tag": "0009_perpetual_wild_pack",
+      "breakpoints": true
     }
   ]
 }

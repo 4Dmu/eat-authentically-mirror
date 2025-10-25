@@ -608,6 +608,7 @@ export const requestUploadUrls = producerActionClient
       imageItemParams: type({
         type: "string",
         name: "string",
+        position: "number",
       })
         .array()
         .atLeastLength(1)
@@ -666,6 +667,7 @@ export const requestUploadUrls = producerActionClient
       const pending: PendingMediaAssetInsert[] = [];
 
       for (let i = 0; i < imageItemParams.length; i++) {
+        const item = imageItemParams[i];
         const form = new FormData();
 
         form.set("creator", userId);
@@ -695,6 +697,7 @@ export const requestUploadUrls = producerActionClient
             pendingAssetKey: uploadUrlGeneratorCloudflareResponseBody.result.id,
             mode: "cloudflare-image",
             ownerUserId: userId,
+            position: item.position,
             createdAt: new Date(),
           });
         } else {
@@ -810,6 +813,7 @@ export const requestVideoUploadUrl = producerActionClient
         pendingAssetKey: uploadUrlGeneratorCloudflareResponseBody.result.uid,
         mode: "cloudflare-stream",
         createdAt: new Date(),
+        position: 0,
       });
 
       return uploadUrlGeneratorCloudflareResponseBody.result.uploadURL;
@@ -890,19 +894,12 @@ export const confirmPengingUpload = producerActionClient
           updatedAt: new Date(),
         });
 
-        const nextPosRow = await db.run(sql`
-          SELECT COALESCE(MAX(position)+1, 0) AS next_pos
-          FROM producer_media
-          WHERE producer_id = ${producerId} AND role = ${"gallery"}
-        `);
-        const nextPos = (nextPosRow.rows[0]?.next_pos ?? 0) as number;
-
         await db.insert(producerMedia).values({
           producerId: producer.id,
           assetId: assetId,
           role: "gallery",
           addedByUserId: userId,
-          position: nextPos,
+          position: pendingImage.position,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -1101,6 +1098,8 @@ export const updateExistingImages = producerActionClient
         `action [updateExistingImages] - Cloudflare delete image response`,
         { response: response }
       );
+
+      await db.delete(mediaAssets).where(eq(mediaAssets.id, image.asset.id));
     }
 
     for (const image of data) {
@@ -1631,6 +1630,7 @@ export const deleteProducer = producerActionClient
             deleteResponse: videDelRes,
           });
         } else {
+          console.log(item.asset.cloudflareId);
           const imageDelRes = await cloudflare.images.v1.delete(
             item.asset.cloudflareId,
             {

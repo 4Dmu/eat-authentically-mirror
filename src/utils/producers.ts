@@ -431,16 +431,17 @@ export function useUploadImages(
       toUpload,
       producerId,
     }: {
-      toUpload: { file: File }[];
+      toUpload: { file: File; position: number }[];
       producerId: string;
     }) => {
       if (toUpload.length === 0) return;
 
       const uploadUrls = await requestUploadUrls({
         producerId,
-        imageItemParams: toUpload.map(({ file }) => ({
+        imageItemParams: toUpload.map(({ file, position }) => ({
           type: file.type,
           name: file.name,
+          position: position,
         })),
       });
 

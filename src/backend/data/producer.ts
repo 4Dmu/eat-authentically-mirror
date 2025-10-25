@@ -5,7 +5,12 @@ import type {
 } from "@/backend/validators/producers";
 import { db } from "../db";
 import { asc, eq, ilike, like, SQL, sql } from "drizzle-orm";
-import { claimRequests, producerCards, producers } from "../db/schema";
+import {
+  claimRequests,
+  producerCards,
+  producerMedia,
+  producers,
+} from "../db/schema";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 
 export async function getUsersProducerIdsCached(userId: string) {
@@ -989,6 +994,7 @@ export async function getFullProducerPublic(args: GetProducerArgs) {
           with: {
             asset: true,
           },
+          orderBy: asc(producerMedia.position),
         },
         location: true,
         commodities: true,
@@ -1081,6 +1087,7 @@ export async function listProducers(args: {
         with: {
           asset: true,
         },
+        orderBy: asc(producerMedia.position),
       },
       location: true,
       commodities: true,

@@ -1,11 +1,12 @@
 "use server";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, asc, count, eq, inArray } from "drizzle-orm";
 import { db } from "../db";
 import {
   pinboards,
   pinListItems,
   pinLists,
   pins,
+  producerMedia,
   producers,
 } from "../db/schema";
 import { authenticatedActionClient } from "./helpers/middleware";
@@ -66,6 +67,7 @@ export const getUserPinboardFull = authenticatedActionClient
                   with: {
                     asset: true,
                   },
+                  orderBy: asc(producerMedia.position),
                 },
               },
             },

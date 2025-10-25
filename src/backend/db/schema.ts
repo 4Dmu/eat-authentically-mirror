@@ -229,7 +229,7 @@ export const mediaAssets = sqliteTable(
     bucket: text("bucket"),
     key: text("key"), // object key/path
     url: text("url").notNull(), // Required absolute url, valid for all storage modes
-    cloudflareId: text("url"),
+    cloudflareId: text("cloudflareId"),
 
     // identity & validation
     contentType: text("content_type"), // image/jpeg, image/webp, video/mp4, ...
@@ -271,6 +271,7 @@ export const pendingMediaAssets = sqliteTable("pending_media_assets", {
   mode: text({ enum: ["cloudflare-image", "cloudflare-stream"] }).notNull(),
   pendingAssetKey: text("pending_asset_key").notNull(),
   pendingAssetMeta: text("pending_asset_meta"),
+  position: integer("position").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
