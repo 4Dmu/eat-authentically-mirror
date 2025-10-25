@@ -70,7 +70,7 @@ export function SearchBox(props: PropsWithChildren) {
           Discover farm-to-table experiences, local ranches, and authentic
           eateries
         </p>
-        <div className="flex gap-2 w-full max-w-3xl rounded-2xl bg-white p-2 shadow-2xl backdrop-blur-sm transition-all hover:shadow-glow">
+        <div className="flex flex-col sm:flex-row gap-2 w-full max-w-3xl rounded-2xl bg-white p-2 shadow-2xl backdrop-blur-sm transition-all hover:shadow-glow">
           <div className="flex flex-1 items-center gap-3 px-4">
             <SearchIcon className="h-5 w-5 text-muted-foreground" />
             <Input
@@ -82,27 +82,29 @@ export function SearchBox(props: PropsWithChildren) {
               className="typewrite-placeholder border-0 bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
             />
           </div>
-          <Button
-            size="lg"
-            onClick={() => setQuery(value)}
-            className="rounded-xl bg-gradient-to-r from-[hsl(142_45%_35%)] to-[hsl(142_40%_45%)] px-8 font-semibold transition-all hover:scale-105 hover:shadow-lg"
-          >
-            Search
-          </Button>
-          {query !== undefined && (
+          <div className="flex gap-2 justify-center">
             <Button
-              onClick={() => {
-                setQuery(undefined);
-                setValue("");
-                resetFilters();
-              }}
-              variant={"secondary"}
-              size={"lg"}
-              className="self-center rounded-xl"
+              size="lg"
+              onClick={() => setQuery(value)}
+              className="rounded-xl flex-1 bg-gradient-to-r from-[hsl(142_45%_35%)] to-[hsl(142_40%_45%)] px-8 font-semibold transition-all hover:scale-102 hover:shadow-lg"
             >
-              <XIcon className="" />
+              Search
             </Button>
-          )}
+            {query !== undefined && (
+              <Button
+                onClick={() => {
+                  setQuery(undefined);
+                  setValue("");
+                  resetFilters();
+                }}
+                variant={"secondary"}
+                size={"lg"}
+                className="self-center rounded-xl hover:scale-105 hover:shadow-lg"
+              >
+                <XIcon className="" />
+              </Button>
+            )}
+          </div>
         </div>
         {props.children}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
