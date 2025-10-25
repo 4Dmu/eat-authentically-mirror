@@ -29,6 +29,8 @@ import {
   producerMedia,
   producers,
   ProducerSelect,
+  producersSearch,
+  ProducersSearchSelect,
   SuggestedProducerInsert,
   suggestedProducers,
 } from "../db/schema";
@@ -361,6 +363,12 @@ export const registerProducer = authenticatedActionClient
       updatedAt: new Date(),
     } satisfies ProducerInsert);
 
+    await db.insert(producersSearch).values({
+      producerId: producerProfileId,
+      searchName: input.name,
+      searchSummary: input.about.substring(0, 300),
+    });
+
     await USER_PRODUCER_IDS_KV.push(userId, producerProfileId);
 
     return producerProfileId;
@@ -490,6 +498,10 @@ export const editProducer = producerActionClient
   .action(async ({ input, ctx: { userId } }) => {
     const producer = await db.query.producers.findFirst({
       where: and(eq(producers.id, input.id), eq(producers.userId, userId)),
+      columns: {
+        id: true,
+        summary: true,
+      },
     });
 
     if (!producer) {
@@ -497,9 +509,11 @@ export const editProducer = producerActionClient
     }
 
     const toUpdate: Partial<ProducerSelect> = {};
+    const toUpdateSearch: Partial<ProducersSearchSelect> = {};
 
     if (input.name) {
       toUpdate.name = input.name;
+      toUpdateSearch.searchName = input.name;
     }
 
     if (input.type) {
@@ -508,10 +522,15 @@ export const editProducer = producerActionClient
 
     if (input.about !== undefined) {
       toUpdate.about = input.about;
+      // Update search via about if summary was not set
+      if (producer.summary == null) {
+        toUpdateSearch.searchSummary = input.about?.substring(0, 300);
+      }
     }
 
     if (input.summary !== undefined) {
       toUpdate.summary = input.summary;
+      toUpdateSearch.searchSummary = input.summary;
     }
 
     // if (input.address) {
@@ -598,6 +617,15 @@ export const editProducer = producerActionClient
         .where(
           and(eq(producers.id, producer.id), eq(producers.userId, userId))
         );
+    }
+
+    if (Object.keys(toUpdateSearch).length > 0) {
+      await db
+        .update(producersSearch)
+        .set({
+          ...toUpdateSearch,
+        })
+        .where(eq(producersSearch.producerId, producer.id));
     }
   });
 
