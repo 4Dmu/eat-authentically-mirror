@@ -28,6 +28,7 @@ import {
   producerLocation,
   producerMedia,
   producers,
+  ProducerSelect,
   SuggestedProducerInsert,
   suggestedProducers,
 } from "../db/schema";
@@ -42,6 +43,7 @@ import {
   notInArray,
   sql,
   isNotNull,
+  asc,
 } from "drizzle-orm";
 import { type } from "arktype";
 import { getSubTier } from "./utils/get-sub-tier";
@@ -92,6 +94,10 @@ import z from "zod";
 import { headers } from "next/headers";
 import { Geo } from "@vercel/functions";
 import { auth } from "@clerk/nextjs/server";
+import {
+  mediaAssetSelectValidator,
+  producerMediaSelectValidator,
+} from "../db/contracts";
 
 export const searchProducers = actionClient
   .name("searchProducers")
@@ -375,6 +381,7 @@ export const fetchUserProducer = producerActionClient
           with: {
             asset: true,
           },
+          orderBy: asc(producerMedia.position),
         },
         location: true,
         commodities: true,
@@ -489,7 +496,7 @@ export const editProducer = producerActionClient
       throw new Error("Unauthorized");
     }
 
-    const toUpdate: Partial<Producer> = {};
+    const toUpdate: Partial<ProducerSelect> = {};
 
     if (input.name) {
       toUpdate.name = input.name;
@@ -501,6 +508,10 @@ export const editProducer = producerActionClient
 
     if (input.about !== undefined) {
       toUpdate.about = input.about;
+    }
+
+    if (input.summary !== undefined) {
+      toUpdate.summary = input.summary;
     }
 
     // if (input.address) {
@@ -682,7 +693,7 @@ export const requestUploadUrls = producerActionClient
           pending.push({
             id: crypto.randomUUID(),
             pendingAssetKey: uploadUrlGeneratorCloudflareResponseBody.result.id,
-            mode: "cloudflare-stream",
+            mode: "cloudflare-image",
             ownerUserId: userId,
             createdAt: new Date(),
           });
@@ -691,6 +702,8 @@ export const requestUploadUrls = producerActionClient
           throw new Error("Error generating urls");
         }
       }
+
+      await db.insert(pendingMediaAssets).values(pending);
 
       await db
         .update(producers)
@@ -1028,7 +1041,14 @@ export const deleteVideo = producerActionClient
   });
 
 export const updateExistingImages = producerActionClient
-  .input(type({ producerId: "string", data: type.string.array() }))
+  .input(
+    type({
+      producerId: "string",
+      data: producerMediaSelectValidator
+        .and({ asset: mediaAssetSelectValidator })
+        .array(),
+    })
+  )
   .name("updateExistingImages")
   .action(async ({ ctx: { userId }, input: { producerId, data } }) => {
     const producer = await db.query.producers.findFirst({
@@ -1042,11 +1062,13 @@ export const updateExistingImages = producerActionClient
       throw new Error("Unauthorized");
     }
 
+    const ids = data.map((r) => r.assetId);
+
     const imagesToDelete = await db.query.producerMedia.findMany({
       where: and(
         eq(producerMedia.producerId, producer.id),
         ne(producerMedia.role, "video"),
-        notInArray(producerMedia.assetId, data)
+        notInArray(producerMedia.assetId, ids)
       ),
       columns: {},
       with: {
@@ -1079,6 +1101,22 @@ export const updateExistingImages = producerActionClient
         `action [updateExistingImages] - Cloudflare delete image response`,
         { response: response }
       );
+    }
+
+    for (const image of data) {
+      await db
+        .update(producerMedia)
+        .set({
+          role: image.role,
+          position: image.position,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(producerMedia.producerId, producerId),
+            eq(producerMedia.assetId, image.assetId)
+          )
+        );
     }
   });
 

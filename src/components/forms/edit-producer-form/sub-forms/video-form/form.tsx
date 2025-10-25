@@ -15,6 +15,19 @@ import { toast } from "sonner";
 import { RotateCwIcon, XIcon } from "lucide-react";
 import { Stream } from "@cloudflare/stream-react";
 import { defaultOptions, withForm } from "./context";
+import { editProducerMediaFormValidator } from "@/backend/validators/producers";
+
+export function isUpload(
+  value: (typeof editProducerMediaFormValidator.infer)["media"][number]
+): value is Extract<
+  (typeof editProducerMediaFormValidator.infer)["media"][number],
+  { file: File }
+> {
+  if ("file" in value) {
+    return true;
+  }
+  return false;
+}
 
 export const Form = withForm({
   ...defaultOptions,
@@ -47,7 +60,9 @@ export const Form = withForm({
                           toast.error("File must be less than 200mb")
                         }
                         mimeType="video/*"
-                        onSelect={(v) => field.handleChange({ file: v })}
+                        onSelect={(v) =>
+                          field.handleChange({ file: v, position: 0 })
+                        }
                       >
                         Add Video
                       </TemporyFileSelectButton>
@@ -63,7 +78,9 @@ export const Form = withForm({
                             toast.error("File must be less than 200mb")
                           }
                           mimeType="video/*"
-                          onSelect={(v) => field.handleChange({ file: v })}
+                          onSelect={(v) =>
+                            field.handleChange({ file: v, position: 0 })
+                          }
                         >
                           <RotateCwIcon />
                         </TemporyFileSelectButton>

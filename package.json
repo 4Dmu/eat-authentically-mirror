@@ -24,6 +24,8 @@
     "@clerk/backend": "^2.9.2",
     "@clerk/nextjs": "^6.31.2",
     "@cloudflare/stream-react": "^1.9.3",
+    "@dnd-kit/helpers": "^0.1.21",
+    "@dnd-kit/react": "^0.1.21",
     "@hookform/resolvers": "^5.2.1",
     "@layered/dns-records": "^2.3.0",
     "@libsql/client": "^0.15.12",

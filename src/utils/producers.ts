@@ -44,7 +44,9 @@ import {
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
+  MediaAssetSelect,
   ProducerCardsRow,
+  ProducerMediaSelect,
   ProducerWith,
   ProducerWithAll,
 } from "@/backend/db/schema";
@@ -406,8 +408,24 @@ export function useEditUserProducer(
   });
 }
 
-export function useUploadImages() {
+export function useUploadImages(
+  opts?: Omit<
+    MutationOptions<
+      void,
+      Error,
+      {
+        toUpload: {
+          file: File;
+        }[];
+        producerId: string;
+      },
+      unknown
+    >,
+    "mutationKey" | "mutationFn"
+  >
+) {
   return useMutation({
+    ...opts,
     mutationKey: ["upload-images"] as const,
     mutationFn: async ({
       toUpload,
@@ -439,8 +457,24 @@ export function useUploadImages() {
   });
 }
 
-export function useUploadVideo() {
+export function useUploadVideo(
+  opts?: Omit<
+    MutationOptions<
+      void,
+      Error,
+      {
+        producerId: string;
+        toUpload: {
+          file: File;
+        };
+      },
+      unknown
+    >,
+    "mutationKey" | "mutationFn"
+  >
+) {
   return useMutation({
+    ...opts,
     mutationKey: ["upload-video"] as const,
     mutationFn: async ({
       producerId,
@@ -458,8 +492,21 @@ export function useUploadVideo() {
   });
 }
 
-export function useDeleteVideo() {
+export function useDeleteVideo(
+  opts?: Omit<
+    MutationOptions<
+      void,
+      Error,
+      {
+        producerId: string;
+      },
+      unknown
+    >,
+    "mutationKey" | "mutationFn"
+  >
+) {
   return useMutation({
+    ...opts,
     mutationKey: ["delete-video"] as const,
     mutationFn: async ({ producerId }: { producerId: string }) => {
       await deleteVideo({ producerId });
@@ -467,10 +514,27 @@ export function useDeleteVideo() {
   });
 }
 
-export function useUpdateExistingImages() {
+export function useUpdateExistingImages(
+  opts?: Omit<
+    MutationOptions<
+      void,
+      Error,
+      {
+        data: (ProducerMediaSelect & { asset: MediaAssetSelect })[];
+        producerId: string;
+      },
+      unknown
+    >,
+    "mutationFn" | "mutationKey"
+  >
+) {
   return useMutation({
+    ...opts,
     mutationKey: ["update-existing-images"] as const,
-    mutationFn: async (data: { data: string[]; producerId: string }) => {
+    mutationFn: async (data: {
+      data: (ProducerMediaSelect & { asset: MediaAssetSelect })[];
+      producerId: string;
+    }) => {
       await updateExistingImages(data);
     },
   });

@@ -461,6 +461,8 @@ export const editProducerMediaFormValidator = type({
     .or(
       type({
         file: "File",
+        position: "number",
+        id: "string",
       })
     )
     .array(),
@@ -473,6 +475,7 @@ export const editProucerVideoFormValidator = type({
     .or(
       type({
         file: "File",
+        position: "number",
       })
     )
     .or(type.null),

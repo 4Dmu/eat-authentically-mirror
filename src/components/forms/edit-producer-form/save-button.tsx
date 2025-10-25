@@ -13,38 +13,45 @@ export function SaveButton({
   disableReset?: boolean;
 }) {
   const [formStates, setFormStates] = useState<
-    { isDirty: boolean; isValid: boolean; isDefaultValue: boolean }[]
+    (
+      | { isDirty: boolean; isValid: boolean; isDefaultValue: boolean }
+      | undefined
+    )[]
   >([]);
 
-  const show = formStates.some((s) => !s.isDefaultValue);
-  const hasOneValid = formStates.some((s) => s.isValid);
+  const show = formStates.some((s) => s && !s.isDefaultValue);
+  const hasOneValid = formStates.some((s) => s && s.isValid);
 
   function reset() {
     forms.forEach((f) => f.reset());
   }
 
   function submit() {
-    forms.forEach((f) => f.handleSubmit());
+    forms.forEach(async (f) => {
+      if (f.state.isDirty) {
+        await f.handleSubmit();
+        f.reset();
+      }
+    });
   }
 
   useEffect(() => {
-    const unsubs: (() => void)[] = [];
-    for (let i = 0; i < forms.length; i++) {
-      const form = forms[i];
-      const unsub = form.store.subscribe((state) => {
-        formStates[i] = {
-          isDirty: state.currentVal.isDirty,
-          isValid: state.currentVal.isValid,
-          isDefaultValue: state.currentVal.isDefaultValue,
-        };
-        setFormStates([...formStates]);
-      });
-      unsubs.push(unsub);
-    }
-    return () => {
-      unsubs.forEach((unsub) => unsub());
-    };
-  }, [forms, formStates]);
+    const unsubs = forms.map((form, i) =>
+      form.store.subscribe((state) => {
+        setFormStates((prev) => {
+          const next = [...prev];
+          next[i] = {
+            isDirty: state.currentVal.isDirty,
+            isValid: state.currentVal.isValid,
+            isDefaultValue: state.currentVal.isDefaultValue,
+          };
+          return next;
+        });
+      })
+    );
+
+    return () => unsubs.forEach((u) => u());
+  }, [forms]);
 
   return (
     <>

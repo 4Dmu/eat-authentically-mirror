@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
+import React, { useId } from "react";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { FileImage } from "@/components/file-image";
 import { Button } from "@/components/ui/button";
@@ -17,16 +17,20 @@ import {
   SelectFileButton,
   TemporyFilesSelectButton,
 } from "@/components/select-file-button";
-import { RotateCwIcon, XIcon } from "lucide-react";
+import { GripIcon, RotateCwIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { defaultOptions, withForm } from "./context";
 import { editProducerMediaFormValidator } from "@/backend/validators/producers";
+import { ProducerWithMap } from "@/backend/db/schema";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
+import { useSortable } from "@dnd-kit/react/sortable";
 
 export function isUpload(
   value: (typeof editProducerMediaFormValidator.infer)["media"][number]
 ): value is Extract<
   (typeof editProducerMediaFormValidator.infer)["media"][number],
-  { file: File }
+  { file: File; position: number; id: string }
 > {
   if ("file" in value) {
     return true;
@@ -80,123 +84,56 @@ export const Form = withForm({
             {(field) => (
               <div className="flex flex-col gap-3">
                 <Label>Add Images</Label>
+                {JSON.stringify(field.state.value.map((r) => r.position))}
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
-                  {field.state.value.map((value, i) => (
-                    <div className="flex flex-col gap-1 relative" key={i}>
-                      <div className="p-2 flex gap-2 justify-end w-full absolute top-2 right-2">
-                        {/* <form.Field name={`media[${i}]`}>
-                          {(subField) => (
-                            <CheckboxPrimitive.Root
-                              checked={
-                                (subField.state.value._type === "upload" &&
-                                  subField.state.value.isPrimary) ||
-                                (subField.state.value._type == "cloudflare" &&
-                                  field.state.value.primaryImgId ===
-                                    subField.state.value.cloudflareId)
-                              }
-                              onCheckedChange={(r) => {
-                                if (r === true && field.state.value) {
-                                  const newValue = field.state.value.items.map(
-                                    (f) =>
-                                      f._type == "cloudflare"
-                                        ? { ...f }
-                                        : { ...f, isPrimary: false }
-                                  );
+                  <DragDropProvider
+                    onDragOver={(event) => {
+                      const { target, source } = event.operation;
+                      if (!target || !source) return;
 
-                                  const item = newValue[i];
+                      const targetId = target.id.toString();
+                      const sourceId = source.id.toString();
 
-                                  if (item._type === "upload") {
-                                    item.isPrimary = true;
-                                    newValue[i] = item;
-                                  }
+                      console.log(targetId, sourceId);
 
-                                  field.handleChange({
-                                    items: [...newValue],
-                                    primaryImgId:
-                                      item._type === "cloudflare"
-                                        ? item.cloudflareId
-                                        : null,
-                                  });
-                                } else if (r === false && field.state.value) {
-                                  const newValue = field.state.value.items.map(
-                                    (f) =>
-                                      f._type == "cloudflare"
-                                        ? { ...f }
-                                        : { ...f, isPrimary: false }
-                                  );
+                      const targetValueIndex = field.state.value.findIndex(
+                        (v) =>
+                          isUpload(v)
+                            ? v.id === targetId
+                            : v.assetId === targetId
+                      );
+                      const targetValue = field.state.value[targetValueIndex];
+                      const sourceValueIndex = field.state.value.findIndex(
+                        (v) =>
+                          isUpload(v)
+                            ? v.id === sourceId
+                            : v.assetId === sourceId
+                      );
+                      const sourceValue = field.state.value[sourceValueIndex];
 
-                                  field.handleChange({
-                                    items: [...newValue],
-                                    primaryImgId: null,
-                                  });
-                                }
-                              }}
-                              data-slot="checkbox"
-                              className={
-                                "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-9 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
-                              }
-                            >
-                              <CheckboxPrimitive.Indicator
-                                data-slot="checkbox-indicator"
-                                className="flex items-center justify-center text-current transition-none"
-                              >
-                                <CheckIcon className="size-3.5" />
-                              </CheckboxPrimitive.Indicator>
-                            </CheckboxPrimitive.Root>
-                          )}
-                        </form.Field> */}
-                        {isUpload(value) && (
-                          <form.Field name={`media[${i}].file`}>
-                            {(subField) => (
-                              <SelectFileButton
-                                maxFileSize={200000000}
-                                size={"icon"}
-                                variant={"default"}
-                                mimeType="image/*"
-                                file={subField.state.value}
-                                onChange={(f) =>
-                                  subField.handleChange(f as File)
-                                }
-                              >
-                                <RotateCwIcon />
-                              </SelectFileButton>
-                            )}
-                          </form.Field>
-                        )}
-                        <form.Field name="media" mode="array">
-                          {(subField) => (
-                            <Button
-                              onClick={() => {
-                                subField.removeValue(i);
-                              }}
-                              size={"icon"}
-                              variant={"destructive"}
-                            >
-                              <XIcon />
-                            </Button>
-                          )}
-                        </form.Field>
-                      </div>
-                      <div className="w-full h-[200px] rounded overflow-hidden border">
-                        {isUpload(value) ? (
-                          value.file && (
-                            <FileImage
-                              className="object-cover h-full w-full"
-                              file={value.file}
-                            />
-                          )
-                        ) : (
-                          <Image
-                            src={value.asset.url}
-                            alt={value.caption ?? ""}
-                            className="object-cover h-full w-full"
-                            width={200}
-                            height={200}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                      console.log(targetValue, sourceValue);
+
+                      if (!targetValue || !sourceValue) {
+                        return;
+                      }
+
+                      const position = sourceValue.position;
+                      sourceValue.position = targetValue.position;
+                      targetValue.position = position;
+
+                      field.replaceValue(targetValueIndex, targetValue);
+                      field.replaceValue(sourceValueIndex, sourceValue);
+                    }}
+                  >
+                    {field.state.value.map((value, i) => (
+                      <SortableImage
+                        key={i}
+                        form={form}
+                        value={value}
+                        index={i}
+                      />
+                    ))}
+                  </DragDropProvider>
                 </div>
                 <form.Field name="media" mode="array">
                   {(subField) => (
@@ -209,9 +146,11 @@ export const Form = withForm({
                         );
                       }}
                       onSelect={(files) => {
-                        files.forEach((file) =>
+                        files.forEach((file, i) =>
                           subField.pushValue({
                             file: file,
+                            position: i + subField.state.value.length,
+                            id: crypto.randomUUID(),
                           })
                         );
                       }}
@@ -226,6 +165,115 @@ export const Form = withForm({
           </form.Field>
         </CardContent>
       </Card>
+    );
+  },
+});
+
+const SortableImage = withForm({
+  ...defaultOptions,
+  props: {
+    value: undefined as unknown as
+      | ProducerWithMap["media"][number]
+      | {
+          file: File;
+          position: number;
+          id: string;
+        },
+    index: 0,
+  },
+  render: ({ form, value, index }) => {
+    const { ref, handleRef } = useSortable({
+      id: `${isUpload(value) ? value.id : value.assetId}`,
+      index: index,
+    });
+
+    return (
+      <div ref={ref} className="flex flex-col gap-1 relative">
+        <div className="p-2 flex gap-2 justify-end w-full absolute top-2 right-2">
+          <form.Field name="media" mode="array">
+            {(mediaField) => (
+              <>
+                {!isUpload(value) && (
+                  <Checkbox
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        const currentRoleIndex =
+                          mediaField.state.value.findIndex(
+                            (v) => !isUpload(v) && v.role === "cover"
+                          );
+                        const currentRole =
+                          mediaField.state.value[currentRoleIndex];
+                        if (currentRole) {
+                          mediaField.replaceValue(currentRoleIndex, {
+                            ...currentRole,
+                            role: "gallery",
+                          });
+                        }
+                        mediaField.replaceValue(index, {
+                          ...value,
+                          role: "cover",
+                        });
+                      }
+                    }}
+                    checked={value.role === "cover"}
+                    className="size-9"
+                  />
+                )}
+              </>
+            )}
+          </form.Field>
+          {isUpload(value) && (
+            <form.Field name={`media[${index}].file`}>
+              {(subField) => (
+                <SelectFileButton
+                  maxFileSize={200000000}
+                  size={"icon"}
+                  variant={"default"}
+                  mimeType="image/*"
+                  file={subField.state.value}
+                  onChange={(f) => subField.handleChange(f as File)}
+                >
+                  <RotateCwIcon />
+                </SelectFileButton>
+              )}
+            </form.Field>
+          )}
+          <form.Field name="media" mode="array">
+            {(subField) => (
+              <Button
+                onClick={() => {
+                  subField.removeValue(index);
+                }}
+                size={"icon"}
+                variant={"destructive"}
+              >
+                <XIcon />
+              </Button>
+            )}
+          </form.Field>
+          <Button ref={handleRef} size={"icon"} variant={"default"}>
+            <GripIcon />
+          </Button>
+        </div>
+        <div className="w-full h-[200px] rounded overflow-hidden border">
+          {isUpload(value) ? (
+            value.file && (
+              <FileImage
+                className="object-cover h-full w-full"
+                file={value.file}
+              />
+            )
+          ) : (
+            <Image
+              src={value.asset.url}
+              alt={value.caption ?? ""}
+              className="object-cover h-full w-full"
+              width={200}
+              height={200}
+            />
+          )}
+        </div>
+      </div>
     );
   },
 });

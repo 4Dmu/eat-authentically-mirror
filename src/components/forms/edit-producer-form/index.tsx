@@ -47,20 +47,31 @@ export function ProducerEditForm(props: {
     initialData: props.producer,
   });
 
-  const uploadImagesMutation = useUploadImages();
-  const uploadVideoMutation = useUploadVideo();
-  const deleteVideoMutation = useDeleteVideo();
-  const updateExisingImagesMutation = useUpdateExistingImages();
+  const uploadImagesMutation = useUploadImages({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const uploadVideoMutation = useUploadVideo({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const deleteVideoMutation = useDeleteVideo({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const updateExistingImages = useUpdateExistingImages({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
   const editUserListingMutation = useEditUserProducer({
-    onError(err) {
-      toast.error(err.message);
-    },
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
   });
 
   const disableSaveButton =
     editUserListingMutation.isPending ||
     uploadImagesMutation.isPending ||
-    updateExisingImagesMutation.isPending ||
+    updateExistingImages.isPending ||
     uploadVideoMutation.isPending ||
     deleteVideoMutation.isPending;
 
@@ -112,9 +123,9 @@ export function ProducerEditForm(props: {
         const hasImagesToUpload = toUpload.length > 0;
         async function handleImageUpdates() {
           if (hasExistingImageChanges)
-            await updateExisingImagesMutation.mutateAsync({
+            await updateExistingImages.mutateAsync({
               producerId: props.producer.id,
-              data: existingImages.map((i) => i.assetId),
+              data: existingImages,
             });
           if (hasImagesToUpload)
             await uploadImagesMutation.mutateAsync({
@@ -162,7 +173,7 @@ export function ProducerEditForm(props: {
             error: () => `Error deleting video.`,
           });
           await deletePromise;
-        } else if (ImagesForm.isUpload(video)) {
+        } else if (VideoForm.isUpload(video)) {
           const videoUploadPromise = uploadVideoMutation.mutateAsync({
             producerId: props.producer.id,
             toUpload: video,

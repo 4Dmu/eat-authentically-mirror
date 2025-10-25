@@ -59,6 +59,19 @@ export const Form = withForm({
               )}
             </form.Field>
           </div>
+          <form.Field name="summary">
+            {(field) => (
+              <div className="flex flex-col gap-3">
+                <Label>Summary</Label>
+                <Input
+                  value={field.state.value ?? ""}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          </form.Field>
           <form.Field name="about">
             {(field) => (
               <div className="flex flex-col gap-3">
