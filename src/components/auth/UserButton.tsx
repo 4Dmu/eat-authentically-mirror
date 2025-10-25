@@ -19,6 +19,7 @@ import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { UserJSON } from "@clerk/backend";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { MessageNotifications } from "../message-notifications";
+import { PopoverClose } from "@radix-ui/react-popover";
 
 export function UserButton({
   subTierFromServer,
@@ -80,37 +81,43 @@ export function UserButton({
           </div>
         </div>
         <Separator />
-        <Button
-          asChild
-          variant={"ghost"}
-          className="w-full justify-start gap-5"
-        >
-          <Link href="/dashboard">
-            <LayoutDashboardIcon />
-            <p>Dashboard</p>
-          </Link>
-        </Button>
-        <Button
-          asChild
-          variant={"ghost"}
-          className="w-full justify-start gap-5"
-        >
-          <Link href="/dashboard/pinboard">
-            <MapIcon />
-            <p>Pinboard</p>
-          </Link>
-        </Button>
-        <Button
-          asChild
-          variant={"ghost"}
-          className="w-full justify-start gap-5 relative"
-        >
-          <Link href="/dashboard/chats">
-            <SendIcon />
-            <p>Chats</p>
-            <MessageNotifications className="ml-auto" />
-          </Link>
-        </Button>
+        <PopoverClose asChild>
+          <Button
+            asChild
+            variant={"ghost"}
+            className="w-full justify-start gap-5"
+          >
+            <Link href="/dashboard">
+              <LayoutDashboardIcon />
+              <p>Dashboard</p>
+            </Link>
+          </Button>
+        </PopoverClose>
+        <PopoverClose asChild>
+          <Button
+            asChild
+            variant={"ghost"}
+            className="w-full justify-start gap-5"
+          >
+            <Link href="/dashboard/pinboard">
+              <MapIcon />
+              <p>Pinboard</p>
+            </Link>
+          </Button>
+        </PopoverClose>
+        <PopoverClose asChild>
+          <Button
+            asChild
+            variant={"ghost"}
+            className="w-full justify-start gap-5 relative"
+          >
+            <Link href="/dashboard/chats">
+              <SendIcon />
+              <p>Chats</p>
+              <MessageNotifications className="ml-auto" />
+            </Link>
+          </Button>
+        </PopoverClose>
         <Separator />
         {/* {authState?.orgId && (
           <Button
@@ -130,14 +137,16 @@ export function UserButton({
           </div>
         )} */}
         <div className="flex gap-2">
-          <Button
-            variant={"ghost"}
-            onClick={() => signOut({ redirectUrl: "/" })}
-            className="w-full justify-start gap-5"
-          >
-            <LogOutIcon />
-            <span>Sign out</span>
-          </Button>
+          <PopoverClose asChild>
+            <Button
+              variant={"ghost"}
+              onClick={() => signOut({ redirectUrl: "/" })}
+              className="w-full justify-start gap-5"
+            >
+              <LogOutIcon />
+              <span>Sign out</span>
+            </Button>
+          </PopoverClose>
         </div>
       </PopoverContent>
     </Popover>
