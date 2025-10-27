@@ -48,7 +48,9 @@ export function ProducerPageClient(props: {
   subTier: SubTier;
   userProducerIds: string[];
 }) {
-  const { data: producer } = useFullProducerPublic(props.producer.id);
+  const { data: producer } = useFullProducerPublic(props.producer.id, {
+    initialData: props.producer,
+  });
   const reviews = useReviewsPublic(props.producer.id);
   const pendingReviews = useReviewProducerPendingState();
 
