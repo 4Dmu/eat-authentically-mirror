@@ -399,6 +399,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
       radiusKm: radius,
     });
   } else if (q) {
+    console.log("query only");
     const textBlend = sql`
       WITH
       prod_fts AS (
@@ -478,7 +479,12 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         cm.commodity_variants_csv,
         lb.search_labels
       FROM producers p
-      JOIN producer_location l ON l.producer_id = p.id
+      JOIN (
+        SELECT DISTINCT producer_id FROM prod_fts
+        UNION
+        SELECT DISTINCT producer_id FROM rev_fts
+      ) AS matched ON matched.producer_id = p.id
+      LEFT JOIN producer_location l ON l.producer_id = p.id
       LEFT JOIN prod_fts      ON prod_fts.producer_id = p.id
       LEFT JOIN rev_fts       ON rev_fts.producer_id  = p.id
       LEFT JOIN rating_scores rs ON rs.producer_id    = p.id
