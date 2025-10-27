@@ -115,7 +115,10 @@ export function PublicProducerCard({
             <p>{distanceFromUserInKM} km</p>
           </div>
         </div>
-        <p className="text-sm">{producer.summary?.substring(0, 100)}...</p>
+        <p className="text-sm">
+          {producer.summary?.substring(0, 100)}
+          ...
+        </p>
         <div className="flex gap-2">
           <Button variant={"default"} asChild className="flex-1">
             <Link
