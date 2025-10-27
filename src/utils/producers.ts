@@ -281,11 +281,14 @@ export function useProducerCountries() {
 
 export function useFullProducerPublic(
   producerId: string,
-  opts?: UseQueryOptions<
-    ProducerWithAll | undefined,
-    Error,
-    ProducerWithAll | undefined,
-    readonly [string, string]
+  opts?: Omit<
+    UseQueryOptions<
+      ProducerWithAll | undefined,
+      Error,
+      ProducerWithAll | undefined,
+      readonly [string, string]
+    >,
+    "queryKey" | "queryFn"
   >
 ) {
   return useQuery({
