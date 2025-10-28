@@ -170,6 +170,8 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
 
   const country = countryHint ? attemptDetectCountry(countryHint) : null;
 
+  const organicCertId = "fc340cb2-34c0-4c21-855b-4cb2c6d2d0df";
+
   if (geo && q) {
     const bbox = "bbox" in geo ? geo.bbox : undefined;
     const radius = "radiusKm" in geo ? geo.radiusKm : undefined;
@@ -335,52 +337,87 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         LEFT JOIN certs         ce ON ce.producer_id    = g.id
         LEFT JOIN comms         cm ON cm.producer_id    = g.id
         LEFT JOIN labels        lb ON lb.producer_id    = g.id
+        WHERE 1=1
         ${
-          filters?.certifications && filters.certifications.length
-            ? sql`
-          JOIN producer_certifications pc ON pc.producer_id = g.id
-          JOIN certifications c ON c.id = pc.certification_id
-            AND c.slug IN (${sql.join(
-              filters.certifications.map((s) => sql`${s}`),
-              sql`,`
-            )})
-        `
-            : sql``
-        }
-        ${
-          (filters?.commodities && filters.commodities.length) ||
-          (filters?.variants && filters.variants.length) ||
           filters?.organicOnly
             ? sql`
-          JOIN producer_commodities pc2 ON pc2.producer_id = g.id
-        `
+         AND EXISTS (
+           SELECT 1
+           FROM producer_certifications pc
+           WHERE pc.producer_id = g.id
+             AND pc.certification_id = ${organicCertId}
+         )
+       `
             : sql``
         }
-        ${
-          filters?.commodities && filters.commodities.length
-            ? sql`
-          JOIN commodities c2 ON c2.id = pc2.commodity_id
-            AND c2.slug IN (${sql.join(
-              filters.commodities.map((s) => sql`${s}`),
-              sql`,`
-            )})
-        `
-            : sql``
-        }
-        ${
-          filters?.variants && filters.variants.length
-            ? sql`
-          JOIN commodity_variants cv ON cv.id = pc2.variant_id
-            AND cv.slug IN (${sql.join(
-              filters.variants.map((s) => sql`${s}`),
-              sql`,`
-            )})
-        `
-            : sql``
-        }
-        WHERE 1=1
+        -- Filter by specific certifications (any of the selected)
+      ${
+        filters?.certifications && filters.certifications.length
+          ? sql`
+              AND EXISTS (
+                SELECT 1
+                FROM producer_certifications pc
+                JOIN certifications c ON c.id = pc.certification_id
+                WHERE pc.producer_id = g.id
+                  AND c.slug IN (${sql.join(
+                    filters.certifications.map((s) => sql`${s}`),
+                    sql`,`
+                  )})
+              )
+            `
+          : sql``
+      }
+
+      -- Filter by a specific certification ID (e.g., organicCertId)
+      ${
+        filters?.organicOnly
+          ? sql`
+              AND EXISTS (
+                SELECT 1
+                FROM producer_certifications pc
+                WHERE pc.producer_id = g.id
+                  AND pc.certification_id = ${organicCertId}
+              )
+            `
+          : sql``
+      }
+
+      -- Filter by commodities
+      ${
+        filters?.commodities && filters.commodities.length
+          ? sql`
+              AND EXISTS (
+                SELECT 1
+                FROM producer_commodities pc2
+                JOIN commodities c2 ON c2.id = pc2.commodity_id
+                WHERE pc2.producer_id = g.id
+                  AND c2.slug IN (${sql.join(
+                    filters.commodities.map((s) => sql`${s}`),
+                    sql`,`
+                  )})
+              )
+            `
+          : sql``
+      }
+
+      -- Filter by variants
+      ${
+        filters?.variants && filters.variants.length
+          ? sql`
+              AND EXISTS (
+                SELECT 1
+                FROM producer_commodities pc2
+                JOIN commodity_variants cv ON cv.id = pc2.variant_id
+                WHERE pc2.producer_id = g.id
+                  AND cv.slug IN (${sql.join(
+                    filters.variants.map((s) => sql`${s}`),
+                    sql`,`
+                  )})
+              )
+            `
+          : sql``
+      }
         ${filters?.category ? sql`AND g.type = ${filters.category}` : sql``}
-        ${filters?.organicOnly ? sql`AND pc2.organic = 1` : sql``}
         ORDER BY
          g.distance_km ASC,
           COALESCE(prod_fts.prod_rel, 10.0) ASC,

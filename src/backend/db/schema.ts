@@ -562,10 +562,10 @@ export const producerCertifications = sqliteTable(
   {
     producerId: text("producer_id")
       .notNull()
-      .references(() => producers.id), // FK -> producers.id
+      .references(() => producers.id, { onDelete: "cascade" }), // FK -> producers.id
     certificationId: text("certification_id")
       .notNull()
-      .references(() => certifications.id), // FK -> certifications.id
+      .references(() => certifications.id, { onDelete: "cascade" }), // FK -> certifications.id
     addedAt: integer("added_at", { mode: "timestamp" }).notNull(),
   },
   (t) => [primaryKey({ columns: [t.producerId, t.certificationId] })]

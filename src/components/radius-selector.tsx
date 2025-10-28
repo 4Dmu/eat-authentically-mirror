@@ -28,7 +28,7 @@ export function RadiusSelector({ defaultRadius }: { defaultRadius: number }) {
       />
       <div className="flex justify-between mt-2 text-xs text-muted-foreground">
         <span>1 km</span>
-        <span>100 km</span>
+        <span>500 km</span>
       </div>
     </div>
   );

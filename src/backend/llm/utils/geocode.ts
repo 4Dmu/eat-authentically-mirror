@@ -50,6 +50,9 @@ export const geocodePlace = async ({
 
     const json = await nominatimResponse.json();
 
+    console.log(place);
+    console.log("nominationJson", json);
+
     const { boundingbox, ...rest } = nominationApiResponse.parse(json)[0];
 
     const result = {

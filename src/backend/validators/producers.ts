@@ -314,6 +314,26 @@ export const ipGeoValidator = type({
 //   "userIpGeo?": ipGeoValidator,
 // });
 
+const queryFilters = type({
+  category: type.enumerated(...PRODUCER_TYPES).optional(),
+  commodities: type.string.atLeastLength(1).array().optional(),
+  variants: type.string.atLeastLength(1).array().optional(),
+  certifications: type.string.atLeastLength(1).array().optional(),
+  organicOnly: type.boolean.optional(),
+  verified: type.boolean.optional(),
+  isClaimed: type.boolean.optional(),
+  locality: type.string.optional(),
+  adminArea: type.string.optional(),
+  subscriptionRankMin: type.number.optional(),
+  subscriptionRankMax: type.number.optional(),
+  minAvgRating: type.number.optional(),
+  minBayesAvg: type.number.optional(),
+  minReviews: type.number.optional(),
+  hasCover: type.boolean.optional(),
+  ids: type.string.array().optional(),
+  excludeIds: type.string.array().optional(),
+}).partial();
+
 const searchByGeoTextQuery = type({
   "q?": type("string")
     .atLeastLength(1)
@@ -335,25 +355,7 @@ const searchByGeoTextQuery = type({
   ),
   "countryHint?": "string",
   "stateProvinceHint?": "string",
-  "filters?": type({
-    category: type.enumerated(...PRODUCER_TYPES).optional(),
-    commodities: type.string.atLeastLength(1).array().optional(),
-    variants: type.string.atLeastLength(1).array().optional(),
-    certifications: type.string.atLeastLength(1).array().optional(),
-    organicOnly: type.boolean.optional(),
-    verified: type.boolean.optional(),
-    isClaimed: type.boolean.optional(),
-    locality: type.string.optional(),
-    adminArea: type.string.optional(),
-    subscriptionRankMin: type.number.optional(),
-    subscriptionRankMax: type.number.optional(),
-    minAvgRating: type.number.optional(),
-    minBayesAvg: type.number.optional(),
-    minReviews: type.number.optional(),
-    hasCover: type.boolean.optional(),
-    ids: type.string.array().optional(),
-    excludeIds: type.string.array().optional(),
-  }).partial(),
+  "filters?": queryFilters,
 });
 
 const searchByGeoTextQueryArgs = searchByGeoTextQuery.and(
@@ -369,6 +371,8 @@ export const searchByGeoTextArgsValidator = searchByGeoTextQueryArgs;
 export type SearchByGeoTextArgs = typeof searchByGeoTextArgsValidator.infer;
 
 export type SearchByGeoTextQueryArgs = typeof searchByGeoTextQuery.infer;
+
+export type QueryFilters = typeof queryFilters.inferIn;
 
 export const geocodePlaceInput = type({
   place: type.string.atLeastLength(2).atMostLength(300).configure({

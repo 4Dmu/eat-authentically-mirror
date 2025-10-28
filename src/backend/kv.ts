@@ -3,6 +3,7 @@ import { redis } from "./lib/redis";
 import { SubscriptionJSON } from "./stripe/stripe-sync";
 import { NominationPlace } from "./validators/nomination-api";
 import { SearchByGeoTextQueryArgs } from "./validators/producers";
+import { GeocodeResponse } from "./validators/google-geocode-api";
 
 export const USER_DATA_KV = {
   generateKey(userId: string) {
@@ -289,6 +290,18 @@ export const NominatimGeocodeResponseCache = {
   },
 };
 
+export const GOOGLE_GEOCODE_RESPONSE_CACHE = {
+  generateKey(query: string) {
+    return `google:geocode-response:${query}`;
+  },
+  async set(query: string, response: GeocodeResponse) {
+    return await redis.set(this.generateKey(query), response);
+  },
+  async get(query: string) {
+    return await redis.get<GeocodeResponse>(this.generateKey(query));
+  },
+};
+
 export const SEARCH_BY_GEO_TEXT_PAGINATION_CACHE = {
   ttlSeconds: 120,
   generateKey(query: string) {
@@ -352,5 +365,47 @@ export const PRODUCER_COUNTRIES_CACHE = {
   },
   async get() {
     return await redis.get<string[]>(this.generateKey());
+  },
+};
+
+export const COMMODITIES_CACHE = {
+  generateKey() {
+    return `producer:commodities-cache`;
+  },
+  async set(commodities: string[]) {
+    await redis.set(this.generateKey(), commodities);
+  },
+  async get() {
+    return (await redis.get<string[]>(this.generateKey())) ?? [];
+  },
+  async add(commodity: string) {
+    const existing = (await this.get()) ?? [];
+    existing.push(commodity);
+    await this.set(existing);
+  },
+  async remove(commodity: string) {
+    const existing = (await this.get()) ?? [];
+    await this.set(existing.filter((e) => e !== commodity));
+  },
+};
+
+export const COMMODITY_VARIANTS_CACHE = {
+  generateKey() {
+    return `producer:commodity-aliases-cache`;
+  },
+  async set(variants: string[]) {
+    await redis.set(this.generateKey(), variants);
+  },
+  async get() {
+    return (await redis.get<string[]>(this.generateKey())) ?? [];
+  },
+  async add(variant: string) {
+    const existing = (await this.get()) ?? [];
+    existing.push(variant);
+    await this.set(existing);
+  },
+  async remove(variant: string) {
+    const existing = (await this.get()) ?? [];
+    await this.set(existing.filter((e) => e !== variant));
   },
 };

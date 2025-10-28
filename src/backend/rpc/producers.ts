@@ -14,6 +14,8 @@ import {
   listProducersArgsValidator,
   editProducerArgsValidatorV2,
   searchProducersArgsValidator,
+  QueryFilters,
+  ProducerTypes,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
@@ -76,6 +78,8 @@ import {
   RATELIMIT_ALL,
 } from "../constants";
 import {
+  COMMODITIES_CACHE,
+  COMMODITY_VARIANTS_CACHE,
   PRODUCER_COUNTRIES_CACHE,
   SEARCH_BY_GEO_TEXT_QUERIES_CACHE,
   USER_PRODUCER_IDS_KV,
@@ -100,6 +104,85 @@ import {
   mediaAssetSelectValidator,
   producerMediaSelectValidator,
 } from "../db/contracts";
+import np from "compromise";
+import { geocodePlace } from "../llm/utils/geocode";
+
+const LOCAL_INTENT_RE =
+  /\b(near\s*me|around\s*me|close\s*by|nearby|in\s*my\s*area)\b/i;
+
+const RE_ORGANIC = /\b(organic)\b/i;
+
+function findCategory(query: string) {
+  const aliases = {
+    farm: ["farm", "farms"],
+    ranch: ["ranch", "ranches"],
+    eatery: ["eatery", "restaurant", "restaurants"],
+  };
+
+  const queryLower = query.toLowerCase();
+
+  for (const [canonical, words] of Object.entries(aliases)) {
+    for (const word of words) {
+      // Match as a whole word
+      const regex = new RegExp(`\\b${word}\\b`, "i");
+      if (regex.test(queryLower)) {
+        return canonical as ProducerTypes;
+      }
+    }
+  }
+
+  return undefined; // No match found
+}
+
+function extractLocationInfo(query: string) {
+  const localIntent = LOCAL_INTENT_RE.test(query);
+  const placeName = (np(query).places().json() as { text: string }[]).map(
+    (r) => r.text
+  )[0] as string | undefined;
+
+  return { placeName, localIntent, query };
+}
+
+//  category: type.enumerated(...PRODUCER_TYPES).optional(),
+//     commodities: type.string.atLeastLength(1).array().optional(),
+//     variants: type.string.atLeastLength(1).array().optional(),
+//     certifications: type.string.atLeastLength(1).array().optional(),
+//     organicOnly: type.boolean.optional(),
+
+function findCommodities(query: string, commodities: string[]) {
+  const commoditiesRegex = new RegExp(
+    "\\b(" +
+      commodities
+        .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join("|") +
+      ")\\b",
+    "g"
+  );
+  const matches = query.match(commoditiesRegex);
+  if (!matches) return [];
+  // Find *all* matches (not just first)
+  return Array.from(query.matchAll(commoditiesRegex), (m) =>
+    m[1].toLowerCase()
+  );
+}
+
+async function extractFilters(query: string): Promise<QueryFilters> {
+  const prepared = query.toLowerCase();
+  const category = findCategory(query);
+  const commodities = await COMMODITIES_CACHE.get();
+  const variants = await COMMODITY_VARIANTS_CACHE.get();
+  const includedCommodities = findCommodities(query, commodities);
+  const includedVariants = findCommodities(query, variants);
+  const organic = RE_ORGANIC.test(query);
+
+  return {
+    category: category,
+    commodities:
+      includedCommodities.length === 0 ? undefined : includedCommodities,
+    variants: includedVariants.length === 0 ? undefined : includedVariants,
+    organicOnly: organic ? true : undefined,
+  };
+}
 
 export const searchProducers = actionClient
   .name("searchProducers")
@@ -225,18 +308,12 @@ export const searchProducers = actionClient
       // Query is not cached so pagination is invalid
       offset = 0;
 
-      const {
-        object: { hasLocationSnippet, userRequestsUsingTheirLocation },
-      } = await generateObject({
-        model: openai("gpt-4o-mini"),
-        schema: z.object({
-          hasLocationSnippet: z.boolean(),
-          userRequestsUsingTheirLocation: z.boolean(),
-        }),
-        prompt: rest.query,
-        system:
-          "Check if input contains a location snippet and if the prompter requests to use their location",
-      });
+      const locationInfo = extractLocationInfo(rest.query);
+      const filters = await extractFilters(rest.query);
+      console.log(filters);
+
+      const hasLocationSnippet = locationInfo.placeName !== undefined;
+      const userRequestsUsingTheirLocation = locationInfo.localIntent;
 
       let output: listing.ProducerSearchResult;
 
@@ -246,77 +323,64 @@ export const searchProducers = actionClient
         hasLocationSnippet === true &&
         userRequestsUsingTheirLocation !== true
       ) {
-        const tools = initTools({
-          search_by_geo_text: {
-            limit: limit,
-            offset: offset,
-            originalQuery: rest.query,
-            countryHint: customFilterOverrides?.country,
-          },
-          userId: undefined,
-        });
-        const result = await generateText({
-          model: openai("gpt-4o-mini"),
-          prompt: rest.query,
-          tools,
-          stopWhen: stepCountIs(2),
-          prepareStep: async ({ stepNumber }) => {
-            if (stepNumber === 0) {
-              return {
-                toolChoice: { type: "tool", toolName: "geocode_place" },
-                activeTools: ["geocode_place"],
-              };
-            } else if (stepNumber === 1) {
-              return {
-                toolChoice: { type: "tool", toolName: "search_by_geo_text" },
-                activeTools: ["search_by_geo_text"],
-              };
-            }
-          },
-          toolChoice: "required",
-          system: `Extract partial of full location snippet from input and call the 'geocode_place' tool.
-        Finally call the 'search_by_geo_text' tool, use the provided tool to find farms, ranches, and restaurants.
-        Always pass bounding box if geocode_place was used.
-        Always pass country hint if geocode_place contains a country.
-        Extract filters from query when possible, only pass q when filters are extracted and parts remain.
-        Only pass commodities filter when looking for farms and the query contains specific products.
-         Only pass category filter if the query contains or implies a category`,
+        const placeInfo = await geocodePlace({
+          place: locationInfo.placeName!,
         });
 
-        const item = result.toolResults[result.toolResults.length - 1];
-        output = item.output as listing.ProducerSearchResult;
+        if (placeInfo.status == "error") {
+          throw new Error("Failed geocoding");
+        }
+
+        await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(rest.query, {
+          geo: {
+            center: {
+              lat: Number(placeInfo.data.lat),
+              lon: Number(placeInfo.data.lon),
+            },
+            bbox: placeInfo.data.boundingbox,
+          },
+          filters,
+          q: rest.query,
+          userRequestsUsingTheirLocation: userRequestsUsingTheirLocation,
+        });
+
+        const result = await listing.searchByGeoText({
+          geo: {
+            center: {
+              lat: Number(placeInfo.data.lat),
+              lon: Number(placeInfo.data.lon),
+            },
+            bbox: placeInfo.data.boundingbox,
+          },
+          filters,
+          q: rest.query,
+          limit: limit,
+          offset: offset,
+        });
+
+        output = result;
       } else {
-        const tools = initTools({
-          search_by_geo_text: {
-            limit: limit,
-            offset: offset,
-            geo:
-              userRequestsUsingTheirLocation === true && userGeo !== undefined
-                ? {
-                    center: userGeo!,
-                    radiusKm: userLocationRadius,
-                  }
-                : undefined,
-            originalQuery: rest.query,
-            userRequestsUsingTheirLocation,
-            countryHint: customFilterOverrides?.country,
-          },
-          userId: undefined,
-        });
-        const result = await generateText({
-          model: openai("gpt-4o-mini"),
-          prompt: rest.query,
-          tools,
-          activeTools: ["search_by_geo_text"],
-          toolChoice: "required",
-          system: `Call the 'search_by_geo_text' tool, use the provided tool to find farms, ranches, and restaurants.
-        Extract filters from query when possible, only pass q when filters are extracted and parts remain.
-        Only pass commodities filter when looking for farms and the query contains specific products.
-        Only pass category filter if the query contains or implies a category`,
+        await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(rest.query, {
+          q: rest.query,
+          filters,
+          userRequestsUsingTheirLocation: userRequestsUsingTheirLocation,
         });
 
-        const item = result.toolResults[result.toolResults.length - 1];
-        output = item.output as listing.ProducerSearchResult;
+        const result = await listing.searchByGeoText({
+          geo:
+            userRequestsUsingTheirLocation === true && userGeo !== undefined
+              ? {
+                  center: userGeo!,
+                  radiusKm: userLocationRadius,
+                }
+              : undefined,
+          q: rest.query,
+          filters,
+          limit: limit,
+          offset: offset,
+        });
+
+        output = result;
       }
 
       return {
