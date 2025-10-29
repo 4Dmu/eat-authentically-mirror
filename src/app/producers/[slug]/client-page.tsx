@@ -13,8 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useFullProducerPublic } from "@/utils/producers";
-import { GlobeIcon, MailIcon, MapPin, PhoneIcon } from "lucide-react";
+import { primaryImageUrl, useFullProducerPublic } from "@/utils/producers";
+import {
+  EllipsisIcon,
+  GlobeIcon,
+  MailIcon,
+  MapPin,
+  PhoneIcon,
+} from "lucide-react";
 import { ClaimProducerCard } from "@/components/claim-producer-card";
 import {
   Carousel,
@@ -25,12 +31,7 @@ import {
 } from "@/components/ui/carousel";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { Stream } from "@/components/stream";
-import { NotSubbed, Subbed } from "@/components/auth/RequireSub";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import {
-  CommunityBenefitsCard,
-  CommunityBenefitsCTACard,
-} from "@/components/community-benefits-card";
 import { MapCard } from "@/components/map-card";
 import { cn } from "@/lib/utils";
 import {
@@ -42,6 +43,24 @@ import { PendingReviewCard, ReviewCard } from "@/components/review-card";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { ProducerWithAll } from "@/backend/db/schema";
 import React from "react";
+import {
+  MessageProducerDialog,
+  MessageProducerDialogTrigger,
+} from "@/components/message-producer-dialog";
+import {
+  ReviewProducerDialog,
+  ReviewProducerDialogTrigger,
+} from "@/components/review-producer-dialog";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  UnstyledDropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function ProducerPageClient(props: {
   producer: ProducerWithAll;
@@ -68,20 +87,49 @@ export function ProducerPageClient(props: {
       (v) => v[1] !== null && v[1] !== undefined
     );
 
-  const communityBenefitsCard = (
+  const isUserListing = props.userProducerIds.includes(props.producer.id);
+
+  const communityBenefitsMenu = (
     <>
       {producer && (
-        <>
-          <Subbed initialSubTier={props.subTier}>
-            <CommunityBenefitsCard
-              userProducerIds={props.userProducerIds}
-              producer={producer}
-            />
-          </Subbed>
-          <NotSubbed>
-            <CommunityBenefitsCTACard />
-          </NotSubbed>
-        </>
+        <ReviewProducerDialog producer={producer}>
+          <MessageProducerDialog producer={producer}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size={"icon"}>
+                  <EllipsisIcon />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="p-2 flex flex-col gap-2"
+                sideOffset={10}
+              >
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                {producer.userId !== null && !isUserListing && (
+                  <UnstyledDropdownMenuItem className="w-full">
+                    <MessageProducerDialogTrigger
+                      disabled={isUserListing}
+                      producerId={producer.id}
+                    />
+                  </UnstyledDropdownMenuItem>
+                )}
+                {!isUserListing && (
+                  <UnstyledDropdownMenuItem className="w-full">
+                    <ReviewProducerDialogTrigger disable={isUserListing} />
+                  </UnstyledDropdownMenuItem>
+                )}
+                {isUserListing && (
+                  <UnstyledDropdownMenuItem className="w-full">
+                    <Button>
+                      <Link href={"/dashboard"}>View on dashboard</Link>
+                    </Button>
+                  </UnstyledDropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </MessageProducerDialog>
+        </ReviewProducerDialog>
       )}
     </>
   );
@@ -210,59 +258,67 @@ export function ProducerPageClient(props: {
       <div className="p-3 sm:p-10 flex flex-col gap-5 max-w-7xl mx-auto">
         <div className="flex gap-5 justify-between">
           <BackButton text="Return Home" href="/" />
-          <SignedIn>
-            <AddToPinboardButton
-              producerId={producer?.id ?? props.producer.id}
-            />
-          </SignedIn>
-          <SignedOut>
-            <AddToPinboardButtonRedirectToAuth />
-          </SignedOut>
+          <div className="flex gap-2">
+            <SignedIn>
+              <AddToPinboardButton
+                producerId={producer?.id ?? props.producer.id}
+              />
+            </SignedIn>
+            <SignedOut>
+              <AddToPinboardButtonRedirectToAuth />
+            </SignedOut>
+            {communityBenefitsMenu}
+          </div>
         </div>
         <div className="flex flex-col lg:flex-row gap-5">
           {producer && (
             <div className="flex-5/8 flex flex-col gap-5">
-              <Card
-                className={cn(
-                  "overflow-hidden flex-1",
-                  producer.media.length > 0 && "pt-0"
-                )}
-              >
-                {producer.media.length > 0 && (
-                  <Carousel>
-                    <CarouselContent className="">
-                      {producer.media.map((item) => (
-                        <React.Fragment key={item.assetId}>
-                          {item.role === "video" ? (
-                            <CarouselItem>
-                              <Stream
-                                responsive={false}
-                                width="100%"
-                                height="100%"
-                                className="object-cover h-full w-full"
-                                controls
-                                src={item.asset.cloudflareId ?? ""}
-                              />
-                            </CarouselItem>
-                          ) : (
-                            <CarouselItem>
-                              <Image
-                                priority
-                                alt=""
-                                className="w-full h-full object-cover aspect-video"
-                                width={1920}
-                                height={1080}
-                                src={item.asset.url}
-                              />
-                            </CarouselItem>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </CarouselContent>
-                    <CarouselNext />
-                    <CarouselPrevious />
-                  </Carousel>
-                )}
+              <Card className={cn("overflow-hidden flex-1", "pt-0")}>
+                <Carousel>
+                  <CarouselContent className="">
+                    {producer.media.map((item) => (
+                      <React.Fragment key={item.assetId}>
+                        {item.role === "video" ? (
+                          <CarouselItem>
+                            <Stream
+                              responsive={false}
+                              width="100%"
+                              height="100%"
+                              className="object-cover h-full w-full"
+                              controls
+                              src={item.asset.cloudflareId ?? ""}
+                            />
+                          </CarouselItem>
+                        ) : (
+                          <CarouselItem>
+                            <Image
+                              priority
+                              alt=""
+                              className="w-full h-full object-cover aspect-video"
+                              width={1920}
+                              height={1080}
+                              src={item.asset.url}
+                            />
+                          </CarouselItem>
+                        )}
+                      </React.Fragment>
+                    ))}
+                    {producer.media.length === 0 && (
+                      <CarouselItem>
+                        <Image
+                          priority
+                          alt=""
+                          className="w-full h-full object-cover aspect-video"
+                          width={1920}
+                          height={1080}
+                          src={primaryImageUrl(producer)}
+                        />
+                      </CarouselItem>
+                    )}
+                  </CarouselContent>
+                  <CarouselNext />
+                  <CarouselPrevious />
+                </Carousel>
                 <CardHeader>
                   <h1 className="font-bold text-4xl">{producer.name}</h1>
                   <Badge>{producer.type}</Badge>
@@ -271,7 +327,6 @@ export function ProducerPageClient(props: {
                   {producer.about?.replace(/\\n/g, "\n")}
                 </CardContent>
               </Card>
-              {hasAddress && communityBenefitsCard}
               <div className="max-lg:hidden">{reviewsCard}</div>
             </div>
           )}
@@ -279,7 +334,6 @@ export function ProducerPageClient(props: {
             {claimProducerCard}
             {contactCard}
             {mapCard}
-            {!hasAddress && communityBenefitsCard}
             <div className="lg:hidden">{reviewsCard}</div>
           </div>
         </div>

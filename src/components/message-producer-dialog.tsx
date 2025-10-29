@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -21,18 +21,21 @@ import { useRouter } from "next/navigation";
 import { match, P } from "ts-pattern";
 import Link from "next/link";
 import { ProducerWithAll } from "@/backend/db/schema";
+import { atom, useAtom, useSetAtom } from "jotai";
+import { NotSubbed, Subbed } from "./auth/RequireSub";
 
 const formSchema = type({
   message: type.string.atLeastLength(5).atMostLength(5000),
 });
 
+const producerDialogOpenAtom = atom(false);
+
 export function MessageProducerDialog({
   producer,
-  disabled,
-}: {
+  children,
+}: PropsWithChildren<{
   producer: ProducerWithAll;
-  disabled: boolean;
-}) {
+}>) {
   const chatQuery = useProducerChat({ producerId: producer.id });
   const router = useRouter();
   const sendMessage = useSendMessageToProducer({
@@ -40,7 +43,7 @@ export function MessageProducerDialog({
     onSuccess: async () => await chatQuery.refetch(),
   });
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAtom(producerDialogOpenAtom);
 
   const form = useForm({
     defaultValues: {
@@ -86,15 +89,81 @@ export function MessageProducerDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      {children}
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Message {producer.name}</DialogTitle>
+        </DialogHeader>
+        <Subbed>
+          <div>
+            <form.Field name="message">
+              {(field) => (
+                <div className="flex flex-col gap-1">
+                  <Textarea
+                    className="min-h-40 resize-none"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.currentTarget.value)}
+                  />
+                  <FieldInfo
+                    otherwise={<p className="h-[24px]">{}</p>}
+                    field={field}
+                  />
+                </div>
+              )}
+            </form.Field>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant={"brandRed"} className="w-32">
+                Cancel
+              </Button>
+            </DialogClose>
+            <form.Subscribe selector={(state) => state.canSubmit}>
+              {(canSubmit) => (
+                <Button
+                  onClick={submit}
+                  disabled={!canSubmit}
+                  variant={"brandGreen"}
+                  className="w-32"
+                >
+                  Send
+                </Button>
+              )}
+            </form.Subscribe>
+          </DialogFooter>
+        </Subbed>
+        <NotSubbed>
+          <p>Upgrade to review and send direct messages to produces.</p>
+          <Button variant={"brandGreen"} asChild>
+            <Link href={"/dashboard/subscribe"}>Upgrade</Link>
+          </Button>
+        </NotSubbed>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function MessageProducerDialogTrigger({
+  disabled,
+  producerId,
+}: {
+  disabled: boolean;
+  producerId: string;
+}) {
+  const chatQuery = useProducerChat({ producerId: producerId });
+  const setOpen = useSetAtom(producerDialogOpenAtom);
+  return (
+    <>
       {match(chatQuery)
         .with({ status: "pending" }, () => (
-          <Button className="w-28" disabled variant={"brandGreen"}>
+          <Button className="w-full" disabled variant={"brandGreen"}>
             Loading...
           </Button>
         ))
         .with({ data: P.nonNullable }, (query) => (
           <Button
-            className="w-28"
+            className="w-full"
             disabled={disabled}
             variant={"brandGreen"}
             asChild
@@ -106,55 +175,15 @@ export function MessageProducerDialog({
           </Button>
         ))
         .otherwise(() => (
-          <DialogTrigger asChild disabled={disabled}>
-            <Button className="w-28" variant={"brandGreen"}>
-              <Send />
-              Message
-            </Button>
-          </DialogTrigger>
+          <Button
+            onClick={() => setOpen(true)}
+            className="w-full"
+            variant={"brandGreen"}
+          >
+            <Send />
+            Message
+          </Button>
         ))}
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Message {producer.name}</DialogTitle>
-        </DialogHeader>
-        <div>
-          <form.Field name="message">
-            {(field) => (
-              <div className="flex flex-col gap-1">
-                <Textarea
-                  className="min-h-40 resize-none"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.currentTarget.value)}
-                />
-                <FieldInfo
-                  otherwise={<p className="h-[24px]">{}</p>}
-                  field={field}
-                />
-              </div>
-            )}
-          </form.Field>
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant={"brandRed"} className="w-32">
-              Cancel
-            </Button>
-          </DialogClose>
-          <form.Subscribe selector={(state) => state.canSubmit}>
-            {(canSubmit) => (
-              <Button
-                onClick={submit}
-                disabled={!canSubmit}
-                variant={"brandGreen"}
-                className="w-32"
-              >
-                Send
-              </Button>
-            )}
-          </form.Subscribe>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }
