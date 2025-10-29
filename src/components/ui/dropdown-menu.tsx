@@ -96,6 +96,7 @@ function UnstyledDropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
+      className={className}
       {...props}
     />
   );

@@ -206,33 +206,6 @@ export const videoValidator = type({
   status: "'ready'|'pending'",
 });
 
-export const producerImagesValidator = type({
-  items: imageDataValidator.array(),
-  primaryImgId: "string|null",
-});
-
-export const producerValidator = type({
-  id: "string.uuid",
-  userId: "string|null",
-  name: "string",
-  type: producerTypesValidator,
-  about: "string|null",
-  contact: contactValidator.or("null"),
-  address: addressValidator.or("null"),
-  certifications: certificationValidator.array(),
-  commodities: type({
-    name: "string",
-    varieties: type.string.array(),
-  }).array(),
-  claimed: "boolean",
-  verified: "boolean",
-  images: producerImagesValidator,
-  video: videoValidator.or(type("null")),
-  createdAt: "Date",
-  updatedAt: "Date",
-  socialMedia: socialMediaValidator,
-});
-
 export const editProducerFormValidator = producerSelectValidator
   .pick("name", "about", "type")
   .and({
@@ -255,33 +228,6 @@ export const producerFormBasicValidator = type({
   type: producerTypesValidator,
   about: "string|null",
 });
-
-export const publicProducerValidator = producerValidator
-  .pick(
-    "id",
-    "name",
-    "type",
-    "about",
-    "images",
-    "claimed",
-    "certifications",
-    "contact",
-    "address",
-    "video",
-    "socialMedia"
-  )
-  .and({ googleMapsUrl: "string|undefined" });
-
-export const publicProducerLightValidator = producerValidator.pick(
-  "id",
-  "name",
-  "type",
-  "images",
-  "claimed",
-  "certifications",
-  "contact",
-  "address"
-);
 
 export const ipGeoValidator = type({
   /** The city that the request originated from. */
@@ -524,12 +470,6 @@ export type Contact = typeof contactValidator.infer;
 export type Address = typeof addressValidator.infer;
 
 export type ImageData = typeof imageDataValidator.infer;
-
-export type Producer = typeof producerValidator.infer;
-
-export type PublicProducer = typeof publicProducerValidator.infer;
-
-export type PublicProducerLight = typeof publicProducerLightValidator.infer;
 
 export type Certification = typeof certificationValidator.infer;
 

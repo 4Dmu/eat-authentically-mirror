@@ -2,7 +2,6 @@
 import * as listing from "@/backend/data/producer";
 import {
   getProducersArgsValidator,
-  Producer,
   claimProducerArgs,
   checkClaimDomainDnsArgs,
   PublicClaimRequest,
@@ -96,10 +95,6 @@ import { addMinutes, isAfter, isBefore } from "date-fns";
 import { tryCatch } from "@/utils/try-catch";
 import { geocode } from "../lib/google-maps";
 import { logger } from "../lib/log";
-import { generateObject, generateText, stepCountIs } from "ai";
-import { initTools } from "../llm/tools";
-import { openai } from "@ai-sdk/openai";
-import z from "zod";
 import { headers } from "next/headers";
 import { Geo } from "@vercel/functions";
 import { auth } from "@clerk/nextjs/server";
@@ -170,7 +165,6 @@ function findCommodities(query: string, commodities: string[]) {
 }
 
 async function extractFilters(query: string): Promise<QueryFilters> {
-  const prepared = query.toLowerCase();
   const category = findCategory(query);
   const commodities = await COMMODITIES_CACHE.get();
   const variants = await COMMODITY_VARIANTS_CACHE.get();

@@ -31,7 +31,6 @@ import {
   editProducerContact,
 } from "@/backend/rpc/producers";
 import {
-  Producer,
   ClaimProducerArgs,
   CheckClaimDomainDnsArgs,
   PublicClaimRequest,
@@ -49,6 +48,7 @@ import {
   MediaAssetSelect,
   ProducerCardsRow,
   ProducerMediaSelect,
+  ProducerSelect,
   ProducerWith,
   ProducerWithAll,
 } from "@/backend/db/schema";
@@ -120,7 +120,9 @@ export function producerSlug(name: string) {
  * @example
  *  'Daves Ranch' returns 'daves-ranch-id'
  */
-export function producerSlugFull(producer: Pick<Producer, "name" | "id">) {
+export function producerSlugFull(
+  producer: Pick<ProducerSelect, "name" | "id">
+) {
   return `${producer.name.toLowerCase().trim().split(" ").join("-")}-${
     producer.id
   }`;
@@ -316,7 +318,12 @@ export function useCertificationTypes() {
 
 export function useLoggedInUserProducers(
   opts?: Pick<
-    UseQueryOptions<ProducerCardsRow[], Error, Producer[], readonly [string]>,
+    UseQueryOptions<
+      ProducerCardsRow[],
+      Error,
+      ProducerCardsRow[],
+      readonly [string]
+    >,
     | "initialData"
     | "networkMode"
     | "persister"

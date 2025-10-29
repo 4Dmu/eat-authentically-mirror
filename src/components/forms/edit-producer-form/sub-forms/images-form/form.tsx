@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React, { useId } from "react";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { FileImage } from "@/components/file-image";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ import { defaultOptions, withForm } from "./context";
 import { editProducerMediaFormValidator } from "@/backend/validators/producers";
 import { ProducerWithMap } from "@/backend/db/schema";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
+import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 
 export function isUpload(
@@ -180,7 +179,7 @@ const SortableImage = withForm({
         },
     index: 0,
   },
-  render: ({ form, value, index }) => {
+  render: function Render({ form, value, index }) {
     const { ref, handleRef } = useSortable({
       id: `${isUpload(value) ? value.id : value.assetId}`,
       index: index,

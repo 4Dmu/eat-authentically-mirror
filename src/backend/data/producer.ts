@@ -4,7 +4,7 @@ import type {
   SearchByGeoTextArgs,
 } from "@/backend/validators/producers";
 import { db } from "../db";
-import { asc, eq, ilike, like, SQL, sql } from "drizzle-orm";
+import { asc, eq, like, SQL, sql } from "drizzle-orm";
 import {
   claimRequests,
   producerCards,
