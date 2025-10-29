@@ -16,6 +16,7 @@ import {
   searchProducersArgsValidator,
   QueryFilters,
   ProducerTypes,
+  editProducerContactArgsValidator,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
@@ -26,6 +27,8 @@ import {
   PendingMediaAssetInsert,
   pendingMediaAssets,
   producerCards,
+  producerContact,
+  ProducerContactSelect,
   ProducerInsert,
   producerLocation,
   producerMedia,
@@ -690,6 +693,50 @@ export const editProducer = producerActionClient
           ...toUpdateSearch,
         })
         .where(eq(producersSearch.producerId, producer.id));
+    }
+  });
+
+export const editProducerContact = producerActionClient
+  .input(editProducerContactArgsValidator)
+  .name("editProducerContact")
+  .action(async ({ input, ctx: { userId } }) => {
+    const producer = await db.query.producers.findFirst({
+      where: and(
+        eq(producers.id, input.producerId),
+        eq(producers.userId, userId)
+      ),
+      columns: {
+        id: true,
+        summary: true,
+      },
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    const toUpdate: Partial<ProducerContactSelect> = {};
+    if (input.email !== undefined) {
+      toUpdate.email = input.email;
+    }
+    if (input.phone !== undefined) {
+      toUpdate.phone = input.phone;
+    }
+    if (input.websiteUrl !== undefined) {
+      toUpdate.websiteUrl = input.websiteUrl;
+    }
+
+    if (Object.keys(toUpdate).length > 0) {
+      await db
+        .insert(producerContact)
+        .values({
+          producerId: producer.id,
+          ...toUpdate,
+        })
+        .onConflictDoUpdate({
+          set: { ...toUpdate },
+          target: producerContact.producerId,
+        });
     }
   });
 

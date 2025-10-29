@@ -18,6 +18,9 @@ export const { useAppForm, withForm } = createFormHook({
 });
 
 export const defaultOptions = formOptions({
-  defaultValues:
-    {} as typeof editProducerContactFormValditator.infer as typeof editProducerContactFormValditator.infer,
+  defaultValues: {
+    email: null,
+    websiteUrl: null,
+    phone: null,
+  } as typeof editProducerContactFormValditator.infer as typeof editProducerContactFormValditator.infer,
 });

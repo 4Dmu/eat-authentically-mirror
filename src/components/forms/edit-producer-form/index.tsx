@@ -9,6 +9,7 @@ import * as AddressForm from "./sub-forms/address-form";
 import { SaveButton } from "./save-button";
 import {
   useDeleteVideo,
+  useEditProducerContact,
   useEditUserProducer,
   useLoggedInUserProducer,
   useUpdateExistingImages,
@@ -64,6 +65,10 @@ export function ProducerEditForm(props: {
     onError: (err) => toast.error(err.message),
   });
   const editUserListingMutation = useEditUserProducer({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const editProducerContactMutation = useEditProducerContact({
     onSuccess: async () => await producerQuery.refetch(),
     onError: (err) => toast.error(err.message),
   });
@@ -189,16 +194,27 @@ export function ProducerEditForm(props: {
     },
   });
 
-  // @TODO
   const contactForm = ContactForm.useAppForm({
     defaultValues: {
-      email: producerQuery.data?.contact?.email,
-      phone: producerQuery.data?.contact?.phone,
-      websiteUrl: producerQuery.data?.contact?.websiteUrl,
+      email: producerQuery.data?.contact?.email ?? null,
+      phone: producerQuery.data?.contact?.phone ?? null,
+      websiteUrl: producerQuery.data?.contact?.websiteUrl ?? null,
     } satisfies typeof editProducerContactFormValditator.infer as typeof editProducerContactFormValditator.infer,
     validators: {
       onChange: ({ formApi }) =>
         formApi.parseValuesWithSchema(editProducerContactFormValditator),
+    },
+    onSubmit: async ({ value }) => {
+      const submitPromise = editProducerContactMutation.mutateAsync({
+        producerId: props.producer.id,
+        ...value,
+      });
+      toast.promise(submitPromise, {
+        loading: "Updating contact data...",
+        success: () => "Updated contact data successfully",
+        error: () => `Error updating.`,
+      });
+      await submitPromise;
     },
   });
 

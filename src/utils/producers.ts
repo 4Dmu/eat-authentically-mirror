@@ -28,6 +28,7 @@ import {
   getFullProducerPublic,
   searchProducers,
   listProducerContries,
+  editProducerContact,
 } from "@/backend/rpc/producers";
 import {
   Producer,
@@ -41,6 +42,7 @@ import {
   ListProducersArgs,
   EditProducerArgsV2,
   ProducerTypes,
+  EditProducerContact,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
@@ -407,6 +409,21 @@ export function useEditUserProducer(
     mutationKey: ["edit-producer"] as const,
     mutationFn: async (args: EditProducerArgsV2) => {
       await editProducer(args);
+    },
+  });
+}
+
+export function useEditProducerContact(
+  opts?: Omit<
+    UseMutationOptions<void, Error, EditProducerContact, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["edit-producer-contact"],
+    mutationFn: async (args) => {
+      await editProducerContact(args);
     },
   });
 }

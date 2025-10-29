@@ -61,7 +61,11 @@ export const Form = withForm({
                         }
                         mimeType="video/*"
                         onSelect={(v) =>
-                          field.handleChange({ file: v, position: 0 })
+                          field.handleChange({
+                            file: v,
+                            position: 0,
+                            id: crypto.randomUUID(),
+                          })
                         }
                       >
                         Add Video
@@ -79,7 +83,11 @@ export const Form = withForm({
                           }
                           mimeType="video/*"
                           onSelect={(v) =>
-                            field.handleChange({ file: v, position: 0 })
+                            field.handleChange({
+                              file: v,
+                              position: 0,
+                              id: crypto.randomUUID(),
+                            })
                           }
                         >
                           <RotateCwIcon />

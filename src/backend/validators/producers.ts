@@ -433,6 +433,10 @@ export const editProducerArgsValidatorV2 = type({
   "summary?": producerInsertValidator.get("summary"),
 });
 
+export const editProducerContactArgsValidator = type({
+  producerId: "string",
+}).and(producerContactSelectValidator.partial());
+
 export const searchProducersArgsValidator = type({
   query: "string",
   limit: "number",
@@ -480,6 +484,7 @@ export const editProucerVideoFormValidator = type({
       type({
         file: "File",
         position: "number",
+        id: "string",
       })
     )
     .or(type.null),
@@ -531,6 +536,8 @@ export type Certification = typeof certificationValidator.infer;
 export type EditProducerArgs = typeof editProducerArgsValidator.infer;
 
 export type EditProducerArgsV2 = typeof editProducerArgsValidatorV2.infer;
+
+export type EditProducerContact = typeof editProducerContactArgsValidator.infer;
 
 export type ProducerClaimVerificationMethods =
   typeof producerClaimVerificationMethods.infer;
