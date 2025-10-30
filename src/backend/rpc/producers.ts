@@ -16,20 +16,28 @@ import {
   QueryFilters,
   ProducerTypes,
   editProducerContactArgsValidator,
+  editProducerLocationArgsValidator,
+  editProducerCertificationsArgsValidator,
+  editProducerCommodotiesArgsValidator,
+  addCommodityAndAssociateArgsValidator,
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
 import { db } from "../db";
 import {
   claimRequests,
+  commodities,
   mediaAssets,
   PendingMediaAssetInsert,
   pendingMediaAssets,
   producerCards,
+  producerCertifications,
+  producerCommodities,
   producerContact,
   ProducerContactSelect,
   ProducerInsert,
   producerLocation,
+  ProducerLocationSelect,
   producerMedia,
   producers,
   ProducerSelect,
@@ -104,6 +112,7 @@ import {
 } from "../db/contracts";
 import np from "compromise";
 import { geocodePlace } from "../llm/utils/geocode";
+import ngeo from "ngeohash";
 
 const LOCAL_INTENT_RE =
   /\b(near\s*me|around\s*me|close\s*by|nearby|in\s*my\s*area)\b/i;
@@ -594,80 +603,6 @@ export const editProducer = producerActionClient
       toUpdateSearch.searchSummary = input.summary;
     }
 
-    // if (input.address) {
-    //   toUpdate.address = normalizeAddress(input.address);
-    // }
-
-    // if (input.contact) {
-    //   toUpdate.contact = input.contact;
-    // }
-
-    // if (input.socialMedia) {
-    //   toUpdate.socialMedia = input.socialMedia;
-    // }
-
-    // if (input.certifications && input.certifications) {
-    //   await db
-    //     .delete(producerCertifications)
-    //     .where(
-    //       and(
-    //         eq(producerCertifications.producerId, producer.id),
-    //         notInArray(
-    //           producerCertifications.certificationId,
-    //           input.certifications
-    //         )
-    //       )
-    //     );
-
-    //   await db
-    //     .insert(producerCertifications)
-    //     .values(
-    //       input.certifications.map((id) => ({
-    //         producerId: producer.id,
-    //         certificationId: id,
-    //         addedAt: new Date(),
-    //       }))
-    //     )
-    //     .onConflictDoNothing();
-    // }
-
-    // if (input.commodities) {
-    //   await db
-    //     .delete(producerCommodities)
-    //     .where(
-    //       and(
-    //         eq(producerCommodities.producerId, producer.id),
-    //         notInArray(producerCommodities.commodityId, input.commodities)
-    //       )
-    //     );
-
-    //   const tier = subTier == "Free" ? "Free" : subTier.tier;
-    //   const maxProducts = PRODUCER_PRODUCTS_LIMIT_BY_TIER[tier];
-
-    //   const totalCommodaties = await db
-    //     .select({ count: count() })
-    //     .from(producerCommodities)
-    //     .where(eq(producerCommodities.producerId, producer.id))
-    //     .then((r) => r[0].count);
-
-    //   if (totalCommodaties + input.commodities.length > maxProducts) {
-    //     throw new Error(
-    //       `Your current plan ("${tier}") allows only ${maxProducts} products.`
-    //     );
-    //   }
-
-    //   await db
-    //     .insert(producerCommodities)
-    //     .values(
-    //       input.commodities.map((id) => ({
-    //         producerId: producer.id,
-    //         commodityId: id,
-    //         updatedAt: new Date(),
-    //       }))
-    //     )
-    //     .onConflictDoNothing();
-    // }
-
     if (Object.keys(toUpdate).length > 0) {
       await db
         .update(producers)
@@ -732,6 +667,233 @@ export const editProducerContact = producerActionClient
           target: producerContact.producerId,
         });
     }
+  });
+
+export const editProducerLocation = producerActionClient
+  .input(editProducerLocationArgsValidator)
+  .name("editProducerLocation")
+  .action(async ({ input, ctx: { userId } }) => {
+    const producer = await db.query.producers.findFirst({
+      where: and(
+        eq(producers.id, input.producerId),
+        eq(producers.userId, userId)
+      ),
+      columns: {
+        id: true,
+        summary: true,
+      },
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    const existing = await db.query.producerLocation.findFirst({
+      where: eq(producerLocation.producerId, producer.id),
+    });
+
+    const toUpdate: Partial<ProducerLocationSelect> = {};
+    if (input.latitude !== undefined) {
+      toUpdate.latitude = input.latitude;
+    }
+    if (input.longitude !== undefined) {
+      toUpdate.longitude = input.longitude;
+    }
+    if (input.locality !== undefined) {
+      toUpdate.locality = input.locality;
+    }
+    if (input.city !== undefined) {
+      toUpdate.city = input.city;
+    }
+    if (input.postcode !== undefined) {
+      toUpdate.postcode = input.postcode;
+    }
+    if (input.adminArea !== undefined) {
+      toUpdate.adminArea = input.adminArea;
+    }
+    if (input.country !== undefined) {
+      toUpdate.country = input.country;
+    }
+    if (input.postcode !== undefined) {
+      toUpdate.postcode = input.postcode;
+    }
+
+    if (input.latitude !== undefined && input.longitude !== undefined) {
+      if (input.latitude === null || input.longitude === null) {
+        toUpdate.geohash = null;
+      } else {
+        toUpdate.geohash = ngeo.encode(input.latitude, input.longitude);
+      }
+    } else if (input.latitude !== undefined) {
+      if (
+        input.latitude == null ||
+        existing?.longitude === undefined ||
+        existing.longitude === null
+      ) {
+        toUpdate.geohash = null;
+      } else {
+        toUpdate.geohash = ngeo.encode(input.latitude, existing.longitude);
+      }
+    } else if (input.longitude !== undefined) {
+      if (
+        input.longitude == null ||
+        existing?.latitude === undefined ||
+        existing.latitude === null
+      ) {
+        toUpdate.geohash = null;
+      } else {
+        toUpdate.geohash = ngeo.encode(existing.latitude, input.longitude);
+      }
+    }
+
+    console.log(toUpdate);
+
+    if (Object.keys(toUpdate).length > 0) {
+      console.log(
+        await db
+          .insert(producerLocation)
+          .values({
+            producerId: producer.id,
+            ...toUpdate,
+          })
+          .onConflictDoUpdate({
+            set: { ...toUpdate },
+            target: producerLocation.producerId,
+          })
+      );
+    }
+  });
+
+export const editProducerCertifications = producerActionClient
+  .input(editProducerCertificationsArgsValidator)
+  .name("editProducerCertifications")
+  .action(async ({ input, ctx: { userId } }) => {
+    const producer = await db.query.producers.findFirst({
+      where: and(
+        eq(producers.id, input.producerId),
+        eq(producers.userId, userId)
+      ),
+      columns: {
+        id: true,
+      },
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    await db
+      .delete(producerCertifications)
+      .where(
+        and(
+          eq(producerCertifications.producerId, producer.id),
+          notInArray(
+            producerCertifications.certificationId,
+            input.certifications
+          )
+        )
+      );
+
+    await db
+      .insert(producerCertifications)
+      .values(
+        input.certifications.map((cert) => ({
+          producerId: input.producerId,
+          certificationId: cert,
+          addedAt: new Date(),
+        }))
+      )
+      .onConflictDoNothing();
+  });
+
+export const editProducerCommodoties = producerActionClient
+  .input(editProducerCommodotiesArgsValidator)
+  .name("editProducerCommodoties")
+  .action(async ({ input, ctx: { userId } }) => {
+    const producer = await db.query.producers.findFirst({
+      where: and(
+        eq(producers.id, input.producerId),
+        eq(producers.userId, userId)
+      ),
+      columns: {
+        id: true,
+      },
+      with: {
+        commodities: {
+          columns: {
+            commodityId: true,
+          },
+        },
+      },
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    console.log(input);
+
+    await db
+      .delete(producerCommodities)
+      .where(
+        and(
+          eq(producerCommodities.producerId, producer.id),
+          notInArray(producerCommodities.commodityId, input.commodities)
+        )
+      );
+
+    const newComms = input.commodities.filter(
+      (ic) => !producer.commodities.some((ec) => ec.commodityId === ic)
+    );
+
+    if (newComms.length > 0) {
+      await db.insert(producerCommodities).values(
+        newComms.map((cert) => ({
+          producerId: input.producerId,
+          commodityId: cert,
+          updatedAt: new Date(),
+        }))
+      );
+    }
+  });
+
+export const addCommodityAndAssociate = producerActionClient
+  .input(addCommodityAndAssociateArgsValidator)
+  .name("addCommodityAndAssociate")
+  .action(async ({ input, ctx: { userId } }) => {
+    const producer = await db.query.producers.findFirst({
+      where: and(
+        eq(producers.id, input.producerId),
+        eq(producers.userId, userId)
+      ),
+      columns: {
+        id: true,
+      },
+    });
+
+    if (!producer) {
+      throw new Error("Unauthorized");
+    }
+
+    const name = input.name.trim();
+    const slug = name.toLowerCase().replaceAll(" ", "_");
+    const commodity = await db
+      .insert(commodities)
+      .values({
+        name: name,
+        slug: slug,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing()
+      .returning()
+      .then((r) => r[0]);
+
+    await db.insert(producerCommodities).values({
+      producerId: producer.id,
+      commodityId: commodity.id,
+      updatedAt: new Date(),
+    });
   });
 
 export const requestUploadUrls = producerActionClient
@@ -1858,4 +2020,10 @@ export const suggestProducer = authenticatedActionClient
       createdAt: new Date(),
       updatedAt: new Date(),
     } satisfies SuggestedProducerInsert);
+  });
+
+export const listCommodites = authenticatedActionClient
+  .name("listCommodites")
+  .action(async () => {
+    return await db.query.commodities.findMany();
   });

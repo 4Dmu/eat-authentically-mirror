@@ -1,4 +1,4 @@
-import { editProducerLocationArgsValidator } from "@/backend/validators/producers";
+import { editProducerLocationFormValidator } from "@/backend/validators/producers";
 import {
   createFormHook,
   createFormHookContexts,
@@ -19,5 +19,5 @@ export const { useAppForm, withForm } = createFormHook({
 
 export const defaultOptions = formOptions({
   defaultValues:
-    {} satisfies typeof editProducerLocationArgsValidator.infer as typeof editProducerLocationArgsValidator.infer,
+    {} satisfies typeof editProducerLocationFormValidator.infer as typeof editProducerLocationFormValidator.infer,
 });

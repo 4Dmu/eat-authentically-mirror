@@ -368,7 +368,7 @@ export const verifyClaimPhoneArgs = type({
   code: type("string.numeric").exactlyLength(6),
 });
 
-export const editProducerLocationArgsValidator =
+export const editProducerLocationFormValidator =
   producerLocationInsertValidator.omit("producerId", "geoId", "geohash");
 
 export const editProducerArgsValidatorV2 = type({
@@ -382,6 +382,25 @@ export const editProducerArgsValidatorV2 = type({
 export const editProducerContactArgsValidator = type({
   producerId: "string",
 }).and(producerContactSelectValidator.partial());
+
+export const editProducerLocationArgsValidator = type({
+  producerId: "string",
+}).and(producerLocationInsertValidator.omit("producerId", "geoId", "geohash"));
+
+export const editProducerCertificationsArgsValidator = type({
+  producerId: "string",
+  certifications: "string[]",
+});
+
+export const editProducerCommodotiesArgsValidator = type({
+  producerId: "string",
+  commodities: "number[]",
+});
+
+export const addCommodityAndAssociateArgsValidator = type({
+  producerId: "string",
+  name: "string",
+});
 
 export const searchProducersArgsValidator = type({
   query: "string",
@@ -441,7 +460,9 @@ export const editProducerCertificationsFormValidator = type({
 });
 
 export const editProducerCommoditiesFormValidator = type({
-  commodities: producerCommoditiesSelectValidator.array(),
+  commodities: producerCommoditiesSelectValidator
+    .or(type({ name: "string" }))
+    .array(),
 });
 
 export const editProducerContactFormValditator = type({
@@ -478,6 +499,18 @@ export type EditProducerArgs = typeof editProducerArgsValidator.infer;
 export type EditProducerArgsV2 = typeof editProducerArgsValidatorV2.infer;
 
 export type EditProducerContact = typeof editProducerContactArgsValidator.infer;
+
+export type EditProducerLocationArgs =
+  typeof editProducerLocationArgsValidator.infer;
+
+export type EditProducerCertifications =
+  typeof editProducerCertificationsArgsValidator.infer;
+
+export type EditProducerCommodoties =
+  typeof editProducerCommodotiesArgsValidator.infer;
+
+export type AddCommodityAndAssociate =
+  typeof addCommodityAndAssociateArgsValidator.infer;
 
 export type ProducerClaimVerificationMethods =
   typeof producerClaimVerificationMethods.infer;

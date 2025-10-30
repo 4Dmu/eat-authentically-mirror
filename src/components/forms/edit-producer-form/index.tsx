@@ -8,9 +8,14 @@ import * as CommoditiesForm from "./sub-forms/commodities-form";
 import * as AddressForm from "./sub-forms/address-form";
 import { SaveButton } from "./save-button";
 import {
+  useAddCommodityAndAssociate,
   useDeleteVideo,
+  useEditProducerCertifications,
+  useEditProducerCommodities,
   useEditProducerContact,
+  useEditProducerLocation,
   useEditUserProducer,
+  useListCommodoties,
   useLoggedInUserProducer,
   useUpdateExistingImages,
   useUploadImages,
@@ -23,7 +28,7 @@ import {
   editProducerCommoditiesFormValidator,
   editProducerContactFormValditator,
   editProducerFormValidatorV2,
-  editProducerLocationArgsValidator,
+  editProducerLocationFormValidator,
   editProducerMediaFormValidator,
   editProucerVideoFormValidator,
 } from "@/backend/validators/producers";
@@ -47,6 +52,7 @@ export function ProducerEditForm(props: {
   const producerQuery = useLoggedInUserProducer(props.producer.id, {
     initialData: props.producer,
   });
+  const commodotiesQuery = useListCommodoties();
 
   const uploadImagesMutation = useUploadImages({
     onSuccess: async () => await producerQuery.refetch(),
@@ -70,6 +76,25 @@ export function ProducerEditForm(props: {
   });
   const editProducerContactMutation = useEditProducerContact({
     onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const editProducerLocationMutation = useEditProducerLocation({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const editProducerCertificationsMutation = useEditProducerCertifications({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const editProducerCommoditiesMutation = useEditProducerCommodities({
+    onSuccess: async () => await producerQuery.refetch(),
+    onError: (err) => toast.error(err.message),
+  });
+  const addCommodityAndAssociateMutation = useAddCommodityAndAssociate({
+    onSuccess: async () => {
+      await producerQuery.refetch();
+      await commodotiesQuery.refetch();
+    },
     onError: (err) => toast.error(err.message),
   });
 
@@ -218,25 +243,34 @@ export function ProducerEditForm(props: {
     },
   });
 
-  // @TODO
   const addressForm = AddressForm.useAppForm({
     defaultValues: {
-      latitude: null,
-      longitude: null,
-      locality: null,
-      city: null,
-      postcode: null,
-      adminArea: null,
-      country: null,
-      geohash: null,
-    } as typeof editProducerLocationArgsValidator.infer,
+      latitude: producerQuery.data?.location?.latitude ?? null,
+      longitude: producerQuery.data?.location?.longitude ?? null,
+      locality: producerQuery.data?.location?.locality ?? null,
+      city: producerQuery.data?.location?.city ?? null,
+      postcode: producerQuery.data?.location?.postcode ?? null,
+      adminArea: producerQuery.data?.location?.adminArea ?? null,
+      country: producerQuery.data?.location?.country ?? null,
+    } as typeof editProducerLocationFormValidator.infer,
     validators: {
       onChange: ({ formApi }) =>
-        formApi.parseValuesWithSchema(editProducerLocationArgsValidator),
+        formApi.parseValuesWithSchema(editProducerLocationFormValidator),
+    },
+    onSubmit: async ({ value }) => {
+      const submitPromise = editProducerLocationMutation.mutateAsync({
+        producerId: props.producer.id,
+        ...value,
+      });
+      toast.promise(submitPromise, {
+        loading: "Updating location data...",
+        success: () => "Updated location data successfully",
+        error: () => `Error updating.`,
+      });
+      await submitPromise;
     },
   });
 
-  // @TODO
   const certificationsForm = CertificationsForm.useAppForm({
     defaultValues: {
       certifications: producerQuery.data?.certifications ?? [],
@@ -245,9 +279,22 @@ export function ProducerEditForm(props: {
       onChange: ({ formApi }) =>
         formApi.parseValuesWithSchema(editProducerCertificationsFormValidator),
     },
+    onSubmit: async ({ value }) => {
+      const submitPromise = editProducerCertificationsMutation.mutateAsync({
+        producerId: props.producer.id,
+        certifications: value.certifications.map(
+          (cert) => cert.certificationId
+        ),
+      });
+      toast.promise(submitPromise, {
+        loading: "Updating producer certifications...",
+        success: () => "Updated producer certifications",
+        error: () => `Error updating.`,
+      });
+      await submitPromise;
+    },
   });
 
-  // @TODO
   const commoditiesForm = CommoditiesForm.useAppForm({
     defaultValues: {
       commodities: producerQuery.data?.commodities ?? [],
@@ -255,6 +302,38 @@ export function ProducerEditForm(props: {
     validators: {
       onChange: ({ formApi }) =>
         formApi.parseValuesWithSchema(editProducerCommoditiesFormValidator),
+    },
+    onSubmit: async ({ value }) => {
+      const existing = value.commodities.filter((r) => "commodityId" in r);
+      const newComms = value.commodities.filter((r) => "name" in r);
+
+      const promises = [];
+
+      promises.push(
+        editProducerCommoditiesMutation.mutateAsync({
+          producerId: props.producer.id,
+          commodities: existing.map((comm) => comm.commodityId),
+        })
+      );
+
+      for (const comm of newComms) {
+        promises.push(
+          addCommodityAndAssociateMutation.mutateAsync({
+            producerId: props.producer.id,
+            name: comm.name,
+          })
+        );
+      }
+
+      const submitPromise = Promise.all(promises);
+
+      toast.promise(submitPromise, {
+        loading: "Updating producer commodities...",
+        success: () => "Updated producer commodities",
+        error: () => `Error updating.`,
+      });
+
+      await submitPromise;
     },
   });
 

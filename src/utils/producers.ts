@@ -29,6 +29,11 @@ import {
   searchProducers,
   listProducerContries,
   editProducerContact,
+  editProducerLocation,
+  editProducerCertifications,
+  editProducerCommodoties,
+  addCommodityAndAssociate,
+  listCommodites,
 } from "@/backend/rpc/producers";
 import {
   ClaimProducerArgs,
@@ -42,9 +47,14 @@ import {
   EditProducerArgsV2,
   ProducerTypes,
   EditProducerContact,
+  EditProducerLocationArgs,
+  EditProducerCertifications,
+  EditProducerCommodoties,
+  AddCommodityAndAssociate,
 } from "@/backend/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
+  CommoditySelect,
   MediaAssetSelect,
   ProducerCardsRow,
   ProducerMediaSelect,
@@ -385,6 +395,24 @@ export function useListClaimRequests(
   });
 }
 
+export function useListCommodoties(
+  props?: Omit<
+    UseQueryOptions<
+      CommoditySelect[],
+      Error,
+      CommoditySelect[],
+      readonly [string]
+    >,
+    "queryFn" | "queryKey"
+  >
+) {
+  return useQuery({
+    ...(props as object),
+    queryKey: ["list-commodites"] as const,
+    queryFn: async () => await listCommodites(),
+  });
+}
+
 export function useFetchUserProducers(
   opts?: Omit<
     UseQueryOptions<
@@ -431,6 +459,66 @@ export function useEditProducerContact(
     mutationKey: ["edit-producer-contact"],
     mutationFn: async (args) => {
       await editProducerContact(args);
+    },
+  });
+}
+
+export function useEditProducerLocation(
+  opts?: Omit<
+    UseMutationOptions<void, Error, EditProducerLocationArgs, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["edit-producer-location"],
+    mutationFn: async (args) => {
+      await editProducerLocation(args);
+    },
+  });
+}
+
+export function useEditProducerCertifications(
+  opts?: Omit<
+    UseMutationOptions<void, Error, EditProducerCertifications, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["edit-producer-certifications"],
+    mutationFn: async (args) => {
+      await editProducerCertifications(args);
+    },
+  });
+}
+
+export function useEditProducerCommodities(
+  opts?: Omit<
+    UseMutationOptions<void, Error, EditProducerCommodoties, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["edit-producer-commodoties"],
+    mutationFn: async (args) => {
+      await editProducerCommodoties(args);
+    },
+  });
+}
+
+export function useAddCommodityAndAssociate(
+  opts?: Omit<
+    UseMutationOptions<void, Error, AddCommodityAndAssociate, unknown>,
+    "mutationKey" | "mutationFn"
+  >
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["add-commodity-and-associate"],
+    mutationFn: async (args) => {
+      await addCommodityAndAssociate(args);
     },
   });
 }
