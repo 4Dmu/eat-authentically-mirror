@@ -13,15 +13,17 @@ export function ReviewCard({ review }: { review: PublicReview }) {
   if ("data" in review) {
     return (
       <div className="flex flex-col gap-4 bg-background p-5 rounded-lg border flex-1 min-w-52">
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <Image
-            className="rounded-full object-cover"
+            className="rounded-full object-cover size-10"
             src={review.data.authorAttribution.photoUri}
             alt="profile"
-            width={25}
-            height={25}
+            width={50}
+            height={50}
           />
-          <p>{review.data.authorAttribution.displayName}</p>
+          <p className="font-bold">
+            {review.data.authorAttribution.displayName}
+          </p>
         </div>
         <p>{review.data.text.text}</p>
         <StarRatingReadonly rating={review.rating} />
@@ -34,17 +36,17 @@ export function ReviewCard({ review }: { review: PublicReview }) {
 
   return (
     <div className="flex flex-col gap-4 bg-background p-5 rounded-lg border flex-1 min-w-52">
-      <div className="flex gap-3">
+      <div className="flex gap-3 items-center">
         {review.reviewerUserImgUrl && (
           <Image
-            className="rounded-full object-cover"
+            className="rounded-full object-cover size-10"
             src={review.reviewerUserImgUrl}
             alt="profile"
-            width={25}
-            height={25}
+            width={50}
+            height={50}
           />
         )}
-        <p>{review.reviewerUserFirstName}</p>
+        <p className="font-bold">{review.reviewerUserFirstName}</p>
       </div>
       <p>{review.body}</p>
       <StarRatingReadonly rating={review.rating} />
