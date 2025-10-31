@@ -1388,8 +1388,10 @@ export type ProducerRatingScoresRow = typeof producerRatingScores.$inferSelect;
 export type ProducerWithMap = {
   media: (ProducerMediaSelect & { asset: MediaAssetSelect })[];
   location: ProducerLocationSelect | null;
-  commodities: ProducerCommoditySelect[];
-  certifications: ProducerCertificationSelect[];
+  commodities: (ProducerCommoditySelect & { commodity: CommoditySelect })[];
+  certifications: (ProducerCertificationSelect & {
+    certification: CertificationSelect;
+  })[];
   chats: ProducerChatSelect[];
   labels: ProducerLabelMapSelect[];
   hours: ProducerHoursSelect[];

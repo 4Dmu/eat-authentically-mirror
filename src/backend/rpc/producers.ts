@@ -137,14 +137,23 @@ function findCategory(query: string) {
 }
 
 function extractLocationInfo(query: string) {
+  let newQuery = query;
   const localIntent = LOCAL_INTENT_RE.test(query);
+
+  if (localIntent) {
+    newQuery = query.replace(LOCAL_INTENT_RE, "");
+  }
+
   const placeName = (np(query).places().json() as { text: string }[]).map(
     (r) => r.text
   )[0] as string | undefined;
 
-  return { placeName, localIntent, query };
-}
+  if (placeName) {
+    newQuery = newQuery.replace(placeName, "");
+  }
 
+  return { placeName, localIntent, query: newQuery.trim() };
+}
 function findCommodities(query: string, commodities: string[]) {
   const commoditiesRegex = new RegExp(
     "\\b(" +
@@ -177,6 +186,49 @@ async function extractFilters(query: string): Promise<QueryFilters> {
     variants: includedVariants.length === 0 ? undefined : includedVariants,
     organicOnly: organic ? true : undefined,
   };
+}
+
+async function prepareQuery(rawQuery: string): Promise<
+  | {
+      localIntent: boolean;
+      hasLocation: true;
+      location: string;
+      keywords: string[];
+      filters: QueryFilters;
+    }
+  | {
+      localIntent: boolean;
+      hasLocation: false;
+      location: undefined;
+      keywords: string[];
+      filters: QueryFilters;
+    }
+> {
+  const { localIntent, placeName, query } = extractLocationInfo(rawQuery);
+  const filters = await extractFilters(query);
+  const rawKeywords = query
+    .split(" ")
+    .filter((r) => r.trim().length > 3)
+    .map((r) => r.trim().toLowerCase());
+  const keywords = new Set(rawKeywords).values().toArray().slice(0, 8); // cap 8 keywords
+
+  if (placeName !== undefined) {
+    return {
+      localIntent,
+      hasLocation: true,
+      location: placeName,
+      keywords,
+      filters,
+    };
+  } else {
+    return {
+      localIntent,
+      hasLocation: false,
+      location: placeName,
+      keywords,
+      filters,
+    };
+  }
 }
 
 export const searchProducers = actionClient
@@ -292,23 +344,14 @@ export const searchProducers = actionClient
       // Query is not cached so pagination is invalid
       offset = 0;
 
-      const locationInfo = extractLocationInfo(rest.query);
-      const filters = await extractFilters(rest.query);
-      console.log(filters);
-
-      const hasLocationSnippet = locationInfo.placeName !== undefined;
-      const userRequestsUsingTheirLocation = locationInfo.localIntent;
+      const query = await prepareQuery(rest.query);
+      console.log(query);
 
       let output: listing.ProducerSearchResult;
 
-      console.log(hasLocationSnippet, userRequestsUsingTheirLocation);
-
-      if (
-        hasLocationSnippet === true &&
-        userRequestsUsingTheirLocation !== true
-      ) {
+      if (query.hasLocation === true && query.localIntent !== true) {
         const placeInfo = await geocodePlace({
-          place: locationInfo.placeName!,
+          place: query.location,
         });
 
         if (placeInfo.status == "error") {
@@ -323,9 +366,9 @@ export const searchProducers = actionClient
             },
             bbox: placeInfo.data.boundingbox,
           },
-          filters,
-          q: rest.query,
-          userRequestsUsingTheirLocation: userRequestsUsingTheirLocation,
+          filters: query.filters,
+          keywords: query.keywords,
+          userRequestsUsingTheirLocation: query.localIntent,
         });
 
         const result = await listing.searchByGeoText({
@@ -336,8 +379,8 @@ export const searchProducers = actionClient
             },
             bbox: placeInfo.data.boundingbox,
           },
-          filters,
-          q: rest.query,
+          filters: query.filters,
+          keywords: query.keywords,
           limit: limit,
           offset: offset,
         });
@@ -345,21 +388,21 @@ export const searchProducers = actionClient
         output = result;
       } else {
         await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(rest.query, {
-          q: rest.query,
-          filters,
-          userRequestsUsingTheirLocation: userRequestsUsingTheirLocation,
+          keywords: query.keywords,
+          filters: query.filters,
+          userRequestsUsingTheirLocation: query.localIntent,
         });
 
         const result = await listing.searchByGeoText({
           geo:
-            userRequestsUsingTheirLocation === true && userGeo !== undefined
+            query.localIntent === true && userGeo !== undefined
               ? {
                   center: userGeo!,
                   radiusKm: userLocationRadius,
                 }
               : undefined,
-          q: rest.query,
-          filters,
+          keywords: query.keywords,
+          filters: query.filters,
           limit: limit,
           offset: offset,
         });
@@ -370,7 +413,7 @@ export const searchProducers = actionClient
       return {
         result: output,
         userLocation: {
-          userRequestsUsingTheirLocation: userRequestsUsingTheirLocation,
+          userRequestsUsingTheirLocation: query.localIntent,
           searchRadius: userLocationRadius,
         },
       };
@@ -440,8 +483,16 @@ export const fetchUserProducer = producerActionClient
           orderBy: asc(producerMedia.position),
         },
         location: true,
-        commodities: true,
-        certifications: true,
+        commodities: {
+          with: {
+            commodity: true,
+          },
+        },
+        certifications: {
+          with: {
+            certification: true,
+          },
+        },
         chats: true,
         labels: true,
         hours: true,

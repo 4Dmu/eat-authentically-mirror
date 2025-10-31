@@ -223,10 +223,7 @@ const queryFilters = type({
 }).partial();
 
 const searchByGeoTextQuery = type({
-  "q?": type("string")
-    .atLeastLength(1)
-    .atMostLength(255)
-    .pipe((v) => v.trim()),
+  keywords: type("string").array(),
   "geo?": type({
     center: type({ lat: "number", lon: "number" }),
   }).and(

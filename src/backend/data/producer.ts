@@ -164,7 +164,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
       }
     | undefined = undefined;
 
-  const { q, geo, filters, countryHint } = args;
+  const { keywords, geo, filters, countryHint } = args;
 
   const hardLimit = limit + 1;
 
@@ -172,7 +172,26 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
 
   const organicCertId = "fc340cb2-34c0-4c21-855b-4cb2c6d2d0df";
 
-  if (geo && q) {
+  const ftsAnyExpr = args.keywords.length
+    ? args.keywords.map((t) => `${t}*`).join(" OR ")
+    : "";
+
+  const existsBlocks = args.keywords.map(
+    (t) => sql`
+  + CASE WHEN EXISTS(
+      SELECT 1
+      FROM producers_fts
+      WHERE rowid = s.rowid
+        AND producers_fts MATCH ${t + "*"}
+    ) THEN 1 ELSE 0 END
+`
+  );
+
+  const matchedTermsSQL = args.keywords.length
+    ? sql.join(existsBlocks, sql``)
+    : sql``;
+
+  if (geo && keywords.length > 0) {
     const bbox = "bbox" in geo ? geo.bbox : undefined;
     const radius = "radiusKm" in geo ? geo.radiusKm : undefined;
 
@@ -241,6 +260,72 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           JOIN producers p ON p.id = l.producer_id
           WHERE 1=1
           ${country ? sql`AND l.country = ${country.alpha3}` : sql``}
+           -- Filter by specific certifications (any of the selected)
+          ${
+            filters?.certifications && filters.certifications.length
+              ? sql`
+                  AND EXISTS (
+                    SELECT 1
+                    FROM producer_certifications pc
+                    JOIN certifications c ON c.id = pc.certification_id
+                    WHERE pc.producer_id = p.id
+                      AND c.slug IN (${sql.join(
+                        filters.certifications.map((s) => sql`${s}`),
+                        sql`,`
+                      )})
+                  )
+                `
+              : sql``
+          }
+          -- Filter by a specific certification ID (e.g., organicCertId)
+          ${
+            filters?.organicOnly
+              ? sql`
+                  AND EXISTS (
+                    SELECT 1
+                    FROM producer_certifications pc
+                    WHERE pc.producer_id = p.id
+                      AND pc.certification_id = ${organicCertId}
+                  )
+                `
+              : sql``
+          }
+
+          -- Filter by commodities
+          ${
+            filters?.commodities && filters.commodities.length
+              ? sql`
+                  AND EXISTS (
+                    SELECT 1
+                    FROM producer_commodities pc2
+                    JOIN commodities c2 ON c2.id = pc2.commodity_id
+                    WHERE pc2.producer_id = p.id
+                      AND c2.slug IN (${sql.join(
+                        filters.commodities.map((s) => sql`${s}`),
+                        sql`,`
+                      )})
+                  )
+                `
+              : sql``
+          }
+          -- Filter by variants
+          ${
+            filters?.variants && filters.variants.length
+              ? sql`
+                  AND EXISTS (
+                    SELECT 1
+                    FROM producer_commodities pc2
+                    JOIN commodity_variants cv ON cv.id = pc2.variant_id
+                    WHERE pc2.producer_id = p.id
+                      AND cv.slug IN (${sql.join(
+                        filters.variants.map((s) => sql`${s}`),
+                        sql`,`
+                      )})
+                  )
+                `
+              : sql``
+          }
+          ${filters?.category ? sql`AND p.type = ${filters.category}` : sql``}
         ),
         geo AS (
           SELECT *
@@ -249,24 +334,26 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           ${
             bbox
               ? sql``
-              : sql`AND (SELECT R FROM bbox) IS NULL OR distance_km <= (SELECT R FROM bbox)`
+              : sql`AND ((SELECT R FROM bbox) IS NULL OR distance_km <= (SELECT R FROM bbox))`
           }
         ),
         prod_fts AS (
-          SELECT s.producer_id, bm25(producers_fts) AS prod_rel
-          FROM producers_search s
-          JOIN producers_fts ON producers_fts.rowid = s.rowid
-          WHERE producers_fts MATCH ${q.trim()}
+          SELECT
+            s.producer_id,
+            bm25(producers_fts) AS prod_rel,
+            (0${matchedTermsSQL}) AS matched_terms
+          FROM producers_search AS s
+          JOIN producers_fts  ON producers_fts.rowid = s.rowid
+          WHERE producers_fts MATCH ${ftsAnyExpr}
         ),
         rev_fts AS (
-          SELECT t.producer_id, MIN(t.rank) AS review_rel
-          FROM (
-            SELECT rc.producer_id, reviews_fts.rank AS rank
-            FROM reviews_fts
-            JOIN reviews_content rc ON rc.docid = reviews_fts.rowid
-            WHERE reviews_fts MATCH ${q.trim()}
-          ) AS t
-          GROUP BY t.producer_id
+          SELECT
+            rc.producer_id,
+            MIN(reviews_fts.rank) AS review_rel
+          FROM reviews_fts
+          JOIN reviews_content AS rc ON rc.docid = reviews_fts.rowid
+          WHERE reviews_fts MATCH ${ftsAnyExpr}
+          GROUP BY rc.producer_id
         ),
         rating_scores AS (
           SELECT
@@ -279,7 +366,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           FROM producer_rating_agg pra
         ),
         cover AS (
-          SELECT pm.producer_id, ma.url AS cover_url
+          SELECT pm.producer_id, MIN(ma.url) AS cover_url
           FROM producer_media pm
           JOIN media_assets ma ON ma.id = pm.asset_id
           WHERE pm.role = 'cover'
@@ -330,7 +417,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
           cm.commodity_variants_csv,
           lb.search_labels
         FROM geo g
-        LEFT JOIN prod_fts      ON prod_fts.producer_id = g.id
+        JOIN prod_fts      ON prod_fts.producer_id = g.id
         LEFT JOIN rev_fts       ON rev_fts.producer_id  = g.id
         LEFT JOIN rating_scores rs ON rs.producer_id    = g.id
         LEFT JOIN cover         co ON co.producer_id    = g.id
@@ -338,90 +425,12 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         LEFT JOIN comms         cm ON cm.producer_id    = g.id
         LEFT JOIN labels        lb ON lb.producer_id    = g.id
         WHERE 1=1
-        ${
-          filters?.organicOnly
-            ? sql`
-         AND EXISTS (
-           SELECT 1
-           FROM producer_certifications pc
-           WHERE pc.producer_id = g.id
-             AND pc.certification_id = ${organicCertId}
-         )
-       `
-            : sql``
-        }
-        -- Filter by specific certifications (any of the selected)
-      ${
-        filters?.certifications && filters.certifications.length
-          ? sql`
-              AND EXISTS (
-                SELECT 1
-                FROM producer_certifications pc
-                JOIN certifications c ON c.id = pc.certification_id
-                WHERE pc.producer_id = g.id
-                  AND c.slug IN (${sql.join(
-                    filters.certifications.map((s) => sql`${s}`),
-                    sql`,`
-                  )})
-              )
-            `
-          : sql``
-      }
-
-      -- Filter by a specific certification ID (e.g., organicCertId)
-      ${
-        filters?.organicOnly
-          ? sql`
-              AND EXISTS (
-                SELECT 1
-                FROM producer_certifications pc
-                WHERE pc.producer_id = g.id
-                  AND pc.certification_id = ${organicCertId}
-              )
-            `
-          : sql``
-      }
-
-      -- Filter by commodities
-      ${
-        filters?.commodities && filters.commodities.length
-          ? sql`
-              AND EXISTS (
-                SELECT 1
-                FROM producer_commodities pc2
-                JOIN commodities c2 ON c2.id = pc2.commodity_id
-                WHERE pc2.producer_id = g.id
-                  AND c2.slug IN (${sql.join(
-                    filters.commodities.map((s) => sql`${s}`),
-                    sql`,`
-                  )})
-              )
-            `
-          : sql``
-      }
-
-      -- Filter by variants
-      ${
-        filters?.variants && filters.variants.length
-          ? sql`
-              AND EXISTS (
-                SELECT 1
-                FROM producer_commodities pc2
-                JOIN commodity_variants cv ON cv.id = pc2.variant_id
-                WHERE pc2.producer_id = g.id
-                  AND cv.slug IN (${sql.join(
-                    filters.variants.map((s) => sql`${s}`),
-                    sql`,`
-                  )})
-              )
-            `
-          : sql``
-      }
-        ${filters?.category ? sql`AND g.type = ${filters.category}` : sql``}
         ORDER BY
-         g.distance_km ASC,
+          g.distance_km ASC,
+          COALESCE(prod_fts.matched_terms, 0) DESC,
           COALESCE(prod_fts.prod_rel, 10.0) ASC,
           COALESCE(rev_fts.review_rel, 10.0) ASC,
+          g.subscription_rank ASC,
           g.id ASC
         LIMIT ${hardLimit} OFFSET ${offset};
         `;
@@ -435,25 +444,26 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
       bbox: bbox,
       radiusKm: radius,
     });
-  } else if (q) {
-    console.log("query only");
+  } else if (args.keywords.length > 0) {
     const textBlend = sql`
       WITH
       prod_fts AS (
-        SELECT s.producer_id, bm25(producers_fts) AS prod_rel
-        FROM producers_search s
-        JOIN producers_fts ON producers_fts.rowid = s.rowid
-        WHERE producers_fts MATCH ${`"${q.trim()}"`}
+        SELECT
+          s.producer_id,
+          bm25(producers_fts) AS prod_rel,
+          (0${matchedTermsSQL}) AS matched_terms
+        FROM producers_search AS s
+        JOIN producers_fts  ON producers_fts.rowid = s.rowid
+        WHERE producers_fts MATCH ${ftsAnyExpr}
       ),
       rev_fts AS (
-        SELECT t.producer_id, MIN(t.rank) AS review_rel
-        FROM (
-          SELECT rc.producer_id, reviews_fts.rank AS rank
-          FROM reviews_fts
-          JOIN reviews_content rc ON rc.docid = reviews_fts.rowid
-          WHERE reviews_fts MATCH ${`"${q.trim()}"`}
-        ) AS t
-        GROUP BY t.producer_id
+        SELECT
+          rc.producer_id,
+          MIN(reviews_fts.rank) AS review_rel
+        FROM reviews_fts
+        JOIN reviews_content AS rc ON rc.docid = reviews_fts.rowid
+        WHERE reviews_fts MATCH ${ftsAnyExpr}
+        GROUP BY rc.producer_id
       ),
       rating_scores AS (
         SELECT
@@ -466,7 +476,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         FROM producer_rating_agg pra
       ),
       cover AS (
-        SELECT pm.producer_id, ma.url AS cover_url
+        SELECT pm.producer_id, MIN(ma.url) AS cover_url
         FROM producer_media pm
         JOIN media_assets ma ON ma.id = pm.asset_id
         WHERE pm.role = 'cover'
@@ -529,56 +539,77 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
       LEFT JOIN certs         ce ON ce.producer_id    = p.id
       LEFT JOIN comms         cm ON cm.producer_id    = p.id
       LEFT JOIN labels        lb ON lb.producer_id    = p.id
+      WHERE 1=1
       ${
         filters?.certifications && filters.certifications.length
           ? sql`
-            JOIN producer_certifications pc ON pc.producer_id = p.id
-            JOIN certifications c ON c.id = pc.certification_id
-            AND c.slug IN (${sql.join(
-              filters.certifications.map((s) => sql`${s}`),
-              sql`,`
-            )})
+            AND EXISTS (
+              SELECT 1
+              FROM producer_certifications pc
+              JOIN certifications c ON c.id = pc.certification_id
+              WHERE pc.producer_id = p.id
+                AND c.slug IN (${sql.join(
+                  filters.certifications.map((s) => sql`${s}`),
+                  sql`,`
+                )})
+            )
           `
           : sql``
       }
+      -- Filter by a specific certification ID (e.g., organicCertId)
       ${
-        (filters?.commodities && filters.commodities.length) ||
-        (filters?.variants && filters.variants.length) ||
         filters?.organicOnly
           ? sql`
-            JOIN producer_commodities pc2 ON pc2.producer_id = p.id
-          `
+              AND EXISTS (
+                SELECT 1
+                FROM producer_certifications pc
+                WHERE pc.producer_id = p.id
+                  AND pc.certification_id = ${organicCertId}
+              )
+            `
           : sql``
       }
+      -- Filter by commodities
       ${
         filters?.commodities && filters.commodities.length
           ? sql`
-            JOIN commodities c2 ON c2.id = pc2.commodity_id
-            AND c2.slug IN (${sql.join(
-              filters.commodities.map((s) => sql`${s}`),
-              sql`,`
-            )})
-          `
+              AND EXISTS (
+                SELECT 1
+                FROM producer_commodities pc2
+                JOIN commodities c2 ON c2.id = pc2.commodity_id
+                WHERE pc2.producer_id = p.id
+                  AND c2.slug IN (${sql.join(
+                    filters.commodities.map((s) => sql`${s}`),
+                    sql`,`
+                  )})
+              )
+            `
           : sql``
       }
+      -- Filter by variants
       ${
         filters?.variants && filters.variants.length
           ? sql`
-            JOIN commodity_variants cv ON cv.id = pc2.variant_id
-            AND cv.slug IN (${sql.join(
-              filters.variants.map((s) => sql`${s}`),
-              sql`,`
-            )})
-          `
+              AND EXISTS (
+                SELECT 1
+                FROM producer_commodities pc2
+                JOIN commodity_variants cv ON cv.id = pc2.variant_id
+                WHERE pc2.producer_id = p.id
+                  AND cv.slug IN (${sql.join(
+                    filters.variants.map((s) => sql`${s}`),
+                    sql`,`
+                  )})
+              )
+            `
           : sql``
       }
-      WHERE 1=1
       ${country ? sql`AND l.country = ${country.alpha3}` : sql``}
       ${filters?.category ? sql`AND p.type = ${filters.category}` : sql``}
-      ${filters?.organicOnly ? sql`AND pc2.organic = 1` : sql``}
       ORDER BY
+        COALESCE(prod_fts.matched_terms, 0) DESC,
         COALESCE(prod_fts.prod_rel, 10.0) ASC,
         COALESCE(rev_fts.review_rel, 10.0) ASC,
+        p.subscription_rank ASC,
         p.id ASC
       LIMIT ${hardLimit} OFFSET ${offset};
     `;
@@ -588,6 +619,13 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
   } else if (geo) {
     const bbox = "bbox" in geo ? geo.bbox : undefined;
     const radius = "radiusKm" in geo ? geo.radiusKm : undefined;
+
+    maxDistance = approximateMaxDistanceKm({
+      center: geo.center,
+      method: "haversine",
+      bbox,
+      radiusKm: radius,
+    });
 
     const geoOnly = sql`
       WITH
@@ -660,6 +698,70 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         JOIN producers p ON p.id = l.producer_id
         WHERE 1=1
         ${country ? sql`AND l.country = ${country.alpha3}` : sql``}
+        ${
+          filters?.certifications && filters.certifications.length
+            ? sql`
+            AND EXISTS (
+              SELECT 1
+              FROM producer_certifications pc
+              JOIN certifications c ON c.id = pc.certification_id
+              WHERE pc.producer_id = p.id
+                AND c.slug IN (${sql.join(
+                  filters.certifications.map((s) => sql`${s}`),
+                  sql`,`
+                )})
+            )
+          `
+            : sql``
+        }
+        -- Filter by a specific certification ID (e.g., organicCertId)
+        ${
+          filters?.organicOnly
+            ? sql`
+                AND EXISTS (
+                  SELECT 1
+                  FROM producer_certifications pc
+                  WHERE pc.producer_id = p.id
+                    AND pc.certification_id = ${organicCertId}
+                )
+              `
+            : sql``
+        }
+        -- Filter by commodities
+        ${
+          filters?.commodities && filters.commodities.length
+            ? sql`
+                AND EXISTS (
+                  SELECT 1
+                  FROM producer_commodities pc2
+                  JOIN commodities c2 ON c2.id = pc2.commodity_id
+                  WHERE pc2.producer_id = p.id
+                    AND c2.slug IN (${sql.join(
+                      filters.commodities.map((s) => sql`${s}`),
+                      sql`,`
+                    )})
+                )
+              `
+            : sql``
+        }
+        -- Filter by variants
+        ${
+          filters?.variants && filters.variants.length
+            ? sql`
+                AND EXISTS (
+                  SELECT 1
+                  FROM producer_commodities pc2
+                  JOIN commodity_variants cv ON cv.id = pc2.variant_id
+                  WHERE pc2.producer_id = p.id
+                    AND cv.slug IN (${sql.join(
+                      filters.variants.map((s) => sql`${s}`),
+                      sql`,`
+                    )})
+                )
+              `
+            : sql``
+        }
+        ${filters?.category ? sql`AND p.type = ${filters.category}` : sql``}
       ),
       -- enforce radius if provided
       geo AS (
@@ -667,6 +769,23 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         FROM scored
         WHERE
           ${radius != null ? sql`distance_km <= (SELECT R FROM bbox)` : sql`1=1`}
+      ),
+      rating_scores AS (
+        SELECT
+          pra.producer_id,
+          pra.review_count AS n,
+          CASE WHEN pra.review_count > 0
+            THEN pra.rating_sum * 1.0 / pra.review_count
+            ELSE NULL END AS avg_rating,
+          (pra.rating_sum + 10 * 4.2) * 1.0 / (pra.review_count + 10) AS bayes_avg
+        FROM producer_rating_agg pra
+      ),
+      cover AS (
+        SELECT pm.producer_id, MIN(ma.url) AS cover_url
+        FROM producer_media pm
+        JOIN media_assets ma ON ma.id = pm.asset_id
+        WHERE pm.role = 'cover'
+        GROUP BY pm.producer_id
       )
       SELECT
         g.id,
@@ -682,10 +801,29 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         g.locality,
         g.admin_area,
         g.country,
-        g.distance_km
+        g.distance_km,
+        NULL as prod_rel,
+        NULL as review_rel,
+        rs.avg_rating,
+        rs.bayes_avg,
+        co.cover_url,
+        NULL as certifications_csv,
+        NULL as commodities_csv,
+        NULL as commodity_variants_csv,
+        NULL as search_labels
       FROM geo g
+      LEFT JOIN rating_scores rs ON rs.producer_id = g.id
+      LEFT JOIN cover         co ON co.producer_id = g.id
+      WHERE 1=1
+      ${filters?.minAvgRating != null ? sql`AND rs.avg_rating  >= ${filters.minAvgRating}` : sql``}
+      ${filters?.minBayesAvg != null ? sql`AND rs.bayes_avg   >= ${filters.minBayesAvg}` : sql``}
+      ${filters?.minReviews != null ? sql`AND rs.n           >= ${filters.minReviews}` : sql``}
+      ${filters?.hasCover === true ? sql`AND co.cover_url IS NOT NULL` : sql``}
+      ${filters?.hasCover === false ? sql`AND co.cover_url IS NULL` : sql``}
       ORDER BY
-        ${radius != null ? sql`g.distance_km ASC,` : sql``}
+        CASE WHEN g.distance_km IS NULL THEN 1 ELSE 0 END,
+        g.distance_km ASC,
+        g.subscription_rank ASC,
         g.id ASC
       LIMIT ${hardLimit} OFFSET ${offset};
     `;
@@ -706,7 +844,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         FROM producer_rating_agg pra
       ),
       cover AS (
-        SELECT pm.producer_id, ma.url AS cover_url
+        SELECT pm.producer_id, MIN(ma.url) AS cover_url
         FROM producer_media pm
         JOIN media_assets ma ON ma.id = pm.asset_id
         WHERE pm.role = 'cover'
@@ -807,7 +945,19 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
       WHERE 1=1
       ${country ? sql`AND l.country = ${country.alpha3}` : sql``}
       ${filters?.category ? sql`AND p.type = ${filters.category}` : sql``}
-      ${filters?.organicOnly ? sql`AND pc2.organic = 1` : sql``}
+      -- Filter by a specific certification ID (e.g., organicCertId)
+      ${
+        filters?.organicOnly
+          ? sql`
+              AND EXISTS (
+                SELECT 1
+                FROM producer_certifications pc
+                WHERE pc.producer_id = p.id
+                  AND pc.certification_id = ${organicCertId}
+              )
+            `
+          : sql``
+      }
 
       -- additional optional filters (applied only when provided)
       ${filters?.verified === true ? sql`AND p.verified = 1` : sql``}
@@ -867,7 +1017,7 @@ export async function searchByGeoText(args: SearchByGeoTextArgs) {
         FROM producer_rating_agg pra
       ),
       cover AS (
-        SELECT pm.producer_id, ma.url AS cover_url
+        SELECT pm.producer_id, MIN(ma.url) AS cover_url
         FROM producer_media pm
         JOIN media_assets ma ON ma.id = pm.asset_id
         WHERE pm.role = 'cover'
@@ -1040,8 +1190,16 @@ export async function getFullProducerPublic(args: GetProducerArgs) {
           orderBy: asc(producerMedia.position),
         },
         location: true,
-        commodities: true,
-        certifications: true,
+        commodities: {
+          with: {
+            commodity: true,
+          },
+        },
+        certifications: {
+          with: {
+            certification: true,
+          },
+        },
         chats: true,
         labels: true,
         hours: true,
@@ -1133,8 +1291,16 @@ export async function listProducers(args: {
         orderBy: asc(producerMedia.position),
       },
       location: true,
-      commodities: true,
-      certifications: true,
+      commodities: {
+        with: {
+          commodity: true,
+        },
+      },
+      certifications: {
+        with: {
+          certification: true,
+        },
+      },
       chats: true,
       labels: true,
       hours: true,
