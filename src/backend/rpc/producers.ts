@@ -106,7 +106,7 @@ import {
 } from "../db/contracts";
 import np from "compromise";
 import ngeo from "ngeohash";
-import { geocodePlace } from "../llm/utils/geocode";
+import { geocodePlace } from "./utils/geocode";
 import { getIpGeo } from "./utils/get-ip-geo";
 
 const LOCAL_INTENT_RE =
