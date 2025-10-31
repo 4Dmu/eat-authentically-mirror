@@ -8,9 +8,8 @@ import {
 import { defaultOptions, withForm } from "./context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, ChevronsUpDownIcon, PlusIcon, XIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronsUpDownIcon, XIcon } from "lucide-react";
+import { useState } from "react";
 import { useListCommodoties } from "@/utils/producers";
 import {
   Command,
@@ -25,9 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import { useMeasure } from "@uidotdev/usehooks";
-import { setQuarter } from "date-fns";
 
 function isProducerCommodity(
   value:
@@ -60,7 +57,7 @@ export const Form = withForm({
   render: function Render({ form }) {
     const [query, setquery] = useState("");
     const [open, setOpen] = useState(false);
-    const [ref, { width, height }] = useMeasure();
+    const [ref, { width }] = useMeasure();
 
     const commodoties = useListCommodoties();
 

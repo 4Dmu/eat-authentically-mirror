@@ -115,24 +115,6 @@ export const claimProducerVerificationClient = type({
     })
   );
 
-export const contactValidator = type({
-  "email?": "string.email|null",
-  "phone?": "string|null",
-  "website?": "string.url|null",
-});
-
-export const addressValidator = type({
-  "street?": "string|undefined",
-  "city?": type("string|undefined"),
-  "state?": "string|undefined",
-  "country?": alpha3CountryCodeValidator.or(type.undefined),
-  "zip?": "string|undefined",
-  "coordinate?": type({
-    latitude: "number",
-    longitude: "number",
-  }).or(type.undefined),
-});
-
 export const suggestProducerArgs = type({
   name: type("string").atLeastLength(3).atMostLength(300).configure({
     expected: "",
@@ -174,36 +156,6 @@ export const suggestProducerArgs = type({
     return false;
   }
   return true;
-});
-
-export const certificationValidator = type({
-  name: "string",
-  isVerified: "boolean",
-  id: "string",
-  createdAt: "Date",
-  updatedAt: "Date",
-});
-
-export const imageDataValidator = type({
-  _type: "'cloudflare'",
-  cloudflareId: "string",
-  cloudflareUrl: "string.url",
-  alt: "string",
-});
-
-export const businessHoursValidator = type({});
-
-export const socialMediaValidator = type({
-  twitter: "string.url|null",
-  facebook: "string.url|null",
-  instagram: "string.url|null",
-});
-
-export const videoValidator = type({
-  url: "string",
-  _type: "'cloudflare'",
-  uid: "string",
-  status: "'ready'|'pending'",
 });
 
 export const editProducerFormValidator = producerSelectValidator
@@ -249,16 +201,6 @@ export const ipGeoValidator = type({
   /** The postal code of the client */
   "postalCode?": "string",
 });
-
-// export const listProducersArgsValidator = type({
-//   "type?": producerTypesValidator,
-//   page: "number",
-//   "query?": "string",
-//   certs: type("string").array(),
-//   "locationSearchArea?": LatLangBoundsLiteralValidator,
-//   "claimed?": "boolean",
-//   "userIpGeo?": ipGeoValidator,
-// });
 
 const queryFilters = type({
   category: type.enumerated(...PRODUCER_TYPES).optional(),
@@ -483,16 +425,6 @@ export type GetProducerArgs = typeof getProducersArgsValidator.infer;
 export type RegisterProducerArgs = typeof registerProducerArgsValidator.infer;
 
 export type ProducerTypes = typeof producerTypesValidator.infer;
-
-export type SocialMedia = typeof socialMediaValidator.infer;
-
-export type Contact = typeof contactValidator.infer;
-
-export type Address = typeof addressValidator.infer;
-
-export type ImageData = typeof imageDataValidator.infer;
-
-export type Certification = typeof certificationValidator.infer;
 
 export type EditProducerArgs = typeof editProducerArgsValidator.infer;
 

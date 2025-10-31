@@ -46,7 +46,6 @@ import {
   SuggestedProducerInsert,
   suggestedProducers,
 } from "../db/schema";
-
 import {
   and,
   ne,
@@ -82,11 +81,7 @@ import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
-import {
-  CLAIM_DNS_TXT_RECORD_NAME,
-  CUSTOM_GEO_HEADER_NAME,
-  RATELIMIT_ALL,
-} from "../constants";
+import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "../constants";
 import {
   COMMODITIES_CACHE,
   COMMODITY_VARIANTS_CACHE,
@@ -104,15 +99,15 @@ import { tryCatch } from "@/utils/try-catch";
 import { geocode } from "../lib/google-maps";
 import { logger } from "../lib/log";
 import { headers } from "next/headers";
-import { Geo } from "@vercel/functions";
 import { auth } from "@clerk/nextjs/server";
 import {
   mediaAssetSelectValidator,
   producerMediaSelectValidator,
 } from "../db/contracts";
 import np from "compromise";
-import { geocodePlace } from "../llm/utils/geocode";
 import ngeo from "ngeohash";
+import { geocodePlace } from "../llm/utils/geocode";
+import { getIpGeo } from "./utils/get-ip-geo";
 
 const LOCAL_INTENT_RE =
   /\b(near\s*me|around\s*me|close\s*by|nearby|in\s*my\s*area)\b/i;
@@ -149,12 +144,6 @@ function extractLocationInfo(query: string) {
 
   return { placeName, localIntent, query };
 }
-
-//  category: type.enumerated(...PRODUCER_TYPES).optional(),
-//     commodities: type.string.atLeastLength(1).array().optional(),
-//     variants: type.string.atLeastLength(1).array().optional(),
-//     certifications: type.string.atLeastLength(1).array().optional(),
-//     organicOnly: type.boolean.optional(),
 
 function findCommodities(query: string, commodities: string[]) {
   const commoditiesRegex = new RegExp(
@@ -205,20 +194,9 @@ export const searchProducers = actionClient
       },
     }) => {
       const { userId } = await auth();
-
       const headerList = await headers();
-      const rawGeo = headerList.get(CUSTOM_GEO_HEADER_NAME);
-      const parsedGeo = rawGeo
-        ? (JSON.parse(Buffer.from(rawGeo, "base64").toString()) as Geo)
-        : undefined;
 
-      const ipGeo =
-        parsedGeo?.latitude && parsedGeo.longitude
-          ? {
-              lat: Number(parsedGeo.latitude),
-              lon: Number(parsedGeo.longitude),
-            }
-          : undefined;
+      const ipGeo = getIpGeo(headerList);
 
       const userGeo = userLocation
         ? {

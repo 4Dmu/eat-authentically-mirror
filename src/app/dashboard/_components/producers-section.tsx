@@ -1,4 +1,6 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
 import { ProducerCardsRow } from "@/backend/db/schema";
 import {
   AddProducerDialog,
@@ -23,8 +25,6 @@ import {
 } from "@/utils/producers";
 import { useAtom } from "jotai";
 import { BuildingIcon, EyeIcon, EditIcon, TrashIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
