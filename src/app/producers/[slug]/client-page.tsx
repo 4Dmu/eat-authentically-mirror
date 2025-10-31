@@ -226,10 +226,12 @@ export function ProducerPageClient(props: {
     </>
   );
 
+  const hasReviews =
+    (reviews.data && reviews.data.length > 0) || pendingReviews.length > 0;
+
   const reviewsCard = (
     <>
-      {((reviews.data && reviews.data.length > 0) ||
-        pendingReviews.length > 0) && (
+      {hasReviews && (
         <Card className="pb-0 overflow-hidden">
           <CardHeader>
             <CardTitle>Reviews</CardTitle>
@@ -319,23 +321,49 @@ export function ProducerPageClient(props: {
                   <CarouselPrevious />
                 </Carousel>
                 <CardHeader>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {producer.certifications.map((cert) => (
+                      <Badge key={cert.certificationId}>
+                        {cert.certification.name}
+                      </Badge>
+                    ))}
+                  </div>
                   <h1 className="font-bold text-4xl">{producer.name}</h1>
-                  <Badge>{producer.type}</Badge>
+                  {/* <Badge>{producer.type}</Badge> */}
                 </CardHeader>
                 <CardContent className="whitespace-pre-wrap">
                   {producer.about?.replace(/\\n/g, "\n")}
                 </CardContent>
               </Card>
-              <div className="max-lg:hidden">{reviewsCard}</div>
+              {hasReviews && <div className="max-lg:hidden">{reviewsCard}</div>}
             </div>
           )}
           <div className="flex-3/8 flex flex-col gap-5">
             {claimProducerCard}
             {contactCard}
             {mapCard}
-            <div className="lg:hidden">{reviewsCard}</div>
+            {hasReviews && <div className="lg:hidden">{reviewsCard}</div>}
           </div>
         </div>
+        {producer && (
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Products</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-wrap gap-3">
+                {producer.commodities.map((comm) => (
+                  <div
+                    key={comm.commodityId}
+                    className="bg-tertiary text-tertiary-foreground p-2 rounded-2xl px-5"
+                  >
+                    <p>{comm.commodity.name}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
