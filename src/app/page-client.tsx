@@ -6,7 +6,7 @@ import { SearchBox } from "@/components/search-box";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useGeolocationStore, useHomePageStore } from "@/stores";
-import { ArrowLeft, ArrowRight, Loader } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 import { useSearchProducers } from "@/utils/producers";
