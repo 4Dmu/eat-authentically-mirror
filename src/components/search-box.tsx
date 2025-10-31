@@ -1,9 +1,10 @@
 import { Input } from "./ui/input";
-import { SearchIcon, XIcon } from "lucide-react";
+import { Loader, SearchIcon, XIcon } from "lucide-react";
 import {
   ChangeEvent,
   KeyboardEvent,
   PropsWithChildren,
+  ReactNode,
   useEffect,
   useState,
 } from "react";
@@ -45,7 +46,12 @@ function useAnimatePlaceholder() {
   return placeholder;
 }
 
-export function SearchBox(props: PropsWithChildren) {
+export function SearchBox(
+  props: PropsWithChildren<{
+    after?: ReactNode | undefined;
+    isSearching?: boolean;
+  }>
+) {
   const placeholder = useAnimatePlaceholder();
   const { setQuery, query, resetFilters } = useHomePageStore();
   const [value, setValue] = useState(query ?? "");
@@ -72,7 +78,11 @@ export function SearchBox(props: PropsWithChildren) {
         </p>
         <div className="flex flex-col sm:flex-row gap-2 w-full max-w-3xl rounded-2xl bg-white p-2 shadow-2xl backdrop-blur-sm transition-all hover:shadow-glow">
           <div className="flex flex-1 items-center gap-3 px-4">
-            <SearchIcon className="h-5 w-5 text-muted-foreground" />
+            {props.isSearching ? (
+              <Loader className="animate-spin text-primary h-5 w-5" />
+            ) : (
+              <SearchIcon className="h-5 w-5 text-muted-foreground" />
+            )}
             <Input
               type="text"
               placeholder={placeholder}
@@ -125,6 +135,7 @@ export function SearchBox(props: PropsWithChildren) {
             </button>
           ))}
         </div>
+        {props.after}
       </div>
     </div>
   );

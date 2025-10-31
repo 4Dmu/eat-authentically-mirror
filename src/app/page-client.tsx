@@ -6,7 +6,7 @@ import { SearchBox } from "@/components/search-box";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useGeolocationStore, useHomePageStore } from "@/stores";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
 import { useSearchProducers } from "@/utils/producers";
@@ -35,7 +35,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
 
   const userLocation = useGeolocationStore((s) => s.state);
 
-  const { data, isPlaceholderData, isEnabled, isPending } = useSearchProducers(
+  const searchQuery = useSearchProducers(
     {
       query: debouncedQuery,
     },
@@ -60,19 +60,19 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Ranch_Default.jpg)] animate-[fade3_150s_infinite]" />
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/Ranch_Default2.jpg)] animate-[fade4_150s_infinite]" />
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/tomatoesontable.jpg)] animate-[fade5_150s_infinite]" />
-        {/* <div className="w-full h-full absolute top-0 left-0 bg-[url(/hero/FRF_Eaterie_Default.jpg)] bg-cover bg-center" /> */}
-        {/* <div className="w-full h-full absolute top-0 left-0 bg-[url(https://images.unsplash.com/photo-1595855759920-86582396756a?w=1600&q=80)] bg-cover bg-center" /> */}
         <div className="w-full h-full absolute top-0 left-0 bg-linear-to-b from-teal-200/50 to-green-700/50" />
         <div className="absolute top-0 left-0 w-full bg-black/10 h-full" />
-        <SearchBox>
-          {data?.userLocation &&
-            data.userLocation.userRequestsUsingTheirLocation &&
-            isEnabled && (
-              <RadiusSelector defaultRadius={data.userLocation.searchRadius} />
+        <SearchBox isSearching={searchQuery.fetchStatus === "fetching"}>
+          {searchQuery.data?.userLocation &&
+            searchQuery.data.userLocation.userRequestsUsingTheirLocation &&
+            searchQuery.isEnabled && (
+              <RadiusSelector
+                defaultRadius={searchQuery.data.userLocation.searchRadius}
+              />
             )}
         </SearchBox>
       </div>
-      {isEnabled && !isPending && (
+      {searchQuery.isEnabled && !searchQuery.isPending && (
         <div className="p-5">
           <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
             <div className="flex justify-between">
@@ -81,29 +81,32 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                   Search Results
                 </h2>
                 <p className="text-muted-foreground">
-                  Found {data?.result.count} for{" "}
+                  Found {searchQuery.data?.result.count} for{" "}
                   <span className="font-semibold text-primary">
                     &quot;{debouncedQuery}&quot;
                   </span>
-                  {(data?.userLocation.userRequestsUsingTheirLocation ||
+                  {(searchQuery.data?.userLocation
+                    .userRequestsUsingTheirLocation ||
                     certs.length > 0 ||
                     typeFilter ||
                     country) && (
                     <>
                       <span> where</span>
                       {typeFilter && <span> category is {typeFilter}</span>}
-                      {data?.userLocation.userRequestsUsingTheirLocation && (
+                      {searchQuery.data?.userLocation
+                        .userRequestsUsingTheirLocation && (
                         <span>
                           {" "}
                           {typeFilter ? "and " : ""}
-                          in a {data.userLocation.searchRadius} km radius{" "}
+                          in a {searchQuery.data.userLocation.searchRadius} km
+                          radius{" "}
                         </span>
                       )}
                       {certs && certs.length > 0 && (
                         <>
                           <span>
                             {" "}
-                            {data?.userLocation
+                            {searchQuery.data?.userLocation
                               .userRequestsUsingTheirLocation || typeFilter
                               ? "and "
                               : ""}
@@ -115,7 +118,8 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                       {country && (
                         <span>
                           {" "}
-                          {data?.userLocation.userRequestsUsingTheirLocation ||
+                          {searchQuery.data?.userLocation
+                            .userRequestsUsingTheirLocation ||
                           typeFilter ||
                           (certs && certs.length)
                             ? "and "
@@ -133,7 +137,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
               <FilterMenu />
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {data?.result.items.map((producer) => (
+              {searchQuery.data?.result.items.map((producer) => (
                 <PublicProducerCard
                   userIpGeo={userIpGeo}
                   key={producer.id}
@@ -141,7 +145,8 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                 />
               ))}
             </div>
-            {(data?.result.hasMore || (data?.result.offset ?? 0) > 0) && (
+            {(searchQuery.data?.result.hasMore ||
+              (searchQuery.data?.result.offset ?? 0) > 0) && (
               <div className="flex justify-between gap-5">
                 <Button
                   variant={"brandBrown"}
@@ -156,12 +161,18 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                   variant={"brandBrown"}
                   size={"icon"}
                   onClick={() => {
-                    if (!isPlaceholderData && data?.result.hasMore) {
+                    if (
+                      !searchQuery.isPlaceholderData &&
+                      searchQuery.data?.result.hasMore
+                    ) {
                       setPage((old) => old + 1);
                     }
                   }}
                   // Disable the Next Page button until we know a next page is available
-                  disabled={isPlaceholderData || !data?.result.hasMore}
+                  disabled={
+                    searchQuery.isPlaceholderData ||
+                    !searchQuery.data?.result.hasMore
+                  }
                 >
                   <ArrowRight />
                 </Button>
