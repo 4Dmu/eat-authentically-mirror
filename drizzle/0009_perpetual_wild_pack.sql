@@ -1,1 +1,0 @@
-ALTER TABLE `pending_media_assets` ADD `position` integer NOT NULL;
