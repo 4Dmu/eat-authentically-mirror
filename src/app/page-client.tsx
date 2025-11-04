@@ -15,6 +15,7 @@ import { PublicProducerCard } from "@/components/public-producer-card";
 import { RadiusSelector } from "@/components/radius-selector";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { match, P } from "ts-pattern";
+import { useRef } from "react";
 
 export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   const {
@@ -32,6 +33,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     customUserLocationRadius,
     500
   );
+  const titleRef = useRef<HTMLDivElement>(null);
 
   const userLocation = useGeolocationStore((s) => s.state);
 
@@ -73,7 +75,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
         </SearchBox>
       </div>
       {searchQuery.isEnabled && !searchQuery.isPending && (
-        <div className="p-5">
+        <div className="p-5" ref={titleRef}>
           <div className="max-w-[1400px] w-full mx-auto flex flex-col gap-5">
             <div className="flex justify-between">
               <div>
@@ -151,7 +153,10 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                 <Button
                   variant={"brandBrown"}
                   size={"icon"}
-                  onClick={() => setPage((old) => Math.max(old - 1, 0))}
+                  onClick={() => {
+                    setPage((old) => Math.max(old - 1, 0));
+                    titleRef.current?.scrollIntoView();
+                  }}
                   disabled={page === 0}
                 >
                   <ArrowLeft />
@@ -166,6 +171,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                       searchQuery.data?.result.hasMore
                     ) {
                       setPage((old) => old + 1);
+                      titleRef.current?.scrollIntoView();
                     }
                   }}
                   // Disable the Next Page button until we know a next page is available
