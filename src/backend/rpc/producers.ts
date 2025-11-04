@@ -155,6 +155,9 @@ function extractLocationInfo(query: string) {
   return { placeName, localIntent, query: newQuery.trim() };
 }
 function findCommodities(query: string, commodities: string[]) {
+  if (commodities.length == 0) {
+    return [];
+  }
   const commoditiesRegex = new RegExp(
     "\\b(" +
       commodities
@@ -163,12 +166,13 @@ function findCommodities(query: string, commodities: string[]) {
       ")\\b",
     "g"
   );
+  console.log(commoditiesRegex);
   const matches = query.match(commoditiesRegex);
   if (!matches) return [];
   // Find *all* matches (not just first)
   return Array.from(query.matchAll(commoditiesRegex), (m) =>
-    m[1].toLowerCase()
-  );
+    m[1].toLowerCase().trim()
+  ).filter((r) => r.length > 0);
 }
 
 async function extractFilters(query: string): Promise<QueryFilters> {
