@@ -10,7 +10,8 @@ import { Header } from "@/components/app-header";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider as JotaiProvider } from "jotai";
 import { WebVitals } from "@/lib/axiom/client";
-import { format } from "date-fns";
+import { BetaNotice } from "@/components/beta-notice";
+import { Footer } from "@/components/app-footer";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
@@ -52,10 +53,8 @@ export default function RootLayout({
             <JotaiProvider>
               <Header />
               {children}
-              <div className="p-10 bg-primary text-primary-foreground">
-                © {format(new Date(), "yyyy")} Eat Authentically. Discover
-                authentic food experiences.
-              </div>
+              <Footer />
+              <BetaNotice />
             </JotaiProvider>
             <Toaster />
             <SpeedInsights />

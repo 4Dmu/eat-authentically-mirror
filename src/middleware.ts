@@ -16,6 +16,8 @@ const isPublicRoute = createRouteMatcher([
   "/claim",
   "/join-and-claim",
   "/sign-in-with-token",
+  "/terms-of-service",
+  "/privacy-policy",
 ]);
 
 const isSubRoute = createRouteMatcher(["/dashboard/subscribe"]);
