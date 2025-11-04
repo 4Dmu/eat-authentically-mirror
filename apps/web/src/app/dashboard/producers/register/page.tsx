@@ -1,0 +1,15 @@
+import { getUsersProducerIdsCached } from "@/backend/data/producer";
+import { ClientPage } from "./page-client";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
+export default async function Page() {
+  const { userId } = await auth.protect();
+  const producerIds = await getUsersProducerIdsCached(userId);
+
+  if (producerIds.length !== 0) {
+    redirect("/organization/profile");
+  }
+
+  return <ClientPage />;
+}
