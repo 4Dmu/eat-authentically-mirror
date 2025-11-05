@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { PINBOARD_VIEW_MODES } from "../db/schema";
+import { PINBOARD_VIEW_MODES } from "@ea/db/schema";
 
 export const pinboardVideModeValidator = type.enumerated(
   ...PINBOARD_VIEW_MODES

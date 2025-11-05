@@ -20,7 +20,7 @@ import { useUser } from "@clerk/nextjs";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { useLoggedInUserProducers } from "@/utils/producers";
 import { useMemo } from "react";
-import { ProducerCardsRow } from "@/backend/db/schema";
+import { ProducerCardsRow } from "@ea/db/schema";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 import {
   AddProducerDialog,

@@ -1,6 +1,6 @@
 "use server";
 import { authenticatedActionClient } from "./helpers/middleware";
-import { db } from "../db";
+import { db } from "@ea/db";
 import {
   and,
   eq,
@@ -19,7 +19,7 @@ import {
   producerChats,
   producerMedia,
   producers,
-} from "../db/schema";
+} from "@ea/db/schema";
 import { messageRatelimit } from "../lib/rate-limit";
 import { getSubTier } from "./utils/get-sub-tier";
 import {

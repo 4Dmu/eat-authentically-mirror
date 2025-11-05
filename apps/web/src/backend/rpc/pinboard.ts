@@ -1,6 +1,6 @@
 "use server";
 import { and, asc, count, eq, inArray } from "drizzle-orm";
-import { db } from "../db";
+import { db } from "@ea/db";
 import {
   pinboards,
   pinListItems,
@@ -8,7 +8,7 @@ import {
   pins,
   producerMedia,
   producers,
-} from "../db/schema";
+} from "@ea/db/schema";
 import { authenticatedActionClient } from "./helpers/middleware";
 import {
   addToPinboardArgs,

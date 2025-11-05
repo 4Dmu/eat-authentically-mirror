@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
-import { db } from "../db";
-import { claimInvitations } from "../db/schema";
+import { db } from "@ea/db";
+import { claimInvitations } from "@ea/db/schema";
 import { isPast } from "date-fns";
 
 export async function getValidClaimInvitationByToken(token: string) {

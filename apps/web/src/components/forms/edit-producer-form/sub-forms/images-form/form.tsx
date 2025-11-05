@@ -20,7 +20,7 @@ import { GripIcon, RotateCwIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { defaultOptions, withForm } from "./context";
 import { editProducerMediaFormValidator } from "@/backend/validators/producers";
-import { ProducerWithMap } from "@/backend/db/schema";
+import { ProducerWithMap } from "@ea/db/schema";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";

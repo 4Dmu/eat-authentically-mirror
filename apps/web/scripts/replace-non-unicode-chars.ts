@@ -1,4 +1,4 @@
-import { db } from "@/backend/db";
+import { db } from "@ea/db";
 import { sql } from "drizzle-orm";
 
 const isDryRun = process.argv.includes("--dry-run");
@@ -33,7 +33,7 @@ function sanitizeName(name: string) {
 async function main() {
   // Find names with non-ASCII chars (outside 0x20–0x7E)
   const res = await db.run(
-    sql`SELECT id, name FROM producers WHERE name GLOB '*[^ -~]*'`,
+    sql`SELECT id, name FROM producers WHERE name GLOB '*[^ -~]*'`
   );
 
   if (res.rows.length === 0) {
@@ -57,11 +57,11 @@ async function main() {
 
       if (isDryRun) {
         console.log(
-          `DRY RUN  id=${id}\n  OLD: ${oldName}\n  NEW: ${newName}\n`,
+          `DRY RUN  id=${id}\n  OLD: ${oldName}\n  NEW: ${newName}\n`
         );
       } else {
         await tx.run(
-          sql`UPDATE producers SET name = ${newName} WHERE id = ${id}`,
+          sql`UPDATE producers SET name = ${newName} WHERE id = ${id}`
         );
         console.log(`Updated id=${id}\n  OLD: ${oldName}\n  NEW: ${newName}\n`);
       }

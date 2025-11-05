@@ -1,4 +1,4 @@
-// import { db } from "@/backend/db";
+// import { db } from "@ea/db";
 // import {
 //   certifications,
 //   commodities,
@@ -12,7 +12,7 @@
 //   producers,
 //   producerSocial,
 //   producersSearch,
-// } from "@/backend/db/schema";
+// } from "@ea/db/schema";
 // import { eq } from "drizzle-orm";
 // import { readdir, readFile, writeFile } from "node:fs/promises";
 // import * as ngeohash from "ngeohash";

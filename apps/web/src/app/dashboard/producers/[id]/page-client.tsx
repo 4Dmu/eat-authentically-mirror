@@ -1,6 +1,6 @@
 "use client";
 
-import { CertificationSelect, ProducerWithAll } from "@/backend/db/schema";
+import { CertificationSelect, ProducerWithAll } from "@ea/db/schema";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { BackButton } from "@/components/back-button";
 import { ProducerEditForm } from "@/components/forms/edit-producer-form";

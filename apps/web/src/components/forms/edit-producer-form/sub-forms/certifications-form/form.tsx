@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { useStore } from "@tanstack/react-form";
 import { defaultOptions, withForm } from "./context";
-import { CertificationSelect } from "@/backend/db/schema";
+import { CertificationSelect } from "@ea/db/schema";
 
 export const Form = withForm({
   ...defaultOptions,

@@ -1,4 +1,4 @@
-import { db } from "@/backend/db";
+import { db } from "@ea/db";
 import { COMMODITIES_CACHE, COMMODITY_VARIANTS_CACHE } from "@/backend/kv";
 
 export async function main() {

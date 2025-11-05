@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ProducerCardsRow } from "@/backend/db/schema";
+import { ProducerCardsRow } from "@ea/db/schema";
 import {
   AddProducerDialog,
   producerDialogAtom,

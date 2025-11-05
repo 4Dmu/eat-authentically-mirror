@@ -1,5 +1,5 @@
-// import { db } from "@/backend/db";
-// import { BusinessHours, ProducerInsert, producers } from "@/backend/db/schema";
+// import { db } from "@ea/db";
+// import { BusinessHours, ProducerInsert, producers } from "@ea/db/schema";
 // import { Address } from "@/backend/validators/producers";
 // import { env } from "@/env";
 // import { countryByName } from "@/utils/contries";

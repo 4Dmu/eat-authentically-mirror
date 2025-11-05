@@ -1,6 +1,6 @@
 import { getUsersProducerIdsCached } from "@/backend/data/producer";
-import { db } from "@/backend/db";
-import { producers } from "@/backend/db/schema";
+import { db } from "@ea/db";
+import { producers } from "@ea/db/schema";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq, isNull } from "drizzle-orm";

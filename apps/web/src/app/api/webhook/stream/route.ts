@@ -1,4 +1,4 @@
-import { db } from "@/backend/db";
+import { db } from "@ea/db";
 import { sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";

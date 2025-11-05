@@ -6,8 +6,8 @@ import {
 } from "../kv";
 import stripe from "stripe";
 import { PLANS } from "./subscription-plans";
-import { db } from "../db";
-import { producers } from "../db/schema";
+import { db } from "@ea/db";
+import { producers } from "@ea/db/schema";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/log";
 

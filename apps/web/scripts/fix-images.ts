@@ -1,5 +1,5 @@
-import { db } from "@/backend/db";
-import { mediaAssets, producerMedia } from "@/backend/db/schema";
+import { db } from "@ea/db";
+import { mediaAssets, producerMedia } from "@ea/db/schema";
 import { and, eq } from "drizzle-orm";
 
 async function main() {

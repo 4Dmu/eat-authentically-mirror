@@ -41,7 +41,7 @@ import {
 import Image from "next/image";
 import { PendingReviewCard, ReviewCard } from "@/components/review-card";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { ProducerWithAll } from "@/backend/db/schema";
+import { ProducerWithAll } from "@ea/db/schema";
 import React from "react";
 import {
   MessageProducerDialog,

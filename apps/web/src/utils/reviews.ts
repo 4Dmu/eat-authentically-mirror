@@ -1,4 +1,4 @@
-import { ProducerReviewSelect } from "@/backend/db/schema";
+import { ProducerReviewSelect } from "@ea/db/schema";
 import {
   deleteReview,
   listReviewsPublic,

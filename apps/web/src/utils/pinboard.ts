@@ -1,4 +1,4 @@
-import { PinSelect, PinboardSelect } from "@/backend/db/schema";
+import { PinSelect, PinboardSelect } from "@ea/db/schema";
 import {
   addToPinboard,
   deletePinList,

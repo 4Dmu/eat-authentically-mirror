@@ -23,7 +23,7 @@ import {
 } from "../validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
-import { db } from "../db";
+import { db } from "@ea/db";
 import {
   claimRequests,
   commodities,
@@ -45,7 +45,7 @@ import {
   ProducersSearchSelect,
   SuggestedProducerInsert,
   suggestedProducers,
-} from "../db/schema";
+} from "@ea/db/schema";
 import {
   and,
   ne,
@@ -103,7 +103,7 @@ import { auth } from "@clerk/nextjs/server";
 import {
   mediaAssetSelectValidator,
   producerMediaSelectValidator,
-} from "../db/contracts";
+} from "@ea/db/contracts";
 import np from "compromise";
 import ngeo from "ngeohash";
 import { geocodePlace } from "./utils/geocode";

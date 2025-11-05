@@ -11,7 +11,7 @@ import { Button } from "./ui/button";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateReview } from "@/utils/reviews";
-import { ProducerReviewSelect } from "@/backend/db/schema";
+import { ProducerReviewSelect } from "@ea/db/schema";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { EditIcon } from "lucide-react";

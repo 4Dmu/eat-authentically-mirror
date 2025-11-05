@@ -1,4 +1,4 @@
-import { ProducerSelect } from "@/backend/db/schema";
+import { ProducerSelect } from "@ea/db/schema";
 import { env } from "@/env";
 import {
   Text,

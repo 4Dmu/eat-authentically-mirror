@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { match, P } from "ts-pattern";
 import Link from "next/link";
-import { ProducerWithAll } from "@/backend/db/schema";
+import { ProducerWithAll } from "@ea/db/schema";
 import { atom, useAtom, useSetAtom } from "jotai";
 import { NotSubbed, Subbed } from "./auth/RequireSub";
 

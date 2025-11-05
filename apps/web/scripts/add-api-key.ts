@@ -1,5 +1,5 @@
-import { db } from "@/backend/db";
-import { externalApiKeys } from "@/backend/db/schema";
+import { db } from "@ea/db";
+import { externalApiKeys } from "@ea/db/schema";
 import { generateToken } from "@/backend/utils/generate-tokens";
 
 async function main() {

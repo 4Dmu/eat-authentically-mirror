@@ -1,6 +1,6 @@
 import { getValidClaimInvitationByToken } from "@/backend/data/claim-invitations";
-import { db } from "@/backend/db";
-import { producers } from "@/backend/db/schema";
+import { db } from "@ea/db";
+import { producers } from "@ea/db/schema";
 import { eq } from "drizzle-orm";
 import { Loader } from "lucide-react";
 import { notFound } from "next/navigation";

@@ -1,6 +1,6 @@
 import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
-import { ClaimRequestStatus } from "../db/schema";
+import { ClaimRequestStatus } from "@ea/db/schema";
 import { isMobilePhone } from "validator";
 import {
   mediaAssetSelectValidator,
@@ -13,7 +13,7 @@ import {
   producerMediaSelectValidator,
   producerSelectValidator,
   producerSocialSelectValidator,
-} from "../db/contracts";
+} from "@ea/db/contracts";
 
 export const PRODUCER_TYPES = [
   "farm",

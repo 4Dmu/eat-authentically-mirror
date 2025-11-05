@@ -1,8 +1,8 @@
 import { type } from "arktype";
 import { handlers } from "../../_helpers/request";
 import { NextResponse } from "next/server";
-import { db } from "@/backend/db";
-import { outreachEvent } from "@/backend/db/schema";
+import { db } from "@ea/db";
+import { outreachEvent } from "@ea/db/schema";
 
 /**
  * @swagger

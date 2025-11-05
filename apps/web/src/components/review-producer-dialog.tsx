@@ -16,7 +16,7 @@ import { Star } from "lucide-react";
 import { Stars } from "@/backend/validators/reviews";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
-import { ProducerWithAll } from "@/backend/db/schema";
+import { ProducerWithAll } from "@ea/db/schema";
 import { atom, useAtom, useSetAtom } from "jotai";
 import { NotSubbed, Subbed } from "./auth/RequireSub";
 import Link from "next/link";

@@ -1,6 +1,6 @@
 import { internalClaimProducer } from "@/backend/data/producer";
-import { db } from "@/backend/db";
-import { claimRequests } from "@/backend/db/schema";
+import { db } from "@ea/db";
+import { claimRequests } from "@ea/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { Loader } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
@@ -10,7 +10,7 @@ async function ClaimPage({ token }: { token: string }) {
   const claim = await db.query.claimRequests.findFirst({
     where: and(
       eq(claimRequests.claimToken, token),
-      sql`json_extract(${claimRequests.status}, '$.type') = 'waiting'`,
+      sql`json_extract(${claimRequests.status}, '$.type') = 'waiting'`
     ),
   });
 

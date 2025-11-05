@@ -1,11 +1,11 @@
-// import { db } from "@/backend/db";
+// import { db } from "@ea/db";
 // import {
 //   BusinessHours,
 //   ImportedReviewInsert,
 //   importedReviews,
 //   ProducerInsert,
 //   producers,
-// } from "@/backend/db/schema";
+// } from "@ea/db/schema";
 // import { env } from "@/env";
 // import { readFile, writeFile } from "node:fs/promises";
 // import { nanoid } from "nanoid";

@@ -1,5 +1,5 @@
-import { db } from "@/backend/db";
-import { externalApiKeys, ExternalApiKeySelect } from "@/backend/db/schema";
+import { db } from "@ea/db";
+import { externalApiKeys, ExternalApiKeySelect } from "@ea/db/schema";
 import { StandardSchemaV1 } from "@standard-schema/spec";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";

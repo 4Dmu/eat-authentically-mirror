@@ -11,7 +11,7 @@ import {
   sqliteView,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import { PRODUCER_TYPES } from "../constants";
+import { PRODUCER_TYPES } from "@ea/shared/constants";
 
 type ClaimProducerVerificationInternal =
   | {

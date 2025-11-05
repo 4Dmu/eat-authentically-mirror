@@ -1,6 +1,6 @@
 "use server";
 import { and, eq, isNull, ne, or } from "drizzle-orm";
-import { db } from "../db";
+import { db } from "@ea/db";
 import {
   deleteReviewArgs,
   listReviewsPublicArgs,
@@ -13,7 +13,7 @@ import {
   producers,
   producerReviews,
   ProducerReviewInsert,
-} from "../db/schema";
+} from "@ea/db/schema";
 import { getSubTier } from "./utils/get-sub-tier";
 import { actionClient } from "./helpers/safe-action";
 import { USER_DATA_KV } from "../kv";

@@ -61,7 +61,7 @@ import {
   ProducerSelect,
   ProducerWith,
   ProducerWithAll,
-} from "@/backend/db/schema";
+} from "@ea/db/schema";
 import type { ProducerSearchResult } from "@/backend/data/producer";
 import { useHomePageStore } from "@/stores";
 import { urls } from "./default-urls";

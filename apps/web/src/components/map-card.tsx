@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import {
   ProducerLocationSelect,
   ProducersGoogleMapsPlaceDetailsSelect,
-} from "@/backend/db/schema";
+} from "@ea/db/schema";
 
 export function MapCard({
   location,

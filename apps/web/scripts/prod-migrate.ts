@@ -1,10 +1,10 @@
-// import { db } from "@/backend/db";
+// import { db } from "@ea/db";
 // import {
 //   Certification,
 //   certifications,
 //   producers,
 //   ProducerSelect,
-// } from "@/backend/db/schema";
+// } from "@ea/db/schema";
 // import { eq } from "drizzle-orm";
 // import { readFile } from "fs/promises";
 

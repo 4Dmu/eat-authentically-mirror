@@ -3,14 +3,14 @@ import type {
   ProducerTypes,
   SearchByGeoTextArgs,
 } from "@/backend/validators/producers";
-import { db } from "../db";
+import { db } from "@ea/db";
 import { asc, eq, like, SQL, sql } from "drizzle-orm";
 import {
   claimRequests,
   producerCards,
   producerMedia,
   producers,
-} from "../db/schema";
+} from "@ea/db/schema";
 import { USER_PRODUCER_IDS_KV } from "../kv";
 
 export async function getUsersProducerIdsCached(userId: string) {

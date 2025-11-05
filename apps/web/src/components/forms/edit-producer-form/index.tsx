@@ -37,7 +37,7 @@ import {
   MediaAssetSelect,
   ProducerMediaSelect,
   ProducerWithAll,
-} from "@/backend/db/schema";
+} from "@ea/db/schema";
 
 function getVideo(media: ProducerWithAll["media"] | undefined) {
   return (media?.find((d) => d.role === "video") ??
