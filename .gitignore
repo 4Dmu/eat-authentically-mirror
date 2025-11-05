@@ -11,6 +11,9 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*
+mirror-repo.sh
+ngrok.yml
 
 # Testing
 coverage
@@ -20,6 +23,8 @@ coverage
 
 # Vercel
 .vercel
+
+.husky
 
 # Build Outputs
 .next/
