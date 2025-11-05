@@ -53,6 +53,43 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     }
   );
 
+  const pagination = (searchQuery.data?.result.hasMore ||
+    (searchQuery.data?.result.offset ?? 0) > 0) && (
+    <div className="flex justify-between gap-5">
+      <Button
+        variant={"brandBrown"}
+        size={"icon"}
+        onClick={() => {
+          setPage((old) => Math.max(old - 1, 0));
+          titleRef.current?.scrollIntoView();
+        }}
+        disabled={page === 0}
+      >
+        <ArrowLeft />
+      </Button>
+      <Badge variant={"brandBrown"}>Page {page + 1}</Badge>
+      <Button
+        variant={"brandBrown"}
+        size={"icon"}
+        onClick={() => {
+          if (
+            !searchQuery.isPlaceholderData &&
+            searchQuery.data?.result.hasMore
+          ) {
+            setPage((old) => old + 1);
+            titleRef.current?.scrollIntoView();
+          }
+        }}
+        // Disable the Next Page button until we know a next page is available
+        disabled={
+          searchQuery.isPlaceholderData || !searchQuery.data?.result.hasMore
+        }
+      >
+        <ArrowRight />
+      </Button>
+    </div>
+  );
+
   return (
     <div className="flex flex-col gap-10  bg-gray-50">
       <RequestLocation />
@@ -82,7 +119,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                 <h2 className="mb-2 text-3xl font-bold text-foreground">
                   Search Results
                 </h2>
-                <p className="text-muted-foreground">
+                {/* <p className="text-muted-foreground">
                   Found {searchQuery.data?.result.count} for{" "}
                   <span className="font-semibold text-primary">
                     &quot;{debouncedQuery}&quot;
@@ -134,10 +171,11 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                       )}
                     </>
                   )}
-                </p>
+                </p> */}
               </div>
               <FilterMenu />
             </div>
+            {(searchQuery.data?.result.count || 0) > 10 && pagination}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {searchQuery.data?.result.items.map((producer) => (
                 <PublicProducerCard
@@ -147,43 +185,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                 />
               ))}
             </div>
-            {(searchQuery.data?.result.hasMore ||
-              (searchQuery.data?.result.offset ?? 0) > 0) && (
-              <div className="flex justify-between gap-5">
-                <Button
-                  variant={"brandBrown"}
-                  size={"icon"}
-                  onClick={() => {
-                    setPage((old) => Math.max(old - 1, 0));
-                    titleRef.current?.scrollIntoView();
-                  }}
-                  disabled={page === 0}
-                >
-                  <ArrowLeft />
-                </Button>
-                <Badge variant={"brandBrown"}>Page {page + 1}</Badge>
-                <Button
-                  variant={"brandBrown"}
-                  size={"icon"}
-                  onClick={() => {
-                    if (
-                      !searchQuery.isPlaceholderData &&
-                      searchQuery.data?.result.hasMore
-                    ) {
-                      setPage((old) => old + 1);
-                      titleRef.current?.scrollIntoView();
-                    }
-                  }}
-                  // Disable the Next Page button until we know a next page is available
-                  disabled={
-                    searchQuery.isPlaceholderData ||
-                    !searchQuery.data?.result.hasMore
-                  }
-                >
-                  <ArrowRight />
-                </Button>
-              </div>
-            )}
+            {pagination}
           </div>
         </div>
       )}
