@@ -90,7 +90,7 @@ export function PublicProducerCard({
           width={1920}
           height={1080}
           alt=""
-          className="w-full grow object-cover aspect-[4/3] border-b group-hover:scale-105 transition"
+          className="w-full grow object-cover aspect-4/3 border-b group-hover:scale-105 transition"
           src={primaryImageUrl(producer)}
         />
       </Link>
