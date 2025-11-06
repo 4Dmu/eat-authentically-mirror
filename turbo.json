@@ -48,7 +48,14 @@
         "TURNSTILE_SECRET_KEY",
         "NEXT_PUBLIC_AXIOM_TOKEN",
         "NEXT_PUBLIC_AXIOM_DATASET",
-        "OPENAI_API_KEY"
+        "OPENAI_API_KEY",
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "ADMIN_TURSO_DB_URL",
+        "ADMIN_TURSO_DB_TOKEN",
+        "AUTH_PASSKEY_RP_ID",
+        "AUTH_PASSKEY_RP_NAME",
+        "AUTH_PASSKEY_ORIGIN"
       ]
     },
     "lint": {
