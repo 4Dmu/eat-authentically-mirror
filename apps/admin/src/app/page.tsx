@@ -1,9 +1,22 @@
-import Image from "next/image";
+import { AppWrapper } from "@/components/app-wrapper";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { sessionOrRedirect } from "@/lib/auth-helpers";
 
-export default function Home() {
+export default async function Home() {
+  await sessionOrRedirect();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <h1>Admin</h1>
-    </div>
+    <AppWrapper crumbs={[{ url: "/", name: "EA Admin" }]} end="Home">
+      <h1 className="font-bold text-2xl">Admin</h1>
+    </AppWrapper>
   );
 }
