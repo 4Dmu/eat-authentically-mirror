@@ -31,12 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TanstackQuery>
-          <SidebarProvider>
-            <AppSidebar />
-            {children}
-          </SidebarProvider>
-        </TanstackQuery>
+        <TanstackQuery>{children}</TanstackQuery>
         <Toaster />
       </body>
     </html>
