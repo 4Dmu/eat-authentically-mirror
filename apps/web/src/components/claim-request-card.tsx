@@ -1,6 +1,6 @@
 "use client";
 import { CLAIM_DNS_TXT_RECORD_NAME } from "@/backend/constants";
-import { PublicClaimRequest } from "@/backend/validators/producers";
+import { PublicClaimRequest } from "@ea/validators/producers";
 import { useCheckClaimDomainDns, useVerifyClaimPhone } from "@/utils/producers";
 import { toast } from "sonner";
 import { Button } from "./ui/button";

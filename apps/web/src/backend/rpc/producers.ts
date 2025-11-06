@@ -20,7 +20,7 @@ import {
   editProducerCertificationsArgsValidator,
   editProducerCommodotiesArgsValidator,
   addCommodityAndAssociateArgsValidator,
-} from "../validators/producers";
+} from "@ea/validators/producers";
 import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
 import { db } from "@ea/db";
@@ -75,7 +75,7 @@ import {
   videoRatelimit,
 } from "../lib/rate-limit";
 import { authenticatedActionClient } from "./helpers/middleware";
-import { registerProducerArgsValidator } from "../validators/producers";
+import { registerProducerArgsValidator } from "@ea/validators/producers";
 import isURL from "validator/es/lib/isURL";
 import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";

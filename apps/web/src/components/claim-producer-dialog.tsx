@@ -25,7 +25,7 @@ import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { ProducerClaimVerificationMethods } from "@/backend/validators/producers";
+import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
 import Image from "next/image";
 import { match } from "ts-pattern";
 import { Label } from "./ui/label";

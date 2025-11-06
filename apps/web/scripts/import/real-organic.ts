@@ -19,7 +19,7 @@
 // import * as z from "zod";
 // import { env } from "@/env";
 // import { GOOGLE_GEOCODE_RESPONSE_CACHE } from "@/backend/kv";
-// import { GeocodeResponseSchema } from "@/backend/validators/google-geocode-api";
+// import { GeocodeResponseSchema } from "@ea/validators/google-geocode-api";
 // import { nanoid } from "nanoid";
 // import mime from "mime-types";
 

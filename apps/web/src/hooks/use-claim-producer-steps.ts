@@ -1,5 +1,5 @@
 import { ProducerWith } from "@ea/db/schema";
-import { ProducerClaimVerificationMethods } from "@/backend/validators/producers";
+import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
 import { type } from "arktype";
 import { useState } from "react";
 

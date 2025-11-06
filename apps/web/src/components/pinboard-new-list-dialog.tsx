@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useForm } from "@tanstack/react-form";
 import { FieldInfo } from "./forms/helpers/field-info";
-import { newPinListArgs } from "@/backend/validators/pinboard";
+import { newPinListArgs } from "@ea/validators/pinboard";
 import { useNewPinlist, useUserPinboardFull } from "@/utils/pinboard";
 
 export function NewPinlistDialog() {

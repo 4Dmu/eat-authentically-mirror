@@ -1,4 +1,4 @@
-import { editProducerCommoditiesFormValidator } from "@/backend/validators/producers";
+import { editProducerCommoditiesFormValidator } from "@ea/validators/producers";
 import {
   createFormHook,
   createFormHookContexts,

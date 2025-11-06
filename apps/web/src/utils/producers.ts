@@ -51,7 +51,7 @@ import {
   EditProducerCertifications,
   EditProducerCommodoties,
   AddCommodityAndAssociate,
-} from "@/backend/validators/producers";
+} from "@ea/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
 import {
   CommoditySelect,

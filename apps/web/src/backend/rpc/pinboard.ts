@@ -18,7 +18,7 @@ import {
   removeFromPinboardArgs,
   syncPinsPinlistMembershipsArgs,
   updateUserPinboardArgs,
-} from "../validators/pinboard";
+} from "@ea/validators/pinboard";
 
 export const getUserPinboard = authenticatedActionClient
   .name("getUserPinboard")

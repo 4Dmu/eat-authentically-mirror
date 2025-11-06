@@ -21,7 +21,7 @@ import {
   registerProducerArgsValidator,
   RegisterProducerArgs,
   ProducerTypes,
-} from "@/backend/validators/producers";
+} from "@ea/validators/producers";
 import { useMutation } from "@tanstack/react-query";
 import { registerProducer } from "@/backend/rpc/producers";
 import { BackButton } from "@/components/back-button";

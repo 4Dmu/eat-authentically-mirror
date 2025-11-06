@@ -1,6 +1,6 @@
 "use client";
 import { ProducerWith } from "@ea/db/schema";
-import { ProducerClaimVerificationMethods } from "@/backend/validators/producers";
+import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
 import { Button } from "@/components/ui/button";
 import {
   Card,

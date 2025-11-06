@@ -3,7 +3,7 @@ import { type } from "arktype";
 import { db } from "@ea/db";
 import { and, eq, isNotNull, isNull, sql, SQL } from "drizzle-orm";
 import { producers } from "@ea/db/schema";
-import { alpha3CountryCodeValidator } from "@/backend/validators/country";
+import { alpha3CountryCodeValidator } from "@ea/validators/country";
 import { handlers } from "../../_helpers/request";
 
 /**

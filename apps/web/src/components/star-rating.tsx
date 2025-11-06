@@ -1,4 +1,4 @@
-import { Stars } from "@/backend/validators/reviews";
+import { Stars } from "@ea/validators/reviews";
 import { cn } from "@/lib/utils";
 import { LucideProps } from "lucide-react";
 import { Dispatch, SetStateAction, useState, Ref } from "react";

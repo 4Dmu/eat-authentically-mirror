@@ -2,7 +2,7 @@ import type {
   GetProducerArgs,
   ProducerTypes,
   SearchByGeoTextArgs,
-} from "@/backend/validators/producers";
+} from "@ea/validators/producers";
 import { db } from "@ea/db";
 import { asc, eq, like, SQL, sql } from "drizzle-orm";
 import {

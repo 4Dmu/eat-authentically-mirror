@@ -18,7 +18,7 @@ import {
   RemoveFromPinboardArgs,
   SyncPinsPinlistMembershipsArgs,
   UpdateUserPinboardArgs,
-} from "@/backend/validators/pinboard";
+} from "@ea/validators/pinboard";
 import {
   useMutation,
   UseMutationOptions,

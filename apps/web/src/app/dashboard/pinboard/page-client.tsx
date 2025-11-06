@@ -21,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GridIcon, ListIcon, MapIcon, Trash2Icon, XIcon } from "lucide-react";
 import { PinboardMap } from "@/components/pinboard-map";
 import { useThrottleCallback } from "@react-hook/throttle";
-import { UpdateUserPinboardArgs } from "@/backend/validators/pinboard";
+import { UpdateUserPinboardArgs } from "@ea/validators/pinboard";
 import { Button } from "@/components/ui/button";
 import {
   Card,

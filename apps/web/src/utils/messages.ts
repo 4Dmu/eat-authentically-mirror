@@ -29,7 +29,7 @@ import {
   SendMessageToProducerArgs,
   UnblockProducerChatArgs,
   UnblockUserChatArgs,
-} from "@/backend/validators/messages";
+} from "@ea/validators/messages";
 import {
   useMutation,
   UseMutationOptions,

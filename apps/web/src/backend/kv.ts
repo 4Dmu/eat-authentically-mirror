@@ -1,9 +1,9 @@
 import type { UserJSON } from "@clerk/backend";
 import { redis } from "./lib/redis";
 import { SubscriptionJSON } from "./stripe/stripe-sync";
-import { NominationPlace } from "./validators/nomination-api";
-import { SearchByGeoTextQueryArgs } from "./validators/producers";
-import { GeocodeResponse } from "./validators/google-geocode-api";
+import { NominationPlace } from "@ea/validators/nomination-api";
+import { SearchByGeoTextQueryArgs } from "@ea/validators/producers";
+import { GeocodeResponse } from "@ea/validators/google-geocode-api";
 
 export const USER_DATA_KV = {
   generateKey(userId: string) {

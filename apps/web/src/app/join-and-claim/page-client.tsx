@@ -3,7 +3,7 @@ import { submitAccountDetailsForClaimInvitation } from "@/backend/rpc/claim-invi
 import {
   SubmitClaimInvitationAccountDetails,
   submitClaimInvitationAccountDetails,
-} from "@/backend/validators/claim-invitations";
+} from "@ea/validators/claim-invitations";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

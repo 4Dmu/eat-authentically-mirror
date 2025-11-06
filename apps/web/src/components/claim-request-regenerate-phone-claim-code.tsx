@@ -1,4 +1,4 @@
-import { PublicClaimRequest } from "@/backend/validators/producers";
+import { PublicClaimRequest } from "@ea/validators/producers";
 import { useRegenerateClaimPhoneToken } from "@/utils/producers";
 import { addMinutes, differenceInSeconds, isAfter } from "date-fns";
 import { RotateCwIcon } from "lucide-react";

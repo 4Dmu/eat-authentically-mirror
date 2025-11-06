@@ -9,7 +9,7 @@ import {
   DeleteReviewArgs,
   ReviewProducerArgs,
   UpdateReviewArgs,
-} from "@/backend/validators/reviews";
+} from "@ea/validators/reviews";
 import {
   useMutation,
   UseMutationOptions,

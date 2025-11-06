@@ -14,7 +14,7 @@ import {
   PRODUCER_TYPES,
   RegisterProducerArgs,
   registerProducerArgsValidator,
-} from "@/backend/validators/producers";
+} from "@ea/validators/producers";
 import { useForm } from "@tanstack/react-form";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";

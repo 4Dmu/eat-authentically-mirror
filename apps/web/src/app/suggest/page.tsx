@@ -1,5 +1,5 @@
 "use client";
-import { suggestProducerArgs } from "@/backend/validators/producers";
+import { suggestProducerArgs } from "@ea/validators/producers";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

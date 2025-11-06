@@ -6,7 +6,7 @@ import {
   listReviewsPublicArgs,
   reviewProducerArgs,
   updateReviewArgs,
-} from "../validators/reviews";
+} from "@ea/validators/reviews";
 import { authenticatedActionClient } from "./helpers/middleware";
 import {
   producerImportedReviews,

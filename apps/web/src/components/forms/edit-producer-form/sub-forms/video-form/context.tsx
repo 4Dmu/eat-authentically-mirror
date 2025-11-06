@@ -1,4 +1,4 @@
-import { editProucerVideoFormValidator } from "@/backend/validators/producers";
+import { editProucerVideoFormValidator } from "@ea/validators/producers";
 import {
   createFormHook,
   createFormHookContexts,

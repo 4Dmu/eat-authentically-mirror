@@ -31,7 +31,7 @@ import {
   editProducerLocationFormValidator,
   editProducerMediaFormValidator,
   editProucerVideoFormValidator,
-} from "@/backend/validators/producers";
+} from "@ea/validators/producers";
 import {
   CertificationSelect,
   MediaAssetSelect,

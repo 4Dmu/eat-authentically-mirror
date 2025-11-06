@@ -13,7 +13,7 @@ import {
 } from "../kv";
 import { auth } from "@clerk/nextjs/server";
 import { updateKvWithLatestStripeData } from "../stripe/stripe-sync";
-import { CreateCheckoutSessionArgsValidator } from "../validators/stripe";
+import { CreateCheckoutSessionArgsValidator } from "@ea/validators/stripe";
 import * as plans from "../stripe/subscription-plans";
 import { type } from "arktype";
 import { logger } from "../lib/log";

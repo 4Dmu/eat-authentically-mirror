@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { RotateCwIcon, XIcon } from "lucide-react";
 import { Stream } from "@cloudflare/stream-react";
 import { defaultOptions, withForm } from "./context";
-import { editProducerMediaFormValidator } from "@/backend/validators/producers";
+import { editProducerMediaFormValidator } from "@ea/validators/producers";
 
 export function isUpload(
   value: (typeof editProducerMediaFormValidator.infer)["media"][number]

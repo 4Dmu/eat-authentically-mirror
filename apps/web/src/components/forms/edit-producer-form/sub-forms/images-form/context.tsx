@@ -1,4 +1,4 @@
-import { editProducerMediaFormValidator } from "@/backend/validators/producers";
+import { editProducerMediaFormValidator } from "@ea/validators/producers";
 import {
   createFormHook,
   createFormHookContexts,

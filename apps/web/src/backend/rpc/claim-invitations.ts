@@ -1,7 +1,7 @@
 "use server";
 import { getValidClaimInvitationByToken } from "../data/claim-invitations";
 import { clerk, clerkApiErrorResponse } from "../lib/clerk";
-import { submitAccountDetailsForClaimInvitationArgs } from "../validators/claim-invitations";
+import { submitAccountDetailsForClaimInvitationArgs } from "@ea/validators/claim-invitations";
 import { actionClient } from "./helpers/safe-action";
 import zxcvbn from "zxcvbn";
 import { db } from "@ea/db";

@@ -5,7 +5,7 @@ import { StarRatingReadonly } from "./star-rating";
 import { useAuth } from "@clerk/nextjs";
 import { DeleteReviewDialog } from "./delete-review-dialog";
 import { UpdateReviewDialog } from "./update-review-dialog";
-import { ReviewProducerArgs } from "@/backend/validators/reviews";
+import { ReviewProducerArgs } from "@ea/validators/reviews";
 
 export function ReviewCard({ review }: { review: PublicReview }) {
   const auth = useAuth();

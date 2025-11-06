@@ -3,7 +3,7 @@ import { allow1RequestPer2Seconds } from "@/backend/lib/rate-limit";
 import {
   nominationApiResponse,
   NominationPlace,
-} from "@/backend/validators/nomination-api";
+} from "@ea/validators/nomination-api";
 
 export const geocodePlace = async ({
   place,

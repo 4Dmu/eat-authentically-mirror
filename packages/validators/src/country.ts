@@ -1,4 +1,4 @@
-import { COUNTRIES } from "@/utils/contries";
+import { COUNTRIES } from "@ea/shared/countries";
 import { type } from "arktype";
 
 export const alpha3CountryCodeValidator = type.enumerated(

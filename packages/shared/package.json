@@ -4,7 +4,8 @@
   "exports": {
     "./constants": "./src/constants.ts",
     "./env": "./src/env.ts",
-    "./subscription-plans": "./src/subscription-plans.ts"
+    "./subscription-plans": "./src/subscription-plans.ts",
+    "./countries": "./src/countries.ts"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.8",

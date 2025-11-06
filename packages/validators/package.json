@@ -1,0 +1,27 @@
+{
+  "name": "@ea/validators",
+  "type": "module",
+  "exports": {
+    "./claim-invitations": "./src/claim-invitations.ts",
+    "./country": "./src/country.ts",
+    "./google-geocode-api": "./src/google-geocode-api.ts",
+    "./messages": "./src/messages.ts",
+    "./nomination-api": "./src/nomination-api.ts",
+    "./pinboard": "./src/pinboard.ts",
+    "./producers": "./src/producers.ts",
+    "./reviews": "./src/reviews.ts",
+    "./stripe": "./src/stripe.ts"
+  },
+  "dependencies": {
+    "@ea/db": "workspace:*",
+    "@ea/shared": "workspace:*",
+    "arktype": "^2.1.25",
+    "validator": "^13.15.20",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/validator": "^13.15.4",
+    "typescript": "latest"
+  }
+}

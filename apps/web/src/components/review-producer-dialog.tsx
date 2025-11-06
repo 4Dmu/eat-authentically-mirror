@@ -13,7 +13,7 @@ import { useReviewProducer } from "@/utils/reviews";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { Star } from "lucide-react";
-import { Stars } from "@/backend/validators/reviews";
+import { Stars } from "@ea/validators/reviews";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
 import { ProducerWithAll } from "@ea/db/schema";

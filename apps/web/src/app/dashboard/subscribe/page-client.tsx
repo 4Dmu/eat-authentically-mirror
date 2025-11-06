@@ -1,7 +1,7 @@
 "use client";
 import { createCheckoutSession } from "@/backend/rpc/stripe";
 import type { Tier, Interval } from "@/backend/stripe/subscription-plans";
-import { CreateCheckoutSessionArgs } from "@/backend/validators/stripe";
+import { CreateCheckoutSessionArgs } from "@ea/validators/stripe";
 import { TierCard } from "@/components/sub/TierCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
