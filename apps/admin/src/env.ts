@@ -3,8 +3,8 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    TURSO_DB_URL: z.string().min(1),
-    TURSO_DB_TOKEN: z.string().min(1),
+    ADMIN_TURSO_DB_URL: z.string().min(1),
+    ADMIN_TURSO_DB_TOKEN: z.string().min(1),
 
     AUTH_PASSKEY_RP_ID: z.string().min(1),
     AUTH_PASSKEY_RP_NAME: z.string().min(1),
