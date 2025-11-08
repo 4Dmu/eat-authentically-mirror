@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useGeolocationStore, useHomePageStore } from "@/stores";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
-import { HOME_PAGE_RESULT_LIMIT } from "@/backend/constants";
+import { HOME_PAGE_RESULT_LIMIT } from "@ea/shared/constants";
 import { useSearchProducers } from "@/utils/producers";
 import { RequestLocation } from "@/components/request-location";
 import { PublicProducerCard } from "@/components/public-producer-card";
@@ -53,7 +53,8 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
 
   const hasMore =
     searchQuery.data &&
-    searchQuery.data.result.page * 10 < searchQuery.data.result.found;
+    searchQuery.data.result.page * HOME_PAGE_RESULT_LIMIT <
+      searchQuery.data.result.found;
 
   const pagination = (hasMore || (searchQuery.data?.result.page ?? 0) > 0) && (
     <div className="flex justify-between gap-5">
@@ -69,7 +70,10 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
         <ArrowLeft />
       </Button>
       <Badge variant={"brandBrown"}>
-        Page {page} of {Math.ceil((searchQuery.data?.result.found ?? 1) / 10)}
+        Page {page} of{" "}
+        {Math.ceil(
+          (searchQuery.data?.result.found ?? 1) / HOME_PAGE_RESULT_LIMIT
+        )}
       </Badge>
       <Button
         variant={"brandBrown"}

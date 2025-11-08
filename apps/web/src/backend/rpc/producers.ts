@@ -81,7 +81,7 @@ import { resend } from "../lib/resend";
 import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
-import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "../constants";
+import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "@ea/shared/constants";
 import {
   COMMODITIES_CACHE,
   COMMODITY_VARIANTS_CACHE,

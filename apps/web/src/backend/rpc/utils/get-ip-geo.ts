@@ -1,4 +1,4 @@
-import { CUSTOM_GEO_HEADER_NAME } from "@/backend/constants";
+import { CUSTOM_GEO_HEADER_NAME } from "@ea/shared/constants";
 import { Geo } from "@vercel/functions";
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 

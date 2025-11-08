@@ -33,7 +33,7 @@ export const PREMIUM_TIER_PROS = [
   "Receive messages from community members",
 ];
 
-export const HOME_PAGE_RESULT_LIMIT = 50;
+export const HOME_PAGE_RESULT_LIMIT = 10;
 
 export const PRODUCER_CERT_LIMIT_BY_TIER: Record<
   "Free" | Plan["tier"],

@@ -162,6 +162,9 @@ importers:
       '@ea/search':
         specifier: workspace:*
         version: link:../../packages/search
+      '@ea/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@ea/validators':
         specifier: workspace:*
         version: link:../../packages/validators

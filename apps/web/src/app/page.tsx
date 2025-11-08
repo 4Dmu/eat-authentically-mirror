@@ -1,6 +1,6 @@
 import { Page } from "./page-client";
 import { headers } from "next/headers";
-import { CUSTOM_GEO_HEADER_NAME } from "@/backend/constants";
+import { CUSTOM_GEO_HEADER_NAME } from "@ea/shared/constants";
 import type { Geo } from "@vercel/functions";
 
 export default async function Home() {

@@ -26,7 +26,7 @@ import {
   COMMUNITY_TIER_PROS,
   PREMIUM_TIER_PROS,
   PRO_TIER_PROS,
-} from "@/backend/constants";
+} from "@ea/shared/constants";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useLogger } from "@/lib/axiom/client";
 
