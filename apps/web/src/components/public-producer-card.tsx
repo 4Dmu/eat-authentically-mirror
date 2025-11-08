@@ -102,8 +102,8 @@ export function PublicProducerCard({
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 shrink-0 text-brand-green" />
           <p className="text-brand-green">
-            {"adminArea" in producer
-              ? `${producer.city ?? ""}, ${producer.adminArea ?? (producer.country ? countryByAlpha3Code(producer.country)?.name : undefined) ?? ""}`
+            {"country" in producer
+              ? `${producer.city ?? ""}, ${producer.adminArea ? producer.adminArea : ((producer.country ? countryByAlpha3Code(producer.country)?.name : undefined) ?? "")}`
               : `${producer.location?.city ?? ""}, ${producer.location?.adminArea ?? ""}`}
           </p>
         </div>
