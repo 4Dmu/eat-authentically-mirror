@@ -9,7 +9,6 @@ import {
   verifyClaimPhoneArgs,
   regenerateClaimPhoneTokenArgs,
   suggestProducerArgs,
-  searchByGeoTextArgsValidator,
   listProducersArgsValidator,
   editProducerArgsValidatorV2,
   searchProducersArgsValidator,

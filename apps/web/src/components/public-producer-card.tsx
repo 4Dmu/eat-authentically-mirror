@@ -5,7 +5,7 @@ import { Badge } from "./ui/badge";
 import { AddToPinboardIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { ProducerCardsRow, ProducerWith } from "@ea/db/schema";
+import { ProducerWith } from "@ea/db/schema";
 import { MapPin, NavigationIcon, StarIcon } from "lucide-react";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { useGeolocationStore } from "@/stores";

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { ProducerCardsRow, ProducerWith } from "@ea/db/schema";
+import { ProducerWith } from "@ea/db/schema";
 import { ProducerSearchResultRow } from "@/backend/data/producer";
 
 export function ProducerCard({

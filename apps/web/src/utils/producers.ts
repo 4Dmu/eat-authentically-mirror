@@ -66,7 +66,6 @@ import type {
   ProducerSearchResult,
   ProducerSearchResultRow,
 } from "@/backend/data/producer";
-import { useHomePageStore } from "@/stores";
 import { urls } from "./default-urls";
 import { hashToIndex } from "@/lib/image-fallback";
 
@@ -203,8 +202,6 @@ export function useSearchProducers(
     ]
   >
 ) {
-  const search = useHomePageStore();
-
   return useQuery({
     ...opts,
     queryKey: [

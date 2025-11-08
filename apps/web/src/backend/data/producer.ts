@@ -4,7 +4,7 @@ import type {
   SearchByGeoTextArgs,
 } from "@ea/validators/producers";
 import { db } from "@ea/db";
-import { asc, eq, like, SQL, sql } from "drizzle-orm";
+import { asc, eq, like, SQL } from "drizzle-orm";
 import {
   claimRequests,
   producerCards,
@@ -17,7 +17,6 @@ import {
   countryByAlpha3Code,
   countryByName,
 } from "@/utils/contries";
-import { Row } from "@libsql/client";
 import { typesense, type SearchResponse } from "@ea/search";
 
 export async function getUsersProducerIdsCached(userId: string) {
