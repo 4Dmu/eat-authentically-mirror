@@ -114,23 +114,41 @@ const LOCAL_INTENT_RE =
 
 const RE_ORGANIC = /\b(organic)\b/i;
 
-function findCategory(query: string): {
+type FindCategoryResult = {
   category: ProducerTypes | undefined;
   query: string;
-} {
+};
+
+function findCategory(query: string): FindCategoryResult {
   const aliases = {
     farm: ["farm", "farms"],
     ranch: ["ranch", "ranches"],
     eatery: ["eatery", "restaurant", "restaurants"],
   };
 
+  const exceptions = [
+    "farm to table",
+    "farm-to-table",
+    "farm to-table",
+    "farm-to table",
+    "farmers market",
+    "farm to fork",
+    "farm shop",
+  ];
+
   const queryLower = query.toLowerCase();
+  let safeQuery = queryLower;
+
+  for (const phrase of exceptions) {
+    const regex = new RegExp(phrase, "gi");
+    safeQuery = safeQuery.replace(regex, " "); // replace with space to preserve separation
+  }
 
   for (const [canonical, words] of Object.entries(aliases)) {
     for (const word of words) {
       // Match as a whole word
       const regex = new RegExp(`\\b${word}\\b`, "ig");
-      if (regex.test(queryLower)) {
+      if (regex.test(safeQuery)) {
         return {
           category: canonical as ProducerTypes,
           query: query.replaceAll(regex, ""),
