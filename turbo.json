@@ -55,7 +55,11 @@
         "ADMIN_TURSO_DB_TOKEN",
         "AUTH_PASSKEY_RP_ID",
         "AUTH_PASSKEY_RP_NAME",
-        "AUTH_PASSKEY_ORIGIN"
+        "AUTH_PASSKEY_ORIGIN",
+        "TYPESENSE_HOST",
+        "TYPESENSE_PORT",
+        "TYPESENSE_PROTOCOL",
+        "TYPESENSE_APIKEY"
       ]
     },
     "lint": {
