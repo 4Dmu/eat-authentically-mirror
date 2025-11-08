@@ -67,6 +67,9 @@ async function main() {
         bayesAvg: bayesAvg,
         reviewCount: r.ratingAgg?.reviewCount ?? 0,
         country: r.location?.country ?? undefined,
+        adminArea: r.location?.adminArea ?? undefined,
+        city: r.location?.city ?? undefined,
+        locality: r.location?.locality ?? undefined,
         organic: r.certifications.some((c) =>
           c.certification.name.toLowerCase().includes("organic")
         ),

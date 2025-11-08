@@ -17,7 +17,7 @@ export type CollectionSchema = {
 export type ProducersCollectionDocument = {
   id: string;
   name: string;
-  summary?: string;
+  summary: string | undefined;
   type: string;
   labels: string[];
   verified: boolean;
@@ -25,18 +25,18 @@ export type ProducersCollectionDocument = {
   avgRating: number;
   bayesAvg: number;
   reviewCount: number;
-  country?: string;
-  adminArea?: string;
-  city?: string;
-  locality?: string;
+  country: string | undefined;
+  adminArea: string | undefined;
+  city: string | undefined;
+  locality: string | undefined;
   organic: boolean;
-  location?: [number, number];
+  location: [number, number] | undefined;
   certifications: string[];
-  coverUrl?: string;
+  coverUrl: string | undefined;
   commodities: string[];
   createdAt: number;
   updatedAt: number;
-  userId?: string;
+  userId?: string | undefined;
 };
 
 export function typesense() {
