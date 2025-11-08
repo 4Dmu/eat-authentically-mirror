@@ -120,8 +120,8 @@ export function SearchBox(
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           {[
             "Organic farms near me",
-            "Best ranch in Texas",
-            "Farm-to-table Florence",
+            "Grass fed beef",
+            "Farm to table restaurant",
           ].map((example) => (
             <button
               key={example}
