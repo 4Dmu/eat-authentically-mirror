@@ -150,9 +150,14 @@ function extractLocationInfo(query: string) {
     newQuery = query.replace(LOCAL_INTENT_RE, "");
   }
 
-  const placeName = (np(query).places().json() as { text: string }[]).map(
-    (r) => r.text
-  )[0] as string | undefined;
+  const doc = np(query);
+  const places = doc.places();
+  const custom = doc.match("(florence|Florence)");
+  const results = (
+    places.concat(custom).unique().sort("chron").json() as { text: string }[]
+  ).map((r) => r.text);
+  const placeName = results.length > 0 ? results.join(",") : undefined;
+  console.log(query, placeName);
 
   if (placeName) {
     newQuery = newQuery.replace(placeName, "");
@@ -172,7 +177,6 @@ function findCommodities(query: string, commodities: string[]) {
       ")\\b",
     "g"
   );
-  console.log(commoditiesRegex);
   const matches = query.match(commoditiesRegex);
   if (!matches) return [];
   // Find *all* matches (not just first)
@@ -230,6 +234,8 @@ async function prepareQuery(rawQuery: string): Promise<
     .filter((r) => r.trim().length > 3)
     .map((r) => r.trim().toLowerCase());
   const keywords = new Set(rawKeywords).values().toArray().slice(0, 8); // cap 8 keywords
+
+  console.log(placeName);
 
   if (placeName !== undefined) {
     return {
