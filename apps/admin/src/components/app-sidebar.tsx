@@ -1,12 +1,11 @@
 "use client";
 
-import * as React from "react";
 import { SquareTerminal } from "lucide-react";
+import type * as React from "react";
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";

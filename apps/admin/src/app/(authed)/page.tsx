@@ -1,14 +1,4 @@
 import { AppWrapper } from "@/components/app-wrapper";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { sessionOrRedirect } from "@/lib/auth-helpers";
 
 export default async function Home() {

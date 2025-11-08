@@ -1,11 +1,11 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 
 export function LoginPageClient() {
   const [email, setEmail] = useState("");
@@ -53,7 +53,10 @@ export function LoginPageClient() {
                 placeholder="Password"
                 type="password"
               />
-              <Button onClick={login} disabled={email == "" || password == ""}>
+              <Button
+                onClick={login}
+                disabled={email === "" || password === ""}
+              >
                 Login
               </Button>
             </div>

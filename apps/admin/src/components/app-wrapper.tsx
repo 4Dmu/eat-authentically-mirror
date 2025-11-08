@@ -1,3 +1,4 @@
+import React, { type ReactNode } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,7 +9,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import React, { ReactNode } from "react";
 
 export function AppWrapper({
   crumbs,
@@ -31,7 +31,7 @@ export function AppWrapper({
           <Breadcrumb>
             <BreadcrumbList>
               {crumbs.map((crumb, i) => (
-                <React.Fragment key={i}>
+                <React.Fragment key={crumb.name}>
                   <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink href={crumb.url}>
                       {crumb.name}

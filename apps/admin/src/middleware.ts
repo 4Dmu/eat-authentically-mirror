@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api/auth")) {
