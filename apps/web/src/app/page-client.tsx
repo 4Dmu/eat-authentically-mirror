@@ -69,7 +69,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
         <ArrowLeft />
       </Button>
       <Badge variant={"brandBrown"}>
-        Page {page} of {(searchQuery.data?.result.found ?? 1) / 10}
+        Page {page} of {Math.ceil((searchQuery.data?.result.found ?? 1) / 10)}
       </Badge>
       <Button
         variant={"brandBrown"}

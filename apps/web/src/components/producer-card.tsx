@@ -74,7 +74,7 @@ export function ProducerCard({
         width={1920}
         height={1080}
         alt=""
-        className="w-full grow object-cover aspect-[4/3] border-b"
+        className="w-full grow object-cover aspect-4/3 border-b"
         src={primaryImageUrl(producer)}
       />
       <div className="p-5 flex gap-5 justify-between">

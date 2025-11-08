@@ -114,7 +114,10 @@ const LOCAL_INTENT_RE =
 
 const RE_ORGANIC = /\b(organic)\b/i;
 
-function findCategory(query: string) {
+function findCategory(query: string): {
+  category: ProducerTypes | undefined;
+  query: string;
+} {
   const aliases = {
     farm: ["farm", "farms"],
     ranch: ["ranch", "ranches"],
@@ -126,14 +129,17 @@ function findCategory(query: string) {
   for (const [canonical, words] of Object.entries(aliases)) {
     for (const word of words) {
       // Match as a whole word
-      const regex = new RegExp(`\\b${word}\\b`, "i");
+      const regex = new RegExp(`\\b${word}\\b`, "ig");
       if (regex.test(queryLower)) {
-        return canonical as ProducerTypes;
+        return {
+          category: canonical as ProducerTypes,
+          query: query.replaceAll(regex, ""),
+        };
       }
     }
   }
 
-  return undefined; // No match found
+  return { category: undefined, query: query }; // No match found
 }
 
 function extractLocationInfo(query: string) {
@@ -175,20 +181,25 @@ function findCommodities(query: string, commodities: string[]) {
   ).filter((r) => r.length > 0);
 }
 
-async function extractFilters(query: string): Promise<QueryFilters> {
-  const category = findCategory(query);
+async function extractFilters(
+  rawQuery: string
+): Promise<{ filters: QueryFilters; query: string }> {
+  const { category, query } = findCategory(rawQuery);
   const commodities = await COMMODITIES_CACHE.get();
   const variants = await COMMODITY_VARIANTS_CACHE.get();
-  const includedCommodities = findCommodities(query, commodities);
-  const includedVariants = findCommodities(query, variants);
-  const organic = RE_ORGANIC.test(query);
+  const includedCommodities = findCommodities(rawQuery, commodities);
+  const includedVariants = findCommodities(rawQuery, variants);
+  const organic = RE_ORGANIC.test(rawQuery);
 
   return {
-    category: category,
-    commodities:
-      includedCommodities.length === 0 ? undefined : includedCommodities,
-    variants: includedVariants.length === 0 ? undefined : includedVariants,
-    organicOnly: organic ? true : undefined,
+    filters: {
+      category: category,
+      commodities:
+        includedCommodities.length === 0 ? undefined : includedCommodities,
+      variants: includedVariants.length === 0 ? undefined : includedVariants,
+      organicOnly: organic ? true : undefined,
+    },
+    query: query,
   };
 }
 
@@ -208,8 +219,12 @@ async function prepareQuery(rawQuery: string): Promise<
       filters: QueryFilters;
     }
 > {
-  const { localIntent, placeName, query } = extractLocationInfo(rawQuery);
-  const filters = await extractFilters(query);
+  const {
+    localIntent,
+    placeName,
+    query: queryV1,
+  } = extractLocationInfo(rawQuery);
+  const { filters, query } = await extractFilters(queryV1);
   const rawKeywords = query
     .split(" ")
     .filter((r) => r.trim().length > 3)
