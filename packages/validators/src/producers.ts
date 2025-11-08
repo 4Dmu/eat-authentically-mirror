@@ -245,8 +245,7 @@ const searchByGeoTextQuery = type({
 
 const searchByGeoTextQueryArgs = searchByGeoTextQuery.and(
   type({
-    limit: type.number.atLeast(1).atMost(50),
-    offset: type.number.atLeast(0),
+    page: type.number.atLeast(1),
     "paginationId?": "string",
   })
 );
@@ -343,8 +342,7 @@ export const addCommodityAndAssociateArgsValidator = type({
 
 export const searchProducersArgsValidator = type({
   query: "string",
-  limit: "number",
-  offset: "number",
+  page: "number",
   "userLocation?": type({
     coords: type({
       accuracy: "number",

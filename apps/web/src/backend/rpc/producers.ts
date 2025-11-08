@@ -241,8 +241,7 @@ export const searchProducers = actionClient
   .action(
     async ({
       input: {
-        limit,
-        offset,
+        page,
         userLocation,
         customUserLocationRadius,
         customFilterOverrides,
@@ -294,10 +293,9 @@ export const searchProducers = actionClient
             : { certifications: customFilterOverrides.certifications };
         }
 
-        const result = await listing.searchByGeoText({
+        const result = await listing.searchByGeoTextV2({
           ...params,
-          limit,
-          offset,
+          page,
           geo: geo ?? params.geo,
           countryHint: customFilterOverrides?.country
             ? customFilterOverrides.country
@@ -346,7 +344,7 @@ export const searchProducers = actionClient
       }
 
       // Query is not cached so pagination is invalid
-      offset = 0;
+      page = 1;
 
       const query = await prepareQuery(rest.query);
       console.log(query);
@@ -375,7 +373,7 @@ export const searchProducers = actionClient
           userRequestsUsingTheirLocation: query.localIntent,
         });
 
-        const result = await listing.searchByGeoText({
+        const result = await listing.searchByGeoTextV2({
           geo: {
             center: {
               lat: Number(placeInfo.data.lat),
@@ -385,8 +383,7 @@ export const searchProducers = actionClient
           },
           filters: query.filters,
           keywords: query.keywords,
-          limit: limit,
-          offset: offset,
+          page: page,
         });
 
         output = result;
@@ -397,7 +394,7 @@ export const searchProducers = actionClient
           userRequestsUsingTheirLocation: query.localIntent,
         });
 
-        const result = await listing.searchByGeoText({
+        const result = await listing.searchByGeoTextV2({
           geo:
             query.localIntent === true && userGeo !== undefined
               ? {
@@ -407,8 +404,7 @@ export const searchProducers = actionClient
               : undefined,
           keywords: query.keywords,
           filters: query.filters,
-          limit: limit,
-          offset: offset,
+          page: page,
         });
 
         output = result;
@@ -570,11 +566,6 @@ export const fetchUserProducerLight = producerActionClient
 
     return result ?? null;
   });
-
-export const searchByGeoText = actionClient
-  .input(searchByGeoTextArgsValidator)
-  .name("searchByGeoText")
-  .action(async ({ input }) => await listing.searchByGeoText(input));
 
 export const listCertificationTypesPublic = actionClient
   .name("listCertificationTypesPublic")

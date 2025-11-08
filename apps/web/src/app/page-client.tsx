@@ -13,8 +13,6 @@ import { useSearchProducers } from "@/utils/producers";
 import { RequestLocation } from "@/components/request-location";
 import { PublicProducerCard } from "@/components/public-producer-card";
 import { RadiusSelector } from "@/components/radius-selector";
-import { countryByAlpha3Code } from "@/utils/contries";
-import { match, P } from "ts-pattern";
 import { useRef } from "react";
 
 export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
@@ -41,7 +39,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     {
       query: debouncedQuery,
     },
-    { offset: page * HOME_PAGE_RESULT_LIMIT, limit: HOME_PAGE_RESULT_LIMIT },
+    { page },
     {
       position: userLocation?.position,
       radius: debouncedCustomUserLocationRadius?.[0],
@@ -53,8 +51,11 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     }
   );
 
-  const pagination = (searchQuery.data?.result.hasMore ||
-    (searchQuery.data?.result.offset ?? 0) > 0) && (
+  const hasMore =
+    searchQuery.data &&
+    searchQuery.data.result.page * 10 < searchQuery.data.result.found;
+
+  const pagination = (hasMore || (searchQuery.data?.result.page ?? 0) > 0) && (
     <div className="flex justify-between gap-5">
       <Button
         variant={"brandBrown"}
@@ -63,27 +64,24 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
           setPage((old) => Math.max(old - 1, 0));
           titleRef.current?.scrollIntoView();
         }}
-        disabled={page === 0}
+        disabled={page === 1}
       >
         <ArrowLeft />
       </Button>
-      <Badge variant={"brandBrown"}>Page {page + 1}</Badge>
+      <Badge variant={"brandBrown"}>
+        Page {page} of {(searchQuery.data?.result.found ?? 1) / 10}
+      </Badge>
       <Button
         variant={"brandBrown"}
         size={"icon"}
         onClick={() => {
-          if (
-            !searchQuery.isPlaceholderData &&
-            searchQuery.data?.result.hasMore
-          ) {
+          if (!searchQuery.isPlaceholderData && hasMore) {
             setPage((old) => old + 1);
             titleRef.current?.scrollIntoView();
           }
         }}
         // Disable the Next Page button until we know a next page is available
-        disabled={
-          searchQuery.isPlaceholderData || !searchQuery.data?.result.hasMore
-        }
+        disabled={searchQuery.isPlaceholderData || !hasMore}
       >
         <ArrowRight />
       </Button>
@@ -119,9 +117,10 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                 <h2 className="mb-2 text-3xl font-bold text-foreground">
                   Search Results
                 </h2>
-                {/* <p className="text-muted-foreground">
-                  Found {searchQuery.data?.result.count} for{" "}
-                  <span className="font-semibold text-primary">
+                <p className="text-muted-foreground">
+                  {searchQuery.data?.result.found} results found - Searched{" "}
+                  {searchQuery.data?.result.out_of}
+                  {/* <span className="font-semibold text-primary">
                     &quot;{debouncedQuery}&quot;
                   </span>
                   {(searchQuery.data?.userLocation
@@ -170,18 +169,17 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
                         </span>
                       )}
                     </>
-                  )}
-                </p> */}
+                  )} */}
+                </p>
               </div>
               <FilterMenu />
             </div>
-            {(searchQuery.data?.result.count || 0) > 10 && pagination}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {searchQuery.data?.result.items.map((producer) => (
+              {searchQuery.data?.result?.hits?.map((row) => (
                 <PublicProducerCard
                   userIpGeo={userIpGeo}
-                  key={producer.id}
-                  producer={producer}
+                  key={row.document.id}
+                  producer={row.document}
                 />
               ))}
             </div>

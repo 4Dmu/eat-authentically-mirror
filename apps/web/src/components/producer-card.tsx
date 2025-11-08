@@ -6,6 +6,7 @@ import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { ProducerCardsRow, ProducerWith } from "@ea/db/schema";
+import { ProducerSearchResultRow } from "@/backend/data/producer";
 
 export function ProducerCard({
   producer,
@@ -16,8 +17,8 @@ export function ProducerCard({
   producer:
     | Pick<ProducerWith<"media">, "media" | "type" | "userId" | "name" | "id">
     | Pick<
-        ProducerCardsRow,
-        "name" | "type" | "thumbnailUrl" | "id" | "isClaimed"
+        ProducerSearchResultRow,
+        "name" | "type" | "coverUrl" | "id" | "userId"
       >;
   mode?: "default" | "list";
   context?: "default" | "pinboard";
@@ -40,9 +41,7 @@ export function ProducerCard({
             className="object-cover h-full border-b aspect-square"
             src={primaryImageUrl(producer)}
           />
-          {!("isClaimed" in producer
-            ? producer.isClaimed
-            : producer.userId !== null) && (
+          {!(producer.userId !== null) && (
             <Badge variant={"brandBrown"} className="absolute top-4 left-4">
               Unclaimed
             </Badge>

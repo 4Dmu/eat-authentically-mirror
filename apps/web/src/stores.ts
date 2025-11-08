@@ -32,7 +32,7 @@ export type HomePageState = {
 };
 
 export const useHomePageStore = create<HomePageState>((set, get) => ({
-  page: 0,
+  page: 1,
   setPage: (page) => {
     if (typeof page === "number") {
       set({ page });

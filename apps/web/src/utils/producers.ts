@@ -62,7 +62,10 @@ import {
   ProducerWith,
   ProducerWithAll,
 } from "@ea/db/schema";
-import type { ProducerSearchResult } from "@/backend/data/producer";
+import type {
+  ProducerSearchResult,
+  ProducerSearchResultRow,
+} from "@/backend/data/producer";
 import { useHomePageStore } from "@/stores";
 import { urls } from "./default-urls";
 import { hashToIndex } from "@/lib/image-fallback";
@@ -82,11 +85,11 @@ type SimpleMutationOps<TData, TArgs> = Omit<
 export function primaryImageUrl(
   producer:
     | Pick<ProducerWith<"media">, "media" | "type" | "id">
-    | Pick<ProducerCardsRow, "thumbnailUrl" | "type" | "id">
+    | Pick<ProducerSearchResultRow, "coverUrl" | "type" | "id">
 ) {
   const url: string | undefined | null =
-    "thumbnailUrl" in producer
-      ? producer.thumbnailUrl
+    "coverUrl" in producer
+      ? producer.coverUrl
       : (producer.media?.find((p) => p.role === "cover")?.asset.url ??
         producer.media?.[0]?.asset.url);
 
@@ -161,7 +164,7 @@ export function useProducerPublic(
 
 export function useSearchProducers(
   params: { query: string | undefined },
-  pagination: { limit: number; offset: number },
+  pagination: { page: number },
   location: {
     position: GeolocationPosition | undefined;
     radius: number | undefined;
@@ -190,7 +193,7 @@ export function useSearchProducers(
     readonly [
       string,
       { query: string | undefined },
-      { limit: number; offset: number },
+      { page: number },
       { position: GeolocationPosition | undefined; radius: number | undefined },
       {
         country: string | undefined;
@@ -213,8 +216,7 @@ export function useSearchProducers(
     ] as const,
     queryFn: async () => {
       const value = await searchProducers({
-        limit: pagination.limit,
-        offset: pagination.offset,
+        page: pagination.page,
         query: params.query ?? "",
         userLocation: location.position?.toJSON(),
         customUserLocationRadius: location.radius,
@@ -223,10 +225,10 @@ export function useSearchProducers(
 
       console.log(clientFilterOverrides);
 
-      if (value.result.offset !== undefined) {
-        console.log(value.result.offset / value.result.limit);
-        search.setPage(value.result.offset / value.result.limit);
-      }
+      // if (value.result.offset !== undefined) {
+      //   console.log(value.result.offset / value.result.limit);
+      //   search.setPage(value.result.offset / value.result.limit);
+      // }
 
       return value;
     },

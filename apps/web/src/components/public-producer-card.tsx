@@ -12,6 +12,7 @@ import { useGeolocationStore } from "@/stores";
 import { useMemo } from "react";
 import { Button } from "./ui/button";
 import type { Geo } from "@vercel/functions";
+import { ProducerSearchResultRow } from "@/backend/data/producer";
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -21,11 +22,8 @@ export function PublicProducerCard({
   userIpGeo,
 }: {
   producer:
-    | ProducerWith<"media" | "ratingAgg" | "location" | "search">
-    | Omit<
-        ProducerCardsRow,
-        "userId" | "subscriptionRank" | "reviewCount" | "ratingSum"
-      >;
+    | ProducerWith<"media" | "ratingAgg" | "location">
+    | ProducerSearchResultRow;
   className?: string;
   userIpGeo: Geo | undefined;
 }) {
@@ -46,13 +44,13 @@ export function PublicProducerCard({
       : location?.position?.coords;
 
     const lat1 = coords?.latitude;
-    const lat2 =
-      "location" in producer ? producer.location?.latitude : producer.latitude;
+    const lat2 = Array.isArray(producer.location)
+      ? producer.location[0]
+      : producer.location?.latitude;
     const lon1 = coords?.longitude;
-    const lon2 =
-      "location" in producer
-        ? producer.location?.longitude
-        : producer.longitude;
+    const lon2 = Array.isArray(producer.location)
+      ? producer.location[1]
+      : producer.location?.longitude;
 
     if (!lat1 || !lat2 || !lon1 || !lon2) {
       return;

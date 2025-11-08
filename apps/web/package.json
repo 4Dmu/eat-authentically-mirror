@@ -26,6 +26,7 @@
     "@dnd-kit/helpers": "^0.1.21",
     "@dnd-kit/react": "^0.1.21",
     "@ea/db": "workspace:*",
+    "@ea/search": "workspace:*",
     "@ea/validators": "workspace:*",
     "@layered/dns-records": "^2.3.0",
     "@libsql/client": "^0.15.12",

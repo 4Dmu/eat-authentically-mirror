@@ -159,6 +159,9 @@ importers:
       '@ea/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ea/search':
+        specifier: workspace:*
+        version: link:../../packages/search
       '@ea/validators':
         specifier: workspace:*
         version: link:../../packages/validators
@@ -484,6 +487,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@ea/search':
+        specifier: workspace:*
+        version: link:../search
       '@ea/shared':
         specifier: workspace:*
         version: link:../shared
@@ -512,6 +518,34 @@ importers:
       drizzle-kit:
         specifier: ^0.31.4
         version: 0.31.6
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
+      typescript:
+        specifier: latest
+        version: 5.9.3
+
+  packages/search:
+    dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.13.8
+        version: 0.13.8(arktype@2.1.25)(typescript@5.9.3)(zod@4.1.12)
+      typesense:
+        specifier: ^2.1.0
+        version: 2.1.0(@babel/runtime@7.28.4)
+      zod:
+        specifier: ^4.0.17
+        version: 4.1.12
+    devDependencies:
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.10.0
+      dotenv-cli:
+        specifier: ^10.0.0
+        version: 10.0.0
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
       typescript:
         specifier: latest
         version: 5.9.3
@@ -5425,6 +5459,10 @@ packages:
     resolution: {integrity: sha512-ja1E3yCr9i/0hmBVaM0bfwDjnGy8I/s6PP4DFp+yP+a+mrHO4Rm7DtmnqROTUkHIkqffC84YY7AeqX6oFk0WFg==}
     engines: {node: '>=18'}
 
+  loglevel@1.9.2:
+    resolution: {integrity: sha512-HgMmCqIJSAKqo68l0rS2AanEWfkxaZ5wNiEFb5ggm08lDs9Xl2KxBlX3PTcaD2chBM1gXAYf491/M2Rv8Jwayg==}
+    engines: {node: '>= 0.6.0'}
+
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -6561,6 +6599,12 @@ packages:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  typesense@2.1.0:
+    resolution: {integrity: sha512-a/IRTL+dRXlpRDU4UodyGj8hl5xBz3nKihVRd/KfSFAfFPGcpdX6lxIgwdXy3O6VLNNiEsN8YwIsPHQPVT0vNw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@babel/runtime': ^7.23.2
 
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
@@ -11939,6 +11983,8 @@ snapshots:
       is-unicode-supported: 2.1.0
       yoctocolors: 2.1.2
 
+  loglevel@1.9.2: {}
+
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 4.0.0
@@ -13313,6 +13359,15 @@ snapshots:
   typescript@5.9.2: {}
 
   typescript@5.9.3: {}
+
+  typesense@2.1.0(@babel/runtime@7.28.4):
+    dependencies:
+      '@babel/runtime': 7.28.4
+      axios: 1.13.1
+      loglevel: 1.9.2
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - debug
 
   unbox-primitive@1.1.0:
     dependencies:
