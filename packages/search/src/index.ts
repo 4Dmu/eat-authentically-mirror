@@ -43,12 +43,15 @@ export function typesense() {
   return new Typesense.Client({
     nodes: [
       {
-        host: env.TYPESENSE_HOST,
-        port: env.TYPESENSE_PORT,
-        protocol: env.TYPESENSE_PROTOCOL,
+        host: env.NEXT_PUBLIC_TYPESENSE_HOST,
+        port: env.NEXT_PUBLIC_TYPESENSE_PORT,
+        protocol: env.NEXT_PUBLIC_TYPESENSE_PROTOCOL,
       },
     ],
-    apiKey: env.TYPESENSE_APIKEY,
+    apiKey:
+      typeof window === undefined
+        ? env.TYPESENSE_APIKEY
+        : env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_APIKEY,
     connectionTimeoutSeconds: 30, // 30 second timeout for all requests
   });
 }

@@ -9,13 +9,17 @@ import { useGeolocationStore, useHomePageStore } from "@/stores";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { HOME_PAGE_RESULT_LIMIT } from "@ea/shared/constants";
-import { useSearchProducers } from "@/utils/producers";
+import { useSearchProducers, useSearchProducersLocal } from "@/utils/producers";
 import { RequestLocation } from "@/components/request-location";
 import { PublicProducerCard } from "@/components/public-producer-card";
 import { RadiusSelector } from "@/components/radius-selector";
 import { useRef } from "react";
 
 export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
+  const ipGeo =
+    userIpGeo && userIpGeo.latitude && userIpGeo.longitude
+      ? { lat: Number(userIpGeo.latitude), lon: Number(userIpGeo.longitude) }
+      : undefined;
   const {
     categoryFilter: typeFilter,
     query,
@@ -35,7 +39,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
 
   const userLocation = useGeolocationStore((s) => s.state);
 
-  const searchQuery = useSearchProducers(
+  const searchQuery = useSearchProducersLocal(
     {
       query: debouncedQuery,
     },
@@ -48,7 +52,8 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
       country: country,
       category: typeFilter,
       certifications: certs.map((c) => c.name),
-    }
+    },
+    ipGeo
   );
 
   const hasMore =
@@ -95,7 +100,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   return (
     <div className="flex flex-col gap-10  bg-gray-50">
       <RequestLocation />
-      <div className="h-[70vh] min-h-[500px] w-full relative">
+      <div className="h-[60vh] min-h-[500px] w-full relative">
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Home.jpg)] animate-[fade1_150s_infinite]" />
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Eaterie_Default.jpg)] animate-[fade2_150s_infinite]" />
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Ranch_Default.jpg)] animate-[fade3_150s_infinite]" />
@@ -178,7 +183,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
               </div>
               <FilterMenu />
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
               {searchQuery.data?.result?.hits?.map((row) => (
                 <PublicProducerCard
                   userIpGeo={userIpGeo}

@@ -68,6 +68,8 @@ import type {
 } from "@/backend/data/producer";
 import { urls } from "./default-urls";
 import { hashToIndex } from "@/lib/image-fallback";
+import { searchProducersLocal } from "@/client/search";
+import { useHomePageStore } from "@/stores";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -226,6 +228,82 @@ export function useSearchProducers(
       //   console.log(value.result.offset / value.result.limit);
       //   search.setPage(value.result.offset / value.result.limit);
       // }
+
+      return value;
+    },
+    enabled: params.query !== undefined,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useSearchProducersLocal(
+  params: { query: string | undefined },
+  pagination: { page: number },
+  location: {
+    position: GeolocationPosition | undefined;
+    radius: number | undefined;
+  },
+  clientFilterOverrides: {
+    country: string | undefined;
+    category: ProducerTypes | undefined;
+    certifications: string[] | undefined;
+  },
+  userIpGeo: { lat: number; lon: number } | undefined,
+  opts?: UseQueryOptions<
+    {
+      result: ProducerSearchResult;
+      userLocation: {
+        userRequestsUsingTheirLocation: boolean | undefined;
+        searchRadius: number;
+      };
+    },
+    Error,
+    {
+      result: ProducerSearchResult;
+      userLocation: {
+        userRequestsUsingTheirLocation: boolean | undefined;
+        searchRadius: number;
+      };
+    },
+    readonly [
+      string,
+      { query: string | undefined },
+      { page: number },
+      { position: GeolocationPosition | undefined; radius: number | undefined },
+      {
+        country: string | undefined;
+        category: ProducerTypes | undefined;
+        certifications: string[] | undefined;
+      },
+      { lat: number; lon: number } | undefined,
+    ]
+  >
+) {
+  const store = useHomePageStore();
+
+  return useQuery({
+    ...opts,
+    queryKey: [
+      "search-producers-local",
+      params,
+      pagination,
+      location,
+      clientFilterOverrides,
+      userIpGeo,
+    ] as const,
+    queryFn: async () => {
+      const value = await searchProducersLocal({
+        page: pagination.page,
+        query: params.query ?? "",
+        userLocation: location.position?.toJSON(),
+        customUserLocationRadius: location.radius,
+        customFilterOverrides: clientFilterOverrides,
+        userIpGeo: userIpGeo,
+      });
+
+      console.log(clientFilterOverrides);
+
+      store.setPage(value.result.page);
 
       return value;
     },

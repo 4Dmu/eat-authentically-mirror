@@ -10,6 +10,12 @@ import {
 } from "react";
 import { useHomePageStore } from "@/stores";
 import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
+import { SelectValue } from "@radix-ui/react-select";
+import { useAtom } from "jotai";
+import { COUNTRIES } from "@/utils/contries";
+import { Label } from "./ui/label";
 
 const placeholders = [
   "Find me a farm to table eatery in Florence...",
@@ -76,45 +82,73 @@ export function SearchBox(
           Discover farm-to-table experiences, local ranches, and authentic
           eateries
         </p>
-        <div className="flex flex-col sm:flex-row gap-2 w-full max-w-3xl rounded-2xl bg-white p-2 shadow-2xl backdrop-blur-sm transition-all hover:shadow-glow">
-          <div className="flex flex-1 items-center gap-3 px-4">
-            {props.isSearching ? (
-              <Loader className="animate-spin text-primary h-5 w-5" />
-            ) : (
-              <SearchIcon className="h-5 w-5 text-muted-foreground" />
-            )}
-            <Input
-              type="text"
-              placeholder={placeholder}
-              onKeyDown={handleSubmit}
-              value={value}
-              onChange={updateQuery}
-              className="typewrite-placeholder border-0 bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
-            />
-          </div>
-          <div className="flex gap-2 justify-center">
-            <Button
-              size="lg"
-              onClick={() => setQuery(value)}
-              className="rounded-xl flex-1 bg-gradient-to-r from-[hsl(142_45%_35%)] to-[hsl(142_40%_45%)] px-8 font-semibold transition-all hover:scale-102 hover:shadow-lg"
-            >
-              Search
-            </Button>
-            {query !== undefined && (
+        <div className="flex flex-col gap-2 w-full max-w-3xl rounded-2xl bg-white p-2 shadow-2xl backdrop-blur-sm transition-all hover:shadow-glow">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-1 items-center gap-3 px-4">
+              {props.isSearching ? (
+                <Loader className="animate-spin text-primary h-5 w-5" />
+              ) : (
+                <SearchIcon className="h-5 w-5 text-muted-foreground" />
+              )}
+              <Input
+                type="text"
+                placeholder={placeholder}
+                onKeyDown={handleSubmit}
+                value={value}
+                onChange={updateQuery}
+                className="typewrite-placeholder border-0 bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+              />
+            </div>
+            <div className="flex gap-2 justify-center">
               <Button
-                onClick={() => {
-                  setQuery(undefined);
-                  setValue("");
-                  resetFilters();
-                }}
-                variant={"secondary"}
-                size={"lg"}
-                className="self-center rounded-xl hover:scale-105 hover:shadow-lg"
+                size="lg"
+                onClick={() => setQuery(value)}
+                className="rounded-xl flex-1 bg-gradient-to-r from-[hsl(142_45%_35%)] to-[hsl(142_40%_45%)] px-8 font-semibold transition-all hover:scale-102 hover:shadow-lg"
               >
-                <XIcon className="" />
+                Search
               </Button>
-            )}
+              {query !== undefined && (
+                <Button
+                  onClick={() => {
+                    setQuery(undefined);
+                    setValue("");
+                    resetFilters();
+                  }}
+                  variant={"secondary"}
+                  size={"lg"}
+                  className="self-center rounded-xl hover:scale-105 hover:shadow-lg"
+                >
+                  <XIcon className="" />
+                </Button>
+              )}
+            </div>
           </div>
+          {query && (
+            <div>
+              <Separator />
+              <div className="flex p-2">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-xs">Type</Label>
+                  <Select
+                  // value={typeFilter === undefined ? "none" : typeFilter}
+                  // onValueChange={(v) =>
+                  //   setTypeFilter(v === "none" ? undefined : (v as "farm"))
+                  // }
+                  >
+                    <SelectTrigger className="">
+                      <SelectValue placeholder={"Farm..."} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="farm">Farm</SelectItem>
+                      <SelectItem value="ranch">Ranch</SelectItem>
+                      <SelectItem value="eatery">Eatery</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         {props.children}
         <div className="mt-6 flex flex-wrap justify-center gap-2">

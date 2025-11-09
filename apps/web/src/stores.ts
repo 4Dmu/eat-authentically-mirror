@@ -1,5 +1,8 @@
 import { create } from "zustand";
-import { RegisterProducerArgs, ProducerTypes } from "@ea/validators/producers";
+import type {
+  RegisterProducerArgs,
+  ProducerTypes,
+} from "@ea/validators/producers";
 import { atomWithStorage } from "jotai/utils";
 import { atom } from "jotai";
 
