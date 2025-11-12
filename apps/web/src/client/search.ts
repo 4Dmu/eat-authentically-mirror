@@ -23,8 +23,13 @@ type BBox = { minLat: number; maxLat: number; minLon: number; maxLon: number };
 function buildGeoFilter(
   geo?:
     | { center: GeoPoint; radiusKm?: number }
-    | { center: GeoPoint; bbox: BBox }
+    | { center: GeoPoint; bbox: BBox },
+  bounds?: google.maps.LatLngBoundsLiteral
 ) {
+  if (bounds) {
+    return `location:(${bounds.south}, ${bounds.west}, ${bounds.north}, ${bounds.west}, ${bounds.north}, ${bounds.east}, ${bounds.south}, ${bounds.east}, ${bounds.south}, ${bounds.west})`;
+  }
+
   if (!geo) return null;
   if ("bbox" in geo) {
     return `location:(${geo.bbox.minLat}, ${geo.bbox.minLon}, ${geo.bbox.minLat}, ${geo.bbox.maxLon}, ${geo.bbox.maxLat}, ${geo.bbox.maxLon}, ${geo.bbox.maxLat}, ${geo.bbox.minLon}, ${geo.bbox.minLat}, ${geo.bbox.minLon})`;
@@ -38,7 +43,8 @@ function buildFacetFilters(
 ) {
   const parts: string[] = [];
 
-  if (countryAlpha3) parts.push(`country:=${countryAlpha3}`);
+  if (filters?.country) parts.push(`country:=${filters.country}`);
+  else if (countryAlpha3) parts.push(`country:=${countryAlpha3}`);
 
   if (filters?.category) parts.push(`type:=${filters.category}`);
   if (filters?.verified === true) parts.push(`verified:=true`);
@@ -49,7 +55,10 @@ function buildFacetFilters(
   if (filters?.organicOnly) parts.push(`organic:=true`);
 
   if (filters?.certifications?.length)
-    parts.push(`certifications:=[${filters.certifications.join(",")}]`);
+    parts.push(
+      filters.certifications.map((c) => `certifications:=${c}`).join("&&")
+    );
+  // parts.push(`certifications:=[${filters.certifications.join(",")}]`);
 
   if (filters?.commodities?.length)
     parts.push(`commodities:=[${filters.commodities.join(",")}]`);
@@ -113,11 +122,15 @@ function attemptDetectCountry(query: string) {
 }
 
 async function searchByGeoTextV2(
-  args: SearchByGeoTextArgs & { locations: string[] }
+  args: SearchByGeoTextArgs & {
+    locations: string[];
+    searchArea: { bounds: google.maps.LatLngBoundsLiteral | undefined };
+  }
 ) {
   const client = typesense();
 
-  const { keywords, geo, filters, countryHint, page, locations } = args;
+  const { keywords, geo, filters, countryHint, page, locations, searchArea } =
+    args;
 
   let q = (keywords && keywords.length ? keywords.join(" ") : "*") || "*";
 
@@ -148,7 +161,7 @@ async function searchByGeoTextV2(
     }
   }
 
-  console.log(countryFromLocations);
+  console.log(countryFromLocations, "country");
 
   if (countryFromLocations) {
     q = q.replace(countryFromLocations.placeName, "");
@@ -158,9 +171,9 @@ async function searchByGeoTextV2(
     q = "*";
   }
 
-  const country = countryHint ? attemptDetectCountry(countryHint) : null;
+  console.log(q, "q");
 
-  const geoFilter = buildGeoFilter(geo);
+  const geoFilter = buildGeoFilter(geo, searchArea?.bounds);
   const facetFilter = buildFacetFilters(
     filters,
     countryFromLocations?.country?.alpha3 ?? null
@@ -177,6 +190,8 @@ async function searchByGeoTextV2(
   const docs = client
     .collections<ProducerSearchResultRow>("producers")
     .documents();
+
+  console.log(q, filter_by);
 
   const results = await docs.search({
     q: q,
@@ -320,7 +335,7 @@ async function prepareQuery(rawQuery: string) {
   const { filters, query } = await extractFilters(queryV1);
   const rawKeywords = query
     .split(" ")
-    .filter((r) => r.trim().length > 3)
+    .filter((r) => r.trim().length > 2)
     .map((r) => r.trim().toLowerCase());
   const keywords = new Set(rawKeywords).values().toArray().slice(0, 8); // cap 8 keywords
 
@@ -337,10 +352,12 @@ export async function searchProducersLocal({
   userIpGeo,
   customUserLocationRadius,
   customFilterOverrides,
+  searchArea,
   page,
   ...rest
 }: SearchProducersArgs & {
   userIpGeo: { lat: number; lon: number } | undefined;
+  searchArea: { bounds: google.maps.LatLngBoundsLiteral | undefined };
 }) {
   const userGeo = userLocation
     ? {
@@ -358,6 +375,7 @@ export async function searchProducersLocal({
     const params: SearchByGeoTextQueryArgs & {
       userRequestsUsingTheirLocation?: boolean;
       locations: string[];
+      searchArea: { bounds: google.maps.LatLngBoundsLiteral | undefined };
     } = JSON.parse(rawParams);
     console.log("Cache hit for query", rest.query, "params", params);
 
@@ -375,6 +393,12 @@ export async function searchProducersLocal({
         : { category: customFilterOverrides.category };
     }
 
+    if (customFilterOverrides?.country) {
+      params.filters = params.filters
+        ? { ...params.filters, country: customFilterOverrides.country }
+        : { country: customFilterOverrides.country };
+    }
+
     if (
       customFilterOverrides?.certifications &&
       customFilterOverrides.certifications.length > 0
@@ -387,6 +411,8 @@ export async function searchProducersLocal({
         : { certifications: customFilterOverrides.certifications };
     }
 
+    console.log(params, "params");
+
     const result = await searchByGeoTextV2({
       ...params,
       page,
@@ -394,6 +420,7 @@ export async function searchProducersLocal({
       countryHint: customFilterOverrides?.country
         ? customFilterOverrides.country
         : params.countryHint,
+      searchArea: searchArea,
     });
 
     return {
@@ -409,7 +436,8 @@ export async function searchProducersLocal({
   page = 1;
 
   const query = await prepareQuery(rest.query);
-  console.log(query);
+
+  console.log(query, "query");
 
   let output: ProducerSearchResult;
 
@@ -420,8 +448,33 @@ export async function searchProducersLocal({
       filters: query.filters,
       locations: query.location,
       userRequestsUsingTheirLocation: query.localIntent,
+      searchArea,
     })
   );
+
+  if (customFilterOverrides?.category) {
+    query.filters = query.filters
+      ? { ...query.filters, category: customFilterOverrides.category }
+      : { category: customFilterOverrides.category };
+  }
+
+  if (customFilterOverrides?.country) {
+    query.filters = query.filters
+      ? { ...query.filters, country: customFilterOverrides.country }
+      : { country: customFilterOverrides.country };
+  }
+
+  if (
+    customFilterOverrides?.certifications &&
+    customFilterOverrides.certifications.length > 0
+  ) {
+    query.filters = query.filters
+      ? {
+          ...query.filters,
+          certifications: customFilterOverrides.certifications,
+        }
+      : { certifications: customFilterOverrides.certifications };
+  }
 
   const result = await searchByGeoTextV2({
     geo:
@@ -434,6 +487,7 @@ export async function searchProducersLocal({
     keywords: query.keywords,
     filters: query.filters,
     locations: query.location,
+    searchArea: searchArea,
     page: page,
   });
 

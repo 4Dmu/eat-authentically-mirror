@@ -10,7 +10,7 @@ export function RadiusSelector({ defaultRadius }: { defaultRadius: number }) {
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium text-foreground">
-            Search Radius
+            Search Radius (Around You)
           </span>
         </div>
         <span className="text-sm font-semibold text-primary">

@@ -36,7 +36,7 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
   }, [bounds, locationSearchArea]);
 
   const handleSelectLocation = useCallback(() => {
-    setLocationSearchArea(bounds ?? undefined);
+    setLocationSearchArea(bounds?.toJSON() ?? undefined);
   }, [bounds, setLocationSearchArea]);
 
   useEffect(() => {

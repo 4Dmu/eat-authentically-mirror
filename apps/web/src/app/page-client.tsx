@@ -9,7 +9,7 @@ import { useGeolocationStore, useHomePageStore } from "@/stores";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { HOME_PAGE_RESULT_LIMIT } from "@ea/shared/constants";
-import { useSearchProducers, useSearchProducersLocal } from "@/utils/producers";
+import { useSearchProducersLocal } from "@/utils/producers";
 import { RequestLocation } from "@/components/request-location";
 import { PublicProducerCard } from "@/components/public-producer-card";
 import { RadiusSelector } from "@/components/radius-selector";
@@ -28,6 +28,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     setPage,
     customUserLocationRadius,
     countryFilter: country,
+    locationSearchArea,
   } = useHomePageStore();
 
   const debouncedQuery = useDebounce(query, 500);
@@ -48,6 +49,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
       position: userLocation?.position,
       radius: debouncedCustomUserLocationRadius?.[0],
     },
+    { bounds: locationSearchArea },
     {
       country: country,
       category: typeFilter,
@@ -55,6 +57,23 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     },
     ipGeo
   );
+
+  // const searchQuery = useSearchProducersLocal2(
+  //   {
+  //     query: debouncedQuery,
+  //   },
+  //   { page },
+  //   {
+  //     position: userLocation?.position,
+  //     radius: debouncedCustomUserLocationRadius?.[0],
+  //   },
+  //   {
+  //     country: country,
+  //     category: typeFilter,
+  //     certifications: certs.map((c) => c.name),
+  //   },
+  //   ipGeo
+  // );
 
   const hasMore =
     searchQuery.data &&

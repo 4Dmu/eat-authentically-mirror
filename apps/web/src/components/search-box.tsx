@@ -1,7 +1,8 @@
 import { Input } from "./ui/input";
-import { Loader, SearchIcon, XIcon } from "lucide-react";
+import { CheckIcon, Loader, SearchIcon, XIcon } from "lucide-react";
 import {
   ChangeEvent,
+  Fragment,
   KeyboardEvent,
   PropsWithChildren,
   ReactNode,
@@ -16,6 +17,33 @@ import { SelectValue } from "@radix-ui/react-select";
 import { useAtom } from "jotai";
 import { COUNTRIES } from "@/utils/contries";
 import { Label } from "./ui/label";
+import { useCertificationTypes, useProducerCountries } from "@/utils/producers";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import { LocationSelect } from "./custom-location-select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const placeholders = [
   "Find me a farm to table eatery in Florence...",
@@ -59,8 +87,25 @@ export function SearchBox(
   }>
 ) {
   const placeholder = useAnimatePlaceholder();
-  const { setQuery, query, resetFilters } = useHomePageStore();
+  const {
+    setQuery,
+    query,
+    resetFilters,
+    countryFilter: country,
+    setCountryFilter: setCountry,
+    certsFilter: certs,
+    setCertsFilter: setCerts,
+    categoryFilter: typeFilter,
+    setCategoryFilter: setTypeFilter,
+    locationSearchArea,
+  } = useHomePageStore();
   const [value, setValue] = useState(query ?? "");
+  const producerCountries = useProducerCountries();
+  const certsQuery = useCertificationTypes();
+
+  const countries = COUNTRIES.filter((c) =>
+    producerCountries.data?.some((cr) => c.alpha3 === cr)
+  );
 
   function updateQuery(e: ChangeEvent<HTMLInputElement>) {
     setValue(e.currentTarget.value);
@@ -103,7 +148,7 @@ export function SearchBox(
               <Button
                 size="lg"
                 onClick={() => setQuery(value)}
-                className="rounded-xl flex-1 bg-gradient-to-r from-[hsl(142_45%_35%)] to-[hsl(142_40%_45%)] px-8 font-semibold transition-all hover:scale-102 hover:shadow-lg"
+                className="rounded-xl flex-1 bg-linear-to-r from-[hsl(142_45%_35%)] to-[hsl(142_40%_45%)] px-8 font-semibold transition-all hover:scale-102 hover:shadow-lg"
               >
                 Search
               </Button>
@@ -124,27 +169,131 @@ export function SearchBox(
             </div>
           </div>
           {query && (
-            <div>
+            <div className="flex flex-col gap-3 pt-3 px-2">
               <Separator />
-              <div className="flex p-2">
+              <div className="flex flex-wrap p-2 gap-4">
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs">Type</Label>
-                  <Select
-                  // value={typeFilter === undefined ? "none" : typeFilter}
-                  // onValueChange={(v) =>
-                  //   setTypeFilter(v === "none" ? undefined : (v as "farm"))
-                  // }
-                  >
-                    <SelectTrigger className="">
-                      <SelectValue placeholder={"Farm..."} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="farm">Farm</SelectItem>
-                      <SelectItem value="ranch">Ranch</SelectItem>
-                      <SelectItem value="eatery">Eatery</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <Select
+                      value={typeFilter === undefined ? "none" : typeFilter}
+                      onValueChange={(v) =>
+                        setTypeFilter(v === "none" ? undefined : (v as "farm"))
+                      }
+                    >
+                      <SelectTrigger className="">
+                        <SelectValue placeholder={"Farm..."} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="farm">Farm</SelectItem>
+                        <SelectItem value="ranch">Ranch</SelectItem>
+                        <SelectItem value="eatery">Eatery</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {typeFilter && (
+                      <div className="absolute -top-1 -left-1 flex items-center justify-center bg-secondary p-1.5 text-white rounded-full"></div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-xs">Country</Label>
+                  {countries.length > 0 && (
+                    <div className="flex gap-2 relative">
+                      <Select
+                        value={country === undefined ? "none" : country}
+                        onValueChange={(v) =>
+                          setCountry(v === "none" ? undefined : v)
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          <SelectItem key={"none"} value={"none"}>
+                            None
+                          </SelectItem>
+                          {countries.map((country) => (
+                            <SelectItem
+                              key={country.alpha3}
+                              value={country.alpha3}
+                            >
+                              {country.aliases?.[0] ?? country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {country && (
+                        <div className="absolute -top-1 -left-1 flex items-center justify-center bg-secondary p-1.5 text-white rounded-full"></div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-xs">Certifications</Label>
+                  <DropdownMenu>
+                    <div className="relative">
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className="font-normal max-w-40"
+                        >
+                          <span className="truncate">
+                            {certs.map((c, i) => (
+                              <Fragment key={c.id}>
+                                {c.name}
+                                {i < certs.length - 1 && ", "}
+                              </Fragment>
+                            ))}
+                            {certs.length == 0 && <span>Select certs</span>}
+                          </span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      {certs.length > 0 && (
+                        <div className="absolute -top-1 -left-1 flex items-center justify-center bg-secondary p-1.5 text-white rounded-full"></div>
+                      )}
+                    </div>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Certifications</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {certsQuery.data?.map((cert) => (
+                        <DropdownMenuCheckboxItem
+                          className="flex gap-2"
+                          key={cert.id}
+                          checked={certs.some((c) => cert.id === c.id)}
+                          onCheckedChange={(e) => {
+                            if (e === true) {
+                              setCerts([
+                                ...certs,
+                                {
+                                  name: cert.name,
+                                  id: cert.id,
+                                  mustBeVerified: false,
+                                },
+                              ]);
+                            } else {
+                              setCerts([
+                                ...certs.filter((c) => c.id !== cert.id),
+                              ]);
+                            }
+                          }}
+                        >
+                          <Label htmlFor={cert.name} className="capitalize">
+                            {cert.name}
+                          </Label>
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-xs">Map Area</Label>
+                  <div className="relative">
+                    <LocationSelect />
+                    {locationSearchArea && (
+                      <div className="absolute -top-1 -left-1 flex items-center justify-center bg-secondary p-1.5 text-white rounded-full"></div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

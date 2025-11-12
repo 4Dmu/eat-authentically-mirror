@@ -393,6 +393,12 @@ importers:
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
+      terra-draw:
+        specifier: ^1.19.0
+        version: 1.19.0
+      terra-draw-google-maps-adapter:
+        specifier: ^1.1.0
+        version: 1.1.0(@googlemaps/js-api-loader@1.16.10)(terra-draw@1.19.0)
       ts-pattern:
         specifier: ^5.8.0
         version: 5.9.0
@@ -1402,6 +1408,9 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@googlemaps/js-api-loader@1.16.10':
+    resolution: {integrity: sha512-c2erv2k7P2ilYzMmtYcMgAR21AULosQuUHJbStnrvRk2dG93k5cqptDrh9A8p+ZNlyhiqEOgHW7N9PAizdUM7Q==}
 
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
@@ -6463,6 +6472,15 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
+  terra-draw-google-maps-adapter@1.1.0:
+    resolution: {integrity: sha512-kBWWesf5/QARO7bInrNiGmY0em1EyWOMwq0d2+M8NVbXJ3iDX0rQ0ycnJdHZCMZf+JQhMBYt7gjgFL9Z8K7KYg==}
+    peerDependencies:
+      '@googlemaps/js-api-loader': ^1.14.3
+      terra-draw: ^1.0.0
+
+  terra-draw@1.19.0:
+    resolution: {integrity: sha512-ZVdeIrHdt3Kju84MvBEMnrozcmbxM0jeyqJ3V5szrop7m0xYA/gqNMcEpeK9q3Dy1r5XnHuRmONBdLtBYQLfwQ==}
+
   terser-webpack-plugin@5.3.14:
     resolution: {integrity: sha512-vkZjpUjb6OMS7dhV+tILUW6BhpDR7P2L/aQSAv+Uwk+m8KATX9EccViHTJR2qDtACKPIYndLGCyl3FMo+r2LMw==}
     engines: {node: '>= 10.13.0'}
@@ -7551,6 +7569,8 @@ snapshots:
       react-dom: 19.2.0(react@19.2.0)
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@googlemaps/js-api-loader@1.16.10': {}
 
   '@hexagon/base64@1.1.28': {}
 
@@ -9901,7 +9921,7 @@ snapshots:
     dependencies:
       '@types/node': 24.10.0
       tapable: 2.3.0
-      webpack: 5.102.1(esbuild@0.25.12)
+      webpack: 5.102.1(esbuild@0.25.0)
     transitivePeerDependencies:
       - '@swc/core'
       - esbuild
@@ -13234,14 +13254,21 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  terser-webpack-plugin@5.3.14(esbuild@0.25.0)(webpack@5.102.1(esbuild@0.25.0)):
+  terra-draw-google-maps-adapter@1.1.0(@googlemaps/js-api-loader@1.16.10)(terra-draw@1.19.0):
+    dependencies:
+      '@googlemaps/js-api-loader': 1.16.10
+      terra-draw: 1.19.0
+
+  terra-draw@1.19.0: {}
+
+  terser-webpack-plugin@5.3.14(esbuild@0.25.0)(webpack@5.102.1(esbuild@0.25.12)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       serialize-javascript: 6.0.2
       terser: 5.44.0
-      webpack: 5.102.1(esbuild@0.25.12)
+      webpack: 5.102.1(esbuild@0.25.0)
     optionalDependencies:
       esbuild: 0.25.0
 
@@ -13573,7 +13600,7 @@ snapshots:
 
   webpack-sources@3.3.3: {}
 
-  webpack@5.102.1(esbuild@0.25.12):
+  webpack@5.102.1(esbuild@0.25.0):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.8
@@ -13597,7 +13624,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
-      terser-webpack-plugin: 5.3.14(esbuild@0.25.0)(webpack@5.102.1(esbuild@0.25.0))
+      terser-webpack-plugin: 5.3.14(esbuild@0.25.0)(webpack@5.102.1(esbuild@0.25.12))
       watchpack: 2.4.4
       webpack-sources: 3.3.3
     transitivePeerDependencies:

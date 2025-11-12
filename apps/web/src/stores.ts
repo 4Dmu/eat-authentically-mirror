@@ -17,13 +17,13 @@ export type HomePageState = {
   categoryFilter: ProducerTypes | undefined;
   query: string | undefined;
   certsFilter: CertificationFilter[];
-  locationSearchArea: google.maps.LatLngBounds | undefined;
+  locationSearchArea: google.maps.LatLngBoundsLiteral | undefined;
   setPage: (page: number | ((current: number) => number)) => void;
   setCategoryFilter: (type: ProducerTypes | undefined) => void;
   setQuery: (query: string | undefined) => void;
   setCertsFilter: (certs: CertificationFilter[]) => void;
   setLocationSearchArea: (
-    locationSearchArea: google.maps.LatLngBounds | undefined
+    locationSearchArea: google.maps.LatLngBoundsLiteral | undefined
   ) => void;
   useIpGeo: boolean;
   setUseIpGeo: (val: boolean) => void;

@@ -70,6 +70,7 @@ import { urls } from "./default-urls";
 import { hashToIndex } from "@/lib/image-fallback";
 import { searchProducersLocal } from "@/client/search";
 import { useHomePageStore } from "@/stores";
+import { SearchResponse } from "@ea/search";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -243,6 +244,9 @@ export function useSearchProducersLocal(
     position: GeolocationPosition | undefined;
     radius: number | undefined;
   },
+  searchArea: {
+    bounds: google.maps.LatLngBoundsLiteral | undefined;
+  },
   clientFilterOverrides: {
     country: string | undefined;
     category: ProducerTypes | undefined;
@@ -271,6 +275,9 @@ export function useSearchProducersLocal(
       { page: number },
       { position: GeolocationPosition | undefined; radius: number | undefined },
       {
+        bounds: google.maps.LatLngBoundsLiteral | undefined;
+      },
+      {
         country: string | undefined;
         category: ProducerTypes | undefined;
         certifications: string[] | undefined;
@@ -288,6 +295,7 @@ export function useSearchProducersLocal(
       params,
       pagination,
       location,
+      searchArea,
       clientFilterOverrides,
       userIpGeo,
     ] as const,
@@ -296,6 +304,7 @@ export function useSearchProducersLocal(
         page: pagination.page,
         query: params.query ?? "",
         userLocation: location.position?.toJSON(),
+        searchArea,
         customUserLocationRadius: location.radius,
         customFilterOverrides: clientFilterOverrides,
         userIpGeo: userIpGeo,
@@ -311,6 +320,84 @@ export function useSearchProducersLocal(
     placeholderData: keepPreviousData,
   });
 }
+
+// export function useSearchProducersLocal2(
+//   params: { query: string | undefined },
+//   pagination: { page: number },
+//   location: {
+//     position: GeolocationPosition | undefined;
+//     radius: number | undefined;
+//   },
+//   clientFilterOverrides: {
+//     country: string | undefined;
+//     category: ProducerTypes | undefined;
+//     certifications: string[] | undefined;
+//   },
+//   userIpGeo: { lat: number; lon: number } | undefined,
+//   opts?: UseQueryOptions<
+//     {
+//       result: SearchResponse<ProducerSearchResultRow>;
+//       userLocation: {
+//         userRequestsUsingTheirLocation: boolean | undefined;
+//         searchRadius: number;
+//       };
+//     },
+//     Error,
+//     {
+//       result: SearchResponse<ProducerSearchResultRow>;
+//       userLocation: {
+//         userRequestsUsingTheirLocation: boolean | undefined;
+//         searchRadius: number;
+//       };
+//     },
+//     readonly [
+//       string,
+//       { query: string | undefined },
+//       { page: number },
+//       { position: GeolocationPosition | undefined; radius: number | undefined },
+//       {
+//         country: string | undefined;
+//         category: ProducerTypes | undefined;
+//         certifications: string[] | undefined;
+//       },
+//       { lat: number; lon: number } | undefined,
+//     ]
+//   >
+// ) {
+//   const store = useHomePageStore();
+
+//   return useQuery({
+//     ...opts,
+//     queryKey: [
+//       "search-producers-local2",
+//       params,
+//       pagination,
+//       location,
+//       clientFilterOverrides,
+//       userIpGeo,
+//     ] as const,
+//     queryFn: async () => {
+//       const value = await searchProducersLocal2({
+//         page: pagination.page,
+//         query: params.query ?? "",
+//       });
+
+//       console.log(clientFilterOverrides);
+
+//       store.setPage(value.page);
+
+//       return {
+//         result: value,
+//         userLocation: {
+//           userRequestsUsingTheirLocation: false,
+//           searchRadius: 0,
+//         },
+//       };
+//     },
+//     enabled: params.query !== undefined,
+//     placeholderData: keepPreviousData,
+//   });
+// }
 
 // export function useSearchByGeoText(
 //   params: Omit<

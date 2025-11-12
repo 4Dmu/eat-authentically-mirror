@@ -212,6 +212,7 @@ const queryFilters = type({
   isClaimed: type.boolean.optional(),
   locality: type.string.optional(),
   adminArea: type.string.optional(),
+  country: type.string.optional(),
   subscriptionRankMin: type.number.optional(),
   subscriptionRankMax: type.number.optional(),
   minAvgRating: type.number.optional(),
