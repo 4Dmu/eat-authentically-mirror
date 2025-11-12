@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { APIProvider, Map, Marker, useMap } from "@vis.gl/react-google-maps";
+import { useEffect, useMemo, useState } from "react";
+import { APIProvider, Map, useMap } from "@vis.gl/react-google-maps";
 import { env } from "@/env";
-import { useGeolocation, useWindowSize } from "@uidotdev/usehooks";
+import { useGeolocation } from "@uidotdev/usehooks";
 import {
   Dialog,
   DialogContent,

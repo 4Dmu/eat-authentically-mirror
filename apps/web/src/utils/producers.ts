@@ -70,7 +70,6 @@ import { urls } from "./default-urls";
 import { hashToIndex } from "@/lib/image-fallback";
 import { searchProducersLocal } from "@/client/search";
 import { useHomePageStore } from "@/stores";
-import { SearchResponse } from "@ea/search";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,

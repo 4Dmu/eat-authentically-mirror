@@ -129,8 +129,7 @@ async function searchByGeoTextV2(
 ) {
   const client = typesense();
 
-  const { keywords, geo, filters, countryHint, page, locations, searchArea } =
-    args;
+  const { keywords, geo, filters, page, locations, searchArea } = args;
 
   let q = (keywords && keywords.length ? keywords.join(" ") : "*") || "*";
 
@@ -439,8 +438,6 @@ export async function searchProducersLocal({
 
   console.log(query, "query");
 
-  let output: ProducerSearchResult;
-
   localStorage.setItem(
     rest.query,
     JSON.stringify({
@@ -491,10 +488,8 @@ export async function searchProducersLocal({
     page: page,
   });
 
-  output = result;
-
   return {
-    result: output,
+    result: result,
     userLocation: {
       userRequestsUsingTheirLocation: query.localIntent,
       searchRadius: userLocationRadius,

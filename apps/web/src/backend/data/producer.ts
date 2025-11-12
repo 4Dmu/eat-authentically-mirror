@@ -60,94 +60,94 @@ function attemptDetectCountry(query: string) {
 type GeoPoint = { lat: number; lon: number };
 type BBox = { minLat: number; maxLat: number; minLon: number; maxLon: number };
 
-const DEG2RAD = Math.PI / 180;
-const EARTH_KM = 6371;
+// const DEG2RAD = Math.PI / 180;
+// const EARTH_KM = 6371;
 
-// Fast planar (good for ≤ ~200 km windows)
-function approxMaxDistanceFromBBoxPlanar(center: GeoPoint, bbox: BBox): number {
-  const latRad = center.lat * DEG2RAD;
-  const kmPerDegLat = 111.045;
-  const kmPerDegLon = 111.045 * Math.cos(latRad);
+// // Fast planar (good for ≤ ~200 km windows)
+// function approxMaxDistanceFromBBoxPlanar(center: GeoPoint, bbox: BBox): number {
+//   const latRad = center.lat * DEG2RAD;
+//   const kmPerDegLat = 111.045;
+//   const kmPerDegLon = 111.045 * Math.cos(latRad);
 
-  const corners: GeoPoint[] = [
-    { lat: bbox.minLat, lon: bbox.minLon },
-    { lat: bbox.minLat, lon: bbox.maxLon },
-    { lat: bbox.maxLat, lon: bbox.minLon },
-    { lat: bbox.maxLat, lon: bbox.maxLon },
-  ];
+//   const corners: GeoPoint[] = [
+//     { lat: bbox.minLat, lon: bbox.minLon },
+//     { lat: bbox.minLat, lon: bbox.maxLon },
+//     { lat: bbox.maxLat, lon: bbox.minLon },
+//     { lat: bbox.maxLat, lon: bbox.maxLon },
+//   ];
 
-  let maxKm = 0;
-  for (const c of corners) {
-    const dxKm = Math.abs((c.lon - center.lon) * kmPerDegLon);
-    const dyKm = Math.abs((c.lat - center.lat) * kmPerDegLat);
-    const d = Math.hypot(dxKm, dyKm);
-    if (d > maxKm) maxKm = d;
-  }
-  // small cushion for rounding/curvature
-  return maxKm * 1.01;
-}
+//   let maxKm = 0;
+//   for (const c of corners) {
+//     const dxKm = Math.abs((c.lon - center.lon) * kmPerDegLon);
+//     const dyKm = Math.abs((c.lat - center.lat) * kmPerDegLat);
+//     const d = Math.hypot(dxKm, dyKm);
+//     if (d > maxKm) maxKm = d;
+//   }
+//   // small cushion for rounding/curvature
+//   return maxKm * 1.01;
+// }
 
-// More accurate (4x haversine) - still cheap
-function haversineKm(a: GeoPoint, b: GeoPoint): number {
-  const dLat = (b.lat - a.lat) * DEG2RAD;
-  const dLon = (b.lon - a.lon) * DEG2RAD;
-  const lat1 = a.lat * DEG2RAD;
-  const lat2 = b.lat * DEG2RAD;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-  return 2 * EARTH_KM * Math.asin(Math.sqrt(h));
-}
+// // More accurate (4x haversine) - still cheap
+// function haversineKm(a: GeoPoint, b: GeoPoint): number {
+//   const dLat = (b.lat - a.lat) * DEG2RAD;
+//   const dLon = (b.lon - a.lon) * DEG2RAD;
+//   const lat1 = a.lat * DEG2RAD;
+//   const lat2 = b.lat * DEG2RAD;
+//   const h =
+//     Math.sin(dLat / 2) ** 2 +
+//     Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+//   return 2 * EARTH_KM * Math.asin(Math.sqrt(h));
+// }
 
-function maxDistanceFromBBoxHaversine(center: GeoPoint, bbox: BBox): number {
-  const corners: GeoPoint[] = [
-    { lat: bbox.minLat, lon: bbox.minLon },
-    { lat: bbox.minLat, lon: bbox.maxLon },
-    { lat: bbox.maxLat, lon: bbox.minLon },
-    { lat: bbox.maxLat, lon: bbox.maxLon },
-  ];
-  let maxKm = 0;
-  for (const c of corners) {
-    const d = haversineKm(center, c);
-    if (d > maxKm) maxKm = d;
-  }
-  return maxKm * 1.005; // tiny cushion
-}
+// function maxDistanceFromBBoxHaversine(center: GeoPoint, bbox: BBox): number {
+//   const corners: GeoPoint[] = [
+//     { lat: bbox.minLat, lon: bbox.minLon },
+//     { lat: bbox.minLat, lon: bbox.maxLon },
+//     { lat: bbox.maxLat, lon: bbox.minLon },
+//     { lat: bbox.maxLat, lon: bbox.maxLon },
+//   ];
+//   let maxKm = 0;
+//   for (const c of corners) {
+//     const d = haversineKm(center, c);
+//     if (d > maxKm) maxKm = d;
+//   }
+//   return maxKm * 1.005; // tiny cushion
+// }
 
-function approximateMaxDistanceKm(args: {
-  center?: GeoPoint; // if omitted with bbox, midpoint is used
-  radiusKm?: number | null; // if present, we return it
-  bbox?: BBox;
-  method?: "planar" | "haversine";
-}): {
-  center: GeoPoint | null;
-  maxDistanceKm: number | null;
-  source: "radius" | "bbox" | "none";
-} {
-  const { center, radiusKm, bbox, method = "planar" } = args;
+// function approximateMaxDistanceKm(args: {
+//   center?: GeoPoint; // if omitted with bbox, midpoint is used
+//   radiusKm?: number | null; // if present, we return it
+//   bbox?: BBox;
+//   method?: "planar" | "haversine";
+// }): {
+//   center: GeoPoint | null;
+//   maxDistanceKm: number | null;
+//   source: "radius" | "bbox" | "none";
+// } {
+//   const { center, radiusKm, bbox, method = "planar" } = args;
 
-  if (radiusKm && radiusKm > 0) {
-    return {
-      center: center ?? null,
-      maxDistanceKm: radiusKm,
-      source: "radius",
-    };
-  }
+//   if (radiusKm && radiusKm > 0) {
+//     return {
+//       center: center ?? null,
+//       maxDistanceKm: radiusKm,
+//       source: "radius",
+//     };
+//   }
 
-  if (bbox) {
-    const ctr = center ?? {
-      lat: (bbox.minLat + bbox.maxLat) / 2,
-      lon: (bbox.minLon + bbox.maxLon) / 2,
-    };
-    const maxKm =
-      method === "haversine"
-        ? maxDistanceFromBBoxHaversine(ctr, bbox)
-        : approxMaxDistanceFromBBoxPlanar(ctr, bbox);
-    return { center: ctr, maxDistanceKm: maxKm, source: "bbox" };
-  }
+//   if (bbox) {
+//     const ctr = center ?? {
+//       lat: (bbox.minLat + bbox.maxLat) / 2,
+//       lon: (bbox.minLon + bbox.maxLon) / 2,
+//     };
+//     const maxKm =
+//       method === "haversine"
+//         ? maxDistanceFromBBoxHaversine(ctr, bbox)
+//         : approxMaxDistanceFromBBoxPlanar(ctr, bbox);
+//     return { center: ctr, maxDistanceKm: maxKm, source: "bbox" };
+//   }
 
-  return { center: center ?? null, maxDistanceKm: null, source: "none" };
-}
+//   return { center: center ?? null, maxDistanceKm: null, source: "none" };
+// }
 
 function buildGeoFilter(
   geo?:

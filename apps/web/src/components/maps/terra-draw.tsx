@@ -1,4 +1,4 @@
-import React, { Ref, RefObject, useEffect } from "react";
+import { RefObject, useEffect } from "react";
 import { useMap } from "@vis.gl/react-google-maps";
 import {
   TerraDraw,
@@ -20,7 +20,7 @@ export function TerraDrawLayer({
     if (!map) return;
     if (drawRef.current) return;
 
-    let listeners = [];
+    const listeners: google.maps.MapsEventListener[] = [];
     let pollInterval = null;
     let stopped = false;
     let draw = null;
@@ -70,10 +70,7 @@ export function TerraDrawLayer({
         draw.on("select", (id) => {
           if (setSelectedFeatureId) setSelectedFeatureId(id);
         });
-        draw.on("finish", (e, d) => {
-          console.log(drawRef.current);
-          console.log(e, d);
-        });
+
         draw.on("deselect", () => {
           if (setSelectedFeatureId) setSelectedFeatureId(null);
         });

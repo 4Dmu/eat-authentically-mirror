@@ -1,12 +1,5 @@
 import { SelectIcon } from "@radix-ui/react-select";
-import {
-  ExpandIcon,
-  Pentagon,
-  PentagonIcon,
-  ScaleIcon,
-  Trash2Icon,
-  TrashIcon,
-} from "lucide-react";
+import { ExpandIcon, PentagonIcon, Trash2Icon, TrashIcon } from "lucide-react";
 import React, { RefObject, useState } from "react";
 import { TerraDraw } from "terra-draw";
 import { Button } from "../ui/button";
