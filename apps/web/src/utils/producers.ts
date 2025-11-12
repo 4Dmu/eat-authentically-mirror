@@ -68,8 +68,8 @@ import type {
 } from "@/backend/data/producer";
 import { urls } from "./default-urls";
 import { hashToIndex } from "@/lib/image-fallback";
-import { searchProducersLocal } from "@/client/search";
 import { useHomePageStore } from "@/stores";
+import { searchProducersLocalV2 } from "@/client/local-search";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -299,17 +299,44 @@ export function useSearchProducersLocal(
       userIpGeo,
     ] as const,
     queryFn: async () => {
-      const value = await searchProducersLocal({
-        page: pagination.page,
-        query: params.query ?? "",
-        userLocation: location.position?.toJSON(),
-        searchArea,
-        customUserLocationRadius: location.radius,
-        customFilterOverrides: clientFilterOverrides,
-        userIpGeo: userIpGeo,
-      });
+      const browserGeolocationJson = location.position?.toJSON() as
+        | {
+            coords: {
+              accuracy: number;
+              altitude: number | null;
+              altitudeAccuracy: number | null;
+              heading: number | null;
+              latitude: number;
+              longitude: number;
+              speed: number | null;
+            };
+          }
+        | undefined;
 
-      console.log(clientFilterOverrides);
+      const userPosition = browserGeolocationJson
+        ? {
+            lat: browserGeolocationJson.coords.latitude,
+            lon: browserGeolocationJson.coords.longitude,
+          }
+        : userIpGeo;
+
+      const value = await searchProducersLocalV2({
+        query: params.query ?? "*",
+        page: pagination.page,
+        userLocation: userPosition
+          ? {
+              position: userPosition,
+              radius: location.radius ?? 100,
+            }
+          : undefined,
+        filters: {
+          ...clientFilterOverrides,
+          searchArea:
+            searchArea?.bounds !== undefined
+              ? { bounds: searchArea.bounds }
+              : undefined,
+        },
+      });
 
       store.setPage(value.result.page);
 

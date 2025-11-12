@@ -15,11 +15,12 @@ import { CheckIcon, MapIcon, Trash2Icon } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useHomePageStore } from "@/stores";
 
-export function LocationSelect() {
+export function LocationSelect({ disabled }: { disabled: boolean }) {
   const userLocation = useGeolocation();
   return (
     <APIProvider apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_JS_PUBLIC_KEY}>
       <Comp
+        disabled={disabled}
         userLocation={
           userLocation.latitude && userLocation.longitude
             ? { lat: userLocation.latitude, lng: userLocation.longitude }
@@ -32,8 +33,10 @@ export function LocationSelect() {
 
 function Comp({
   userLocation,
+  disabled,
 }: {
   userLocation: { lat: number; lng: number } | null;
+  disabled: boolean;
 }) {
   const { locationSearchArea, setLocationSearchArea } = useHomePageStore();
 
@@ -83,10 +86,18 @@ function Comp({
           <DialogTitle>Select an area</DialogTitle>
           <DialogDescription>
             Zoom in on an area you would like to search in and hit select when
-            ready
+            ready.
           </DialogDescription>
+          <em className="text-destructive">
+            {disabled && (
+              <p>
+                Your current query is using your location and thus selecting a
+                location area manually is disabled.
+              </p>
+            )}
+          </em>
         </DialogHeader>
-        <div>
+        <div className="relative">
           <Map
             style={{
               width: "100%",
@@ -104,10 +115,13 @@ function Comp({
               setCurrentBounds(e.detail.bounds);
             }}
           ></Map>
+          {disabled && (
+            <div className="absolute top-0 left-0 w-full h-full bg-black/50 rounded-lg"></div>
+          )}
         </div>
         <div className="flex gap-2">
           <DialogClose asChild>
-            <Button disabled={!boundsAreDifferent} onClick={select}>
+            <Button disabled={!boundsAreDifferent || disabled} onClick={select}>
               <CheckIcon />
               Select
             </Button>
@@ -115,6 +129,7 @@ function Comp({
           {locationSearchArea && (
             <DialogClose asChild>
               <Button
+                disabled={disabled}
                 onClick={() => setLocationSearchArea(undefined)}
                 variant={"destructive"}
               >

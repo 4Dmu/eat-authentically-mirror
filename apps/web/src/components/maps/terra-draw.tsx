@@ -107,7 +107,7 @@ export function TerraDrawLayer({
       listeners.forEach((l) => {
         try {
           google.maps.event.removeListener(l);
-        } catch (e) {}
+        } catch {}
       });
       if (pollInterval) clearInterval(pollInterval);
       if (drawRef.current) {

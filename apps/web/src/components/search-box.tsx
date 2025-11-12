@@ -1,5 +1,5 @@
 import { Input } from "./ui/input";
-import { CheckIcon, Loader, SearchIcon, XIcon } from "lucide-react";
+import { Loader, SearchIcon, XIcon } from "lucide-react";
 import {
   ChangeEvent,
   Fragment,
@@ -66,6 +66,7 @@ export function SearchBox(
   props: PropsWithChildren<{
     after?: ReactNode | undefined;
     isSearching?: boolean;
+    userRequestsUsingTheirLocation?: boolean;
   }>
 ) {
   const placeholder = useAnimatePlaceholder();
@@ -271,7 +272,9 @@ export function SearchBox(
                 <div className="flex flex-col gap-1">
                   <Label className="text-xs">Map Area</Label>
                   <div className="relative">
-                    <LocationSelect />
+                    <LocationSelect
+                      disabled={props.userRequestsUsingTheirLocation ?? false}
+                    />
                     {locationSearchArea && (
                       <div className="absolute -top-1 -left-1 flex items-center justify-center bg-secondary p-1.5 text-white rounded-full"></div>
                     )}

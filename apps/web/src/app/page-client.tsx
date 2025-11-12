@@ -53,7 +53,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
     {
       country: country,
       category: typeFilter,
-      certifications: certs.map((c) => c.name),
+      certifications: certs.length === 0 ? undefined : certs.map((c) => c.name),
     },
     ipGeo
   );
@@ -127,7 +127,12 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/tomatoesontable.jpg)] animate-[fade5_150s_infinite]" />
         <div className="w-full h-full absolute top-0 left-0 bg-linear-to-b from-teal-200/50 to-green-700/50" />
         <div className="absolute top-0 left-0 w-full bg-black/10 h-full" />
-        <SearchBox isSearching={searchQuery.fetchStatus === "fetching"}>
+        <SearchBox
+          userRequestsUsingTheirLocation={
+            searchQuery.data?.userLocation.userRequestsUsingTheirLocation
+          }
+          isSearching={searchQuery.fetchStatus === "fetching"}
+        >
           {searchQuery.data?.userLocation &&
             searchQuery.data.userLocation.userRequestsUsingTheirLocation &&
             searchQuery.isEnabled && (
