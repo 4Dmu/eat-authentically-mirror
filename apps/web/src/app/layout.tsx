@@ -49,7 +49,9 @@ export default function RootLayout({
     <ClerkProvider>
       <ReactQueryProvider>
         <html lang="en">
-          <body className={`${interSans.variable} antialiased bg-gray-50`}>
+          <body
+            className={`${interSans.variable} antialiased bg-gray-50 h-screen overflow-auto flex flex-col`}
+          >
             <JotaiProvider>
               <Header />
               {children}

@@ -119,7 +119,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   return (
     <div className="flex flex-col gap-10  bg-gray-50">
       <RequestLocation />
-      <div className="h-[60vh] min-h-[500px] w-full relative">
+      <div className="h-[65vh] min-h-[550px] w-full relative">
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Home.jpg)] animate-[fade1_150s_infinite]" />
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Eaterie_Default.jpg)] animate-[fade2_150s_infinite]" />
         <div className="w-full h-full absolute top-0 left-0 bg-cover bg-center bg-[url(/hero/FRF_Ranch_Default.jpg)] animate-[fade3_150s_infinite]" />
