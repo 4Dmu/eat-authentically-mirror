@@ -272,7 +272,7 @@ export type ProducerSearchResultRow = {
   createdAt: number;
   id: string;
   labels: string[];
-  location: [37.140639, -8.632694] | undefined;
+  location: [number, number] | undefined;
   name: string;
   organic: boolean;
   reviewCount: number;
@@ -389,6 +389,16 @@ export async function internalClaimProducer({
         verified: true,
       })
       .where(eq(producers.id, producerId));
+
+    const client = typesense();
+    const docs = client
+      .collections<ProducerSearchResultRow>("producers")
+      .documents(producerId);
+
+    const typsenseDocResult = await docs.update({
+      userId: userId,
+    });
+    console.log(typsenseDocResult);
 
     await USER_PRODUCER_IDS_KV.push(userId, producerId);
   });

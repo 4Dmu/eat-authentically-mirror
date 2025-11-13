@@ -1,4 +1,10 @@
 "use server";
+import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
+import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
+import ClaimListingEmail from "@/components/emails/claim-listing-email";
+import crypto from "node:crypto";
+import ngeo from "ngeohash";
+import isURL from "validator/es/lib/isURL";
 import * as listing from "@/backend/data/producer";
 import {
   getProducersArgsValidator,
@@ -11,9 +17,6 @@ import {
   suggestProducerArgs,
   listProducersArgsValidator,
   editProducerArgsValidatorV2,
-  searchProducersArgsValidator,
-  QueryFilters,
-  ProducerTypes,
   editProducerContactArgsValidator,
   editProducerLocationArgsValidator,
   editProducerCertificationsArgsValidator,
@@ -24,6 +27,7 @@ import { actionClient } from "./helpers/safe-action";
 import { producerActionClient } from "./helpers/middleware";
 import { db } from "@ea/db";
 import {
+  certifications,
   claimRequests,
   commodities,
   mediaAssets,
@@ -62,9 +66,6 @@ import { getSubTier } from "./utils/get-sub-tier";
 import { env } from "@/env";
 import { cloudflare } from "../lib/cloudflare";
 import {
-  allow100RequestPer30Min,
-  allow10RequestPer30Minutes,
-  allow25RequestPer30Min,
   claimProducerRateLimit,
   geocodeRatelimit,
   producerClaimDnsCheckRatelimit,
@@ -75,388 +76,23 @@ import {
 } from "../lib/rate-limit";
 import { authenticatedActionClient } from "./helpers/middleware";
 import { registerProducerArgsValidator } from "@ea/validators/producers";
-import isURL from "validator/es/lib/isURL";
 import { resend } from "../lib/resend";
-import ClaimListingEmail from "@/components/emails/claim-listing-email";
 import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
 import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "@ea/shared/constants";
-import {
-  COMMODITIES_CACHE,
-  COMMODITY_VARIANTS_CACHE,
-  PRODUCER_COUNTRIES_CACHE,
-  SEARCH_BY_GEO_TEXT_QUERIES_CACHE,
-  USER_PRODUCER_IDS_KV,
-} from "../kv";
-import ManualClaimListingEmail from "@/components/emails/manual-claim-listing-email";
-import SocialClaimListingInternalEmail from "@/components/emails/internal/social-claim-listing-email";
-import crypto from "node:crypto";
+import { PRODUCER_COUNTRIES_CACHE, USER_PRODUCER_IDS_KV } from "../kv";
 import { sendClaimCodeMessage } from "./helpers/sms";
 import { isMobilePhone, isNumeric } from "validator";
 import { addMinutes, isAfter, isBefore } from "date-fns";
 import { tryCatch } from "@/utils/try-catch";
 import { geocode } from "../lib/google-maps";
 import { logger } from "../lib/log";
-import { headers } from "next/headers";
-import { auth } from "@clerk/nextjs/server";
 import {
   mediaAssetSelectValidator,
   producerMediaSelectValidator,
 } from "@ea/db/contracts";
-import np from "compromise";
-import ngeo from "ngeohash";
-import { geocodePlace } from "./utils/geocode";
-import { getIpGeo } from "./utils/get-ip-geo";
-
-const LOCAL_INTENT_RE =
-  /\b(near\s*me|around\s*me|close\s*by|nearby|in\s*my\s*area)\b/i;
-
-const RE_ORGANIC = /\b(organic)\b/i;
-
-type FindCategoryResult = {
-  category: ProducerTypes | undefined;
-  query: string;
-};
-
-function findCategory(query: string): FindCategoryResult {
-  const aliases = {
-    farm: ["farm", "farms"],
-    ranch: ["ranch", "ranches"],
-    eatery: ["eatery", "restaurant", "restaurants"],
-  };
-
-  const exceptions = [
-    "farm to table",
-    "farm-to-table",
-    "farm to-table",
-    "farm-to table",
-    "farmers market",
-    "farm to fork",
-    "farm shop",
-  ];
-
-  const queryLower = query.toLowerCase();
-  let safeQuery = queryLower;
-
-  for (const phrase of exceptions) {
-    const regex = new RegExp(phrase, "gi");
-    safeQuery = safeQuery.replace(regex, " "); // replace with space to preserve separation
-  }
-
-  for (const [canonical, words] of Object.entries(aliases)) {
-    for (const word of words) {
-      // Match as a whole word
-      const regex = new RegExp(`\\b${word}\\b`, "ig");
-      if (regex.test(safeQuery)) {
-        return {
-          category: canonical as ProducerTypes,
-          query: query.replaceAll(regex, ""),
-        };
-      }
-    }
-  }
-
-  return { category: undefined, query: query }; // No match found
-}
-
-function extractLocationInfo(query: string) {
-  let newQuery = query;
-  const localIntent = LOCAL_INTENT_RE.test(query);
-
-  if (localIntent) {
-    newQuery = query.replace(LOCAL_INTENT_RE, "");
-  }
-
-  const doc = np(query);
-  const places = doc.places();
-  const custom = doc.match("(florence|Florence)");
-  const results = (
-    places.concat(custom).unique().sort("chron").json() as { text: string }[]
-  ).map((r) => r.text);
-  const placeName = results.length > 0 ? results.join(",") : undefined;
-  console.log(query, placeName);
-
-  if (placeName) {
-    newQuery = newQuery.replace(placeName, "");
-  }
-
-  return { placeName, localIntent, query: newQuery.trim() };
-}
-function findCommodities(query: string, commodities: string[]) {
-  if (commodities.length == 0) {
-    return [];
-  }
-  const commoditiesRegex = new RegExp(
-    "\\b(" +
-      commodities
-        .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-        .join("|") +
-      ")\\b",
-    "g"
-  );
-  const matches = query.match(commoditiesRegex);
-  if (!matches) return [];
-  // Find *all* matches (not just first)
-  return Array.from(query.matchAll(commoditiesRegex), (m) =>
-    m[1].toLowerCase().trim()
-  ).filter((r) => r.length > 0);
-}
-
-async function extractFilters(
-  rawQuery: string
-): Promise<{ filters: QueryFilters; query: string }> {
-  const { category, query } = findCategory(rawQuery);
-  const commodities = await COMMODITIES_CACHE.get();
-  const variants = await COMMODITY_VARIANTS_CACHE.get();
-  const includedCommodities = findCommodities(rawQuery, commodities);
-  const includedVariants = findCommodities(rawQuery, variants);
-  const organic = RE_ORGANIC.test(rawQuery);
-
-  return {
-    filters: {
-      category: category,
-      commodities:
-        includedCommodities.length === 0 ? undefined : includedCommodities,
-      variants: includedVariants.length === 0 ? undefined : includedVariants,
-      organicOnly: organic ? true : undefined,
-    },
-    query: query,
-  };
-}
-
-async function prepareQuery(rawQuery: string): Promise<
-  | {
-      localIntent: boolean;
-      hasLocation: true;
-      location: string;
-      keywords: string[];
-      filters: QueryFilters;
-    }
-  | {
-      localIntent: boolean;
-      hasLocation: false;
-      location: undefined;
-      keywords: string[];
-      filters: QueryFilters;
-    }
-> {
-  const {
-    localIntent,
-    placeName,
-    query: queryV1,
-  } = extractLocationInfo(rawQuery);
-  const { filters, query } = await extractFilters(queryV1);
-  const rawKeywords = query
-    .split(" ")
-    .filter((r) => r.trim().length > 3)
-    .map((r) => r.trim().toLowerCase());
-  const keywords = new Set(rawKeywords).values().toArray().slice(0, 8); // cap 8 keywords
-
-  console.log(placeName);
-
-  if (placeName !== undefined) {
-    return {
-      localIntent,
-      hasLocation: true,
-      location: placeName,
-      keywords,
-      filters,
-    };
-  } else {
-    return {
-      localIntent,
-      hasLocation: false,
-      location: placeName,
-      keywords,
-      filters,
-    };
-  }
-}
-
-export const searchProducers = actionClient
-  .name("searchProducers")
-  .input(searchProducersArgsValidator)
-  .action(
-    async ({
-      input: {
-        page,
-        userLocation,
-        customUserLocationRadius,
-        customFilterOverrides,
-        ...rest
-      },
-    }) => {
-      const { userId } = await auth();
-      const headerList = await headers();
-
-      const ipGeo = getIpGeo(headerList);
-
-      const userGeo = userLocation
-        ? {
-            lat: userLocation.coords.latitude,
-            lon: userLocation.coords.longitude,
-          }
-        : ipGeo;
-
-      const userLocationRadius = customUserLocationRadius ?? 100;
-
-      const params = await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.get(rest.query);
-
-      if (params) {
-        console.log("Cache hit for query", rest.query, "params", params);
-
-        const geo =
-          params.userRequestsUsingTheirLocation === true
-            ? {
-                center: userGeo!,
-                radiusKm: userLocationRadius,
-              }
-            : undefined;
-
-        if (customFilterOverrides?.category) {
-          params.filters = params.filters
-            ? { ...params.filters, category: customFilterOverrides.category }
-            : { category: customFilterOverrides.category };
-        }
-
-        if (
-          customFilterOverrides?.certifications &&
-          customFilterOverrides.certifications.length > 0
-        ) {
-          params.filters = params.filters
-            ? {
-                ...params.filters,
-                certifications: customFilterOverrides.certifications,
-              }
-            : { certifications: customFilterOverrides.certifications };
-        }
-
-        const result = await listing.searchByGeoTextV2({
-          ...params,
-          page,
-          geo: geo ?? params.geo,
-          countryHint: customFilterOverrides?.country
-            ? customFilterOverrides.country
-            : params.countryHint,
-        });
-
-        return {
-          result: result,
-          userLocation: {
-            userRequestsUsingTheirLocation:
-              params.userRequestsUsingTheirLocation,
-            searchRadius: userLocationRadius,
-          },
-        };
-      }
-
-      if (!userId) {
-        const { success } = await allow10RequestPer30Minutes.limit(
-          "searchProducers:global"
-        );
-
-        if (!success) {
-          throw new Error(
-            "Global ratelimit exceeded. Create an account to make more searches"
-          );
-        }
-      } else {
-        const subTier = await getSubTier(userId);
-        if (subTier === "Free") {
-          const { success } = await allow25RequestPer30Min.limit(
-            `searchProducers:user:${userId}`
-          );
-
-          if (!success) {
-            throw new Error("Ratelimit exceeded");
-          }
-        } else {
-          const { success } = await allow100RequestPer30Min.limit(
-            `searchProducers:user:${userId}`
-          );
-
-          if (!success) {
-            throw new Error("Ratelimit exceeded");
-          }
-        }
-      }
-
-      // Query is not cached so pagination is invalid
-      page = 1;
-
-      const query = await prepareQuery(rest.query);
-      console.log(query);
-
-      let output: listing.ProducerSearchResult;
-
-      if (query.hasLocation === true && query.localIntent !== true) {
-        const placeInfo = await geocodePlace({
-          place: query.location,
-        });
-
-        if (placeInfo.status == "error") {
-          throw new Error("Failed geocoding");
-        }
-
-        await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(rest.query, {
-          geo: {
-            center: {
-              lat: Number(placeInfo.data.lat),
-              lon: Number(placeInfo.data.lon),
-            },
-            bbox: placeInfo.data.boundingbox,
-          },
-          filters: query.filters,
-          keywords: query.keywords,
-          userRequestsUsingTheirLocation: query.localIntent,
-        });
-
-        const result = await listing.searchByGeoTextV2({
-          geo: {
-            center: {
-              lat: Number(placeInfo.data.lat),
-              lon: Number(placeInfo.data.lon),
-            },
-            bbox: placeInfo.data.boundingbox,
-          },
-          filters: query.filters,
-          keywords: query.keywords,
-          page: page,
-        });
-
-        output = result;
-      } else {
-        await SEARCH_BY_GEO_TEXT_QUERIES_CACHE.set(rest.query, {
-          keywords: query.keywords,
-          filters: query.filters,
-          userRequestsUsingTheirLocation: query.localIntent,
-        });
-
-        const result = await listing.searchByGeoTextV2({
-          geo:
-            query.localIntent === true && userGeo !== undefined
-              ? {
-                  center: userGeo!,
-                  radiusKm: userLocationRadius,
-                }
-              : undefined,
-          keywords: query.keywords,
-          filters: query.filters,
-          page: page,
-        });
-
-        output = result;
-      }
-
-      return {
-        result: output,
-        userLocation: {
-          userRequestsUsingTheirLocation: query.localIntent,
-          searchRadius: userLocationRadius,
-        },
-      };
-    }
-  );
+import { typesense } from "@ea/search";
+import { ProducerSearchResultRow } from "@/backend/data/producer";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
@@ -487,10 +123,43 @@ export const registerProducer = authenticatedActionClient
       type: input.type,
       verified: false,
       about: input.about,
+      summary: input.about.substring(0, 200),
       subscriptionRank: subscriptionRank,
       createdAt: new Date(),
       updatedAt: new Date(),
     } satisfies ProducerInsert);
+
+    const client = typesense();
+    const docs = client
+      .collections<ProducerSearchResultRow>("producers")
+      .documents();
+
+    const typsenseDocResult = await docs.create({
+      id: producerProfileId,
+      userId: userId,
+      verified: true,
+      name: input.name,
+      type: input.type,
+      summary: input.about.substring(0, 200),
+      avgRating: 0,
+      bayesAvg: 0,
+      reviewCount: 0,
+      subscriptionRank: subscriptionRank,
+      certifications: [],
+      commodities: [],
+      labels: [],
+      country: undefined,
+      city: undefined,
+      adminArea: undefined,
+      locality: undefined,
+      location: undefined,
+      coverUrl: undefined,
+      organic: false,
+      createdAt: Math.floor(new Date().getDate() / 1000),
+      updatedAt: Math.floor(new Date().getDate() / 1000),
+    });
+
+    console.log(typsenseDocResult);
 
     await db.insert(producersSearch).values({
       producerId: producerProfileId,
@@ -641,15 +310,18 @@ export const editProducer = producerActionClient
     }
 
     const toUpdate: Partial<ProducerSelect> = {};
+    const toUpdateTypesense: Partial<ProducerSearchResultRow> = {};
     const toUpdateSearch: Partial<ProducersSearchSelect> = {};
 
     if (input.name) {
       toUpdate.name = input.name;
       toUpdateSearch.searchName = input.name;
+      toUpdateTypesense.name = input.name;
     }
 
     if (input.type) {
       toUpdate.type = input.type;
+      toUpdateTypesense.type = input.type;
     }
 
     if (input.about !== undefined) {
@@ -657,12 +329,14 @@ export const editProducer = producerActionClient
       // Update search via about if summary was not set
       if (producer.summary == null) {
         toUpdateSearch.searchSummary = input.about?.substring(0, 300);
+        toUpdateTypesense.summary = input.about?.substring(0, 300);
       }
     }
 
     if (input.summary !== undefined) {
       toUpdate.summary = input.summary;
       toUpdateSearch.searchSummary = input.summary;
+      toUpdateTypesense.summary = input.summary ?? undefined;
     }
 
     if (Object.keys(toUpdate).length > 0) {
@@ -675,6 +349,16 @@ export const editProducer = producerActionClient
         .where(
           and(eq(producers.id, producer.id), eq(producers.userId, userId))
         );
+    }
+
+    if (Object.keys(toUpdateTypesense).length > 0) {
+      const client = typesense();
+      const docs = client
+        .collections<ProducerSearchResultRow>("producers")
+        .documents(producer.id);
+
+      const typsenseDocResult = await docs.update(toUpdateTypesense);
+      console.log(typsenseDocResult);
     }
 
     if (Object.keys(toUpdateSearch).length > 0) {
@@ -755,6 +439,7 @@ export const editProducerLocation = producerActionClient
     });
 
     const toUpdate: Partial<ProducerLocationSelect> = {};
+    const toUpdateTypesense: Partial<ProducerSearchResultRow> = {};
     if (input.latitude !== undefined) {
       toUpdate.latitude = input.latitude;
     }
@@ -763,28 +448,31 @@ export const editProducerLocation = producerActionClient
     }
     if (input.locality !== undefined) {
       toUpdate.locality = input.locality;
+      toUpdateTypesense.locality = input.locality ?? undefined;
     }
     if (input.city !== undefined) {
       toUpdate.city = input.city;
+      toUpdateTypesense.city = input.city ?? undefined;
     }
     if (input.postcode !== undefined) {
       toUpdate.postcode = input.postcode;
     }
     if (input.adminArea !== undefined) {
       toUpdate.adminArea = input.adminArea;
+      toUpdateTypesense.adminArea = input.adminArea ?? undefined;
     }
     if (input.country !== undefined) {
       toUpdate.country = input.country;
-    }
-    if (input.postcode !== undefined) {
-      toUpdate.postcode = input.postcode;
+      toUpdateTypesense.country = input.country ?? undefined;
     }
 
     if (input.latitude !== undefined && input.longitude !== undefined) {
       if (input.latitude === null || input.longitude === null) {
         toUpdate.geohash = null;
+        toUpdateTypesense.location = undefined;
       } else {
         toUpdate.geohash = ngeo.encode(input.latitude, input.longitude);
+        toUpdateTypesense.location = [input.latitude, input.longitude];
       }
     } else if (input.latitude !== undefined) {
       if (
@@ -793,8 +481,10 @@ export const editProducerLocation = producerActionClient
         existing.longitude === null
       ) {
         toUpdate.geohash = null;
+        toUpdateTypesense.location = undefined;
       } else {
         toUpdate.geohash = ngeo.encode(input.latitude, existing.longitude);
+        toUpdateTypesense.location = [input.latitude, existing.longitude];
       }
     } else if (input.longitude !== undefined) {
       if (
@@ -803,8 +493,10 @@ export const editProducerLocation = producerActionClient
         existing.latitude === null
       ) {
         toUpdate.geohash = null;
+        toUpdateTypesense.location = undefined;
       } else {
         toUpdate.geohash = ngeo.encode(existing.latitude, input.longitude);
+        toUpdateTypesense.location = [existing.latitude, input.longitude];
       }
     }
 
@@ -823,6 +515,16 @@ export const editProducerLocation = producerActionClient
             target: producerLocation.producerId,
           })
       );
+    }
+
+    if (Object.keys(toUpdateTypesense).length > 0) {
+      const client = typesense();
+      const docs = client
+        .collections<ProducerSearchResultRow>("producers")
+        .documents(producer.id);
+
+      const typsenseDocResult = await docs.update(toUpdateTypesense);
+      console.log(typsenseDocResult);
     }
   });
 
@@ -866,6 +568,21 @@ export const editProducerCertifications = producerActionClient
         }))
       )
       .onConflictDoNothing();
+
+    const certs = await db.query.certifications.findMany({
+      where: inArray(certifications.id, input.certifications),
+    });
+
+    const client = typesense();
+    const docs = client
+      .collections<ProducerSearchResultRow>("producers")
+      .documents(producer.id);
+
+    const typsenseDocResult = await docs.update({
+      certifications: certs.map((cert) => cert.name),
+      organic: certs.some((cert) => cert.id === env.ORGANIC_CERT_ID),
+    });
+    console.log(typsenseDocResult);
   });
 
 export const editProducerCommodoties = producerActionClient
@@ -917,6 +634,20 @@ export const editProducerCommodoties = producerActionClient
         }))
       );
     }
+
+    const comms = await db.query.commodities.findMany({
+      where: inArray(commodities.id, input.commodities),
+    });
+
+    const client = typesense();
+    const docs = client
+      .collections<ProducerSearchResultRow>("producers")
+      .documents(producer.id);
+
+    const typsenseDocResult = await docs.update({
+      commodities: comms.map((comm) => comm.name),
+    });
+    console.log(typsenseDocResult);
   });
 
 export const addCommodityAndAssociate = producerActionClient
@@ -930,6 +661,18 @@ export const addCommodityAndAssociate = producerActionClient
       ),
       columns: {
         id: true,
+      },
+      with: {
+        commodities: {
+          columns: {},
+          with: {
+            commodity: {
+              columns: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -956,6 +699,18 @@ export const addCommodityAndAssociate = producerActionClient
       commodityId: commodity.id,
       updatedAt: new Date(),
     });
+
+    const comms = producer.commodities.map((c) => c.commodity.name);
+
+    const client = typesense();
+    const docs = client
+      .collections<ProducerSearchResultRow>("producers")
+      .documents(producer.id);
+
+    const typsenseDocResult = await docs.update({
+      commodities: [...comms, name],
+    });
+    console.log(typsenseDocResult);
   });
 
 export const requestUploadUrls = producerActionClient
@@ -1265,6 +1020,26 @@ export const confirmPengingUpload = producerActionClient
           .delete(pendingMediaAssets)
           .where(eq(pendingMediaAssets.id, pendingImage.id));
       }
+
+      const media = await db.query.producerMedia.findMany({
+        where: eq(producerMedia.producerId, producer.id),
+        with: {
+          asset: true,
+        },
+      });
+
+      const client = typesense();
+      const docs = client
+        .collections<ProducerSearchResultRow>("producers")
+        .documents(producer.id);
+
+      const coverUrl =
+        media.find((r) => r.role === "cover")?.asset.url ?? media[0].asset.url;
+
+      const typsenseDocResult = await docs.update({
+        coverUrl: coverUrl,
+      });
+      console.log(typsenseDocResult);
     } catch (err) {
       console.error(err);
       throw new Error("Error generating urls");
@@ -1474,6 +1249,26 @@ export const updateExistingImages = producerActionClient
           )
         );
     }
+
+    const media = await db.query.producerMedia.findMany({
+      where: eq(producerMedia.producerId, producer.id),
+      with: {
+        asset: true,
+      },
+    });
+
+    const client = typesense();
+    const docs = client
+      .collections<ProducerSearchResultRow>("producers")
+      .documents(producer.id);
+
+    const coverUrl =
+      media.find((r) => r.role === "cover")?.asset.url ?? media[0].asset.url;
+
+    const typsenseDocResult = await docs.update({
+      coverUrl: coverUrl,
+    });
+    console.log(typsenseDocResult);
   });
 
 export const claimProducer = authenticatedActionClient
@@ -2005,6 +1800,14 @@ export const deleteProducer = producerActionClient
     const delTxRes = await db
       .delete(producers)
       .where(eq(producers.id, producer.id));
+
+    const client = typesense();
+    const docs = client
+      .collections<ProducerSearchResultRow>("producers")
+      .documents(producerId);
+
+    const typsenseDocResult = await docs.delete();
+    console.log(typsenseDocResult);
 
     await USER_PRODUCER_IDS_KV.pop(userId, producer.id);
 

@@ -42,6 +42,8 @@ export const env = createEnv({
     TWILIO_NUMBER: z.string().min(1),
 
     GOOGLE_MAPS_API_KEY: z.string().min(1),
+
+    ORGANIC_CERT_ID: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
