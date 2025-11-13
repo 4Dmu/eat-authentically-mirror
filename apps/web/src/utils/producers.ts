@@ -26,7 +26,6 @@ import {
   suggestProducer,
   listProducers,
   getFullProducerPublic,
-  searchProducers,
   listProducerContries,
   editProducerContact,
   editProducerLocation,
@@ -159,79 +158,6 @@ export function useProducerPublic(
       if (!producer) throw new Error("Producer not found");
       return producer;
     },
-    placeholderData: keepPreviousData,
-  });
-}
-
-export function useSearchProducers(
-  params: { query: string | undefined },
-  pagination: { page: number },
-  location: {
-    position: GeolocationPosition | undefined;
-    radius: number | undefined;
-  },
-  clientFilterOverrides: {
-    country: string | undefined;
-    category: ProducerTypes | undefined;
-    certifications: string[] | undefined;
-  },
-  opts?: UseQueryOptions<
-    {
-      result: ProducerSearchResult;
-      userLocation: {
-        userRequestsUsingTheirLocation: boolean | undefined;
-        searchRadius: number;
-      };
-    },
-    Error,
-    {
-      result: ProducerSearchResult;
-      userLocation: {
-        userRequestsUsingTheirLocation: boolean | undefined;
-        searchRadius: number;
-      };
-    },
-    readonly [
-      string,
-      { query: string | undefined },
-      { page: number },
-      { position: GeolocationPosition | undefined; radius: number | undefined },
-      {
-        country: string | undefined;
-        category: ProducerTypes | undefined;
-        certifications: string[] | undefined;
-      },
-    ]
-  >
-) {
-  return useQuery({
-    ...opts,
-    queryKey: [
-      "search-producers",
-      params,
-      pagination,
-      location,
-      clientFilterOverrides,
-    ] as const,
-    queryFn: async () => {
-      const value = await searchProducers({
-        page: pagination.page,
-        query: params.query ?? "",
-        userLocation: location.position?.toJSON(),
-        customUserLocationRadius: location.radius,
-        customFilterOverrides: clientFilterOverrides,
-      });
-
-      console.log(clientFilterOverrides);
-
-      // if (value.result.offset !== undefined) {
-      //   console.log(value.result.offset / value.result.limit);
-      //   search.setPage(value.result.offset / value.result.limit);
-      // }
-
-      return value;
-    },
-    enabled: params.query !== undefined,
     placeholderData: keepPreviousData,
   });
 }

@@ -1,11 +1,11 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { db } from "@ea/db";
 import { externalApiKeys } from "@ea/db/schema";
-import { headers } from "next/headers";
 import { generateToken } from "@ea/shared/generate-tokens";
 import { asc } from "drizzle-orm";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
 export async function listExternalApiKeys() {
   const session = await auth.api.getSession({

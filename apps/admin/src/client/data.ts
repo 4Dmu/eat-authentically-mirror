@@ -1,10 +1,10 @@
-import { createExternalApiKey, listExternalApiKeys } from "@/rpc/api";
 import {
-  MutationOptions,
-  QueryOptions,
+  type MutationOptions,
+  type QueryOptions,
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
+import { createExternalApiKey, listExternalApiKeys } from "@/rpc/api";
 
 export function useExternalApiKeys(
   opts?: Omit<
@@ -25,7 +25,7 @@ export function useExternalApiKeys(
       string[]
     >,
     "queryKey" | "queryFn"
-  >
+  >,
 ) {
   return useQuery({
     ...opts,
@@ -40,7 +40,7 @@ export function useCreateExternalApiKey(
   opts?: Omit<
     MutationOptions<void, Error, void, unknown>,
     "queryKey" | "queryFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
