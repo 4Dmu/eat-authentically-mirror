@@ -24,6 +24,10 @@ const data = {
           title: "Add Producer",
           url: "/misc/add-producer",
         },
+        {
+          title: "External Api Keys",
+          url: "/misc/external-api-keys",
+        },
       ],
     },
   ],

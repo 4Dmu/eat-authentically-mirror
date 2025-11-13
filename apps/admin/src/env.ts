@@ -9,6 +9,9 @@ export const env = createEnv({
     AUTH_PASSKEY_RP_ID: z.string().min(1),
     AUTH_PASSKEY_RP_NAME: z.string().min(1),
     AUTH_PASSKEY_ORIGIN: z.string().min(1),
+
+    TURSO_DB_URL: z.string().min(1),
+    TURSO_DB_TOKEN: z.string().min(1),
   },
   client: {},
   experimental__runtimeEnv: {},
