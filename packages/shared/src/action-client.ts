@@ -1,5 +1,23 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { logger } from "./log";
+
+type Logger = {
+  debug: (
+    message: string,
+    args?: Record<string | symbol, any> | undefined
+  ) => void;
+  info: (
+    message: string,
+    args?: Record<string | symbol, any> | undefined
+  ) => void;
+  warn: (
+    message: string,
+    args?: Record<string | symbol, any> | undefined
+  ) => void;
+  error: (
+    message: string,
+    args?: Record<string | symbol, any> | undefined
+  ) => void;
+};
 
 type Fn<TPrevious, TNext> = (prev: TPrevious) => TNext | Promise<TNext>;
 
@@ -26,7 +44,7 @@ class InputActionClient<
 
   name(name: string) {
     return new InputActionClient(
-      new ActionClient(this.client.middleware, name),
+      new ActionClient(this.client.middleware, this.client.log, name),
       this.schema
     );
   }
@@ -39,7 +57,7 @@ class InputActionClient<
   ) {
     return async (input: StandardSchemaV1.InferInput<TSchema>) => {
       const actionName = this.client.actionName ?? "anonymous";
-      logger.info(`[ACTION ${actionName}] start`);
+      this.client.log.info(`[ACTION ${actionName}] start`);
 
       const ctx = await this.client.resolveCtx();
 
@@ -52,7 +70,7 @@ class InputActionClient<
 
       const response = await fn({ ctx, input: result.value });
 
-      logger.info(`[ACTION ${actionName}] end`);
+      this.client.log.info(`[ACTION ${actionName}] end`);
 
       return response;
     };
@@ -65,12 +83,15 @@ export class ActionClient<
 > {
   middleware: Middleware<TPreviousContext, TNextContext>;
   actionName: string | undefined;
+  log: Logger;
 
   constructor(
     middleware: Middleware<TPreviousContext, TNextContext> = [],
+    log: Logger,
     name?: string
   ) {
     this.middleware = middleware;
+    this.log = log;
     this.actionName = name;
   }
 
@@ -81,22 +102,22 @@ export class ActionClient<
       TNextContext,
       TNextContext & N
     >;
-    return new ActionClient(newMiddleware);
+    return new ActionClient(newMiddleware, this.log);
   }
 
   name(name: string) {
-    return new ActionClient(this.middleware, name);
+    return new ActionClient(this.middleware, this.log, name);
   }
 
   action<TResult>(fn: (ctx: TNextContext) => TResult | Promise<TResult>) {
     return async () => {
       const actionName = this.actionName ?? "anonymous";
-      logger.info(`[ACTION ${actionName}] start`);
+      this.log.info(`[ACTION ${actionName}] start`);
 
       const ctx = await this.resolveCtx();
       const result = await fn(ctx);
 
-      logger.info(`[ACTION ${actionName}] end`);
+      this.log.info(`[ACTION ${actionName}] end`);
       return result;
     };
   }

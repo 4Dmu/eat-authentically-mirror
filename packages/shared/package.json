@@ -6,13 +6,15 @@
     "./env": "./src/env.ts",
     "./subscription-plans": "./src/subscription-plans.ts",
     "./countries": "./src/countries.ts",
-    "./generate-tokens": "./src/generate-tokens.ts"
+    "./generate-tokens": "./src/generate-tokens.ts",
+    "./action-client": "./src/action-client.ts"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.8",
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@standard-schema/spec": "^1.0.0",
     "@types/node": "^24.5.2",
     "typescript": "latest"
   }

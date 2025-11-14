@@ -574,6 +574,9 @@ importers:
         specifier: ^4.0.17
         version: 4.1.12
     devDependencies:
+      '@standard-schema/spec':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@types/node':
         specifier: ^24.5.2
         version: 24.10.0

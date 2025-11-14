@@ -1,3 +1,4 @@
-import { ActionClient } from "@/backend/lib/action-client";
+import { logger } from "@/backend/lib/log";
+import { ActionClient } from "@ea/shared/action-client";
 
-export const actionClient = new ActionClient();
+export const actionClient = new ActionClient([], logger);

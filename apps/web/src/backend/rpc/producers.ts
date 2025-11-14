@@ -77,7 +77,6 @@ import {
 import { authenticatedActionClient } from "./helpers/middleware";
 import { registerProducerArgsValidator } from "@ea/validators/producers";
 import { resend } from "../lib/resend";
-import { generateCode, generateToken } from "../utils/generate-tokens";
 import { getDnsRecords } from "@layered/dns-records";
 import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "@ea/shared/constants";
 import { PRODUCER_COUNTRIES_CACHE, USER_PRODUCER_IDS_KV } from "../kv";
@@ -93,6 +92,7 @@ import {
 } from "@ea/db/contracts";
 import { typesense } from "@ea/search";
 import { ProducerSearchResultRow } from "@/backend/data/producer";
+import { generateCode, generateToken } from "@ea/shared/generate-tokens";
 
 export const registerProducer = authenticatedActionClient
   .input(registerProducerArgsValidator)
