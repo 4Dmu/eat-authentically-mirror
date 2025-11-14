@@ -39,6 +39,31 @@ export type ProducersCollectionDocument = {
   userId?: string | undefined;
 };
 
+export type ProducerSearchResultRow = {
+  avgRating: number;
+  bayesAvg: number;
+  certifications: string[];
+  commodities: string[];
+  country: string | undefined;
+  city: string | undefined;
+  adminArea: string | undefined;
+  locality: string | undefined;
+  coverUrl: string | undefined;
+  createdAt: number;
+  id: string;
+  labels: string[];
+  location: [number, number] | undefined;
+  name: string;
+  organic: boolean;
+  reviewCount: number;
+  subscriptionRank: number;
+  summary: string | undefined;
+  type: "farm" | "ranch" | "eatery";
+  updatedAt: number;
+  verified: boolean;
+  userId: string | undefined;
+};
+
 export function typesense() {
   return new Typesense.Client({
     nodes: [
