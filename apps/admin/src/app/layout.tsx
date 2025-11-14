@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import "@ea/ui/global-styles";
+import "@ea/ui/globals.css";
 import TanstackQuery from "@/components/tanstack-query";
 import { Toaster } from "@ea/ui/sonner";
 

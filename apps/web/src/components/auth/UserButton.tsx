@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Popover, PopoverContent, PopoverTrigger } from "@ea/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverClose,
+} from "@ea/ui/popover";
 import { Separator } from "@ea/ui/separator";
 import { Button } from "@ea/ui/button";
 import {
@@ -15,7 +20,6 @@ import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { UserJSON } from "@clerk/backend";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { MessageNotifications } from "../message-notifications";
-import { PopoverClose } from "@radix-ui/react-popover";
 
 export function UserButton({
   subTierFromServer,

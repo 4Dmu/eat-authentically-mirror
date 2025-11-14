@@ -2,7 +2,7 @@
   "name": "@ea/ui",
   "type": "module",
   "exports": {
-    "./global-styles": "./src/global-styles.css",
+    "./globals.css": "./src/styles/globals.css",
     "./accordion": "./src/components/accordion.tsx",
     "./alert-dialog": "./src/components/alert-dialog.tsx",
     "./alert": "./src/components/alert.tsx",
@@ -103,6 +103,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.16",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.0",
     "@types/validator": "^13.15.4",
