@@ -4,15 +4,15 @@ import {
   AddToPinboardButton,
   AddToPinboardButtonRedirectToAuth,
 } from "@/components/pinboard";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@ea/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+} from "@ea/ui/card";
+import { Label } from "@ea/ui/label";
 import { primaryImageUrl, useFullProducerPublic } from "@/utils/producers";
 import {
   EllipsisIcon,
@@ -28,7 +28,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
+} from "@ea/ui/carousel";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { Stream } from "@/components/stream";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
@@ -51,7 +51,7 @@ import {
   ReviewProducerDialog,
   ReviewProducerDialogTrigger,
 } from "@/components/review-producer-dialog";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ea/ui/button";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -59,7 +59,7 @@ import {
   DropdownMenuLabel,
   UnstyledDropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@ea/ui/dropdown-menu";
 
 export function ProducerPageClient(props: {
   producer: ProducerWithAll;

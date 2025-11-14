@@ -13,31 +13,31 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+} from "@ea/ui/dialog";
+import { Button } from "@ea/ui/button";
 import {
   useClaimProducer,
   primaryImageUrl,
   useProducers,
 } from "@/utils/producers";
 import { useDebounce } from "@uidotdev/usehooks";
-import { Input } from "./ui/input";
-import { ScrollArea } from "./ui/scroll-area";
+import { Input } from "@ea/ui/input";
+import { ScrollArea } from "@ea/ui/scroll-area";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ea/ui/tabs";
 import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
 import Image from "next/image";
 import { match } from "ts-pattern";
-import { Label } from "./ui/label";
+import { Label } from "@ea/ui/label";
 import { countryByAlpha3Code } from "@/utils/contries";
-import { Card } from "./ui/card";
+import { Card } from "@ea/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "@ea/ui/select";
 import { toast } from "sonner";
 import {
   Step,

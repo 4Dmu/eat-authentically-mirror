@@ -8,8 +8,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "./ui/button";
+} from "@ea/ui/alert-dialog";
+import { Button } from "@ea/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDeleteReview } from "@/utils/reviews";

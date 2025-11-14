@@ -1,5 +1,5 @@
 import { AppWrapper } from "@/components/app-wrapper";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
 
 export default function Page() {
   return (

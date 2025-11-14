@@ -1,5 +1,5 @@
 import React, { ComponentProps, useRef } from "react";
-import { Button } from "./ui/button";
+import { Button } from "@ea/ui/button";
 import {
   FileInput,
   FileInputProps,

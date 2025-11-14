@@ -11,7 +11,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@ea/ui/breadcrumb";
 import Link from "next/link";
 
 export function ProducersPageClient({

@@ -5,8 +5,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from "@ea/ui/card";
+import { Button } from "@ea/ui/button";
 import Link from "next/link";
 import { match, P } from "ts-pattern";
 import { TemporyFileSelectButton } from "@/components/select-file-button";

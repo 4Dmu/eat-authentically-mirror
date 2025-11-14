@@ -7,8 +7,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { Button } from "./ui/button";
+} from "@ea/ui/card";
+import { Button } from "@ea/ui/button";
 import {
   ProducerLocationSelect,
   ProducersGoogleMapsPlaceDetailsSelect,

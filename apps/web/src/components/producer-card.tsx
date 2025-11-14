@@ -1,5 +1,5 @@
 import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
-import { Badge } from "./ui/badge";
+import { Badge } from "@ea/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";

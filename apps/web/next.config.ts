@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: ["@ea/ui"],
 };
 
 export default nextConfig;

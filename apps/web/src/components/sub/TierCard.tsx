@@ -5,8 +5,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Badge } from "../ui/badge";
+} from "@ea/ui/card";
+import { Badge } from "@ea/ui/badge";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 

@@ -1,4 +1,4 @@
-import { Button } from "../ui/button";
+import { Button } from "@ea/ui/button";
 import { Landmark } from "lucide-react";
 import { toast } from "sonner";
 import { useBillingPortableMutation } from "@/utils/stripe";

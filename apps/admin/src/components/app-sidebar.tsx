@@ -8,7 +8,7 @@ import {
   SidebarContent,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@ea/ui/sidebar";
 import { NavMain } from "./nav-main";
 
 // This is sample data.

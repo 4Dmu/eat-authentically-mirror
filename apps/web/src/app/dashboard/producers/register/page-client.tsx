@@ -1,21 +1,21 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ea/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "@ea/ui/card";
+import { Input } from "@ea/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from "@ea/ui/select";
+import { Textarea } from "@ea/ui/textarea";
 import {
   PRODUCER_TYPES,
   registerProducerArgsValidator,
@@ -27,7 +27,7 @@ import { registerProducer } from "@/backend/rpc/producers";
 import { BackButton } from "@/components/back-button";
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
-import { Label } from "@/components/ui/label";
+import { Label } from "@ea/ui/label";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
 
 export function ClientPage() {

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "@ea/ui/global-styles";
 import { ClerkProvider } from "@clerk/nextjs";
 import ReactQueryProvider from "@/components/react-query-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@ea/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Header } from "@/components/app-header";

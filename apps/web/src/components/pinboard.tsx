@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "@ea/ui/button";
 import { ListPlusIcon, MapPin, PinIcon } from "lucide-react";
 import {
   useAddToPinboard,
@@ -17,18 +17,14 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Checkbox } from "./ui/checkbox";
-import { Separator } from "./ui/separator";
+} from "@ea/ui/dialog";
+import { Label } from "@ea/ui/label";
+import { Checkbox } from "@ea/ui/checkbox";
+import { Separator } from "@ea/ui/separator";
 import { useAtom, useAtomValue } from "jotai";
 import { showPinlistDialogAfterPinCreationAtom } from "@/stores";
 import * as R from "remeda";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@ea/ui/tooltip";
 
 export function AddToPinboardButton({
   producerId,

@@ -8,11 +8,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@ea/ui/alert-dialog";
 import { VariantProps } from "class-variance-authority";
 
 import { ReactNode } from "react";
-import { buttonVariants } from "./ui/button";
+import { buttonVariants } from "@ea/ui/button";
 
 export function ConfirmDialog({
   children,

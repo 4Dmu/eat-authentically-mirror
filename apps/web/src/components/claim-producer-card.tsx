@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import { Button } from "@ea/ui/button";
 import Link from "next/link";
 
 export function ClaimProducerCard({ name, id }: { name: string; id: string }) {

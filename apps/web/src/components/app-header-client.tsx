@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { AppNavSheet } from "./app-nav-sheet";
-import { Button } from "./ui/button";
+import { Button } from "@ea/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { SignedOut } from "@clerk/nextjs";

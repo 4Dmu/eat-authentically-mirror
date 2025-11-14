@@ -5,7 +5,7 @@ import { RotateCwIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { P } from "ts-pattern";
-import { Button } from "./ui/button";
+import { Button } from "@ea/ui/button";
 
 function calculateTimeLeft(tokenExpiresAt: Date) {
   const now = new Date();

@@ -1,10 +1,10 @@
+import { rpc } from "@/rpc";
 import {
   type MutationOptions,
   type QueryOptions,
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import { createExternalApiKey, listExternalApiKeys } from "@/rpc/api";
 
 export function useExternalApiKeys(
   opts?: Omit<
@@ -25,13 +25,13 @@ export function useExternalApiKeys(
       string[]
     >,
     "queryKey" | "queryFn"
-  >,
+  >
 ) {
   return useQuery({
     ...opts,
     queryKey: ["list-external-api-keys"],
     queryFn: async () => {
-      return await listExternalApiKeys();
+      return await rpc.externalApiKeys.list();
     },
   });
 }
@@ -40,13 +40,13 @@ export function useCreateExternalApiKey(
   opts?: Omit<
     MutationOptions<void, Error, void, unknown>,
     "queryKey" | "queryFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
     mutationKey: ["create-external-api-key"],
     mutationFn: async () => {
-      return await createExternalApiKey();
+      return await rpc.externalApiKeys.create();
     },
   });
 }

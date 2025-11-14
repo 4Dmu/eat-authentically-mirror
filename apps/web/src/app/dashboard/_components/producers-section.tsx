@@ -8,8 +8,8 @@ import {
 } from "@/components/add-producer-dialog";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@ea/ui/badge";
+import { Button } from "@ea/ui/button";
 import {
   Card,
   CardAction,
@@ -17,7 +17,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@ea/ui/card";
 import {
   useDeleteProducer,
   useFetchUserProducers,

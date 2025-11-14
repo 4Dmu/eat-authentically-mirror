@@ -3,14 +3,14 @@ import { createCheckoutSession } from "@/backend/rpc/stripe";
 import type { Tier, Interval } from "@/backend/stripe/subscription-plans";
 import { CreateCheckoutSessionArgs } from "@ea/validators/stripe";
 import { TierCard } from "@/components/sub/TierCard";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ea/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { UserJSON } from "@clerk/backend";
 import { useMutation } from "@tanstack/react-query";
 import { Crown, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@ea/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   Breadcrumb,
@@ -19,7 +19,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@ea/ui/breadcrumb";
 import Link from "next/link";
 import { BackButton } from "@/components/back-button";
 import {
@@ -27,7 +27,7 @@ import {
   PREMIUM_TIER_PROS,
   PRO_TIER_PROS,
 } from "@ea/shared/constants";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@ea/ui/card";
 import { useLogger } from "@/lib/axiom/client";
 
 export function ClientPage(props: {

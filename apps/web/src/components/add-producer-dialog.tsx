@@ -1,4 +1,4 @@
-import { Button } from "./ui/button";
+import { Button } from "@ea/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,7 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogFooter,
-} from "./ui/dialog";
+} from "@ea/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { registerProducer } from "@/backend/rpc/producers";
 import {
@@ -16,17 +16,17 @@ import {
   registerProducerArgsValidator,
 } from "@ea/validators/producers";
 import { useForm } from "@tanstack/react-form";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+import { Label } from "@ea/ui/label";
+import { Input } from "@ea/ui/input";
 import { FieldInfo } from "./forms/helpers/field-info";
-import { Textarea } from "./ui/textarea";
+import { Textarea } from "@ea/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "@ea/ui/select";
 import { toast } from "sonner";
 import { PropsWithChildren } from "react";
 import { atom } from "jotai";

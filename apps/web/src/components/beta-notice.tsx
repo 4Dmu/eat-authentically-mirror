@@ -6,8 +6,8 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+} from "@ea/ui/dialog";
+import { Button } from "@ea/ui/button";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 

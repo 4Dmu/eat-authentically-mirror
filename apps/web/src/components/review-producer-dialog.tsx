@@ -5,13 +5,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+} from "@ea/ui/dialog";
+import { Button } from "@ea/ui/button";
 import { PropsWithChildren, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useReviewProducer } from "@/utils/reviews";
-import { Textarea } from "./ui/textarea";
-import { Label } from "./ui/label";
+import { Textarea } from "@ea/ui/textarea";
+import { Label } from "@ea/ui/label";
 import { Star } from "lucide-react";
 import { Stars } from "@ea/validators/reviews";
 import { toast } from "sonner";

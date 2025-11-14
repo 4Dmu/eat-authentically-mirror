@@ -1,19 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@ea/ui/popover";
+import { Separator } from "@ea/ui/separator";
+import { Button } from "@ea/ui/button";
 import {
   LayoutDashboardIcon,
   LogOutIcon,
   MapIcon,
   SendIcon,
 } from "lucide-react";
-import { Badge } from "../ui/badge";
+import { Badge } from "@ea/ui/badge";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { UserJSON } from "@clerk/backend";

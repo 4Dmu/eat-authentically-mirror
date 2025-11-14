@@ -2,10 +2,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { UserJSON } from "@clerk/backend";
-import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
+import { Separator } from "@ea/ui/separator";
+import { Label } from "@ea/ui/label";
 import { match } from "ts-pattern";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@ea/ui/badge";
 import {
   Card,
   CardContent,
@@ -13,9 +13,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@ea/ui/card";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ea/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { useLoggedInUserProducers } from "@/utils/producers";

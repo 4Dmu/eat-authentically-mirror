@@ -1,5 +1,5 @@
 import React, { ComponentProps, useEffect } from "react";
-import { Input } from "./ui/input";
+import { Input } from "@ea/ui/input";
 
 export type FileInputProps = {
   files: File[];

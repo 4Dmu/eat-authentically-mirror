@@ -4,10 +4,10 @@ import { CopyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useCreateExternalApiKey, useExternalApiKeys } from "@/client/data";
 import { AppWrapper } from "@/components/app-wrapper";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@ea/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import { Input } from "@ea/ui/input";
+import { Separator } from "@ea/ui/separator";
 
 export function ClientPage(props: { keys: ExternalApiKeySelect[] }) {
   const keys = useExternalApiKeys({ initialData: props.keys });

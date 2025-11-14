@@ -5,10 +5,10 @@ import {
   submitClaimInvitationAccountDetails,
 } from "@ea/validators/claim-invitations";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@ea/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import { Input } from "@ea/ui/input";
+import { Label } from "@ea/ui/label";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

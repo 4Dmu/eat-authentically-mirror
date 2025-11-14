@@ -4,11 +4,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@ea/ui/card";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { FileImage } from "@/components/file-image";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Button } from "@ea/ui/button";
+import { Label } from "@ea/ui/label";
 import { useStore } from "@tanstack/react-form";
 import { FieldInfo } from "../../../helpers/field-info";
 import Image from "next/image";
@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { defaultOptions, withForm } from "./context";
 import { editProducerMediaFormValidator } from "@ea/validators/producers";
 import { ProducerWithMap } from "@ea/db/schema";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@ea/ui/checkbox";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 

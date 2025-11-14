@@ -1,25 +1,20 @@
 "use client";
 import { ProducerWith } from "@ea/db/schema";
 import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@ea/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@ea/ui/card";
+import { Checkbox } from "@ea/ui/checkbox";
+import { Input } from "@ea/ui/input";
+import { Label } from "@ea/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@ea/ui/select";
+import { Separator } from "@ea/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ea/ui/tabs";
 import { useClaimProducerSteps } from "@/hooks/use-claim-producer-steps";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { useClaimProducer } from "@/utils/producers";

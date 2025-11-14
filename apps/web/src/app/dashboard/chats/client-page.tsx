@@ -2,8 +2,8 @@
 
 import { ProducerChat } from "@/backend/rpc/messages";
 import { ChatMessageNotifications } from "@/components/message-notifications";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@ea/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
 import { countListItemsByPropertyValues } from "@/utils/array";
 import {
   useUserChatMessageNotificationsCount,

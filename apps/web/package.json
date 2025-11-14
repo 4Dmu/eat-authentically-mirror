@@ -29,6 +29,7 @@
     "@ea/search": "workspace:*",
     "@ea/shared": "workspace:*",
     "@ea/validators": "workspace:*",
+    "@ea/ui": "workspace:*",
     "@layered/dns-records": "^2.3.0",
     "@libsql/client": "^0.15.12",
     "@radix-ui/react-accordion": "^1.2.12",

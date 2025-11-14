@@ -8,9 +8,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from "@ea/ui/breadcrumb";
+import { Button } from "@ea/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
 import { redirect } from "next/navigation";
 import { CreditCard, MailIcon, PinIcon, UserIcon } from "lucide-react";
 import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";

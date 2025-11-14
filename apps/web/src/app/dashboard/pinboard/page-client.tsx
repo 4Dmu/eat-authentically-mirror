@@ -13,29 +13,29 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@ea/ui/breadcrumb";
 import Link from "next/link";
 import { BackButton } from "@/components/back-button";
 import { ProducerCard } from "@/components/producer-card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ea/ui/tabs";
 import { GridIcon, ListIcon, MapIcon, Trash2Icon, XIcon } from "lucide-react";
 import { PinboardMap } from "@/components/pinboard-map";
 import { useThrottleCallback } from "@react-hook/throttle";
 import { UpdateUserPinboardArgs } from "@ea/validators/pinboard";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ea/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@ea/ui/card";
 import { NewPinlistDialog } from "@/components/pinboard-new-list-dialog";
-import { Label } from "@/components/ui/label";
+import { Label } from "@ea/ui/label";
 import { useMemo, useState } from "react";
 import { useAtom } from "jotai";
 import { showPinlistDialogAfterPinCreationAtom } from "@/stores";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@ea/ui/checkbox";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export function PinboardPageClient(props: { pinboard: PinboardFull }) {

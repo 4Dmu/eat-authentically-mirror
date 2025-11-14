@@ -1,17 +1,17 @@
 "use client";
 import { suggestProducerArgs } from "@ea/validators/producers";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@ea/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import { Input } from "@ea/ui/input";
+import { Label } from "@ea/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ea/ui/select";
 import { COUNTRIES } from "@/utils/contries";
 import { useSuggestProducer } from "@/utils/producers";
 import { useForm } from "@tanstack/react-form";

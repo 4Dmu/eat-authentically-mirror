@@ -1,10 +1,10 @@
 "use client";
 import { SingleTierCard } from "./TierCard";
-import { Button } from "../ui/button";
+import { Button } from "@ea/ui/button";
 import { createCheckoutSession } from "@/backend/rpc/stripe";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Tabs, TabsTrigger, TabsContent, TabsList } from "../ui/tabs";
+import { Tabs, TabsTrigger, TabsContent, TabsList } from "@ea/ui/tabs";
 import { CreateCheckoutSessionArgs } from "@ea/validators/stripe";
 
 export function TiersCard() {

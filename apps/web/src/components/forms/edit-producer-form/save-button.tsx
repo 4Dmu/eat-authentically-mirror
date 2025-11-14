@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@ea/ui/button";
 import { InfoIcon } from "lucide-react";
 import { AnyFormApi } from "@tanstack/react-form";
 import { useEffect, useState } from "react";

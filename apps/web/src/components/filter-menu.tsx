@@ -5,20 +5,25 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "./ui/button";
+} from "@ea/ui/sheet";
+import { Button } from "@ea/ui/button";
 import { useCertificationTypes, useProducerCountries } from "@/utils/producers";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Checkbox } from "./ui/checkbox";
-import { Label } from "./ui/label";
+} from "@ea/ui/accordion";
+import { Checkbox } from "@ea/ui/checkbox";
+import { Label } from "@ea/ui/label";
 import { showFilterMenuAtom, useHomePageStore } from "@/stores";
 import { FilterIcon } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@ea/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { useAtom } from "jotai";
 import { COUNTRIES } from "@/utils/contries";

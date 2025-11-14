@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+} from "@ea/ui/dialog";
+import { Button } from "@ea/ui/button";
 
 export function ConfirmDeleteDialog(props: {
   children?: ReactNode | undefined;

@@ -1,4 +1,4 @@
-import { Input } from "./ui/input";
+import { Input } from "@ea/ui/input";
 import { Loader, SearchIcon, XIcon } from "lucide-react";
 import {
   ChangeEvent,
@@ -10,12 +10,17 @@ import {
   useState,
 } from "react";
 import { useHomePageStore } from "@/stores";
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
+import { Button } from "@ea/ui/button";
+import { Separator } from "@ea/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@ea/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { COUNTRIES } from "@/utils/contries";
-import { Label } from "./ui/label";
+import { Label } from "@ea/ui/label";
 import { useCertificationTypes, useProducerCountries } from "@/utils/producers";
 import {
   DropdownMenu,
@@ -24,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
+} from "@ea/ui/dropdown-menu";
 import { LocationSelect } from "./custom-location-select";
 
 const placeholders = [

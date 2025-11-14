@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { APIProvider, Map, Marker, useMap } from "@vis.gl/react-google-maps";
 import { useHomePageStore } from "@/stores";
-import { Button } from "./ui/button";
+import { Button } from "@ea/ui/button";
 import { env } from "@/env";
 import { useGeolocation } from "@uidotdev/usehooks";
 

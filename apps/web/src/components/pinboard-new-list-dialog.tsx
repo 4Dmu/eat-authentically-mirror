@@ -1,8 +1,13 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@ea/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { Button } from "@ea/ui/button";
+import { Input } from "@ea/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { FieldInfo } from "./forms/helpers/field-info";
 import { newPinListArgs } from "@ea/validators/pinboard";

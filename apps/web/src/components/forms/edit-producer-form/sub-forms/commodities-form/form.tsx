@@ -4,10 +4,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@ea/ui/card";
 import { defaultOptions, withForm } from "./context";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@ea/ui/badge";
+import { Button } from "@ea/ui/button";
 import { ChevronsUpDownIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { useListCommodoties } from "@/utils/producers";
@@ -18,12 +18,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@ea/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@ea/ui/popover";
 import { useMeasure } from "@uidotdev/usehooks";
 
 function isProducerCommodity(

@@ -5,12 +5,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+} from "@ea/ui/card";
+import { Input } from "@ea/ui/input";
+import { Button } from "@ea/ui/button";
+import { Label } from "@ea/ui/label";
 import { match, P } from "ts-pattern";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@ea/ui/badge";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { useStore } from "@tanstack/react-form";
 import { defaultOptions, withForm } from "./context";

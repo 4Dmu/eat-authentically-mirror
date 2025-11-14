@@ -3,20 +3,16 @@ import { CLAIM_DNS_TXT_RECORD_NAME } from "@ea/shared/constants";
 import { PublicClaimRequest } from "@ea/validators/producers";
 import { useCheckClaimDomainDns, useVerifyClaimPhone } from "@/utils/producers";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+import { Button } from "@ea/ui/button";
+import { Badge } from "@ea/ui/badge";
 import { match, P } from "ts-pattern";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+} from "@ea/ui/accordion";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@ea/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useForm } from "@tanstack/react-form";
 import { FieldInfo } from "./forms/helpers/field-info";

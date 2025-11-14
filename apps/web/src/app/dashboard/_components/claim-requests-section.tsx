@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardAction,
   CardContent,
-} from "@/components/ui/card";
+} from "@ea/ui/card";
 import { useListClaimRequests } from "@/utils/producers";
 import { BuildingIcon } from "lucide-react";
 

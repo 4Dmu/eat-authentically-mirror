@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@ea/ui/badge";
+import { Separator } from "@ea/ui/separator";
 import {
   HeartIcon,
   InfoIcon,
@@ -9,8 +9,8 @@ import {
   TreeDeciduousIcon,
   UsersIcon,
 } from "lucide-react";
-import { Alert, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle } from "@ea/ui/alert";
+import { Button } from "@ea/ui/button";
 import Link from "next/link";
 
 export default function AboutPage() {

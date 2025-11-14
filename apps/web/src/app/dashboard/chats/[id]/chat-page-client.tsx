@@ -5,16 +5,11 @@ import {
   type ProducerChat,
 } from "@/backend/rpc/messages";
 import { MessageCard } from "@/components/message-card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@ea/ui/avatar";
+import { Button } from "@ea/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@ea/ui/card";
+import { Separator } from "@ea/ui/separator";
+import { Textarea } from "@ea/ui/textarea";
 import {
   useBlockProducerChat,
   useBlockUserChat,

@@ -5,10 +5,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "./ui/button";
+} from "@ea/ui/sheet";
+import { Button } from "@ea/ui/button";
 import { HomeIcon, InfoIcon, MenuIcon } from "lucide-react";
-import { Separator } from "./ui/separator";
+import { Separator } from "@ea/ui/separator";
 import { NotSubbed } from "./auth/RequireSub";
 import { IsNotProducer } from "./auth/RequireOrg";
 import Link from "next/link";

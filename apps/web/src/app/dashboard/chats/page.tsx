@@ -9,11 +9,11 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
   BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
+} from "@ea/ui/breadcrumb";
 import Link from "next/link";
 import { listAllProducersChats, listUserChats } from "@/backend/rpc/messages";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import { Button } from "@ea/ui/button";
 
 export default async function MessagesPage() {
   const session = await auth.protect();

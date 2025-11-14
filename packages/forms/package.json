@@ -1,0 +1,24 @@
+{
+  "name": "@ea/forms",
+  "type": "module",
+  "exports": {
+    "./edit-producer-form": "./src/edit-producer-form",
+    "./helpers": "./src/helpers"
+  },
+  "dependencies": {
+    "@ea/db": "workspace:*",
+    "@ea/shared": "workspace:*",
+    "@tanstack/react-form": "^1.25.0",
+    "arktype": "^2.1.25",
+    "lucide-react": "^0.540.0",
+    "react": "^19.2.0",
+    "validator": "^13.15.20",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.1.0",
+    "@types/validator": "^13.15.4",
+    "typescript": "latest"
+  }
+}

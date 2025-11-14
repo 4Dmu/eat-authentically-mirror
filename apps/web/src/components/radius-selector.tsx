@@ -1,5 +1,5 @@
 import { MapPin } from "lucide-react";
-import { Slider } from "./ui/slider";
+import { Slider } from "@ea/ui/slider";
 import { useHomePageStore } from "@/stores";
 
 export function RadiusSelector({ defaultRadius }: { defaultRadius: number }) {

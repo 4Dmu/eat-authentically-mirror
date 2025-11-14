@@ -8,7 +8,7 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
   BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
+} from "@ea/ui/breadcrumb";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {

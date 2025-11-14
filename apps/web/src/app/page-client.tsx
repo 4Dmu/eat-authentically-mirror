@@ -3,8 +3,8 @@
 import type { Geo } from "@vercel/functions";
 import { FilterMenu } from "@/components/filter-menu";
 import { SearchBox } from "@/components/search-box";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@ea/ui/badge";
+import { Button } from "@ea/ui/button";
 import { useGeolocationStore, useHomePageStore } from "@/stores";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useDebounce } from "@uidotdev/usehooks";

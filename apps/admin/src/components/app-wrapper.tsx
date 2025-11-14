@@ -6,9 +6,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+} from "@ea/ui/breadcrumb";
+import { Separator } from "@ea/ui/separator";
+import { SidebarInset, SidebarTrigger } from "@ea/ui/sidebar";
 
 export function AppWrapper({
   crumbs,

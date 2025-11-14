@@ -6,14 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+} from "@ea/ui/dialog";
+import { Button } from "@ea/ui/button";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateReview } from "@/utils/reviews";
 import { ProducerReviewSelect } from "@ea/db/schema";
-import { Textarea } from "./ui/textarea";
-import { Label } from "./ui/label";
+import { Textarea } from "@ea/ui/textarea";
+import { Label } from "@ea/ui/label";
 import { EditIcon } from "lucide-react";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";

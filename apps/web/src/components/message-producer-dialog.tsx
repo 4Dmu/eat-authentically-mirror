@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { Textarea } from "./ui/textarea";
-import { Button } from "./ui/button";
+} from "@ea/ui/dialog";
+import { Textarea } from "@ea/ui/textarea";
+import { Button } from "@ea/ui/button";
 import { Send } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { type } from "arktype";

@@ -2,7 +2,7 @@ import { SelectIcon } from "@radix-ui/react-select";
 import { ExpandIcon, PentagonIcon, Trash2Icon, TrashIcon } from "lucide-react";
 import React, { RefObject, useState } from "react";
 import { TerraDraw } from "terra-draw";
-import { Button } from "../ui/button";
+import { Button } from "@ea/ui/button";
 
 export default function ModeUI({
   drawRef,
