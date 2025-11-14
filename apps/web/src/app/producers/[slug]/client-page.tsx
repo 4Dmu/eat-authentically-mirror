@@ -33,7 +33,7 @@ import { countryByAlpha3Code } from "@/utils/contries";
 import { Stream } from "@/components/stream";
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { MapCard } from "@/components/map-card";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 import {
   useReviewsPublic,
   useReviewProducerPendingState,

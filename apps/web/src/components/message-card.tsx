@@ -1,5 +1,5 @@
 import { ProducerChatMessage } from "@/backend/rpc/messages";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 import { format } from "date-fns";
 
 export function MessageCard({

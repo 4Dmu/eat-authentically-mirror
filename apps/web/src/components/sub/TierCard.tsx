@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@ea/ui/card";
 import { Badge } from "@ea/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 import { ReactNode } from "react";
 
 export function TierCard({

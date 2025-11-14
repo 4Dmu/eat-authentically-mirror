@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { AddToPinboardIconButton, AddToPinlistIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 import { ProducerWith } from "@ea/db/schema";
 import { ProducerSearchResultRow } from "@/backend/data/producer";
 

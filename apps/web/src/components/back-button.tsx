@@ -1,7 +1,7 @@
 import React, { ComponentProps } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 
 export function BackButton(
   props: Omit<ComponentProps<typeof Link>, "children"> & { text: string }

@@ -49,7 +49,8 @@
     "./textarea": "./src/components/textarea.tsx",
     "./toggle-group": "./src/components/toggle-group.tsx",
     "./toggle": "./src/components/toggle.tsx",
-    "./tooltip": "./src/components/tooltip.tsx"
+    "./tooltip": "./src/components/tooltip.tsx",
+    "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {
     "@ea/db": "workspace:*",

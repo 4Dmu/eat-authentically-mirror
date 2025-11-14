@@ -1,11 +1,11 @@
 import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import * as BasicInfoForm from "./sub-forms/basic-info-form";
-import * as ImagesForm from "./sub-forms/images-form";
-import * as VideoForm from "./sub-forms/video-form";
-import * as ContactForm from "./sub-forms/contact-form";
-import * as CertificationsForm from "./sub-forms/certifications-form";
-import * as CommoditiesForm from "./sub-forms/commodities-form";
-import * as AddressForm from "./sub-forms/address-form";
+import * as BasicInfoForm from "@ea/forms/basic-info-form";
+import * as ImagesForm from "@ea/forms/images-form";
+import * as VideoForm from "@ea/forms/video-form";
+import * as ContactForm from "@ea/forms/contact-form";
+import * as CertificationsForm from "@ea/forms/certifications-form";
+import * as CommoditiesForm from "@ea/forms/commodities-form";
+import * as AddressForm from "@ea/forms/address-form";
 import { SaveButton } from "./save-button";
 import {
   useAddCommodityAndAssociate,
@@ -38,6 +38,7 @@ import {
   ProducerMediaSelect,
   ProducerWithAll,
 } from "@ea/db/schema";
+import { match, P } from "ts-pattern";
 
 function getVideo(media: ProducerWithAll["media"] | undefined) {
   return (media?.find((d) => d.role === "video") ??
@@ -337,6 +338,8 @@ export function ProducerEditForm(props: {
     },
   });
 
+  const commodoties = useListCommodoties();
+
   return (
     <div className="w-full flex flex-col gap-10">
       <div className="flex flex-col gap-2">
@@ -346,17 +349,46 @@ export function ProducerEditForm(props: {
         </p>
       </div>
       <BasicInfoForm.Form form={basicInfoForm} />
-      <ImagesForm.Form tier={props.tier} form={imagesForm} />
-      <VideoForm.Form tier={props.tier} form={videoForm} />
+      <ImagesForm.Form
+        tier={typeof props.tier === "string" ? props.tier : props.tier.tier}
+        maxFiles={
+          props.tier === "Free"
+            ? 1
+            : props.tier.tier === "community"
+              ? 1
+              : props.tier.tier === "pro"
+                ? 4
+                : props.tier.tier === "premium" ||
+                    props.tier.tier === "enterprise"
+                  ? 5
+                  : 1
+        }
+        form={imagesForm}
+      />
+      <VideoForm.Form
+        canUploadVideo={
+          props.tier !== "Free" &&
+          (props.tier.tier === "premium" || props.tier.tier === "enterprise")
+        }
+        form={videoForm}
+      />
       <ContactForm.Form form={contactForm} />
       <AddressForm.Form form={addressForm} />
       <CertificationsForm.Form
-        tier={props.tier}
+        maxCerts={match(props.tier)
+          .with("Free", () => 3)
+          .with({ tier: "community" }, () => 3)
+          .with({ tier: "pro" }, () => 5)
+          .with({ tier: P.union("premium", "enterprise") }, () => 10)
+          .exhaustive()}
         certifications={props.certifications}
         producerId={props.producer.id}
         form={certificationsForm}
       />
-      <CommoditiesForm.Form form={commoditiesForm} />
+      <CommoditiesForm.Form
+        commodities={commodoties.data}
+        form={commoditiesForm}
+      />
       <SaveButton
         disableSubmit={disableSaveButton}
         disableReset={disableSaveButton}

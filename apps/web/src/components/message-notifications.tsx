@@ -1,6 +1,6 @@
 import { useUserChatsMessageNotificationsCount } from "@/utils/messages";
 import { Badge } from "@ea/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 import { ChatNotificationsCount } from "@/backend/rpc/messages";
 import { useAuth } from "@clerk/nextjs";
 

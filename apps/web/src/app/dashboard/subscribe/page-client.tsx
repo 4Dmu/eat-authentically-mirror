@@ -11,7 +11,7 @@ import { Crown, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@ea/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 import {
   Breadcrumb,
   BreadcrumbItem,

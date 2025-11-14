@@ -8,7 +8,7 @@ import {
   useSyncPinsPinlistMemberships,
 } from "@/utils/pinboard";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn } from "@ea/ui/utils";
 import Link from "next/link";
 import {
   Dialog,
