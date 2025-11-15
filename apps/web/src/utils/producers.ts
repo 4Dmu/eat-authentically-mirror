@@ -69,6 +69,7 @@ import { urls } from "./default-urls";
 import { hashToIndex } from "@/lib/image-fallback";
 import { useHomePageStore } from "@/stores";
 import { searchProducersLocalV2 } from "@/client/local-search";
+import { useRef } from "react";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -212,6 +213,7 @@ export function useSearchProducersLocal(
   >
 ) {
   const store = useHomePageStore();
+  const queryRef = useRef(params.query);
 
   return useQuery({
     ...opts,
@@ -246,6 +248,11 @@ export function useSearchProducersLocal(
           }
         : userIpGeo;
 
+      if (queryRef.current !== params.query && pagination.page > 1) {
+        pagination.page = 1;
+        store.setPage(1);
+      }
+
       const value = await searchProducersLocalV2({
         query: params.query ?? "*",
         page: pagination.page,
@@ -264,6 +271,7 @@ export function useSearchProducersLocal(
         },
       });
 
+      queryRef.current = params.query;
       store.setPage(value.result.page);
 
       return value;
