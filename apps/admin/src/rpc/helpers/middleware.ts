@@ -1,6 +1,6 @@
+import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { actionClient } from "./safe-action";
-import { headers } from "next/headers";
 
 export const authenticatedActionClient = actionClient.use(async () => {
   const headrs = await headers();

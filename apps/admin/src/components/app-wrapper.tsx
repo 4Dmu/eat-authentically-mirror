@@ -1,4 +1,3 @@
-import React, { type ReactNode } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +8,7 @@ import {
 } from "@ea/ui/breadcrumb";
 import { Separator } from "@ea/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@ea/ui/sidebar";
+import React, { type ReactNode } from "react";
 
 export function AppWrapper({
   crumbs,

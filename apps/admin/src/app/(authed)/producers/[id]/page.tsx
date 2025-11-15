@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { PageClient } from "./page-client";
 import { rpc } from "@/rpc";
+import { PageClient } from "./page-client";
 
 export default async function Page(props: {
   params: Promise<{ id: string | undefined }>;

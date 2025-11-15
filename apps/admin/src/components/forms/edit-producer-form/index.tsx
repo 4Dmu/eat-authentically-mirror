@@ -1,29 +1,18 @@
+import type {
+  MediaAssetSelect,
+  ProducerMediaSelect,
+  ProducerWithAll,
+} from "@ea/db/schema";
+import * as AddressForm from "@ea/forms/address-form";
 import * as BasicInfoForm from "@ea/forms/basic-info-form";
-import * as ImagesForm from "@ea/forms/images-form";
-import * as VideoForm from "@ea/forms/video-form";
-import * as ContactForm from "@ea/forms/contact-form";
 import * as CertificationsForm from "@ea/forms/certifications-form";
 import * as CommoditiesForm from "@ea/forms/commodities-form";
-import * as AddressForm from "@ea/forms/address-form";
-import { SaveButton } from "./save-button";
-import {
-  useAddCommodityAndAssociate,
-  useDeleteVideo,
-  useEditProducerCertifications,
-  useEditProducerCommodities,
-  useEditProducerContact,
-  useEditProducerLocation,
-  useEditUserProducer,
-  useUpdateExistingImages,
-  useUploadImages,
-  useUploadVideo,
-  useListCommodoties,
-  useProducer,
-  useListCertifications,
-  useUser,
-} from "@/client/data";
-import { toast } from "sonner";
-import * as R from "remeda";
+import * as ContactForm from "@ea/forms/contact-form";
+import * as ImagesForm from "@ea/forms/images-form";
+import * as VideoForm from "@ea/forms/video-form";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import { Input } from "@ea/ui/input";
+import { Label } from "@ea/ui/label";
 import {
   editProducerCertificationsFormValidator,
   editProducerCommoditiesFormValidator,
@@ -33,15 +22,26 @@ import {
   editProducerMediaFormValidator,
   editProucerVideoFormValidator,
 } from "@ea/validators/producers";
-import {
-  MediaAssetSelect,
-  ProducerMediaSelect,
-  ProducerWithAll,
-} from "@ea/db/schema";
-import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
-import { Input } from "@ea/ui/input";
-import { Label } from "@ea/ui/label";
 import Image from "next/image";
+import * as R from "remeda";
+import { toast } from "sonner";
+import {
+  useAddCommodityAndAssociate,
+  useDeleteVideo,
+  useEditProducerCertifications,
+  useEditProducerCommodities,
+  useEditProducerContact,
+  useEditProducerLocation,
+  useEditUserProducer,
+  useListCertifications,
+  useListCommodoties,
+  useProducer,
+  useUpdateExistingImages,
+  useUploadImages,
+  useUploadVideo,
+  useUser,
+} from "@/client/data";
+import { SaveButton } from "./save-button";
 
 function getVideo(media: ProducerWithAll["media"] | undefined) {
   return (media?.find((d) => d.role === "video") ??
@@ -143,12 +143,12 @@ export function ProducerEditForm(props: { producer: ProducerWithAll }) {
       if (!R.isDeepEqual(value, producerQuery.data)) {
         const existingImages = value.media.filter(
           (x): x is ProducerMediaSelect & { asset: MediaAssetSelect } =>
-            !ImagesForm.isUpload(x)
+            !ImagesForm.isUpload(x),
         );
         const toUpload = value.media.filter(ImagesForm.isUpload);
         const hasExistingImageChanges = !R.isDeepEqual(
           existingImages,
-          producerQuery.data?.media
+          producerQuery.data?.media,
         );
 
         const hasImagesToUpload = toUpload.length > 0;
@@ -284,7 +284,7 @@ export function ProducerEditForm(props: { producer: ProducerWithAll }) {
       const submitPromise = editProducerCertificationsMutation.mutateAsync({
         producerId: props.producer.id,
         certifications: value.certifications.map(
-          (cert) => cert.certificationId
+          (cert) => cert.certificationId,
         ),
       });
       toast.promise(submitPromise, {
@@ -314,7 +314,7 @@ export function ProducerEditForm(props: { producer: ProducerWithAll }) {
         editProducerCommoditiesMutation.mutateAsync({
           producerId: props.producer.id,
           commodities: existing.map((comm) => comm.commodityId),
-        })
+        }),
       );
 
       for (const comm of newComms) {
@@ -322,7 +322,7 @@ export function ProducerEditForm(props: { producer: ProducerWithAll }) {
           addCommodityAndAssociateMutation.mutateAsync({
             producerId: props.producer.id,
             name: comm.name,
-          })
+          }),
         );
       }
 

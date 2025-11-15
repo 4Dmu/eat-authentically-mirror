@@ -1,8 +1,8 @@
 "use client";
+import type { ProducerWithAll } from "@ea/db/schema";
 import { useProducer } from "@/client/data";
 import { AppWrapper } from "@/components/app-wrapper";
 import { ProducerEditForm } from "@/components/forms/edit-producer-form";
-import { ProducerWithAll } from "@ea/db/schema";
 
 export function PageClient(props: { producer: ProducerWithAll }) {
   const producer = useProducer(props.producer.id, {

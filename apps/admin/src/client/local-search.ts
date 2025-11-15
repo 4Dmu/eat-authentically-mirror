@@ -1,4 +1,4 @@
-import { ProducerSearchResultRow, typesense } from "@ea/search";
+import { type ProducerSearchResultRow, typesense } from "@ea/search";
 
 export async function searchProducersLocal(props: {
   query: string;

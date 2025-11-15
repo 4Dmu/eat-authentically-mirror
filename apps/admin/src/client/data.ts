@@ -1,8 +1,7 @@
-import { rpc } from "@/rpc";
 import type {
-  ProducerMediaSelect,
-  MediaAssetSelect,
   CommoditySelect,
+  MediaAssetSelect,
+  ProducerMediaSelect,
   ProducerWithAll,
 } from "@ea/db/schema";
 import type {
@@ -17,11 +16,12 @@ import type {
 import {
   type MutationOptions,
   type QueryOptions,
+  type UseMutationOptions,
+  type UseQueryOptions,
   useMutation,
-  UseMutationOptions,
   useQuery,
-  UseQueryOptions,
 } from "@tanstack/react-query";
+import { rpc } from "@/rpc";
 import { searchProducersLocal } from "./local-search";
 
 export function useExternalApiKeys(
@@ -43,7 +43,7 @@ export function useExternalApiKeys(
       string[]
     >,
     "queryKey" | "queryFn"
-  >
+  >,
 ) {
   return useQuery({
     ...opts,
@@ -58,7 +58,7 @@ export function useCreateExternalApiKey(
   opts?: Omit<
     MutationOptions<void, Error, void, unknown>,
     "queryKey" | "queryFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -73,7 +73,7 @@ export function useCreateProducer(
   opts?: Omit<
     MutationOptions<string, Error, RegisterProducerArgs, unknown>,
     "queryKey" | "queryFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -88,7 +88,7 @@ export function useEditUserProducer(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerArgsV2, unknown>,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -103,7 +103,7 @@ export function useEditProducerContact(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerContact, unknown>,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -118,7 +118,7 @@ export function useEditProducerLocation(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerLocationArgs, unknown>,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -133,7 +133,7 @@ export function useEditProducerCertifications(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerCertifications, unknown>,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -148,7 +148,7 @@ export function useEditProducerCommodities(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerCommodoties, unknown>,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -163,7 +163,7 @@ export function useAddCommodityAndAssociate(
   opts?: Omit<
     UseMutationOptions<void, Error, AddCommodityAndAssociate, unknown>,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -188,7 +188,7 @@ export function useUploadImages(
       unknown
     >,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -238,7 +238,7 @@ export function useUploadVideo(
       unknown
     >,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -272,7 +272,7 @@ export function useDeleteVideo(
       unknown
     >,
     "mutationKey" | "mutationFn"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -295,7 +295,7 @@ export function useUpdateExistingImages(
       unknown
     >,
     "mutationFn" | "mutationKey"
-  >
+  >,
 ) {
   return useMutation({
     ...opts,
@@ -318,7 +318,7 @@ export function useListCommodoties(
       readonly [string]
     >,
     "queryFn" | "queryKey"
-  >
+  >,
 ) {
   return useQuery({
     ...(props as object),
@@ -337,7 +337,7 @@ export function useProducer(
       readonly [string, string]
     >,
     "queryFn" | "queryKey"
-  >
+  >,
 ) {
   return useQuery({
     ...(props as object),

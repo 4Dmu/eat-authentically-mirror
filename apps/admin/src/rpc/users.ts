@@ -1,8 +1,7 @@
 "use server";
-import { authenticatedActionClient } from "./helpers/middleware";
 import { type } from "arktype";
 import { clerk } from "@/lib/clerk";
-import { UserJSON } from "@clerk/backend";
+import { authenticatedActionClient } from "./helpers/middleware";
 
 export const get = authenticatedActionClient
   .name("users.get")

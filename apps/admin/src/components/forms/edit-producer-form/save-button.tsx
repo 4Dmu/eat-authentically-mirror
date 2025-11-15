@@ -1,6 +1,6 @@
 import { Button } from "@ea/ui/button";
+import type { AnyFormApi } from "@tanstack/react-form";
 import { InfoIcon } from "lucide-react";
-import { AnyFormApi } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 
 export function SaveButton({
@@ -20,10 +20,12 @@ export function SaveButton({
   >([]);
 
   const show = formStates.some((s) => s && !s.isDefaultValue);
-  const hasOneValid = formStates.some((s) => s && s.isValid);
+  const hasOneValid = formStates.some((s) => s?.isValid);
 
   function reset() {
-    forms.forEach((f) => f.reset());
+    forms.forEach((f) => {
+      f.reset();
+    });
   }
 
   function submit() {
@@ -47,10 +49,13 @@ export function SaveButton({
           };
           return next;
         });
-      })
+      }),
     );
 
-    return () => unsubs.forEach((u) => u());
+    return () =>
+      unsubs.forEach((u) => {
+        u();
+      });
   }, [forms]);
 
   return (

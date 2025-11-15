@@ -1,34 +1,15 @@
 "use client";
-import { useCreateProducer, useSearchProducers } from "@/client/data";
-import { AppWrapper } from "@/components/app-wrapper";
-import { FieldInfo } from "@/components/forms/helpers/field-info";
-import { PRODUCER_TYPES } from "@ea/shared/constants";
-import { Button } from "@ea/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import type { ProducerSearchResultRow } from "@ea/search";
 import { Input } from "@ea/ui/input";
-import { Label } from "@ea/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ea/ui/select";
-import { Textarea } from "@ea/ui/textarea";
-import {
-  registerProducerArgsValidator,
-  type ProducerTypes,
-} from "@ea/validators/producers";
-import { useForm } from "@tanstack/react-form";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import Image from "next/image";
 import { Skeleton } from "@ea/ui/skeleton";
-import { ProducerSearchResultRow } from "@ea/search";
-import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/data-table";
-import Link from "next/link";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useThrottle } from "@uidotdev/usehooks";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useSearchProducers } from "@/client/data";
+import { AppWrapper } from "@/components/app-wrapper";
+import { DataTable } from "@/components/data-table";
 
 export const columns: ColumnDef<ProducerSearchResultRow>[] = [
   {
@@ -63,11 +44,9 @@ export const columns: ColumnDef<ProducerSearchResultRow>[] = [
     header: "Name",
     cell: ({ row }) => {
       return (
-        <>
-          <Link className="underline" href={`/producers/${row.original.id}`}>
-            {row.original.name}
-          </Link>
-        </>
+        <Link className="underline" href={`/producers/${row.original.id}`}>
+          {row.original.name}
+        </Link>
       );
     },
   },

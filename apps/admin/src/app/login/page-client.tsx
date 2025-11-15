@@ -1,10 +1,10 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@ea/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
 import { Input } from "@ea/ui/input";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
 export function LoginPageClient() {

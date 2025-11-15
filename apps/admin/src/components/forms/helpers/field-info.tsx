@@ -1,5 +1,9 @@
-import { AnyFieldApi, AnyFormApi, useStore } from "@tanstack/react-form";
-import { ReactNode } from "react";
+import {
+  type AnyFieldApi,
+  type AnyFormApi,
+  useStore,
+} from "@tanstack/react-form";
+import type { ReactNode } from "react";
 import { match, P } from "ts-pattern";
 
 export function FieldInfo({
@@ -20,7 +24,7 @@ export function FieldInfo({
               .map((err) =>
                 match(err)
                   .with({ message: P.string }, (v) => v.message)
-                  .otherwise((v) => v)
+                  .otherwise((v) => v),
               )
               .join(",")}
         </em>

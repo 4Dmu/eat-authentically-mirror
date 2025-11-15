@@ -1,5 +1,4 @@
-import { env } from "@/env";
 import { createClerkClient } from "@clerk/backend";
-import { type } from "arktype";
+import { env } from "@/env";
 
 export const clerk = createClerkClient({ secretKey: env.CLERK_SECRET_KEY });

@@ -1,14 +1,13 @@
 "use client";
 
-import { FactoryIcon, SquareTerminal } from "lucide-react";
-import type * as React from "react";
-
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarRail,
 } from "@ea/ui/sidebar";
+import { FactoryIcon, SquareTerminal } from "lucide-react";
+import type * as React from "react";
 import { NavMain } from "./nav-main";
 
 // This is sample data.

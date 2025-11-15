@@ -1,16 +1,7 @@
 "use client";
-import { useCreateProducer } from "@/client/data";
-import { AppWrapper } from "@/components/app-wrapper";
-import { FieldInfo } from "@/components/forms/helpers/field-info";
 import { PRODUCER_TYPES } from "@ea/shared/constants";
 import { Button } from "@ea/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@ea/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
 import { Input } from "@ea/ui/input";
 import { Label } from "@ea/ui/label";
 import {
@@ -22,15 +13,22 @@ import {
 } from "@ea/ui/select";
 import { Textarea } from "@ea/ui/textarea";
 import {
-  registerProducerArgsValidator,
   type ProducerTypes,
+  registerProducerArgsValidator,
 } from "@ea/validators/producers";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
+import { useCreateProducer } from "@/client/data";
+import { AppWrapper } from "@/components/app-wrapper";
+import { FieldInfo } from "@/components/forms/helpers/field-info";
 
 export default function Page() {
   const router = useRouter();
-  const addProducer = useCreateProducer();
+  const addProducer = useCreateProducer({
+    onSuccess(e) {
+      router.push(`/producers/${e}`);
+    },
+  });
 
   const form = useForm({
     defaultValues: {

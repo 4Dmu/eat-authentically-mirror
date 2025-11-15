@@ -12,7 +12,7 @@ export const list = authenticatedActionClient
     async () =>
       await db.query.externalApiKeys.findMany({
         orderBy: asc(externalApiKeys.createdAt),
-      })
+      }),
   );
 
 export const create = authenticatedActionClient
