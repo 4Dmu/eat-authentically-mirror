@@ -18,6 +18,8 @@ export const env = createEnv({
     SAFE_CLOUDFLARE_ACCOUNT_HASH: z.string().min(1),
 
     ORGANIC_CERT_ID: z.string().min(1),
+
+    CLERK_SECRET_KEY: z.string().min(1),
   },
   client: {},
   experimental__runtimeEnv: {},

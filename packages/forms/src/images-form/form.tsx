@@ -62,7 +62,7 @@ export const Form = withForm({
             {(field) => (
               <div className="flex flex-col gap-3">
                 <Label>Add Images</Label>
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
                   <DragDropProvider
                     onDragOver={(event) => {
                       const { target, source } = event.operation;
@@ -253,8 +253,8 @@ const SortableImage = withForm({
               src={value.asset.url}
               alt={value.caption ?? ""}
               className="object-cover h-full w-full"
-              width={200}
-              height={200}
+              width={500}
+              height={500}
             />
           )}
         </div>

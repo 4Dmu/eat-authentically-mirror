@@ -1,6 +1,6 @@
 "use client";
 
-import { SquareTerminal } from "lucide-react";
+import { FactoryIcon, SquareTerminal } from "lucide-react";
 import type * as React from "react";
 
 import {
@@ -15,15 +15,27 @@ import { NavMain } from "./nav-main";
 const data = {
   navMain: [
     {
+      title: "Producers",
+      url: "/producers",
+      icon: FactoryIcon,
+      isActive: true,
+      items: [
+        {
+          title: "List Producers",
+          url: "/producers",
+        },
+        {
+          title: "Add Producer",
+          url: "/producers/create",
+        },
+      ],
+    },
+    {
       title: "Misc",
       url: "/misc",
       icon: SquareTerminal,
       isActive: true,
       items: [
-        {
-          title: "Add Producer",
-          url: "/misc/add-producer",
-        },
         {
           title: "External Api Keys",
           url: "/misc/external-api-keys",

@@ -3,7 +3,7 @@ import { db } from "@ea/db";
 import { authenticatedActionClient } from "./helpers/middleware";
 
 export const list = authenticatedActionClient
-  .name("commodities.list")
+  .name("certifications.list")
   .action(async () => {
-    return await db.query.commodities.findMany();
+    return await db.query.certifications.findMany();
   });

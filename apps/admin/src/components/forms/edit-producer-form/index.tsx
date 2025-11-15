@@ -19,6 +19,8 @@ import {
   useUploadVideo,
   useListCommodoties,
   useProducer,
+  useListCertifications,
+  useUser,
 } from "@/client/data";
 import { toast } from "sonner";
 import * as R from "remeda";
@@ -32,26 +34,26 @@ import {
   editProucerVideoFormValidator,
 } from "@ea/validators/producers";
 import {
-  CertificationSelect,
   MediaAssetSelect,
   ProducerMediaSelect,
   ProducerWithAll,
 } from "@ea/db/schema";
-import { match, P } from "ts-pattern";
+import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
+import { Input } from "@ea/ui/input";
+import { Label } from "@ea/ui/label";
+import Image from "next/image";
 
 function getVideo(media: ProducerWithAll["media"] | undefined) {
   return (media?.find((d) => d.role === "video") ??
     null) as (typeof editProucerVideoFormValidator.infer)["video"];
 }
 
-export function ProducerEditForm(props: {
-  producer: ProducerWithAll;
-  certifications: CertificationSelect[];
-}) {
+export function ProducerEditForm(props: { producer: ProducerWithAll }) {
   const producerQuery = useProducer(props.producer.id, {
     initialData: props.producer,
   });
   const commodotiesQuery = useListCommodoties();
+  const certificationsQuery = useListCertifications();
 
   const uploadImagesMutation = useUploadImages({
     onSuccess: async () => await producerQuery.refetch(),
@@ -337,15 +339,58 @@ export function ProducerEditForm(props: {
   });
 
   const commodoties = useListCommodoties();
+  const user = useUser(props.producer.userId);
 
   return (
     <div className="w-full flex flex-col gap-10">
       <div className="flex flex-col gap-2">
-        <h1 className="font-bold text-3xl">Edit Producer Profile</h1>
+        <h1 className="font-bold text-3xl">Edit Producer Info</h1>
         <p className="text-muted-foreground">
-          Update your producer information and manage your profile settings.
+          Edit this producers info{" "}
+          <span className="text-destructive">
+            (Warning this will affect production and potentially customer data)
+          </span>
         </p>
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Producer Owner</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-5">
+          {user.data?.has_image === true && (
+            <div>
+              <Image
+                className="rounded-full size-20"
+                src={user.data.image_url}
+                alt="profile"
+                width={120}
+                height={120}
+              />
+            </div>
+          )}
+          <div className="flex flex-col gap-2">
+            <Label>User Id</Label>
+            <Input readOnly defaultValue={producerQuery.data?.userId ?? ""} />
+          </div>
+          <div className="flex gap-5">
+            <div className="flex flex-col gap-2">
+              <Label>Firstname</Label>
+              <Input readOnly value={user.data?.first_name ?? ""} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Lastname</Label>
+              <Input readOnly value={user.data?.last_name ?? ""} />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Subsctiption Rank</Label>
+            <Input
+              readOnly
+              defaultValue={producerQuery.data?.subscriptionRank ?? ""}
+            />
+          </div>
+        </CardContent>
+      </Card>
       <BasicInfoForm.Form form={basicInfoForm} />
       <ImagesForm.Form tier={"Admin"} maxFiles={10} form={imagesForm} />
       <VideoForm.Form canUploadVideo={true} form={videoForm} />
@@ -353,7 +398,7 @@ export function ProducerEditForm(props: {
       <AddressForm.Form form={addressForm} />
       <CertificationsForm.Form
         maxCerts={10}
-        certifications={props.certifications}
+        certifications={certificationsQuery.data ?? []}
         producerId={props.producer.id}
         form={certificationsForm}
       />

@@ -22,6 +22,7 @@ import {
   useQuery,
   UseQueryOptions,
 } from "@tanstack/react-query";
+import { searchProducersLocal } from "./local-search";
 
 export function useExternalApiKeys(
   opts?: Omit<
@@ -342,5 +343,40 @@ export function useProducer(
     ...(props as object),
     queryKey: ["producer", producerId] as const,
     queryFn: async () => await rpc.producers.get({ id: producerId }),
+  });
+}
+
+export function useUser(userId: string | null) {
+  return useQuery({
+    queryKey: ["user", userId],
+    queryFn: async () => {
+      if (!userId) {
+        return null;
+      }
+      return await rpc.users.get({ userId: userId });
+    },
+  });
+}
+
+export function useSearchProducers(props: { page: number; query: string }) {
+  return useQuery({
+    queryKey: ["search-producers", props],
+    queryFn: async () => {
+      const query = props.query.trim().length === 0 ? "*" : props.query.trim();
+
+      return await searchProducersLocal({
+        page: props.page,
+        query: query,
+      });
+    },
+  });
+}
+
+export function useListCertifications() {
+  return useQuery({
+    queryKey: ["list-certification"] as const,
+    queryFn: () => rpc.certifications.list(),
+    staleTime: 24 * 60 * 60 * 1000, // 24h
+    gcTime: 7 * 24 * 60 * 60 * 1000,
   });
 }

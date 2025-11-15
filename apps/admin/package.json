@@ -13,6 +13,8 @@
     "scripts:register-admin": "dotenv -- tsx ./src/scripts/register-admin.ts"
   },
   "dependencies": {
+    "@clerk/backend": "^2.19.2",
+    "@clerk/types": "^4.100.0",
     "@ea/db": "workspace:*",
     "@ea/forms": "workspace:*",
     "@ea/search": "workspace:*",
@@ -29,6 +31,8 @@
     "@tanstack/react-form": "^1.25.0",
     "@tanstack/react-query": "^5.90.6",
     "@tanstack/react-query-devtools": "^5.90.2",
+    "@tanstack/react-table": "^8.21.3",
+    "@uidotdev/usehooks": "^2.4.1",
     "arktype": "^2.1.25",
     "better-auth": "^1.3.34",
     "class-variance-authority": "^0.7.1",
