@@ -9,10 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@ea/ui/dialog";
 import { Button } from "@ea/ui/button";
 import { CheckIcon, MapIcon, Trash2Icon } from "lucide-react";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { useHomePageStore } from "@/stores";
 
 export function LocationSelect({ disabled }: { disabled: boolean }) {

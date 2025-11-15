@@ -16,9 +16,9 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectValue,
   SelectTrigger,
 } from "@ea/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
 import { COUNTRIES } from "@/utils/contries";
 import { Label } from "@ea/ui/label";
 import { useCertificationTypes, useProducerCountries } from "@/utils/producers";

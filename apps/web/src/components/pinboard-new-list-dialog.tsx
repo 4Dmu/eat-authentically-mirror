@@ -4,8 +4,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@ea/ui/dialog";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "@ea/ui/button";
 import { Input } from "@ea/ui/input";
 import { useForm } from "@tanstack/react-form";

@@ -23,8 +23,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@ea/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
 import { useAtom } from "jotai";
 import { COUNTRIES } from "@/utils/contries";
 
