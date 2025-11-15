@@ -1,7 +1,7 @@
 import { PinboardFull } from "@/backend/rpc/pinboard";
 import { env } from "@/env";
 import { countryByAlpha3Code } from "@/utils/contries";
-import { producerSlugFull } from "@/utils/producers";
+import { producerSlugFull } from "@/utils/producer-helpers";
 import {
   APIProvider,
   InfoWindow,

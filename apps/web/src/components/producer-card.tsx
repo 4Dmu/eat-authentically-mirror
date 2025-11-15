@@ -1,4 +1,4 @@
-import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
+import { primaryImageUrl, producerSlugFull } from "@/utils/producer-helpers";
 import { Badge } from "@ea/ui/badge";
 import Link from "next/link";
 import Image from "next/image";

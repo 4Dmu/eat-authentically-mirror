@@ -1,25 +1,5 @@
 "use client";
 import type { ProducerSearchResultRow } from "@ea/search";
-import type { ColumnDef } from "@tanstack/react-table";
-import Image from "next/image";
-import Link from "next/link";
-import { Input } from "@ea/ui/input";
-import { Skeleton } from "@ea/ui/skeleton";
-import { useThrottle } from "@uidotdev/usehooks";
-import { useMemo, useState } from "react";
-import { useRemoveProducer, useSearchProducers } from "@/client/data";
-import { AppWrapper } from "@/components/app-wrapper";
-import { DataTable } from "@/components/data-table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@ea/ui/dropdown-menu";
-import { Button } from "@ea/ui/button";
-import { MoreHorizontal } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,7 +11,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@ea/ui/alert-dialog";
+import { Button } from "@ea/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@ea/ui/dropdown-menu";
+import { Input } from "@ea/ui/input";
+import { Skeleton } from "@ea/ui/skeleton";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useThrottle } from "@uidotdev/usehooks";
+import { MoreHorizontal } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useRemoveProducer, useSearchProducers } from "@/client/data";
+import { AppWrapper } from "@/components/app-wrapper";
+import { DataTable } from "@/components/data-table";
 
 export const columns: ColumnDef<ProducerSearchResultRow>[] = [
   {
@@ -172,6 +172,18 @@ export default function Page() {
 
   const results = useSearchProducers({ page: page, query: throttledQuery });
 
+  const removeProducer = useRemoveProducer({
+    onSuccess: async () => {
+      await results.refetch();
+    },
+    onError: (e) => {
+      console.log(e);
+      toast.error("Error deleting producer", {
+        description: e.message,
+      });
+    },
+  });
+
   const columns = useMemo<ColumnDef<ProducerSearchResultRow>[]>(
     () => [
       {
@@ -227,17 +239,6 @@ export default function Page() {
         id: "actions",
         cell: ({ row }) => {
           const document = row.original;
-          const removeProducer = useRemoveProducer({
-            onSuccess: async () => {
-              await results.refetch();
-            },
-            onError: (e) => {
-              console.log(e);
-              toast.error("Error deleting producer", {
-                description: e.message,
-              });
-            },
-          });
 
           return (
             <AlertDialog>
@@ -316,7 +317,7 @@ export default function Page() {
         },
       },
     ],
-    [results.refetch]
+    [removeProducer],
   );
 
   return (

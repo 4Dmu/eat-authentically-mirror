@@ -18,16 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@ea/ui/card";
-import {
-  useDeleteProducer,
-  useFetchUserProducers,
-  producerSlugFull,
-} from "@/utils/producers";
+import { useDeleteProducer, useFetchUserProducers } from "@/utils/producers";
 import { useAtom } from "jotai";
 import { BuildingIcon, EyeIcon, EditIcon, TrashIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { producerSlugFull } from "@/utils/producer-helpers";
 
 export function ProducersSection({
   producers,

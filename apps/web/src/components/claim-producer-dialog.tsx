@@ -15,11 +15,7 @@ import {
   DialogTrigger,
 } from "@ea/ui/dialog";
 import { Button } from "@ea/ui/button";
-import {
-  useClaimProducer,
-  primaryImageUrl,
-  useProducers,
-} from "@/utils/producers";
+import { useClaimProducer, useProducers } from "@/utils/producers";
 import { useDebounce } from "@uidotdev/usehooks";
 import { Input } from "@ea/ui/input";
 import { ScrollArea } from "@ea/ui/scroll-area";
@@ -44,6 +40,7 @@ import {
   StepSetter,
   useClaimProducerSteps,
 } from "@/hooks/use-claim-producer-steps";
+import { primaryImageUrl } from "@/utils/producer-helpers";
 
 const LIMIT = 50;
 
@@ -182,7 +179,7 @@ export function ClaimProducerDialog(props: PropsWithChildren) {
                       <Image
                         src={primaryImageUrl(p)}
                         alt=""
-                        className="border-r aspect-[4/3] object-cover"
+                        className="border-r aspect-4/3 object-cover"
                         width={100}
                         height={100}
                       />

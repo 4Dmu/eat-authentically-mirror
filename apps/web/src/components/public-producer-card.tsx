@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { primaryImageUrl, producerSlugFull } from "@/utils/producers";
+import { primaryImageUrl, producerSlugFull } from "@/utils/producer-helpers";
 import { Badge } from "@ea/ui/badge";
 import { AddToPinboardIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";

@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@ea/ui/card";
 import { Label } from "@ea/ui/label";
-import { primaryImageUrl, useFullProducerPublic } from "@/utils/producers";
+import { useFullProducerPublic } from "@/utils/producers";
 import {
   EllipsisIcon,
   GlobeIcon,
@@ -60,6 +60,7 @@ import {
   UnstyledDropdownMenuItem,
   DropdownMenuTrigger,
 } from "@ea/ui/dropdown-menu";
+import { primaryImageUrl } from "@/utils/producer-helpers";
 
 export function ProducerPageClient(props: {
   producer: ProducerWithAll;
