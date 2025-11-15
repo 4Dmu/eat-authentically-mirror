@@ -1,5 +1,5 @@
 // app/api/unread/route.ts
-import { USER_MESSAGE_NOTIFICATIONS_KV } from "@/backend/kv";
+import { USER_MESSAGE_NOTIFICATIONS_KV } from "@ea/kv";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 

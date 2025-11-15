@@ -1,0 +1,19 @@
+{
+  "name": "@ea/kv",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./redis": "./src/redis.ts"
+  },
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.8",
+    "@upstash/redis": "^1.35.6",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@clerk/backend": "^2.22.0",
+    "@standard-schema/spec": "^1.0.0",
+    "@types/node": "^24.5.2",
+    "typescript": "latest"
+  }
+}

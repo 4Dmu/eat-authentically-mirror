@@ -11,7 +11,7 @@ import {
   producerMedia,
   producers,
 } from "@ea/db/schema";
-import { USER_PRODUCER_IDS_KV } from "../kv";
+import { USER_PRODUCER_IDS_KV } from "@ea/kv";
 import {
   countryByAlpha2Code,
   countryByAlpha3Code,

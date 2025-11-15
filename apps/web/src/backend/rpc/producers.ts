@@ -79,7 +79,7 @@ import { registerProducerArgsValidator } from "@ea/validators/producers";
 import { resend } from "../lib/resend";
 import { getDnsRecords } from "@layered/dns-records";
 import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "@ea/shared/constants";
-import { PRODUCER_COUNTRIES_CACHE, USER_PRODUCER_IDS_KV } from "../kv";
+import { PRODUCER_COUNTRIES_CACHE, USER_PRODUCER_IDS_KV } from "@ea/kv";
 import { sendClaimCodeMessage } from "./helpers/sms";
 import { isMobilePhone, isNumeric } from "validator";
 import { addMinutes, isAfter, isBefore } from "date-fns";

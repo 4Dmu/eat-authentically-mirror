@@ -1,7 +1,7 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
 import { actionClient } from "./helpers/safe-action";
-import { USER_DATA_KV } from "../kv";
+import { USER_DATA_KV } from "@ea/kv";
 import { getSubTier, SubTier } from "./utils/get-sub-tier";
 import { getUsersProducerIdsCached } from "../data/producer";
 

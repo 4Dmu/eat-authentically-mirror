@@ -32,6 +32,9 @@ importers:
       '@ea/forms':
         specifier: workspace:*
         version: link:../../packages/forms
+      '@ea/kv':
+        specifier: workspace:*
+        version: link:../../packages/kv
       '@ea/search':
         specifier: workspace:*
         version: link:../../packages/search
@@ -204,6 +207,9 @@ importers:
       '@ea/forms':
         specifier: workspace:*
         version: link:../../packages/forms
+      '@ea/kv':
+        specifier: workspace:*
+        version: link:../../packages/kv
       '@ea/search':
         specifier: workspace:*
         version: link:../../packages/search
@@ -645,6 +651,31 @@ importers:
       '@types/validator':
         specifier: ^13.15.4
         version: 13.15.4
+      typescript:
+        specifier: latest
+        version: 5.9.3
+
+  packages/kv:
+    dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.13.8
+        version: 0.13.8(arktype@2.1.25)(typescript@5.9.3)(zod@4.1.12)
+      '@upstash/redis':
+        specifier: ^1.35.6
+        version: 1.35.6
+      zod:
+        specifier: ^4.0.17
+        version: 4.1.12
+    devDependencies:
+      '@clerk/backend':
+        specifier: ^2.22.0
+        version: 2.22.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@standard-schema/spec':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.10.0
       typescript:
         specifier: latest
         version: 5.9.3
@@ -1116,6 +1147,10 @@ packages:
 
   '@clerk/backend@2.19.2':
     resolution: {integrity: sha512-SlBZUGVPlZiBm6lDNqo5NBbzcb17u7jzWT1US+d4jxJdvNVLBNo+1aL4PyAm9IMpdecKgIbmfbWT63cKXO85Gg==}
+    engines: {node: '>=18.17.0'}
+
+  '@clerk/backend@2.22.0':
+    resolution: {integrity: sha512-d/PWhQ9l531SJArX3vYXzAMPLYkkSmfVOl6/MxuiCWTUzx8J8ZIxXT/duXQNM6jM8NRfyQbnt+kLPoE+L0zBlg==}
     engines: {node: '>=18.17.0'}
 
   '@clerk/clerk-react@5.53.5':
@@ -7540,6 +7575,17 @@ snapshots:
   '@clerk/backend@2.19.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@clerk/shared': 3.30.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@clerk/types': 4.100.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      cookie: 1.0.2
+      standardwebhooks: 1.0.0
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
+  '@clerk/backend@2.22.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+    dependencies:
+      '@clerk/shared': 3.34.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@clerk/types': 4.100.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       cookie: 1.0.2
       standardwebhooks: 1.0.0

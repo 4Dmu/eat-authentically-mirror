@@ -1,4 +1,4 @@
-import { USER_STRIPE_CUSTOMER_ID_KV } from "@/backend/kv";
+import { USER_STRIPE_CUSTOMER_ID_KV } from "@ea/kv";
 import { billingPortalRatelimit } from "@/backend/lib/rate-limit";
 import { createBillingPortalSession } from "@/backend/rpc/stripe";
 import { auth } from "@clerk/nextjs/server";

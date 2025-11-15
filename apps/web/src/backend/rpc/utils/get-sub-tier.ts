@@ -1,7 +1,5 @@
-import {
-  STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
-  USER_STRIPE_CUSTOMER_ID_KV,
-} from "@/backend/kv";
+import { STRIPE_CUSTOMER_SUBSCRIPTIONS_KV } from "@/backend/kv";
+import { USER_STRIPE_CUSTOMER_ID_KV } from "@ea/kv";
 import { PLANS } from "@/backend/stripe/subscription-plans";
 import { auth } from "@clerk/nextjs/server";
 

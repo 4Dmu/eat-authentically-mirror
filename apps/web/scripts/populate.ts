@@ -1,5 +1,5 @@
 import { db } from "@ea/db";
-import { COMMODITIES_CACHE, COMMODITY_VARIANTS_CACHE } from "@/backend/kv";
+import { COMMODITIES_CACHE, COMMODITY_VARIANTS_CACHE } from "@ea/kv";
 
 export async function main() {
   const commodities = await db.query.commodities

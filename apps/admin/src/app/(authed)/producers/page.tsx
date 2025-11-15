@@ -1,15 +1,37 @@
 "use client";
 import type { ProducerSearchResultRow } from "@ea/search";
-import { Input } from "@ea/ui/input";
-import { Skeleton } from "@ea/ui/skeleton";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useThrottle } from "@uidotdev/usehooks";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { useSearchProducers } from "@/client/data";
+import { Input } from "@ea/ui/input";
+import { Skeleton } from "@ea/ui/skeleton";
+import { useThrottle } from "@uidotdev/usehooks";
+import { useMemo, useState } from "react";
+import { useRemoveProducer, useSearchProducers } from "@/client/data";
 import { AppWrapper } from "@/components/app-wrapper";
 import { DataTable } from "@/components/data-table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@ea/ui/dropdown-menu";
+import { Button } from "@ea/ui/button";
+import { MoreHorizontal } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@ea/ui/alert-dialog";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<ProducerSearchResultRow>[] = [
   {
@@ -53,10 +75,93 @@ export const columns: ColumnDef<ProducerSearchResultRow>[] = [
   {
     accessorKey: "id",
     header: "Id",
+    cell: ({ row }) => {
+      return <p className="break-all">{row.original.id}</p>;
+    },
   },
   {
     accessorKey: "userId",
     header: "User Id",
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const document = row.original;
+      const removeProducer = useRemoveProducer({
+        onSuccess: () => toast.success("Producer deleted successfully"),
+        onError: (e) => {
+          console.log(e);
+          toast.error("Error deleting producer", {
+            description: e.message,
+          });
+        },
+      });
+
+      return (
+        <AlertDialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(document.id)}
+              >
+                Copy producer ID
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  if (document.userId) {
+                    navigator.clipboard.writeText(document.userId);
+                  } else {
+                    navigator.clipboard.writeText("null");
+                  }
+                }}
+              >
+                Copy producer userId
+              </DropdownMenuItem>
+
+              <AlertDialogTrigger asChild disabled={removeProducer.isPending}>
+                <DropdownMenuItem>Delete Producer</DropdownMenuItem>
+              </AlertDialogTrigger>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href={`/producers/${row.original.id}`}>
+                  View producer
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this
+                producer, it will not delete the user it may be associated with
+                or other producers associated with that user.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={removeProducer.isPending}
+                variant={"destructive"}
+                onClick={() =>
+                  removeProducer.mutate({ producerId: document.id })
+                }
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      );
+    },
   },
 ];
 
@@ -64,7 +169,156 @@ export default function Page() {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const throttledQuery = useThrottle(query, 500);
+
   const results = useSearchProducers({ page: page, query: throttledQuery });
+
+  const columns = useMemo<ColumnDef<ProducerSearchResultRow>[]>(
+    () => [
+      {
+        accessorKey: "coverUrl",
+        header: "Cover",
+        cell: ({ row }) => {
+          return (
+            <>
+              {row.original.coverUrl ? (
+                <Image
+                  className="size-12 object-cover rounded-lg"
+                  alt="cover"
+                  width={300}
+                  height={300}
+                  src={row.original.coverUrl}
+                />
+              ) : (
+                <Skeleton className="size-12 object-cover flex justify-center items-center text-center">
+                  <p>
+                    No
+                    <br />
+                    Image
+                  </p>
+                </Skeleton>
+              )}
+            </>
+          );
+        },
+      },
+      {
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ row }) => {
+          return (
+            <Link className="underline" href={`/producers/${row.original.id}`}>
+              {row.original.name}
+            </Link>
+          );
+        },
+      },
+      {
+        accessorKey: "id",
+        header: "Id",
+        cell: ({ row }) => {
+          return <p className="break-all">{row.original.id}</p>;
+        },
+      },
+      {
+        accessorKey: "userId",
+        header: "User Id",
+      },
+      {
+        id: "actions",
+        cell: ({ row }) => {
+          const document = row.original;
+          const removeProducer = useRemoveProducer({
+            onSuccess: async () => {
+              await results.refetch();
+            },
+            onError: (e) => {
+              console.log(e);
+              toast.error("Error deleting producer", {
+                description: e.message,
+              });
+            },
+          });
+
+          return (
+            <AlertDialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onClick={() => navigator.clipboard.writeText(document.id)}
+                  >
+                    Copy producer ID
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (document.userId) {
+                        navigator.clipboard.writeText(document.userId);
+                      } else {
+                        navigator.clipboard.writeText("null");
+                      }
+                    }}
+                  >
+                    Copy producer userId
+                  </DropdownMenuItem>
+
+                  <AlertDialogTrigger
+                    asChild
+                    disabled={removeProducer.isPending}
+                  >
+                    <DropdownMenuItem>Delete Producer</DropdownMenuItem>
+                  </AlertDialogTrigger>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href={`/producers/${row.original.id}`}>
+                      View producer
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    this producer, it will not delete the user it may be
+                    associated with or other producers associated with that
+                    user.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={removeProducer.isPending}
+                    variant={"destructive"}
+                    onClick={() => {
+                      const promise = removeProducer.mutateAsync({
+                        producerId: document.id,
+                      });
+                      toast.promise(promise, {
+                        loading: "Deleting producer",
+                        success: "Producer deleted successfully",
+                      });
+                    }}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          );
+        },
+      },
+    ],
+    [results.refetch]
+  );
+
   return (
     <AppWrapper crumbs={[{ url: "/", name: "EA Admin" }]} end="Producers">
       <div className="flex justify-center p-10">

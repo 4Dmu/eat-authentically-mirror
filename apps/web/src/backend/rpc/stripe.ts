@@ -6,11 +6,8 @@ import {
   authenticatedActionClient,
   authenticatedWithUserActionClient,
 } from "./helpers/middleware";
-import {
-  STRIPE_CUSTOMER_ID_USER_KV,
-  STRIPE_CUSTOMER_SUBSCRIPTIONS_KV,
-  USER_STRIPE_CUSTOMER_ID_KV,
-} from "../kv";
+import { STRIPE_CUSTOMER_SUBSCRIPTIONS_KV } from "../kv";
+import { USER_STRIPE_CUSTOMER_ID_KV, STRIPE_CUSTOMER_ID_USER_KV } from "@ea/kv";
 import { auth } from "@clerk/nextjs/server";
 import { updateKvWithLatestStripeData } from "../stripe/stripe-sync";
 import { CreateCheckoutSessionArgsValidator } from "@ea/validators/stripe";

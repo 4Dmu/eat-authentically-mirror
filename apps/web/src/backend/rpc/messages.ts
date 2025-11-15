@@ -35,7 +35,7 @@ import {
   unblockProducerChatArgs,
   unblockUserChatArgs,
 } from "@ea/validators/messages";
-import { USER_DATA_KV, USER_MESSAGE_NOTIFICATIONS_KV } from "../kv";
+import { USER_DATA_KV, USER_MESSAGE_NOTIFICATIONS_KV } from "@ea/kv";
 
 export const sendMessageToProducer = authenticatedActionClient
   .input(sendMessageToProducerArgs)

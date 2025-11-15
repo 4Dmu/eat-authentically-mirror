@@ -1,8 +1,4 @@
-import {
-  USER_COUNT_KV,
-  USER_DATA_KV,
-  USER_DELETED_COUNT_KV,
-} from "@/backend/kv";
+import { USER_COUNT_KV, USER_DATA_KV, USER_DELETED_COUNT_KV } from "@ea/kv";
 import { logger } from "@/backend/lib/log";
 import { env } from "@/env";
 import { verifyWebhook } from "@clerk/backend/webhooks";

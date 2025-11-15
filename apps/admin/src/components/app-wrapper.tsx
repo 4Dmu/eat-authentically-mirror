@@ -50,7 +50,7 @@ export function AppWrapper({
           </Breadcrumb>
         </div>
       </header>
-      <div className="bg-background p-5">{children}</div>
+      <div className="bg-background p-5 w-full">{children}</div>
     </SidebarInset>
   );
 }

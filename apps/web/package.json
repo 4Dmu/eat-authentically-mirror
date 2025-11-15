@@ -30,6 +30,7 @@
     "@ea/search": "workspace:*",
     "@ea/shared": "workspace:*",
     "@ea/ui": "workspace:*",
+    "@ea/kv": "workspace:*",
     "@ea/validators": "workspace:*",
     "@layered/dns-records": "^2.3.0",
     "@libsql/client": "^0.15.12",
