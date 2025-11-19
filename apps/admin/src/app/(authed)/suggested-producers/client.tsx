@@ -32,6 +32,8 @@ import {
 import { AppWrapper } from "@/components/app-wrapper";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
 import type { SuggestedProducersListItem } from "@/rpc/suggested-producers";
+import { Badge } from "@ea/ui/badge";
+import Link from "next/link";
 
 export function SuggestedProducersPage({
   suggested,
@@ -53,56 +55,70 @@ export function SuggestedProducersPage({
           <div>
             {producers.data?.map((producer) => (
               <Card key={producer.id}>
-                <CardHeader>
-                  <CardTitle>
-                    "{producer.name}" suggested by{" "}
-                    {producer.suggesterUserData?.first_name}{" "}
-                    {producer.suggesterUserData?.last_name}
-                  </CardTitle>
+                <CardHeader className="flex justify-between items-center">
+                  <div className="flex flex-col gap-2">
+                    <Badge variant={"secondary"}>{producer.status}</Badge>
+                    <CardTitle>
+                      "{producer.name}" suggested by{" "}
+                      {producer.suggesterUserData?.first_name}{" "}
+                      {producer.suggesterUserData?.last_name}
+                    </CardTitle>
+                  </div>
+                  {producer.producerId && (
+                    <Button asChild>
+                      <Link href={`/producers/${producer.producerId}`}>
+                        Visit
+                      </Link>
+                    </Button>
+                  )}
                 </CardHeader>
-                <CardContent className="flex flex-col gap-5">
-                  <div className="flex flex-col gap-2">
-                    <Label>Name</Label>
-                    <Input readOnly defaultValue={producer.name} />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label>Type</Label>
-                    <Input readOnly defaultValue={producer.type} />
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-5">
-                    <div className="flex flex-col gap-2">
-                      <Label>Email</Label>
-                      {producer.email ? (
-                        <Input readOnly defaultValue={producer.email} />
-                      ) : (
-                        <p>No email provided</p>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Label>Phone</Label>
-                      {producer.phone ? (
-                        <Input readOnly defaultValue={producer.phone} />
-                      ) : (
-                        <p>No phone provided</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label>Address</Label>
-                    {producer.address ? (
-                      <Textarea
-                        readOnly
-                        defaultValue={`${producer.address?.street}, ${producer.address?.city}, ${producer.address?.state}, ${producer.address?.zip}, ${producer.address?.country}`}
-                      />
-                    ) : (
-                      <p>No address provided</p>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex gap-2">
-                  <ApproveDialog suggested={producer} />
-                  <Button variant={"destructive"}>Reject</Button>
-                </CardFooter>
+                {producer.status === "pending" && (
+                  <>
+                    <CardContent className="flex flex-col gap-5">
+                      <div className="flex flex-col gap-2">
+                        <Label>Name</Label>
+                        <Input readOnly defaultValue={producer.name} />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label>Type</Label>
+                        <Input readOnly defaultValue={producer.type} />
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-5">
+                        <div className="flex flex-col gap-2">
+                          <Label>Email</Label>
+                          {producer.email ? (
+                            <Input readOnly defaultValue={producer.email} />
+                          ) : (
+                            <p>No email provided</p>
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <Label>Phone</Label>
+                          {producer.phone ? (
+                            <Input readOnly defaultValue={producer.phone} />
+                          ) : (
+                            <p>No phone provided</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label>Address</Label>
+                        {producer.address ? (
+                          <Textarea
+                            readOnly
+                            defaultValue={`${producer.address?.street}, ${producer.address?.city}, ${producer.address?.state}, ${producer.address?.zip}, ${producer.address?.country}`}
+                          />
+                        ) : (
+                          <p>No address provided</p>
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex gap-2">
+                      <ApproveDialog suggested={producer} />
+                      <Button variant={"destructive"}>Reject</Button>
+                    </CardFooter>
+                  </>
+                )}
               </Card>
             ))}
           </div>

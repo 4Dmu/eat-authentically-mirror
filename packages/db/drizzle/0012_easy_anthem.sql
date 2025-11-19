@@ -1,0 +1,1 @@
+ALTER TABLE `suggested_producers` ADD `producerId` text REFERENCES producers(id);

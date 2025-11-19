@@ -34,15 +34,17 @@ export const list = authenticatedActionClient
   .name("suggested-producers.list")
   .action(async () => {
     const producers = await db.query.suggestedProducers.findMany({
-      orderBy: desc(suggestedProducers.createdAt),
-      where: eq(suggestedProducers.status, "pending"),
+      orderBy: [
+        desc(suggestedProducers.createdAt),
+        desc(suggestedProducers.status),
+      ],
     });
 
     const suggestions = [];
 
     for (const producer of producers) {
       const userWithSuggestion = await USER_DATA_KV.get(
-        producer.suggesterUserId,
+        producer.suggesterUserId
       );
       suggestions.push({ ...producer, suggesterUserData: userWithSuggestion });
     }
@@ -57,7 +59,7 @@ export const approve = authenticatedActionClient
     const suggested = await db.query.suggestedProducers.findFirst({
       where: and(
         eq(suggestedProducers.id, input.suggestedProducerId),
-        eq(suggestedProducers.status, "pending"),
+        eq(suggestedProducers.status, "pending")
       ),
       orderBy: desc(suggestedProducers.createdAt),
     });

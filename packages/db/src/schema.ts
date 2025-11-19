@@ -102,6 +102,7 @@ export const suggestedProducers = sqliteTable("suggested_producers", {
   status: text({ enum: ["pending", "rejected", "accepted"] })
     .notNull()
     .default("pending"),
+  producerId: text().references(() => producers.id),
   name: text().notNull(),
   type: text({ enum: PRODUCER_TYPES }).notNull(),
   address: text({ mode: "json" }).$type<Address>(),
@@ -1014,8 +1015,8 @@ export const producerCards = sqliteView("v_producer_cards").as((qb) =>
           FROM ${producerMedia}
           WHERE ${eq(producerMedia.producerId, producers.id)}
           ORDER BY (${producerMedia.role} = 'cover') DESC, ${
-            producerMedia.position
-          } ASC
+        producerMedia.position
+      } ASC
           LIMIT 1
         )
       )`.as("thumbnailUrl"),
@@ -1044,8 +1045,8 @@ export const producerRatingScores = sqliteView("v_producer_rating_scores").as(
           String(PRIOR_MEAN)
         )} + ${producerRatingAgg.ratingSum})
                     / NULLIF(${sql.raw(String(PRIOR_WEIGHT))} + ${
-                      producerRatingAgg.reviewCount
-                    }, 0)`.as("bayesAvg"),
+          producerRatingAgg.reviewCount
+        }, 0)`.as("bayesAvg"),
         lastReviewAt: producerRatingAgg.lastReviewAt,
         updatedAt: producerRatingAgg.updatedAt,
       })
