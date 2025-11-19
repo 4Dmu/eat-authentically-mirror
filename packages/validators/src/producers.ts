@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
 import { ClaimRequestStatus } from "@ea/db/schema";
-import { isMobilePhone } from "validator";
+import { isMobilePhone, isNumeric } from "validator";
 import {
   mediaAssetSelectValidator,
   producerCertificationsSelectValidator,
@@ -129,7 +129,16 @@ export const suggestProducerArgs = type({
     city: type("string").atLeastLength(1),
     state: type("string").atLeastLength(1),
     country: alpha3CountryCodeValidator,
-    zip: type("string.numeric").atLeastLength(2),
+    zip: type("string")
+      .atLeastLength(2)
+      .narrow((data, ctx) => {
+        for (const char of data) {
+          if (!isNumeric(char) && char !== "-") {
+            ctx.reject({ expected: "number or -", actual: "" });
+          }
+        }
+        return true;
+      }),
   }),
   "email?": "string.email|undefined",
   "phone?": type("string|undefined").narrow((v, ctx) =>
@@ -156,6 +165,15 @@ export const suggestProducerArgs = type({
     return false;
   }
   return true;
+});
+
+export const approveSuggestedProducerArgs = type({
+  suggestedProducerId: "string.uuid",
+  additional: {
+    lat: "string.numeric.parse",
+    lng: "string.numeric.parse",
+    about: "string",
+  },
 });
 
 export const editProducerFormValidator = producerSelectValidator
@@ -530,3 +548,6 @@ export type SearchProducersQueryArgs = {
   limit: number;
   offset: number;
 };
+
+export type ApproveSuggestedProducerArgs =
+  typeof approveSuggestedProducerArgs.inferIn;

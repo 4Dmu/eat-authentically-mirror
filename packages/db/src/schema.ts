@@ -41,7 +41,7 @@ type ClaimProducerVerificationInternal =
       socialHandle: string;
     };
 
-type Address = {
+export type Address = {
   street?: string | undefined;
   city?: string | undefined;
   state?: string | undefined;
@@ -99,6 +99,9 @@ export const PINBOARD_VIEW_MODES = ["grid", "list", "map"] as const;
 export const suggestedProducers = sqliteTable("suggested_producers", {
   id: text().primaryKey(),
   suggesterUserId: text("suggester_user_id").notNull(),
+  status: text({ enum: ["pending", "rejected", "accepted"] })
+    .notNull()
+    .default("pending"),
   name: text().notNull(),
   type: text({ enum: PRODUCER_TYPES }).notNull(),
   address: text({ mode: "json" }).$type<Address>(),

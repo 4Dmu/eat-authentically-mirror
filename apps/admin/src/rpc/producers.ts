@@ -358,7 +358,7 @@ export const editLocation = authenticatedActionClient
           .onConflictDoUpdate({
             set: { ...toUpdate },
             target: producerLocation.producerId,
-          })
+          }),
       );
     }
 
@@ -395,9 +395,9 @@ export const editCertifications = authenticatedActionClient
           eq(producerCertifications.producerId, producer.id),
           notInArray(
             producerCertifications.certificationId,
-            input.certifications
-          )
-        )
+            input.certifications,
+          ),
+        ),
       );
 
     await db
@@ -407,7 +407,7 @@ export const editCertifications = authenticatedActionClient
           producerId: input.producerId,
           certificationId: cert,
           addedAt: new Date(),
-        }))
+        })),
       )
       .onConflictDoNothing();
 
@@ -456,12 +456,12 @@ export const editCommodities = authenticatedActionClient
       .where(
         and(
           eq(producerCommodities.producerId, producer.id),
-          notInArray(producerCommodities.commodityId, input.commodities)
-        )
+          notInArray(producerCommodities.commodityId, input.commodities),
+        ),
       );
 
     const newComms = input.commodities.filter(
-      (ic) => !producer.commodities.some((ec) => ec.commodityId === ic)
+      (ic) => !producer.commodities.some((ec) => ec.commodityId === ic),
     );
 
     if (newComms.length > 0) {
@@ -470,7 +470,7 @@ export const editCommodities = authenticatedActionClient
           producerId: input.producerId,
           commodityId: cert,
           updatedAt: new Date(),
-        }))
+        })),
       );
     }
 
@@ -561,7 +561,7 @@ export const requestUploadUrls = authenticatedActionClient
         .array()
         .atLeastLength(1)
         .atMostLength(10),
-    })
+    }),
   )
   .name("producers.requestUploadUrls")
   .action(
@@ -589,7 +589,7 @@ export const requestUploadUrls = authenticatedActionClient
       const images = producer.media.filter(
         (m) =>
           m.asset.contentType === undefined ||
-          m.asset.contentType?.startsWith("image/")
+          m.asset.contentType?.startsWith("image/"),
       );
 
       const maxFiles = 10;
@@ -610,7 +610,7 @@ export const requestUploadUrls = authenticatedActionClient
         form.set("creator", session.user.id);
         form.set(
           "metadata",
-          JSON.stringify({ producerId: producer.id, userId: session.user.id })
+          JSON.stringify({ producerId: producer.id, userId: session.user.id }),
         );
 
         const uploadUrlGeneratorCloudflareResponse = await fetch(
@@ -621,7 +621,7 @@ export const requestUploadUrls = authenticatedActionClient
               Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
             },
             body: form,
-          }
+          },
         );
 
         const uploadUrlGeneratorCloudflareResponseBody =
@@ -653,7 +653,7 @@ export const requestUploadUrls = authenticatedActionClient
         .where(eq(producers.id, producer.id));
 
       return urls;
-    }
+    },
   );
 
 export const requestVideoUploadUrl = authenticatedActionClient
@@ -674,7 +674,7 @@ export const requestVideoUploadUrl = authenticatedActionClient
     const pendingVideo = await db.query.pendingMediaAssets.findFirst({
       where: and(
         eq(pendingMediaAssets.ownerUserId, session.user.id),
-        eq(pendingMediaAssets.mode, "cloudflare-stream")
+        eq(pendingMediaAssets.mode, "cloudflare-stream"),
       ),
     });
 
@@ -698,7 +698,7 @@ export const requestVideoUploadUrl = authenticatedActionClient
         producerId: producer.id,
         message: "Made by admin",
         userId: session.session.userId,
-      })
+      }),
     );
 
     const uploadUrlGeneratorCloudflareResponse = await fetch(
@@ -723,7 +723,7 @@ export const requestVideoUploadUrl = authenticatedActionClient
             message: "Made by admin",
           },
         }),
-      }
+      },
     );
 
     const uploadUrlGeneratorCloudflareResponseBody =
@@ -770,7 +770,7 @@ export const confirmPengingUpload = authenticatedActionClient
     const pendingImages = await db.query.pendingMediaAssets.findMany({
       where: and(
         eq(pendingMediaAssets.ownerUserId, session.user.id),
-        eq(pendingMediaAssets.mode, "cloudflare-image")
+        eq(pendingMediaAssets.mode, "cloudflare-image"),
       ),
     });
 
@@ -785,7 +785,7 @@ export const confirmPengingUpload = authenticatedActionClient
           headers: {
             Authorization: `Bearer ${env.SAFE_CLOUDFLARE_API_TOKEN}`,
           },
-        }
+        },
       );
 
       const imagesListBody = (await imageListResponse.json()) as {
@@ -800,7 +800,7 @@ export const confirmPengingUpload = authenticatedActionClient
 
       for (const pendingImage of pendingImages) {
         const cloudflareImage = imagesListBody.result.images.find(
-          (img) => img.id === pendingImage.pendingAssetKey
+          (img) => img.id === pendingImage.pendingAssetKey,
         );
 
         if (!cloudflareImage) {
@@ -878,7 +878,7 @@ export const confirmPendingVideoUpload = authenticatedActionClient
     const pendingVideos = await db.query.pendingMediaAssets.findMany({
       where: and(
         eq(pendingMediaAssets.ownerUserId, session.user.id),
-        eq(pendingMediaAssets.mode, "cloudflare-stream")
+        eq(pendingMediaAssets.mode, "cloudflare-stream"),
       ),
     });
 
@@ -894,7 +894,7 @@ export const confirmPendingVideoUpload = authenticatedActionClient
 
       for (const pendingVideo of pendingVideos) {
         const cloudflareVideo = videosPage.result.find(
-          (vid) => vid.uid === pendingVideo.pendingAssetKey
+          (vid) => vid.uid === pendingVideo.pendingAssetKey,
         );
 
         if (
@@ -967,7 +967,7 @@ export const deleteVideo = authenticatedActionClient
     const video = await db.query.producerMedia.findFirst({
       where: and(
         eq(producerMedia.producerId, producerId),
-        eq(producerMedia.role, "video")
+        eq(producerMedia.role, "video"),
       ),
       with: { asset: true },
     });
@@ -990,7 +990,7 @@ export const updateExistingImages = authenticatedActionClient
       data: producerMediaSelectValidator
         .and({ asset: mediaAssetSelectValidator })
         .array(),
-    })
+    }),
   )
   .name("producers.updateExistingImages")
   .action(async ({ ctx: { session }, input: { producerId, data } }) => {
@@ -1011,7 +1011,7 @@ export const updateExistingImages = authenticatedActionClient
       where: and(
         eq(producerMedia.producerId, producer.id),
         ne(producerMedia.role, "video"),
-        notInArray(producerMedia.assetId, ids)
+        notInArray(producerMedia.assetId, ids),
       ),
       columns: {},
       with: {
@@ -1030,19 +1030,19 @@ export const updateExistingImages = authenticatedActionClient
       }
 
       logger.info(
-        `action [updateExistingImages] - Deleting image (${image.asset.cloudflareId}) - run by admin(${session.user.id})`
+        `action [updateExistingImages] - Deleting image (${image.asset.cloudflareId}) - run by admin(${session.user.id})`,
       );
 
       const response = await cloudflare.images.v1.delete(
         image.asset.cloudflareId,
         {
           account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-        }
+        },
       );
 
       logger.info(
         `action [updateExistingImages] - Cloudflare delete image response`,
-        { response: response }
+        { response: response },
       );
 
       await db.delete(mediaAssets).where(eq(mediaAssets.id, image.asset.id));
@@ -1059,8 +1059,8 @@ export const updateExistingImages = authenticatedActionClient
         .where(
           and(
             eq(producerMedia.producerId, producerId),
-            eq(producerMedia.assetId, image.assetId)
-          )
+            eq(producerMedia.assetId, image.assetId),
+          ),
         );
     }
 
@@ -1098,7 +1098,7 @@ export const remove = authenticatedActionClient
     }
 
     logger.info(
-      `[deleteProducer] Starting deletion proccess - admin Id: ${session.user.id} producerId: ${producer.id}`
+      `[deleteProducer] Starting deletion proccess - admin Id: ${session.user.id} producerId: ${producer.id}`,
     );
 
     const media = await db.query.producerMedia.findMany({
@@ -1116,7 +1116,7 @@ export const remove = authenticatedActionClient
               item.asset.cloudflareId,
               {
                 account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-              }
+              },
             );
             logger.info(`[deleteProducer] deleting video`, {
               deleteResponse: videDelRes,
@@ -1127,7 +1127,7 @@ export const remove = authenticatedActionClient
               item.asset.cloudflareId,
               {
                 account_id: env.SAFE_CLOUDFLARE_ACCOUNT_ID,
-              }
+              },
             );
             logger.info(`[deleteProducer] deleting image`, {
               imageResponse: imageDelRes,

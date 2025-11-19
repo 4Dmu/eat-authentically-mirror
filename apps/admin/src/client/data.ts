@@ -6,6 +6,7 @@ import type {
 } from "@ea/db/schema";
 import type {
   AddCommodityAndAssociate,
+  ApproveSuggestedProducerArgs,
   EditProducerArgsV2,
   EditProducerCertifications,
   EditProducerCommodoties,
@@ -22,6 +23,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { rpc } from "@/rpc";
+import type { SuggestedProducersListItem } from "@/rpc/suggested-producers";
 import { searchProducersLocal } from "./local-search";
 
 export function useExternalApiKeys(
@@ -400,5 +402,38 @@ export function useListCertifications() {
     queryFn: () => rpc.certifications.list(),
     staleTime: 24 * 60 * 60 * 1000, // 24h
     gcTime: 7 * 24 * 60 * 60 * 1000,
+  });
+}
+
+export function useListSuggestedProducers(
+  props?: Omit<
+    UseQueryOptions<
+      SuggestedProducersListItem[],
+      Error,
+      SuggestedProducersListItem[],
+      readonly [string]
+    >,
+    "queryFn" | "queryKey"
+  >,
+) {
+  return useQuery({
+    ...(props as object),
+    queryKey: ["list-suggested-producers"] as const,
+    queryFn: async () => await rpc.suggestedProducers.list(),
+  });
+}
+
+export function useApproveSuggestedProducer(
+  opts?: Omit<
+    MutationOptions<string, Error, ApproveSuggestedProducerArgs, unknown>,
+    "mutationFn" | "mutationKey"
+  >,
+) {
+  return useMutation({
+    ...opts,
+    mutationKey: ["approve-suggested-producers"] as const,
+    mutationFn: async (data) => {
+      return await rpc.suggestedProducers.approve(data);
+    },
   });
 }

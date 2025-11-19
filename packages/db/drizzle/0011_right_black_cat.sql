@@ -1,0 +1,1 @@
+ALTER TABLE `suggested_producers` ADD `status` text DEFAULT 'pending' NOT NULL;

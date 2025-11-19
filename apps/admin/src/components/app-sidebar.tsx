@@ -6,7 +6,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@ea/ui/sidebar";
-import { FactoryIcon, SquareTerminal } from "lucide-react";
+import { FactoryIcon, SignatureIcon, SquareTerminal } from "lucide-react";
 import type * as React from "react";
 import { NavMain } from "./nav-main";
 
@@ -28,6 +28,12 @@ const data = {
           url: "/producers/create",
         },
       ],
+    },
+    {
+      title: "Suggested Producers",
+      url: "/suggested-producers",
+      icon: SignatureIcon,
+      isActive: true,
     },
     {
       title: "Misc",
