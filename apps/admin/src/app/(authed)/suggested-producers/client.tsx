@@ -49,7 +49,7 @@ export function SuggestedProducersPage({
     >
       <div className="flex justify-center p-10">
         <div className="flex flex-col w-full gap-5">
-          <h1 className="font-bold text-2xl">List Producers</h1>
+          <h1 className="font-bold text-2xl">List Suggested Producers</h1>
           <div>
             {producers.data?.map((producer) => (
               <Card key={producer.id}>
@@ -132,7 +132,7 @@ function ApproveDialog({ suggested }: { suggested: SuggestedProducerSelect }) {
     validators: {
       onChange: ({ formApi }) =>
         formApi.parseValuesWithSchema(
-          approveSuggestedProducerArgs.get("additional"),
+          approveSuggestedProducerArgs.get("additional")
         ),
     },
     onSubmit({ value }) {
