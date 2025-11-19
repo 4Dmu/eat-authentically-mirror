@@ -1,6 +1,6 @@
 "use client";
 
-import { ProducerChat } from "@/backend/rpc/messages";
+import type { ProducerChat } from "@/backend/rpc/messages";
 import { ChatMessageNotifications } from "@/components/message-notifications";
 import { Avatar, AvatarFallback, AvatarImage } from "@ea/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";

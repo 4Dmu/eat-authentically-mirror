@@ -5,14 +5,14 @@ import { Badge } from "@ea/ui/badge";
 import { AddToPinboardIconButton } from "./pinboard";
 import { SignedIn } from "@clerk/nextjs";
 import { cn } from "@ea/ui/utils";
-import { ProducerWith } from "@ea/db/schema";
+import type { ProducerWith } from "@ea/db/schema";
 import { MapPin, NavigationIcon, StarIcon } from "lucide-react";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { useGeolocationStore } from "@/stores";
 import { useMemo } from "react";
 import { Button } from "@ea/ui/button";
 import type { Geo } from "@vercel/functions";
-import { ProducerSearchResultRow } from "@/backend/data/producer";
+import type { ProducerSearchResultRow } from "@/backend/data/producer";
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 

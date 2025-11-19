@@ -14,13 +14,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@ea/ui/card";
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { Button } from "@ea/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { useLoggedInUserProducers } from "@/utils/producers";
 import { useMemo } from "react";
-import { ProducerCardsRow } from "@ea/db/schema";
+import type { ProducerCardsRow } from "@ea/db/schema";
 import { ClaimProducerDialog } from "@/components/claim-producer-dialog";
 import {
   AddProducerDialog,

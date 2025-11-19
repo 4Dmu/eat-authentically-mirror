@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { APIProvider, Map, Marker, useMap } from "@vis.gl/react-google-maps";
+import {
+  APIProvider,
+  Map as MapComp,
+  Marker,
+  useMap,
+} from "@vis.gl/react-google-maps";
 import { useHomePageStore } from "@/stores";
 import { Button } from "@ea/ui/button";
 import { env } from "@/env";
@@ -59,8 +64,8 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
     if (!center) return;
 
     if (
-      center.lat() == 36.778259 &&
-      center.lng() == -119.417931 &&
+      center.lat() === 36.778259 &&
+      center.lng() === -119.417931 &&
       (location.lat !== 36.778259 || location.lng !== -119.417931)
     ) {
       map.setCenter({ lat: location.lat, lng: location.lng });
@@ -74,7 +79,7 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
         automatically center at your location if allowed). Pan and scroll to
         change.
       </div>
-      <Map
+      <MapComp
         style={{ width: "100%", height: "40vh" }}
         gestureHandling={"greedy"}
         disableDefaultUI={true}
@@ -100,7 +105,7 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
             }}
           />
         )}
-      </Map>
+      </MapComp>
       <div className="flex gap-2">
         <Button disabled={disableSelect} onClick={handleSelectLocation}>
           Select

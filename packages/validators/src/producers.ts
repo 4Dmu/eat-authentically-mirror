@@ -1,6 +1,6 @@
 import { type } from "arktype";
 import { alpha3CountryCodeValidator } from "./country";
-import { ClaimRequestStatus } from "@ea/db/schema";
+import type { ClaimRequestStatus } from "@ea/db/schema";
 import { isMobilePhone, isNumeric } from "validator";
 import {
   mediaAssetSelectValidator,

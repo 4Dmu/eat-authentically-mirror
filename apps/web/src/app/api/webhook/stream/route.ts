@@ -1,7 +1,7 @@
+import crypto from "node:crypto";
 import { db } from "@ea/db";
 import { sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+import { type NextRequest, NextResponse } from "next/server";
 import { env } from "@/env";
 import { logger } from "@/backend/lib/log";
 
@@ -14,7 +14,7 @@ type SuccessWebhookPayload = {
   modified: Date;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// biome-ignore lint/complexity/noBannedTypes: Meta is an empty object?
 type Meta = {};
 
 type SuccessStatus = {
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
   const computedSignature = hash.digest("hex");
 
-  if (dangerousSignature != computedSignature) {
+  if (dangerousSignature !== computedSignature) {
     logger.info(
       "[CLOUDFLARE STREAM WEHOOK] Signature verification failed because of signature was invalid"
     );

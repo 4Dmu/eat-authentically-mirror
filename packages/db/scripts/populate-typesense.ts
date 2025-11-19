@@ -1,4 +1,4 @@
-import { ProducersCollectionDocument, typesense } from "@ea/search";
+import { type ProducersCollectionDocument, typesense } from "@ea/search";
 import { db } from "../src";
 import { asc } from "drizzle-orm";
 import { producers } from "../src/schema";
@@ -40,7 +40,7 @@ async function main() {
       },
     });
 
-    if (results.length == 0) {
+    if (results.length === 0) {
       break;
     }
 
@@ -74,7 +74,7 @@ async function main() {
           c.certification.name.toLowerCase().includes("organic")
         ),
         location:
-          r.location && r.location.latitude && r.location.longitude
+          r.location?.latitude && r.location.longitude
             ? [r.location.latitude, r.location.longitude]
             : undefined,
         certifications: r.certifications.map((c) => c.certification.name),

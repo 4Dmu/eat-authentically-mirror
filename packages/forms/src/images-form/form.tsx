@@ -18,8 +18,8 @@ import {
 import { GripIcon, RotateCwIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { defaultOptions, withForm } from "./context";
-import { editProducerMediaFormValidator } from "@ea/validators/producers";
-import { ProducerWithMap } from "@ea/db/schema";
+import type { editProducerMediaFormValidator } from "@ea/validators/producers";
+import type { ProducerWithMap } from "@ea/db/schema";
 import { Checkbox } from "@ea/ui/checkbox";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
@@ -104,7 +104,7 @@ export const Form = withForm({
                   >
                     {field.state.value.map((value, i) => (
                       <SortableImage
-                        key={i}
+                        key={"producerId" in value ? value.assetId : value.id}
                         form={form}
                         value={value}
                         index={i}
@@ -123,13 +123,13 @@ export const Form = withForm({
                         );
                       }}
                       onSelect={(files) => {
-                        files.forEach((file, i) =>
+                        files.forEach((file, i) => {
                           subField.pushValue({
                             file: file,
                             position: i + subField.state.value.length,
                             id: crypto.randomUUID(),
-                          })
-                        );
+                          });
+                        });
                       }}
                     >
                       Add Images

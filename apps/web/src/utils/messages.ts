@@ -1,11 +1,11 @@
 import {
   blockUserChat,
-  ProducerChat,
+  type ProducerChat,
   getUserOrProducerChat,
   listAllProducersChats,
   listProducerChats,
   listUserChats,
-  ProducerChatMessage,
+  type ProducerChatMessage,
   replyToUserMessage,
   sendMessageToProducer,
   unblockUserChat,
@@ -15,10 +15,10 @@ import {
   getProducerChat,
   getUserChatMessageNotificationsCount,
   getUserChatsMessageNotificationsCount,
-  ChatNotificationsCount,
+  type ChatNotificationsCount,
   resetChatNotifications,
 } from "@/backend/rpc/messages";
-import {
+import type {
   BlockProducerChatArgs,
   BlockUserChatArgs,
   GetProducerChatArgs,
@@ -32,9 +32,9 @@ import {
 } from "@ea/validators/messages";
 import {
   useMutation,
-  UseMutationOptions,
+  type UseMutationOptions,
   useQuery,
-  UseQueryOptions,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
 
 // ----------------------- Mutations -----------------------

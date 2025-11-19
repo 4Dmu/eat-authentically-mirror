@@ -1,4 +1,4 @@
-import { PinSelect, PinboardSelect } from "@ea/db/schema";
+import type { PinSelect, PinboardSelect } from "@ea/db/schema";
 import {
   addToPinboard,
   deletePinList,
@@ -6,12 +6,12 @@ import {
   getUserPinboardFull,
   getUserProducerPin,
   newPinList,
-  PinboardFull,
+  type PinboardFull,
   removeFromPinboard,
   syncPinsPinlistMemberships,
   updateUserPinboard,
 } from "@/backend/rpc/pinboard";
-import {
+import type {
   AddToPinboardArgs,
   DeletePinListArgs,
   NewPinListArgs,
@@ -21,9 +21,9 @@ import {
 } from "@ea/validators/pinboard";
 import {
   useMutation,
-  UseMutationOptions,
+  type UseMutationOptions,
   useQuery,
-  UseQueryOptions,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
 
 // --- queries ---

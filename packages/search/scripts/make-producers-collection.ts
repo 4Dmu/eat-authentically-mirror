@@ -1,4 +1,4 @@
-import { CollectionSchema, typesense } from "../src";
+import { type CollectionSchema, typesense } from "../src";
 
 async function main() {
   const client = typesense();

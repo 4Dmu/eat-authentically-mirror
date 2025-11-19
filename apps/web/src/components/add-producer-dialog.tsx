@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { registerProducer } from "@/backend/rpc/producers";
 import {
   PRODUCER_TYPES,
-  RegisterProducerArgs,
+  type RegisterProducerArgs,
   registerProducerArgsValidator,
 } from "@ea/validators/producers";
 import { useForm } from "@tanstack/react-form";
@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@ea/ui/select";
 import { toast } from "sonner";
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { atom } from "jotai";
 
 export const producerDialogAtom = atom(false);

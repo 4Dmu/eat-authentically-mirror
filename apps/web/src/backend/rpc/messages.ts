@@ -74,7 +74,7 @@ export const sendMessageToProducer = authenticatedActionClient
     });
 
     if (chat === undefined) {
-      chat = await db
+      const tempChat = await db
         .insert(producerChats)
         .values({
           id: crypto.randomUUID(),
@@ -85,7 +85,13 @@ export const sendMessageToProducer = authenticatedActionClient
           updatedAt: new Date(),
         })
         .returning()
-        .then((r) => r[0]!);
+        .then((r) => r[0]);
+
+      if (!tempChat) {
+        throw new Error("Error creating chat");
+      }
+
+      chat = tempChat;
     }
 
     if (chat?.producerPreventedMoreMessagesAt !== null) {
@@ -103,7 +109,7 @@ export const sendMessageToProducer = authenticatedActionClient
 
     await db.insert(producerChatMessages).values({
       id: crypto.randomUUID(),
-      chatId: chat!.id,
+      chatId: chat.id,
       senderUserId: userId,
       content: message,
       createdAt: new Date(),
@@ -334,8 +340,8 @@ export const getProducerChat = authenticatedActionClient
                   FROM ${producerMedia}
                   WHERE ${eq(producerMedia.producerId, producers.id)}
                   ORDER BY (${producerMedia.role} = 'cover') DESC, ${
-                    producerMedia.position
-                  } ASC
+          producerMedia.position
+        } ASC
                   LIMIT 1
                 )
               )`.as("producerThumbnailUrl"),
@@ -378,8 +384,8 @@ export const listUserChats = authenticatedActionClient
                   FROM ${producerMedia}
                   WHERE ${eq(producerMedia.producerId, producers.id)}
                   ORDER BY (${producerMedia.role} = 'cover') DESC, ${
-                    producerMedia.position
-                  } ASC
+          producerMedia.position
+        } ASC
                   LIMIT 1
                 )
               )`.as("producerThumbnailUrl"),
@@ -415,8 +421,8 @@ export const listProducerChats = authenticatedActionClient
                   FROM ${producerMedia}
                   WHERE ${eq(producerMedia.producerId, producers.id)}
                   ORDER BY (${producerMedia.role} = 'cover') DESC, ${
-                    producerMedia.position
-                  } ASC
+          producerMedia.position
+        } ASC
                   LIMIT 1
                 )
               )`.as("producerThumbnailUrl"),
@@ -463,8 +469,8 @@ export const listAllProducersChats = authenticatedActionClient
                   FROM ${producerMedia}
                   WHERE ${eq(producerMedia.producerId, producers.id)}
                   ORDER BY (${producerMedia.role} = 'cover') DESC, ${
-                    producerMedia.position
-                  } ASC
+          producerMedia.position
+        } ASC
                   LIMIT 1
                 )
               )`.as("producerThumbnailUrl"),
@@ -513,8 +519,8 @@ export const getUserOrProducerChat = authenticatedActionClient
                   FROM ${producerMedia}
                   WHERE ${eq(producerMedia.producerId, producers.id)}
                   ORDER BY (${producerMedia.role} = 'cover') DESC, ${
-                    producerMedia.position
-                  } ASC
+          producerMedia.position
+        } ASC
                   LIMIT 1
                 )
               )`.as("producerThumbnailUrl"),
@@ -573,8 +579,8 @@ export const getUserOrProducerChatMessages = authenticatedActionClient
                   FROM ${producerMedia}
                   WHERE ${eq(producerMedia.producerId, producers.id)}
                   ORDER BY (${producerMedia.role} = 'cover') DESC, ${
-                    producerMedia.position
-                  } ASC
+          producerMedia.position
+        } ASC
                   LIMIT 1
                 )
               )`.as("producerThumbnailUrl"),

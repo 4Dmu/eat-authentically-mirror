@@ -1,6 +1,6 @@
 "use client";
-import { ProducerWith } from "@ea/db/schema";
-import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
+import type { ProducerWith } from "@ea/db/schema";
+import type { ProducerClaimVerificationMethods } from "@ea/validators/producers";
 import { Button } from "@ea/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@ea/ui/card";
 import { Checkbox } from "@ea/ui/checkbox";
@@ -19,7 +19,7 @@ import { useClaimProducerSteps } from "@/hooks/use-claim-producer-steps";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { useClaimProducer } from "@/utils/producers";
 import { useRouter } from "next/navigation";
-import { ReactNode, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 
@@ -57,15 +57,15 @@ export function ClaimPage({
       verification: match(step.verification.method)
         .with("domain-email-link", (v) => ({
           method: v,
-          domainDomainEmailPart: submitState.domainEmailPart!,
+          domainDomainEmailPart: submitState.domainEmailPart ?? "",
         }))
         .with("manual", (v) => ({
           method: v,
-          claimerEmail: submitState.manualContactEmail!,
+          claimerEmail: submitState.manualContactEmail ?? "",
         }))
         .with("social-post", (v) => ({
           method: v,
-          socialHandle: submitState.choosenSocialHandle!,
+          socialHandle: submitState.choosenSocialHandle ?? "",
         }))
         .otherwise((v) => ({
           method: v,
@@ -145,7 +145,13 @@ export function ClaimPage({
                 <div className="flex flex-col gap-2">
                   <Label>Address</Label>
                   <p className="md:text-lg h-[unset] p-3">
-                    {`${producer.location?.locality ?? ""}${producer.location?.city ? `, ${format(producer.location?.city)}` : ""}${format(producer.location?.adminArea) ?? ""}${format(producer.location?.postcode) ?? ""}${
+                    {`${producer.location?.locality ?? ""}${
+                      producer.location?.city
+                        ? `, ${format(producer.location?.city)}`
+                        : ""
+                    }${format(producer.location?.adminArea) ?? ""}${
+                      format(producer.location?.postcode) ?? ""
+                    }${
                       producer.location?.country
                         ? countryByAlpha3Code(producer.location.country)?.name
                         : ""
@@ -300,7 +306,7 @@ export function ClaimPage({
                         value={submitState.domainEmailPart ?? ""}
                         onChange={(e) =>
                           submitState.setDomainEmailPart(
-                            e.currentTarget.value.length == 0
+                            e.currentTarget.value.length === 0
                               ? undefined
                               : e.currentTarget.value
                           )
@@ -321,7 +327,7 @@ export function ClaimPage({
                         value={submitState.manualContactEmail ?? ""}
                         onChange={(e) =>
                           submitState.setManualContactEmail(
-                            e.currentTarget.value.length == 0
+                            e.currentTarget.value.length === 0
                               ? undefined
                               : e.currentTarget.value
                           )
@@ -447,5 +453,5 @@ function VerificationCard({
 
 function format(value: string | undefined | null) {
   if (!value) return "";
-  return value + ", ";
+  return `${value}, `;
 }

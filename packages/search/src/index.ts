@@ -1,7 +1,7 @@
 import Typesense from "typesense";
 import { env } from "./env";
-import { FieldType } from "typesense/lib/Typesense/Collection";
-import { SearchResponse } from "typesense/lib/Typesense/Documents";
+import type { FieldType } from "typesense/lib/Typesense/Collection";
+import type { SearchResponse } from "typesense/lib/Typesense/Documents";
 
 export type CollectionSchema = {
   name: string;
@@ -74,7 +74,7 @@ export function typesense() {
       },
     ],
     apiKey:
-      typeof window === undefined
+      typeof window === "undefined"
         ? env.TYPESENSE_APIKEY
         : env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_APIKEY,
     connectionTimeoutSeconds: 30, // 30 second timeout for all requests

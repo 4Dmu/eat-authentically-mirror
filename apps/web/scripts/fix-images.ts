@@ -1,6 +1,6 @@
 import { db } from "@ea/db";
-import { mediaAssets, producerMedia } from "@ea/db/schema";
-import { and, eq } from "drizzle-orm";
+import { mediaAssets } from "@ea/db/schema";
+import { eq } from "drizzle-orm";
 
 async function main() {
   const limit = 50;

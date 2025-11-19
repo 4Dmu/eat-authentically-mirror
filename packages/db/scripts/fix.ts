@@ -1,6 +1,6 @@
 import { asc, like, or } from "drizzle-orm";
 import { db } from "../src";
-import { producerCertifications, producers } from "../src/schema";
+import { producers } from "../src/schema";
 import { typesense } from "@ea/search";
 
 async function main() {

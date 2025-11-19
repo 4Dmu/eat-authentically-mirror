@@ -7,16 +7,16 @@ import {
   DialogTitle,
 } from "@ea/ui/dialog";
 import { Button } from "@ea/ui/button";
-import { PropsWithChildren, useMemo, useState } from "react";
+import { type PropsWithChildren, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useReviewProducer } from "@/utils/reviews";
 import { Textarea } from "@ea/ui/textarea";
 import { Label } from "@ea/ui/label";
 import { Star } from "lucide-react";
-import { Stars } from "@ea/validators/reviews";
+import type { Stars } from "@ea/validators/reviews";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
-import { ProducerWithAll } from "@ea/db/schema";
+import type { ProducerWithAll } from "@ea/db/schema";
 import { atom, useAtom, useSetAtom } from "jotai";
 import { NotSubbed, Subbed } from "./auth/RequireSub";
 import Link from "next/link";
@@ -92,7 +92,7 @@ export function ReviewProducerDialog({
             </DialogClose>
             <Button
               onClick={submit}
-              disabled={actualMessage.length == 0}
+              disabled={actualMessage.length === 0}
               variant={"brandGreen"}
               className="w-32"
             >

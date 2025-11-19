@@ -21,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ea/ui/tabs";
 import { GridIcon, ListIcon, MapIcon, Trash2Icon, XIcon } from "lucide-react";
 import { PinboardMap } from "@/components/pinboard-map";
 import { useThrottleCallback } from "@react-hook/throttle";
-import { UpdateUserPinboardArgs } from "@ea/validators/pinboard";
+import type { UpdateUserPinboardArgs } from "@ea/validators/pinboard";
 import { Button } from "@ea/ui/button";
 import {
   Card,
@@ -301,7 +301,7 @@ export function PinboardPageClient(props: { pinboard: PinboardFull }) {
                 className="size-5"
                 checked={showPinlistDialogAfterPinCreation}
                 onCheckedChange={(e) =>
-                  setShowPinlistDialogAfterPinCreation(e == true)
+                  setShowPinlistDialogAfterPinCreation(e === true)
                 }
               />
             </div>

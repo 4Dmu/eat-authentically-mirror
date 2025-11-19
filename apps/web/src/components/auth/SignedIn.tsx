@@ -1,6 +1,6 @@
 import { useUser } from "@/hooks/use-user";
-import { UserJSON } from "@clerk/backend";
-import { PropsWithChildren } from "react";
+import type { UserJSON } from "@clerk/backend";
+import type { PropsWithChildren } from "react";
 
 export default function SignedIn({
   userFromServer,

@@ -1,8 +1,8 @@
 import { db } from "@ea/db";
-import { externalApiKeys, ExternalApiKeySelect } from "@ea/db/schema";
-import { StandardSchemaV1 } from "@standard-schema/spec";
+import { externalApiKeys, type ExternalApiKeySelect } from "@ea/db/schema";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 function get_search<T extends StandardSchemaV1>(
   searchParamsSchema: T,

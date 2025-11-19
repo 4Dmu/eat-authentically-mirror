@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from "@ea/ui/select";
 import { Textarea } from "@ea/ui/textarea";
-import React from "react";
 import { Label } from "@ea/ui/label";
 import { FieldInfo } from "./../helpers/field-info";
 import { defaultOptions, withForm } from "./context";

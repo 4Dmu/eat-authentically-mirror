@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { processStripeEvent } from "@/backend/stripe/stripe-sync";
 import { env } from "@/env";
-import { after, NextRequest, NextResponse } from "next/server";
+import { after, type NextRequest, NextResponse } from "next/server";
 import { logger } from "@/backend/lib/log";
 
 export async function POST(req: NextRequest) {

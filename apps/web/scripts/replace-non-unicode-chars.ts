@@ -18,6 +18,7 @@ function sanitizeName(name: string) {
     .replace(/\u00A0/g, " "); // NBSP → space
 
   // Remove control chars (except \n\t if you want to keep them)
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: Need to remove control chars
   s = s.replace(/[\u0000-\u001F\u007F]/g, " ");
 
   // Collapse whitespace, trim

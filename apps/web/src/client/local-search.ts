@@ -1,11 +1,11 @@
-import { ProducerSearchResultRow } from "@/backend/data/producer";
+import type { ProducerSearchResultRow } from "@/backend/data/producer";
 import { typesense } from "@ea/search";
 import {
   countryByAlpha2Code,
   countryByAlpha3Code,
   countryByName,
 } from "@ea/shared/countries";
-import { ProducerTypes } from "@ea/validators/producers";
+import type { ProducerTypes } from "@ea/validators/producers";
 import np from "compromise";
 
 const LOCAL_INTENT_RE =
@@ -116,7 +116,7 @@ function findCategory(query: string) {
 }
 
 function findCommodities(query: string, commodities: string[]) {
-  if (commodities.length == 0) {
+  if (commodities.length === 0) {
     return [];
   }
   const commoditiesRegex = new RegExp(
@@ -315,7 +315,9 @@ export async function searchProducersLocalV2(props: {
     );
   if (props.filters?.excludeIds?.length)
     filters.push(
-      `!id:=[${props.filters.excludeIds.map((s) => JSON.stringify(s)).join(",")}]`
+      `!id:=[${props.filters.excludeIds
+        .map((s) => JSON.stringify(s))
+        .join(",")}]`
     );
 
   const filter_by = filters.length === 0 ? undefined : filters.join(" && ");

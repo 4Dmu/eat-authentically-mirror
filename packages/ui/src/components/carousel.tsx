@@ -1,3 +1,5 @@
+// biome-ignore-all lint: Ignore for component file
+
 "use client";
 
 import * as React from "react";
@@ -118,7 +120,7 @@ function Carousel({
         canScrollNext,
       }}
     >
-      <div
+      <section
         onKeyDownCapture={handleKeyDown}
         className={cn("relative", className)}
         role="region"
@@ -127,7 +129,7 @@ function Carousel({
         {...props}
       >
         {children}
-      </div>
+      </section>
     </CarouselContext.Provider>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
-import { PublicReview } from "@/backend/rpc/reviews";
+import type { PublicReview } from "@/backend/rpc/reviews";
 import Image from "next/image";
 import { StarRatingReadonly } from "./star-rating";
 import { useAuth } from "@clerk/nextjs";
 import { DeleteReviewDialog } from "./delete-review-dialog";
 import { UpdateReviewDialog } from "./update-review-dialog";
-import { ReviewProducerArgs } from "@ea/validators/reviews";
+import type { ReviewProducerArgs } from "@ea/validators/reviews";
 
 export function ReviewCard({ review }: { review: PublicReview }) {
   const auth = useAuth();
@@ -69,7 +69,7 @@ export function PendingReviewCard({ review }: { review: ReviewProducerArgs }) {
         {auth.sessionClaims?.imageUrl && (
           <Image
             className="rounded-full object-cover"
-            src={auth.sessionClaims.imageUrl!}
+            src={auth.sessionClaims.imageUrl}
             alt="profile"
             width={25}
             height={25}

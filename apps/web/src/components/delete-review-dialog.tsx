@@ -13,7 +13,7 @@ import { Button } from "@ea/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDeleteReview } from "@/utils/reviews";
-import { PublicReview } from "@/backend/rpc/reviews";
+import type { PublicReview } from "@/backend/rpc/reviews";
 
 export function DeleteReviewDialog({ review }: { review: PublicReview }) {
   const queryClient = useQueryClient();

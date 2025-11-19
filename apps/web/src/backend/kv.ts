@@ -1,7 +1,7 @@
-import { SubscriptionJSON } from "./stripe/stripe-sync";
-import { NominationPlace } from "@ea/validators/nomination-api";
-import { SearchByGeoTextQueryArgs } from "@ea/validators/producers";
-import { GeocodeResponse } from "@ea/validators/google-geocode-api";
+import type { SubscriptionJSON } from "./stripe/stripe-sync";
+import type { NominationPlace } from "@ea/validators/nomination-api";
+import type { SearchByGeoTextQueryArgs } from "@ea/validators/producers";
+import type { GeocodeResponse } from "@ea/validators/google-geocode-api";
 import { redis } from "@ea/kv/redis";
 
 export const STRIPE_CUSTOMER_SUBSCRIPTIONS_KV = {

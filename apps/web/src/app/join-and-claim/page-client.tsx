@@ -1,7 +1,7 @@
 "use client";
 import { submitAccountDetailsForClaimInvitation } from "@/backend/rpc/claim-invitations";
 import {
-  SubmitClaimInvitationAccountDetails,
+  type SubmitClaimInvitationAccountDetails,
   submitClaimInvitationAccountDetails,
 } from "@ea/validators/claim-invitations";
 import { FieldInfo } from "@/components/forms/helpers/field-info";
@@ -163,9 +163,11 @@ export function JoinPage({
                         )}
                         {serverPasswordError?.suggestions.map(
                           (suggestion, i) => (
-                            <p className="text-sm text-brand-green" key={i}>
-                              {suggestion}
-                            </p>
+                            <>
+                              <p className="text-sm text-brand-green" key={i}>
+                                {suggestion}
+                              </p>
+                            </>
                           )
                         )}
                       </>

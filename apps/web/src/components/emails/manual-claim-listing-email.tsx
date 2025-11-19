@@ -10,7 +10,6 @@ import {
   Container,
   Link,
 } from "@react-email/components";
-import * as React from "react";
 
 export default function ManualClaimListingEmail(props: {
   producer: {

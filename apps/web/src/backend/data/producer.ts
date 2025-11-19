@@ -4,7 +4,7 @@ import type {
   SearchByGeoTextArgs,
 } from "@ea/validators/producers";
 import { db } from "@ea/db";
-import { asc, eq, like, SQL } from "drizzle-orm";
+import { asc, eq, like, type SQL } from "drizzle-orm";
 import {
   claimRequests,
   producerCards,
@@ -226,7 +226,7 @@ export async function searchByGeoTextV2(args: SearchByGeoTextArgs) {
 
   const { keywords, geo, filters, countryHint, page } = args;
 
-  const q = (keywords && keywords.length ? keywords.join(" ") : "*") || "*";
+  const q = (keywords?.length ? keywords.join(" ") : "*") || "*";
 
   const country = countryHint ? attemptDetectCountry(countryHint) : null;
 
@@ -409,7 +409,7 @@ export async function listProducers(args: {
   limit: number;
   query?: string;
 }) {
-  let where: SQL<unknown> | undefined = undefined;
+  let where: SQL<unknown> | undefined;
 
   if (args.query) {
     where = like(producerCards.name, `%${args.query}%`);

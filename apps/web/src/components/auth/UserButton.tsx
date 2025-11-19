@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@ea/ui/badge";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import { UserJSON } from "@clerk/backend";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import type { UserJSON } from "@clerk/backend";
 import { useSubTier } from "@/hooks/use-sub-tier";
 import { MessageNotifications } from "../message-notifications";
 

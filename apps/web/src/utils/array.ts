@@ -4,7 +4,7 @@
 export function withProperty<T, TKey extends keyof T>(
   array: T[],
   property: TKey,
-  value: T[TKey],
+  value: T[TKey]
 ) {
   for (let i = 0; i < array.length; i++) {
     array[i][property] = value;
@@ -18,7 +18,7 @@ export function withProperty<T, TKey extends keyof T>(
 export function setProperty<T, TKey extends keyof T>(
   array: T[],
   property: TKey,
-  value: T[TKey],
+  value: T[TKey]
 ) {
   for (let i = 0; i < array.length; i++) {
     array[i][property] = value;
@@ -29,7 +29,7 @@ export function setProperty<T, TKey extends keyof T>(
 export function some<T>(
   arr: T[],
   requiredNumberOfMatches: number,
-  predicate: (value: T) => boolean,
+  predicate: (value: T) => boolean
 ): boolean {
   let hitCount = 0;
 
@@ -38,7 +38,7 @@ export function some<T>(
       hitCount++;
     }
 
-    if (hitCount == requiredNumberOfMatches) {
+    if (hitCount === requiredNumberOfMatches) {
       break;
     }
   }
@@ -48,7 +48,7 @@ export function some<T>(
 
 export function countListItemsByPropertyValues<T, TKey extends keyof T>(
   arr: T[],
-  key: TKey,
+  key: TKey
 ) {
   const results = new Map<T[TKey], number>();
 

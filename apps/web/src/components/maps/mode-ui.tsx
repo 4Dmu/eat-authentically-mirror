@@ -1,7 +1,7 @@
 import { SelectIcon } from "@radix-ui/react-select";
 import { ExpandIcon, PentagonIcon, Trash2Icon, TrashIcon } from "lucide-react";
-import React, { RefObject, useState } from "react";
-import { TerraDraw } from "terra-draw";
+import { type RefObject, useState } from "react";
+import type { TerraDraw } from "terra-draw";
 import { Button } from "@ea/ui/button";
 
 export default function ModeUI({
@@ -69,7 +69,9 @@ export default function ModeUI({
         size="icon"
         id="resize-button"
         variant={activeButtonId === "resize-button" ? "secondary" : "default"}
-        className={`mode-button ${activeButtonId === "resize-button" ? "active" : ""}`}
+        className={`mode-button ${
+          activeButtonId === "resize-button" ? "active" : ""
+        }`}
         title="Resize"
         onClick={toggleResize}
       >
@@ -79,7 +81,9 @@ export default function ModeUI({
       <Button
         size="icon"
         id="clear-mode"
-        className={`mode-button ${activeButtonId === "clear-mode" ? "active" : ""}`}
+        className={`mode-button ${
+          activeButtonId === "clear-mode" ? "active" : ""
+        }`}
         title="Clear"
         onClick={() => {
           if (drawRef.current) {
@@ -95,7 +99,9 @@ export default function ModeUI({
       <Button
         size="icon"
         id="delete-selected-button"
-        className={`mode-button ${activeButtonId === "delete-selected-button" ? "active" : ""}`}
+        className={`mode-button ${
+          activeButtonId === "delete-selected-button" ? "active" : ""
+        }`}
         title="Clear last or Selected"
         onClick={() => {
           if (drawRef.current) {

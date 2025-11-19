@@ -2,7 +2,7 @@
 import { useAuth } from "@clerk/nextjs";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 export default function AthorizePage() {
   const router = useRouter();

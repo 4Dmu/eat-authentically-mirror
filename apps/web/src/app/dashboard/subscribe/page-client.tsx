@@ -1,11 +1,11 @@
 "use client";
 import { createCheckoutSession } from "@/backend/rpc/stripe";
 import type { Tier, Interval } from "@/backend/stripe/subscription-plans";
-import { CreateCheckoutSessionArgs } from "@ea/validators/stripe";
+import type { CreateCheckoutSessionArgs } from "@ea/validators/stripe";
 import { TierCard } from "@/components/sub/TierCard";
 import { Button } from "@ea/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
-import { UserJSON } from "@clerk/backend";
+import type { UserJSON } from "@clerk/backend";
 import { useMutation } from "@tanstack/react-query";
 import { Crown, Star } from "lucide-react";
 import { useState } from "react";
@@ -116,7 +116,7 @@ export function ClientPage(props: {
               value={mode}
               onValueChange={(e) => {
                 setMode(e as "producer");
-                if (e == "producer") {
+                if (e === "producer") {
                   setTier("pro");
                 } else {
                   setTier("community");
@@ -141,7 +141,7 @@ export function ClientPage(props: {
                     onClick={() => setInterval("month")}
                     className={cn(
                       "flex gap-1 items-center rounded-full p-2",
-                      interval == "month" &&
+                      interval === "month" &&
                         "text-primary-foreground bg-primary"
                     )}
                   >
@@ -152,7 +152,8 @@ export function ClientPage(props: {
                     type="button"
                     className={cn(
                       "flex gap-1 items-center rounded-full p-2",
-                      interval == "year" && "text-primary-foreground bg-primary"
+                      interval === "year" &&
+                        "text-primary-foreground bg-primary"
                     )}
                   >
                     <span>12 Months</span>

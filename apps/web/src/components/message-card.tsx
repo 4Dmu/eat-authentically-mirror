@@ -1,4 +1,4 @@
-import { ProducerChatMessage } from "@/backend/rpc/messages";
+import type { ProducerChatMessage } from "@/backend/rpc/messages";
 import { cn } from "@ea/ui/utils";
 import { format } from "date-fns";
 

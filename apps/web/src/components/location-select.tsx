@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { APIProvider, Map, Marker, useMap } from "@vis.gl/react-google-maps";
+import {
+  APIProvider,
+  Map as MapComp,
+  Marker,
+  useMap,
+} from "@vis.gl/react-google-maps";
 import { env } from "@/env";
 import { useGeolocation } from "@uidotdev/usehooks";
 
@@ -31,8 +36,8 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
     if (!center) return;
 
     if (
-      center.lat() == 36.778259 &&
-      center.lng() == -119.417931 &&
+      center.lat() === 36.778259 &&
+      center.lng() === -119.417931 &&
       (location.lat !== 36.778259 || location.lng !== -119.417931)
     ) {
       map.setCenter({ lat: location.lat, lng: location.lng });
@@ -41,7 +46,7 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
 
   return (
     <div className="space-y-4">
-      <Map
+      <MapComp
         style={{ width: "100%", height: "30vh" }}
         gestureHandling={"greedy"}
         defaultZoom={4}
@@ -58,7 +63,7 @@ function Comp({ location }: { location: { lat: number; lng: number } | null }) {
         }}
       >
         {map && selected && <Marker position={selected} />}
-      </Map>
+      </MapComp>
       <div className="flex gap-2">
         {/* {locationSearchArea && (
           <Button onClick={() => setLocationSearchArea(undefined)}>

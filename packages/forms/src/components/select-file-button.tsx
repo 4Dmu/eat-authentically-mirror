@@ -1,10 +1,10 @@
-import React, { ComponentProps, useRef } from "react";
+import { type ComponentProps, useRef } from "react";
 import { Button } from "@ea/ui/button";
 import {
   FileInput,
-  FileInputProps,
+  type FileInputProps,
   SingleFileInput,
-  SingleFileInputProps,
+  type SingleFileInputProps,
 } from "./file-input";
 
 export function SelectFileButton({

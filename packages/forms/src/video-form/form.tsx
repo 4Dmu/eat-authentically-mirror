@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { RotateCwIcon, XIcon } from "lucide-react";
 import { Stream } from "@cloudflare/stream-react";
 import { defaultOptions, withForm } from "./context";
-import { editProducerMediaFormValidator } from "@ea/validators/producers";
+import type { editProducerMediaFormValidator } from "@ea/validators/producers";
 
 export function isUpload(
   value: (typeof editProducerMediaFormValidator.infer)["media"][number]
@@ -33,7 +33,7 @@ export const Form = withForm({
   props: {
     canUploadVideo: false,
   },
-  render: function ({ form, canUploadVideo }) {
+  render: ({ form, canUploadVideo }) => {
     if (canUploadVideo) {
       return (
         <Card>

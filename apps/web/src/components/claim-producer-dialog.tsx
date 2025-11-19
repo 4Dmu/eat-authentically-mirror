@@ -1,7 +1,7 @@
 "use client";
-import React, {
-  PropsWithChildren,
-  ReactNode,
+import {
+  type PropsWithChildren,
+  type ReactNode,
   useCallback,
   useEffect,
   useState,
@@ -21,7 +21,7 @@ import { Input } from "@ea/ui/input";
 import { ScrollArea } from "@ea/ui/scroll-area";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ea/ui/tabs";
-import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
+import type { ProducerClaimVerificationMethods } from "@ea/validators/producers";
 import Image from "next/image";
 import { match } from "ts-pattern";
 import { Label } from "@ea/ui/label";
@@ -36,8 +36,8 @@ import {
 } from "@ea/ui/select";
 import { toast } from "sonner";
 import {
-  Step,
-  StepSetter,
+  type Step,
+  type StepSetter,
   useClaimProducerSteps,
 } from "@/hooks/use-claim-producer-steps";
 import { primaryImageUrl } from "@/utils/producer-helpers";
@@ -66,9 +66,10 @@ function usePaginatedProducers() {
       const newOffset = newPage * LIMIT;
       setOffset(newOffset);
     },
-    [setOffset, page]
+    [page]
   );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reset when query changes
   useEffect(() => {
     setOffset(0);
   }, [debouncedQuery]);
@@ -109,15 +110,15 @@ export function ClaimProducerDialog(props: PropsWithChildren) {
       verification: match(step.verification.method)
         .with("domain-email-link", (v) => ({
           method: v,
-          domainDomainEmailPart: submitState.domainEmailPart!,
+          domainDomainEmailPart: submitState.domainEmailPart ?? "",
         }))
         .with("manual", (v) => ({
           method: v,
-          claimerEmail: submitState.manualContactEmail!,
+          claimerEmail: submitState.manualContactEmail ?? "",
         }))
         .with("social-post", (v) => ({
           method: v,
-          socialHandle: submitState.choosenSocialHandle!,
+          socialHandle: submitState.choosenSocialHandle ?? "",
         }))
         .otherwise((v) => ({
           method: v,
@@ -162,7 +163,7 @@ export function ClaimProducerDialog(props: PropsWithChildren) {
                 value={query ?? ""}
                 onChange={(e) =>
                   setQuery(
-                    e.currentTarget.value.length == 0
+                    e.currentTarget.value.length === 0
                       ? undefined
                       : e.currentTarget.value
                   )
@@ -172,6 +173,7 @@ export function ClaimProducerDialog(props: PropsWithChildren) {
                 <div className="flex flex-col gap-3">
                   {data?.items.map((p) => (
                     <button
+                      type="button"
                       key={p.id}
                       onClick={() => setStep({ mode: "review", producer: p })}
                       className="bg-white hover:bg-accent cursor-pointer border overflow-hidden flex gap-2 items-center rounded-lg"
@@ -383,7 +385,7 @@ export function ClaimProducerDialog(props: PropsWithChildren) {
                       value={submitState.domainEmailPart ?? ""}
                       onChange={(e) =>
                         submitState.setDomainEmailPart(
-                          e.currentTarget.value.length == 0
+                          e.currentTarget.value.length === 0
                             ? undefined
                             : e.currentTarget.value
                         )
@@ -403,7 +405,7 @@ export function ClaimProducerDialog(props: PropsWithChildren) {
                       value={submitState.manualContactEmail ?? ""}
                       onChange={(e) =>
                         submitState.setManualContactEmail(
-                          e.currentTarget.value.length == 0
+                          e.currentTarget.value.length === 0
                             ? undefined
                             : e.currentTarget.value
                         )

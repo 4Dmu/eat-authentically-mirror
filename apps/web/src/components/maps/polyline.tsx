@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* biome-ignore-all lint: Disable */
 import {
   forwardRef,
   useContext,

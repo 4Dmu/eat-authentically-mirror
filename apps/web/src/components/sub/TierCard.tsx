@@ -1,4 +1,4 @@
-import { CheckIcon, LucideProps, XIcon } from "lucide-react";
+import { CheckIcon, type LucideProps, XIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
 } from "@ea/ui/card";
 import { Badge } from "@ea/ui/badge";
 import { cn } from "@ea/ui/utils";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export function TierCard({
   name,

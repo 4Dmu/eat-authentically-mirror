@@ -1,5 +1,5 @@
-import { env } from "@/env";
 import {
+  Button,
   Text,
   Heading,
   Html,
@@ -8,9 +8,8 @@ import {
   Img,
   Column,
   Container,
-  Button,
 } from "@react-email/components";
-import * as React from "react";
+import { env } from "@/env";
 
 export default function ClaimListingEmail(props: {
   producer: {

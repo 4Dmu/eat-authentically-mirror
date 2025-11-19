@@ -7,7 +7,7 @@ import Image from "next/image";
 import { SignedOut } from "@clerk/nextjs";
 import { NotSubbed } from "./auth/RequireSub";
 import { UserButton } from "./auth/UserButton";
-import { UserJSON } from "@clerk/backend";
+import type { UserJSON } from "@clerk/backend";
 import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import SignedIn from "./auth/SignedIn";
 

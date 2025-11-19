@@ -1,21 +1,21 @@
-import { ProducerReviewSelect } from "@ea/db/schema";
+import type { ProducerReviewSelect } from "@ea/db/schema";
 import {
   deleteReview,
   listReviewsPublic,
   reviewProducer,
   updateReview,
 } from "@/backend/rpc/reviews";
-import {
+import type {
   DeleteReviewArgs,
   ReviewProducerArgs,
   UpdateReviewArgs,
 } from "@ea/validators/reviews";
 import {
   useMutation,
-  UseMutationOptions,
+  type UseMutationOptions,
   useMutationState,
   useQuery,
-  UseQueryOptions,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
 
 // --- mutations ---

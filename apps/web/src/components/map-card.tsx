@@ -1,6 +1,10 @@
 "use client";
 import { env } from "@/env";
-import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
+import {
+  APIProvider,
+  Map as GoogleMapsComp,
+  Marker,
+} from "@vis.gl/react-google-maps";
 import {
   Card,
   CardContent,
@@ -9,7 +13,7 @@ import {
   CardTitle,
 } from "@ea/ui/card";
 import { Button } from "@ea/ui/button";
-import {
+import type {
   ProducerLocationSelect,
   ProducersGoogleMapsPlaceDetailsSelect,
 } from "@ea/db/schema";
@@ -32,7 +36,7 @@ export function MapCard({
       </CardHeader>
       <CardContent>
         <APIProvider apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_JS_PUBLIC_KEY}>
-          <Map
+          <GoogleMapsComp
             style={{
               width: "100%",
               height: "20vh",
@@ -54,7 +58,7 @@ export function MapCard({
                 lng: location.longitude,
               }}
             />
-          </Map>
+          </GoogleMapsComp>
         </APIProvider>
       </CardContent>
       <CardFooter>

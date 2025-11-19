@@ -10,7 +10,7 @@ import {
   getProducersArgsValidator,
   claimProducerArgs,
   checkClaimDomainDnsArgs,
-  PublicClaimRequest,
+  type PublicClaimRequest,
   deleteProducerArgs,
   verifyClaimPhoneArgs,
   regenerateClaimPhoneTokenArgs,
@@ -31,22 +31,22 @@ import {
   claimRequests,
   commodities,
   mediaAssets,
-  PendingMediaAssetInsert,
+  type PendingMediaAssetInsert,
   pendingMediaAssets,
   producerCards,
   producerCertifications,
   producerCommodities,
   producerContact,
-  ProducerContactSelect,
-  ProducerInsert,
+  type ProducerContactSelect,
+  type ProducerInsert,
   producerLocation,
-  ProducerLocationSelect,
+  type ProducerLocationSelect,
   producerMedia,
   producers,
-  ProducerSelect,
+  type ProducerSelect,
   producersSearch,
-  ProducersSearchSelect,
-  SuggestedProducerInsert,
+  type ProducersSearchSelect,
+  type SuggestedProducerInsert,
   suggestedProducers,
 } from "@ea/db/schema";
 import {
@@ -91,7 +91,7 @@ import {
   producerMediaSelectValidator,
 } from "@ea/db/contracts";
 import { typesense } from "@ea/search";
-import { ProducerSearchResultRow } from "@/backend/data/producer";
+import type { ProducerSearchResultRow } from "@/backend/data/producer";
 import { generateCode, generateToken } from "@ea/shared/generate-tokens";
 
 export const registerProducer = authenticatedActionClient
@@ -762,12 +762,12 @@ export const requestUploadUrls = producerActionClient
         tier === "Free"
           ? 1
           : tier.tier === "community"
-            ? 1
-            : tier.tier === "pro"
-              ? 4
-              : tier.tier === "premium" || tier.tier === "enterprise"
-                ? 5
-                : 1;
+          ? 1
+          : tier.tier === "pro"
+          ? 4
+          : tier.tier === "premium" || tier.tier === "enterprise"
+          ? 5
+          : 1;
 
       const remainingFiles = maxFiles - images.length;
 
@@ -862,7 +862,7 @@ export const requestVideoUploadUrl = producerActionClient
     const tier = await getSubTier(userId);
 
     if (
-      tier == "Free" ||
+      tier === "Free" ||
       !(tier.tier === "enterprise" || tier.tier === "premium")
     ) {
       throw new Error("Must be premium to upload video");
@@ -1099,7 +1099,7 @@ export const confirmPendingVideoUpload = producerActionClient
           uploadedByType: "user",
           uploadedById: userId,
           contentType: "video/*",
-          url: `https://customer-a80gdw9axz7eg3xk.cloudflarestream.com/${cloudflareVideo.uid!}/manifest/video.m3u8`,
+          url: `https://customer-a80gdw9axz7eg3xk.cloudflarestream.com/${cloudflareVideo.uid}/manifest/video.m3u8`,
           cloudflareId: cloudflareVideo.uid,
           videoStatus:
             cloudflareVideo.status.state === "ready" ? "ready" : "pending",
@@ -1330,7 +1330,7 @@ export const claimProducer = authenticatedActionClient
       }
 
       switch (verification.method) {
-        case "contact-email-link":
+        case "contact-email-link": {
           const email = type("string.email")(producer.contact?.email?.trim());
 
           if (email instanceof type.errors) {
@@ -1367,6 +1367,7 @@ export const claimProducer = authenticatedActionClient
           });
 
           break;
+        }
         case "domain-dns":
         case "domain-email-link": {
           const website = producer.contact?.websiteUrl;
@@ -1451,7 +1452,7 @@ export const claimProducer = authenticatedActionClient
           const phone = rawPhone
             .trim()
             .split("")
-            .filter((c) => isNumeric(c) || c == "+")
+            .filter((c) => isNumeric(c) || c === "+")
             .join("");
 
           if (!isMobilePhone(phone)) {
@@ -1597,11 +1598,11 @@ export const listClaimRequests = authenticatedActionClient
             requestedVerification.method === "domain-dns"
               ? { ...requestedVerification, token: claimToken }
               : requestedVerification.method === "social-post"
-                ? { ...requestedVerification, token: claimToken }
-                : requestedVerification.method === "contact-phone-link"
-                  ? { ...requestedVerification }
-                  : requestedVerification,
-        }) satisfies PublicClaimRequest
+              ? { ...requestedVerification, token: claimToken }
+              : requestedVerification.method === "contact-phone-link"
+              ? { ...requestedVerification }
+              : requestedVerification,
+        } satisfies PublicClaimRequest)
     );
   });
 

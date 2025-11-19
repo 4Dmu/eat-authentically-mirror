@@ -1,5 +1,5 @@
 "use client";
-import { PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useState } from "react";
 import {
   // isServer,
   QueryClient,

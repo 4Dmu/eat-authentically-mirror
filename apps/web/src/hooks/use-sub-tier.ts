@@ -1,5 +1,5 @@
 import { fetchSubTier } from "@/backend/rpc/auth";
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 

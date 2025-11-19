@@ -5,7 +5,7 @@ import { createCheckoutSession } from "@/backend/rpc/stripe";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Tabs, TabsTrigger, TabsContent, TabsList } from "@ea/ui/tabs";
-import { CreateCheckoutSessionArgs } from "@ea/validators/stripe";
+import type { CreateCheckoutSessionArgs } from "@ea/validators/stripe";
 
 export function TiersCard() {
   const createMemeberCheckoutSessionMutation = useMutation({

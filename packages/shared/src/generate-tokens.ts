@@ -1,3 +1,4 @@
+// biome-ignore lint/style/useNodejsImportProtocol: Functions may be used on client
 import { randomBytes, randomInt } from "crypto";
 
 /**

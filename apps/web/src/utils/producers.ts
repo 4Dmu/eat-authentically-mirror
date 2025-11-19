@@ -1,11 +1,11 @@
 import {
   keepPreviousData,
-  MutationOptions,
+  type MutationOptions,
   useMutation,
-  UseMutationOptions,
+  type UseMutationOptions,
   useQuery,
   useQueryClient,
-  UseQueryOptions,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
 import {
   confirmPengingUpload,
@@ -34,7 +34,7 @@ import {
   addCommodityAndAssociate,
   listCommodites,
 } from "@/backend/rpc/producers";
-import {
+import type {
   ClaimProducerArgs,
   CheckClaimDomainDnsArgs,
   PublicClaimRequest,
@@ -52,7 +52,7 @@ import {
   AddCommodityAndAssociate,
 } from "@ea/validators/producers";
 import { fetchUserProducer, fetchUserProducers } from "@/backend/rpc/producers";
-import {
+import type {
   CommoditySelect,
   MediaAssetSelect,
   ProducerCardsRow,

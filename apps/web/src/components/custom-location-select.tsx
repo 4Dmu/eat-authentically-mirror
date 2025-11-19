@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { APIProvider, Map, useMap } from "@vis.gl/react-google-maps";
+import { APIProvider, Map as MapComp, useMap } from "@vis.gl/react-google-maps";
 import { env } from "@/env";
 import { useGeolocation } from "@uidotdev/usehooks";
 import {
@@ -52,8 +52,8 @@ function Comp({
     if (!center) return;
 
     if (
-      center.lat() == 36.778259 &&
-      center.lng() == -119.417931 &&
+      center.lat() === 36.778259 &&
+      center.lng() === -119.417931 &&
       (userLocation.lat !== 36.778259 || userLocation.lng !== -119.417931)
     ) {
       map.setCenter({ lat: userLocation.lat, lng: userLocation.lng });
@@ -98,7 +98,7 @@ function Comp({
           </em>
         </DialogHeader>
         <div className="relative">
-          <Map
+          <MapComp
             style={{
               width: "100%",
             }}
@@ -114,7 +114,7 @@ function Comp({
             onBoundsChanged={(e) => {
               setCurrentBounds(e.detail.bounds);
             }}
-          ></Map>
+          ></MapComp>
           {disabled && (
             <div className="absolute top-0 left-0 w-full h-full bg-black/50 rounded-lg"></div>
           )}

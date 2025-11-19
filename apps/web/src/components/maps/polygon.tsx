@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* biome-ignore-all lint: Disable */
 import {
   forwardRef,
   useContext,
@@ -64,7 +64,7 @@ function usePolygon(props: PolygonProps) {
   // lot of time updating values that didn't change)
   useMemo(() => {
     polygon.setOptions(polygonOptions);
-  }, [polygon, polygonOptions]);
+  }, [polygon]);
 
   const map = useContext(GoogleMapsContext)?.map;
 
@@ -72,7 +72,7 @@ function usePolygon(props: PolygonProps) {
   useMemo(() => {
     if (!encodedPaths || !geometryLibrary) return;
     const paths = encodedPaths.map((path) =>
-      geometryLibrary.encoding.decodePath(path),
+      geometryLibrary.encoding.decodePath(path)
     );
     polygon.setPaths(paths);
   }, [polygon, encodedPaths, geometryLibrary]);

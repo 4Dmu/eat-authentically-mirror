@@ -19,8 +19,8 @@ import { Textarea } from "@ea/ui/textarea";
 import {
   PRODUCER_TYPES,
   registerProducerArgsValidator,
-  RegisterProducerArgs,
-  ProducerTypes,
+  type RegisterProducerArgs,
+  type ProducerTypes,
 } from "@ea/validators/producers";
 import { useMutation } from "@tanstack/react-query";
 import { registerProducer } from "@/backend/rpc/producers";

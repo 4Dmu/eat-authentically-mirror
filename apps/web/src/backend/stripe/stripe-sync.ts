@@ -2,7 +2,7 @@ import { env } from "@/env";
 import Stripe from "stripe";
 import { STRIPE_CUSTOMER_SUBSCRIPTIONS_KV } from "../kv";
 import { STRIPE_CUSTOMER_ID_USER_KV } from "@ea/kv";
-import stripe from "stripe";
+import type stripe from "stripe";
 import { PLANS } from "./subscription-plans";
 import { db } from "@ea/db";
 import { producers } from "@ea/db/schema";

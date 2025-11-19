@@ -1,6 +1,6 @@
 import { CUSTOM_GEO_HEADER_NAME } from "@ea/shared/constants";
-import { Geo } from "@vercel/functions";
-import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
+import type { Geo } from "@vercel/functions";
+import type { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 
 export function getIpGeo(headers: ReadonlyHeaders) {
   const rawGeo = headers.get(CUSTOM_GEO_HEADER_NAME);

@@ -1,5 +1,5 @@
-import { ProducerWith } from "@ea/db/schema";
-import { ProducerClaimVerificationMethods } from "@ea/validators/producers";
+import type { ProducerWith } from "@ea/db/schema";
+import type { ProducerClaimVerificationMethods } from "@ea/validators/producers";
 import { type } from "arktype";
 import { useState } from "react";
 
@@ -93,7 +93,7 @@ export function useClaimProducerSteps(initialStep?: Step) {
         return "success";
       case "submit":
         switch (step.verification) {
-          case "contact-email-link":
+          case "contact-email-link": {
             const email = type("string.email")(
               step.producer.contact?.email?.trim()
             );
@@ -111,8 +111,9 @@ export function useClaimProducerSteps(initialStep?: Step) {
               },
             });
             return "success";
+          }
           case "domain-dns":
-          case "domain-email-link":
+          case "domain-email-link": {
             const website = step.producer.contact?.websiteUrl;
             if (!website) {
               return { error: "Missing or invalid website" };
@@ -134,7 +135,8 @@ export function useClaimProducerSteps(initialStep?: Step) {
             });
 
             return "success";
-          case "contact-phone-link":
+          }
+          case "contact-phone-link": {
             const phone = step.producer.contact?.phone;
 
             if (!phone) {
@@ -150,7 +152,8 @@ export function useClaimProducerSteps(initialStep?: Step) {
               },
             });
             return "success";
-          case "social-post":
+          }
+          case "social-post": {
             const profiles: string[] = [];
 
             if (step.producer.social?.facebook) {
@@ -176,6 +179,7 @@ export function useClaimProducerSteps(initialStep?: Step) {
               },
             });
             return "success";
+          }
           case "manual":
             setCurrentStep({
               mode: "submit",

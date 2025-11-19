@@ -14,7 +14,8 @@ export default async function Page(props: {
 
   if (
     session.userId !== null &&
-    (searchParams.jwtSub == undefined || searchParams.jwtSub === session.userId)
+    (searchParams.jwtSub === undefined ||
+      searchParams.jwtSub === session.userId)
   ) {
     redirect(searchParams.redirectUrl ?? "/");
   }

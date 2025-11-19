@@ -1,8 +1,8 @@
 "use client";
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
-import { Tier } from "@/backend/stripe/subscription-plans";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import type { Tier } from "@/backend/stripe/subscription-plans";
 import { useSubTier } from "@/hooks/use-sub-tier";
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
 export function Subbed({
   children,

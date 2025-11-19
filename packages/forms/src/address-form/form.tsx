@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@ea/ui/card";
 import { Input } from "@ea/ui/input";
-import React from "react";
 import { Label } from "@ea/ui/label";
 import {
   Select,

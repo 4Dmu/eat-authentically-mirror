@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo } from "react";
+import type React from "react";
+import { useEffect, useMemo } from "react";
 
 export function FileImage({
   file,
@@ -12,6 +13,6 @@ export function FileImage({
     };
   }, [url]);
 
-  // eslint-disable-next-line @next/next/no-img-element
+  // biome-ignore lint/performance/noImgElement: Don;t want next to cache file image
   return <img {...props} alt={props.alt ?? ""} src={url} />;
 }

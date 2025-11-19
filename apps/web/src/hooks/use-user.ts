@@ -1,5 +1,5 @@
 import { fetchUser } from "@/backend/rpc/auth";
-import { UserJSON } from "@clerk/backend";
+import type { UserJSON } from "@clerk/backend";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 

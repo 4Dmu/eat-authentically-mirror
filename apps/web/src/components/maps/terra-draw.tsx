@@ -1,4 +1,4 @@
-import { RefObject, useEffect } from "react";
+import { type RefObject, useEffect } from "react";
 import { useMap } from "@vis.gl/react-google-maps";
 import {
   TerraDraw,
@@ -27,7 +27,7 @@ export function TerraDrawLayer({
 
     const init = () => {
       try {
-        const realDiv = map.getDiv && map.getDiv();
+        const realDiv = map.getDiv?.();
         if (!realDiv) return false;
         if (!document.body.contains(realDiv)) return false;
         if (!realDiv.id) {

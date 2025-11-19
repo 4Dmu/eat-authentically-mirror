@@ -12,7 +12,7 @@ import {
   producerImportedReviews,
   producers,
   producerReviews,
-  ProducerReviewInsert,
+  type ProducerReviewInsert,
 } from "@ea/db/schema";
 import { getSubTier } from "./utils/get-sub-tier";
 import { actionClient } from "./helpers/safe-action";

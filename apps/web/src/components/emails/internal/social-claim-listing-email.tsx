@@ -1,4 +1,4 @@
-import { ProducerSelect } from "@ea/db/schema";
+import type { ProducerSelect } from "@ea/db/schema";
 import { env } from "@/env";
 import {
   Text,
@@ -11,7 +11,6 @@ import {
   Container,
   Button,
 } from "@react-email/components";
-import * as React from "react";
 
 export default function SocialClaimListingInternalEmail({
   producer: { id, userId, name, type, verified, updatedAt },

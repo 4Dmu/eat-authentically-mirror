@@ -14,7 +14,7 @@ import { IsNotProducer } from "./auth/RequireOrg";
 import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 
 export function AppNavSheet({
   subTier,

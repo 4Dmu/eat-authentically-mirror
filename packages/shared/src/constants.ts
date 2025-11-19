@@ -1,4 +1,4 @@
-import { Plan } from "./subscription-plans";
+import type { Plan } from "./subscription-plans";
 
 export const CLAIM_DNS_TXT_RECORD_NAME = "ea-verify";
 

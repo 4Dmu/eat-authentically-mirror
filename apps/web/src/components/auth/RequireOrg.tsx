@@ -1,5 +1,5 @@
 import { useLoggedInUserProducerIds } from "@/hooks/use-logged-in-user-producer-ids";
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
 export function IsProducer(
   props: PropsWithChildren & { producerIds: string[] }

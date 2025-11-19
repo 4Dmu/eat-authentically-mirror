@@ -1,3 +1,4 @@
+// biome-ignore-all lint: Disable biome
 "use client";
 
 import * as React from "react";

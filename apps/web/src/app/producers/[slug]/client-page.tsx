@@ -31,7 +31,7 @@ import {
 } from "@ea/ui/carousel";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { Stream } from "@/components/stream";
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { MapCard } from "@/components/map-card";
 import { cn } from "@ea/ui/utils";
 import {
@@ -41,7 +41,7 @@ import {
 import Image from "next/image";
 import { PendingReviewCard, ReviewCard } from "@/components/review-card";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { ProducerWithAll } from "@ea/db/schema";
+import type { ProducerWithAll } from "@ea/db/schema";
 import React from "react";
 import {
   MessageProducerDialog,
@@ -144,7 +144,7 @@ export function ProducerPageClient(props: {
 
   const mapCard = (
     <>
-      {producer && producer.location && (
+      {producer?.location && (
         <MapCard
           maps={producer.googleMapsPlaceDetails}
           location={producer.location}
@@ -246,7 +246,7 @@ export function ProducerPageClient(props: {
                 <ReviewCard key={r.id} review={r} />
               ))}
               {pendingReviews.map((r, i) => (
-                <PendingReviewCard review={r} key={i} />
+                <PendingReviewCard review={r} key={`${r.producerId}${i}`} />
               ))}
             </div>
           </CardContent>

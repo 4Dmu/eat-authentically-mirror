@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Page() {
   return (
     <div className="flex justify-center p-10">

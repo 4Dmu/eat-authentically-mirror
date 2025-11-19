@@ -14,6 +14,7 @@ import { CreateCheckoutSessionArgsValidator } from "@ea/validators/stripe";
 import * as plans from "../stripe/subscription-plans";
 import { type } from "arktype";
 import { logger } from "../lib/log";
+import type Stripe from "stripe";
 
 export const createCheckoutSession = authenticatedWithUserActionClient
   .input(CreateCheckoutSessionArgsValidator)
@@ -75,7 +76,7 @@ export const createCheckoutSession = authenticatedWithUserActionClient
       stripeCustomerId = newCustomer.id;
     }
 
-    let session;
+    let session: Stripe.Checkout.Session;
     try {
       session = await stripe.checkout.sessions.create({
         line_items: [
@@ -104,7 +105,11 @@ export const createCheckoutSession = authenticatedWithUserActionClient
       );
     }
 
-    return session.url!;
+    if (!session.url) {
+      throw new Error("Stripe did not return session url");
+    }
+
+    return session.url;
 
     // async function handleActiveSubscription(
     //   activeSub: SubscriptionJSON,

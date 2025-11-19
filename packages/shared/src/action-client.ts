@@ -3,25 +3,29 @@ import type { StandardSchemaV1 } from "@standard-schema/spec";
 type Logger = {
   debug: (
     message: string,
+    // biome-ignore lint/suspicious/noExplicitAny: Need any
     args?: Record<string | symbol, any> | undefined
   ) => void;
   info: (
     message: string,
+    // biome-ignore lint/suspicious/noExplicitAny: Need any
     args?: Record<string | symbol, any> | undefined
   ) => void;
   warn: (
     message: string,
+    // biome-ignore lint/suspicious/noExplicitAny: Need any
     args?: Record<string | symbol, any> | undefined
   ) => void;
   error: (
     message: string,
+    // biome-ignore lint/suspicious/noExplicitAny: Need any
     args?: Record<string | symbol, any> | undefined
   ) => void;
 };
 
 type Fn<TPrevious, TNext> = (prev: TPrevious) => TNext | Promise<TNext>;
 
-// eslint-disable-next-line
+// biome-ignore lint/suspicious/noExplicitAny: Need any
 type EmptyCtx = Record<string, any>;
 
 type Middleware<P, N extends P> = [...Fn<P, P>[], Fn<P, N>] | [];
@@ -29,7 +33,7 @@ type Middleware<P, N extends P> = [...Fn<P, P>[], Fn<P, N>] | [];
 class InputActionClient<
   TPreviousContext extends EmptyCtx,
   TNextContext extends TPreviousContext,
-  TSchema extends StandardSchemaV1,
+  TSchema extends StandardSchemaV1
 > {
   schema: TSchema;
   client: ActionClient<TPreviousContext, TNextContext>;
@@ -79,7 +83,7 @@ class InputActionClient<
 
 export class ActionClient<
   TPreviousContext extends EmptyCtx,
-  TNextContext extends TPreviousContext,
+  TNextContext extends TPreviousContext
 > {
   middleware: Middleware<TPreviousContext, TNextContext>;
   actionName: string | undefined;

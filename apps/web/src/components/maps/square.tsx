@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* biome-ignore-all lint: Disable */
 import {
   forwardRef,
   useContext,
@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import type { Ref } from "react";
-import { GoogleMapsContext, latLngEquals } from "@vis.gl/react-google-maps";
+import { GoogleMapsContext } from "@vis.gl/react-google-maps";
 
 type RectangleEventProps = {
   onClick?: (e: google.maps.MapMouseEvent) => void;
@@ -121,5 +121,5 @@ export const Rectangle = forwardRef(
     useImperativeHandle(ref, () => rectangle);
 
     return null;
-  },
+  }
 );

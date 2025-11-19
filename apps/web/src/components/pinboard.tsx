@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@ea/ui/button";
 import { ListPlusIcon, MapPin, PinIcon } from "lucide-react";
 import {
@@ -259,7 +259,7 @@ function AddPinToPinlistDialog({
   }
 
   useEffect(() => {
-    if (idsOfPinListsThatIncludePin.length == 0) {
+    if (idsOfPinListsThatIncludePin.length === 0) {
       return;
     }
 
@@ -333,7 +333,7 @@ function AddPinToPinlistDialog({
               <Checkbox
                 checked={showPinlistDialogAfterPinCreation}
                 onCheckedChange={(e) =>
-                  setShowPinlistDialogAfterPinCreation(e == true)
+                  setShowPinlistDialogAfterPinCreation(e === true)
                 }
               />
             </div>

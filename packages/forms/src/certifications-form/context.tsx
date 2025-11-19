@@ -1,4 +1,4 @@
-import { editProducerCertificationsFormValidator } from "@ea/validators/producers";
+import type { editProducerCertificationsFormValidator } from "@ea/validators/producers";
 import {
   createFormHook,
   createFormHookContexts,

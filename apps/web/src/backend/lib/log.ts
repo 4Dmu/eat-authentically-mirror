@@ -16,7 +16,7 @@ export const logger = {
   },
 } satisfies Record<
   string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: Need any
   (message: string, args?: Record<string | symbol, any>) => void
 >;
 

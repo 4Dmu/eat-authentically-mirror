@@ -7,7 +7,7 @@ export const logger = new Logger({
   transports: [
     new AxiomJSTransport({
       axiom: axiomClient,
-      dataset: env.NEXT_PUBLIC_AXIOM_DATASET!,
+      dataset: env.NEXT_PUBLIC_AXIOM_DATASET ?? "",
     }),
     // {
     //   log: (value) => console.log(...value),

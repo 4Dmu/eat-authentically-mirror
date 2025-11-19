@@ -6,8 +6,6 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write",
     "auth:generate": "dotenv -- pnpm dlx @better-auth/cli@latest generate --output ./src/db/schema/auth-schema.ts",
     "db:push": "dotenv drizzle-kit push",
     "scripts:register-admin": "dotenv -- tsx ./src/scripts/register-admin.ts"
@@ -56,7 +54,6 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.0",
     "@tailwindcss/postcss": "^4",
     "@types/ngeohash": "^0.6.8",
     "@types/node": "^20",

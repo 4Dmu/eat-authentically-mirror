@@ -1,6 +1,7 @@
+// biome-ignore-all lint: Disable biome
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
@@ -8,9 +9,9 @@ import { Button } from "./button";
 import { Input } from "./input";
 import { Textarea } from "./textarea";
 
-function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
+function InputGroup({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (
-    <div
+    <fieldset
       data-slot="input-group"
       role="group"
       className={cn(
@@ -61,9 +62,10 @@ function InputGroupAddon({
   className,
   align = "inline-start",
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupAddonVariants>) {
+}: React.ComponentProps<"fieldset"> &
+  VariantProps<typeof inputGroupAddonVariants>) {
   return (
-    <div
+    <fieldset
       role="group"
       data-slot="input-group-addon"
       data-align={align}

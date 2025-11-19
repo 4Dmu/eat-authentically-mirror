@@ -1,4 +1,4 @@
-import { SubTier } from "@/backend/rpc/utils/get-sub-tier";
+import type { SubTier } from "@/backend/rpc/utils/get-sub-tier";
 import * as BasicInfoForm from "@ea/forms/basic-info-form";
 import * as ImagesForm from "@ea/forms/images-form";
 import * as VideoForm from "@ea/forms/video-form";
@@ -32,7 +32,7 @@ import {
   editProducerMediaFormValidator,
   editProucerVideoFormValidator,
 } from "@ea/validators/producers";
-import {
+import type {
   CertificationSelect,
   MediaAssetSelect,
   ProducerMediaSelect,

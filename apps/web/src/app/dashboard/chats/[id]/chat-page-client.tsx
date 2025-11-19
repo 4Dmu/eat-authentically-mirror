@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  type ProducerChatMessage,
-  type ProducerChat,
-} from "@/backend/rpc/messages";
+import type { ProducerChatMessage, ProducerChat } from "@/backend/rpc/messages";
 import { MessageCard } from "@/components/message-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@ea/ui/avatar";
 import { Button } from "@ea/ui/button";
@@ -125,7 +122,7 @@ export function ChatPageClient(props: {
 
   function sendMessage() {
     if (
-      message.trim().length == 0 ||
+      message.trim().length === 0 ||
       !chatQuery.data ||
       chatQuery.data.initiatorPreventedMoreMessagesAt !== null ||
       chatQuery.data.producerPreventedMoreMessagesAt !== null
@@ -153,7 +150,7 @@ export function ChatPageClient(props: {
         senderUserId: props.userId,
         createdAt: new Date(),
         updatedAt: new Date(),
-        chatId: chatQuery.data!.id,
+        chatId: chatQuery.data.id,
       });
     });
 
@@ -172,6 +169,7 @@ export function ChatPageClient(props: {
 
   const userIsInitiator = chatQuery.data?.initiatorUserId === props.userId;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Want to scroll down whenever messages changes
   useEffect(() => {
     messageListRef.current?.scrollTo({
       top: messageListRef.current.scrollHeight,
@@ -254,8 +252,8 @@ export function ChatPageClient(props: {
               >
                 <div className="flex flex-col gap-5 pb-0">
                   <div className="flex flex-col gap-5">
-                    {sortedMessages.map((group, i) => (
-                      <Fragment key={i}>
+                    {sortedMessages.map((group) => (
+                      <Fragment key={group[0]}>
                         <p className="text-center">
                           {format(new Date(group[0]), "EE, MMM dd, yyyy")}
                         </p>

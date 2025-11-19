@@ -1,11 +1,11 @@
-import { PinboardFull } from "@/backend/rpc/pinboard";
+import type { PinboardFull } from "@/backend/rpc/pinboard";
 import { env } from "@/env";
 import { countryByAlpha3Code } from "@/utils/contries";
 import { producerSlugFull } from "@/utils/producer-helpers";
 import {
   APIProvider,
   InfoWindow,
-  Map,
+  Map as MapComp,
   Marker,
 } from "@vis.gl/react-google-maps";
 import Link from "next/link";
@@ -50,9 +50,9 @@ export function PinboardMap({ pins }: PinboardMapProps) {
           ...p.producer,
           location: {
             ...p.producer.location,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+            // biome-ignore lint/style/noNonNullAssertion: Latitude must be
             latitude: p.producer.location?.latitude!,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+            // biome-ignore lint/style/noNonNullAssertion: Latitude must be
             longitude: p.producer.location?.longitude!,
           },
         },
@@ -89,7 +89,7 @@ function PinboardMapInner({
   const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
 
   return (
-    <Map
+    <MapComp
       style={{ width: "100%", height: "100%" }}
       gestureHandling={"greedy"}
       disableDefaultUI={true}
@@ -140,6 +140,6 @@ function PinboardMapInner({
           )}
         </div>
       ))}
-    </Map>
+    </MapComp>
   );
 }

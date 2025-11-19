@@ -1,11 +1,11 @@
 import { Input } from "@ea/ui/input";
 import { Loader, SearchIcon, XIcon } from "lucide-react";
 import {
-  ChangeEvent,
+  type ChangeEvent,
   Fragment,
-  KeyboardEvent,
-  PropsWithChildren,
-  ReactNode,
+  type KeyboardEvent,
+  type PropsWithChildren,
+  type ReactNode,
   useEffect,
   useState,
 } from "react";
@@ -233,7 +233,7 @@ export function SearchBox(
                                 {i < certs.length - 1 && ", "}
                               </Fragment>
                             ))}
-                            {certs.length == 0 && <span>Select certs</span>}
+                            {certs.length === 0 && <span>Select certs</span>}
                           </span>
                         </Button>
                       </DropdownMenuTrigger>
@@ -297,6 +297,7 @@ export function SearchBox(
             "Farm to table restaurant",
           ].map((example) => (
             <button
+              type="button"
               key={example}
               onClick={() => {
                 setValue(example);

@@ -11,13 +11,13 @@ import { Button } from "@ea/ui/button";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateReview } from "@/utils/reviews";
-import { ProducerReviewSelect } from "@ea/db/schema";
+import type { ProducerReviewSelect } from "@ea/db/schema";
 import { Textarea } from "@ea/ui/textarea";
 import { Label } from "@ea/ui/label";
 import { EditIcon } from "lucide-react";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
-import { UserPublicReview } from "@/backend/rpc/reviews";
+import type { UserPublicReview } from "@/backend/rpc/reviews";
 
 export function UpdateReviewDialog({
   review,
@@ -87,7 +87,7 @@ export function UpdateReviewDialog({
           </DialogClose>
           <Button
             onClick={submit}
-            disabled={actualMessage.length == 0}
+            disabled={actualMessage.length === 0}
             variant={"brandGreen"}
             className="w-32"
           >

@@ -1,5 +1,5 @@
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { RefObject, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type OverlayGeometry =
   | google.maps.Marker
@@ -53,8 +53,7 @@ export function useDrawingManager(
 type Overlay = google.maps.Polygon;
 
 export function useDrawingManagerEvents(
-  drawingManager: google.maps.drawing.DrawingManager | null,
-  overlaysShouldUpdateRef: RefObject<boolean>
+  drawingManager: google.maps.drawing.DrawingManager | null
 ) {
   const [overlay, setOverlay] = useState<Overlay>();
 
@@ -79,11 +78,11 @@ export function useDrawingManagerEvents(
     eventListeners.push(overlayCompleteListener);
 
     return () => {
-      eventListeners.forEach((listener) =>
-        google.maps.event.removeListener(listener)
-      );
+      eventListeners.forEach((listener) => {
+        google.maps.event.removeListener(listener);
+      });
     };
-  }, [drawingManager, overlaysShouldUpdateRef]);
+  }, [drawingManager]);
 
   return overlay;
 }

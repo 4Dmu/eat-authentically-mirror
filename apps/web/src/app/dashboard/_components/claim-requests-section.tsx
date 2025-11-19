@@ -1,5 +1,5 @@
 "use client";
-import { PublicClaimRequest } from "@ea/validators/producers";
+import type { PublicClaimRequest } from "@ea/validators/producers";
 import { ClaimRequestCard } from "@/components/claim-request-card";
 import {
   Card,

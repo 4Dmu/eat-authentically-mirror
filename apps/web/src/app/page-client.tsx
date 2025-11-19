@@ -17,7 +17,7 @@ import { useRef } from "react";
 
 export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
   const ipGeo =
-    userIpGeo && userIpGeo.latitude && userIpGeo.longitude
+    userIpGeo?.latitude && userIpGeo.longitude
       ? { lat: Number(userIpGeo.latitude), lon: Number(userIpGeo.longitude) }
       : undefined;
   const {
@@ -133,8 +133,7 @@ export function Page({ userIpGeo }: { userIpGeo: Geo | undefined }) {
           }
           isSearching={searchQuery.fetchStatus === "fetching"}
         >
-          {searchQuery.data?.userLocation &&
-            searchQuery.data.userLocation.userRequestsUsingTheirLocation &&
+          {searchQuery.data?.userLocation.userRequestsUsingTheirLocation &&
             searchQuery.isEnabled && (
               <RadiusSelector
                 defaultRadius={searchQuery.data.userLocation.searchRadius}

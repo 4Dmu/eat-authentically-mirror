@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ProducerCardsRow } from "@ea/db/schema";
+import type { ProducerCardsRow } from "@ea/db/schema";
 import {
   AddProducerDialog,
   producerDialogAtom,
@@ -59,7 +59,7 @@ export function ProducersSection({
       newParams.delete("mode");
       router.replace(`?${newParams.toString()}`);
     }
-  }, [mode, router, searchparams]);
+  }, [mode, router, searchparams, setProducerDialogOpen]);
 
   return (
     <Card className="bg-gray-50">

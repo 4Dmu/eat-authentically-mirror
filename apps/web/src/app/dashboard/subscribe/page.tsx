@@ -1,7 +1,6 @@
-import React from "react";
-import { ClientPage } from "./page-client";
-import { fetchUser } from "@/backend/rpc/auth";
 import { redirect } from "next/navigation";
+import { fetchUser } from "@/backend/rpc/auth";
+import { ClientPage } from "./page-client";
 
 export default async function SubscribePage({
   searchParams,

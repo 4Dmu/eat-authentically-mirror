@@ -12,7 +12,7 @@ import { Badge } from "@ea/ui/badge";
 import { PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { useStore } from "@tanstack/react-form";
 import { defaultOptions, withForm } from "./context";
-import { CertificationSelect } from "@ea/db/schema";
+import type { CertificationSelect } from "@ea/db/schema";
 
 export const Form = withForm({
   ...defaultOptions,
@@ -50,7 +50,7 @@ export const Form = withForm({
                   <Label>Your Certifications</Label>
                   <div className="flex flex-wrap gap-2">
                     {field.state.value.map((v, i) => (
-                      <div className="relative" key={i}>
+                      <div className="relative" key={v.certificationId}>
                         <Badge>
                           {
                             certifications.find(

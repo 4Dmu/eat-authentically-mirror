@@ -2,7 +2,7 @@ import { NominatimGeocodeResponseCache } from "@/backend/kv";
 import { allow1RequestPer2Seconds } from "@/backend/lib/rate-limit";
 import {
   nominationApiResponse,
-  NominationPlace,
+  type NominationPlace,
 } from "@ea/validators/nomination-api";
 
 export const geocodePlace = async ({
