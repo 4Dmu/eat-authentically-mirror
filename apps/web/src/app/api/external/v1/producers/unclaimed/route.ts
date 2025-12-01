@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { type } from "arktype";
 import { db } from "@ea/db";
 import { and, desc, eq, isNotNull, isNull, sql, type SQL } from "drizzle-orm";
-import { producers } from "@ea/db/schema";
+import { producerContact, producerLocation, producers } from "@ea/db/schema";
 import { alpha3CountryCodeValidator } from "@ea/validators/country";
 import { handlers } from "../../_helpers/request";
 
@@ -20,58 +20,54 @@ import { handlers } from "../../_helpers/request";
  *         in: query
  *         required: false
  *         type: number
- *       - name: filter
+ *       - name: alpha3CountryCode
  *         in: query
  *         required: false
- *         type: object
- *         properties:
- *           alpha3CountryCode:
- *             type: string
- *             required: false
- *           hasEmail:
- *             type: boolean
- *             required: false
+ *         type: string
+ *       - name: hasEmail
+ *         in: query
+ *         required: false
+ *         type: boolean
  */
 export const GET = handlers.get.search(
   type({
     "limit?": type("string.json.parse").to(type.number.atLeast(1).atMost(200)),
     "offset?": type("string.json.parse").to(type.number.atLeast(1)),
-    "filter?": {
-      "alpha3CountryCode?": alpha3CountryCodeValidator,
-      "hasEmail?": "boolean",
-    },
+    "alpha3CountryCode?": alpha3CountryCodeValidator,
+    "hasEmail?": type("string.json.parse").to(type.boolean),
   }),
   async ({ search }) => {
     const filters: SQL<unknown>[] = [isNull(producers.userId)];
 
-    if (search.filter?.alpha3CountryCode) {
+    if (search.alpha3CountryCode) {
+      filters.push(eq(producerLocation.country, search.alpha3CountryCode));
+    }
+
+    // Filter by whether email exists (now on the contact table)
+    if (search?.hasEmail !== undefined) {
       filters.push(
-        eq(
-          sql`json_extract(address, '$.country')`,
-          search.filter.alpha3CountryCode
-        )
+        search.hasEmail
+          ? isNotNull(producerContact.email)
+          : isNull(producerContact.email)
       );
     }
 
-    if (search.filter?.hasEmail !== undefined) {
-      filters.push(
-        search.filter.hasEmail
-          ? isNotNull(sql`json_extract(contact, '$.email')`)
-          : isNull(sql`json_extract(contact, '$.email')`)
-      );
-    }
+    const query = await db
+      .select()
+      .from(producers)
+      .leftJoin(producerContact, eq(producers.id, producerContact.producerId))
+      .leftJoin(producerLocation, eq(producers.id, producerLocation.producerId))
+      .where(and(...filters))
+      .offset(search.offset ?? 0)
+      .limit(search.limit ?? 100)
+      .orderBy(desc(producers.createdAt));
 
-    const data = await db.query.producers.findMany({
-      where: and(...filters),
-      limit: search.limit ?? 100,
-      offset: search.offset,
-      with: {
-        contact: true,
-        location: true,
-      },
-      orderBy: desc(producers.createdAt),
+    return NextResponse.json({
+      items: query.map((r) => ({
+        ...r.producers,
+        contact: r.producer_contact,
+        location: r.producer_location,
+      })),
     });
-
-    return NextResponse.json({ items: data });
   }
 );
