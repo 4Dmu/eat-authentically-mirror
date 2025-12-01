@@ -5,6 +5,8 @@ import { getSubTier } from "@/backend/rpc/utils/get-sub-tier";
 import { auth } from "@clerk/nextjs/server";
 import { ProducerPageClient } from "./client-page";
 import { getFullProducerPublic } from "@/backend/rpc/producers";
+import { after } from "next/server";
+import { PRODUCER_PROFILE_ANALYTICS } from "@ea/kv";
 
 export default async function ProducerPage({
   params,
@@ -31,6 +33,13 @@ export default async function ProducerPage({
   if (receivedSlug !== correctSlug) {
     redirect(`${correctSlug}${producer.id}`);
   }
+
+  after(async () => {
+    await PRODUCER_PROFILE_ANALYTICS.track(
+      producer.id,
+      session.userId ? "authenticated" : "public"
+    );
+  });
 
   return (
     <ProducerPageClient

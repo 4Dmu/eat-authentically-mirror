@@ -1,5 +1,6 @@
 import type { UserJSON } from "@clerk/backend";
 import { redis } from "./redis";
+import { format, parse, subDays } from "date-fns";
 
 export const USER_DATA_KV = {
   generateKey(userId: string) {
@@ -315,3 +316,78 @@ export const COMMODITY_VARIANTS_CACHE = {
     await this.set(existing.filter((e) => e !== variant));
   },
 };
+
+export const PRODUCER_PROFILE_ANALYTICS = {
+  retention: 60 * 60 * 24 * 90,
+
+  date(sub = 0) {
+    return format(subDays(new Date(), sub), "dd/MM/yyyy");
+  },
+
+  generateKey(producerId: string, date: string) {
+    const staticKey = `producer:${producerId}:profile-analytics`;
+    return `${staticKey}:${date}`;
+  },
+
+  async track(producerId: string, mode: "public" | "authenticated") {
+    const key = this.generateKey(producerId, this.date());
+    let hash: Record<string, unknown>;
+    const existingHash = await redis.hgetall(key);
+    if (existingHash) {
+      hash = existingHash;
+      hash[mode] = Number(hash[mode]) + 1;
+    } else {
+      hash = { public: 0, authenticated: 0 };
+      hash[mode] = 1;
+    }
+
+    await redis.hset(key, hash);
+    await redis.expire(key, this.retention);
+  },
+
+  async retrieve(producerId: string, date: string) {
+    const key = this.generateKey(producerId, date);
+    const hash = await redis.hgetall<{ public: number; authenticated: number }>(
+      key
+    );
+
+    return {
+      date: date,
+      stats: hash
+        ? { ...hash, total: hash.authenticated + hash.public }
+        : { public: 0, authenticated: 0, total: 0 },
+    };
+  },
+
+  async retrieveDays(producerId: string, nDays: number) {
+    type RetrievePromise = ReturnType<typeof this.retrieve>;
+    const promises: RetrievePromise[] = [];
+    for (let i = 0; i < nDays; i++) {
+      const date = this.date(i);
+      promises.push(this.retrieve(producerId, date));
+    }
+
+    const fetched = await Promise.all(promises);
+
+    const data = fetched.sort((a, b) => {
+      if (
+        parse(a.date, "dd/MM/yyyy", new Date()) >
+        parse(b.date, "dd/MM/yyyy", new Date())
+      ) {
+        return 1;
+      }
+      return -1;
+    });
+
+    return {
+      days: data,
+      total: data.reduce((total, item) => {
+        return item.stats.total + total;
+      }, 0),
+    };
+  },
+};
+
+export type NDaysAnalytics = Awaited<
+  ReturnType<typeof PRODUCER_PROFILE_ANALYTICS.retrieveDays>
+>;

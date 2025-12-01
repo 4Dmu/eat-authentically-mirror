@@ -25,11 +25,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { producerSlugFull } from "@/utils/producer-helpers";
+import type { ProducerProfileAnalyticsHelper } from "@/utils/types";
 
 export function ProducersSection({
   producers,
 }: {
-  producers: ProducerCardsRow[];
+  producers: (ProducerCardsRow &
+    ProducerProfileAnalyticsHelper<"analyticsLast90Days">)[];
 }) {
   const [producerDialogOpen, setProducerDialogOpen] =
     useAtom(producerDialogAtom);
@@ -98,6 +100,7 @@ export function ProducersSection({
               <CardContent className="p-5 flex flex-col gap-2">
                 <p className="font-fraunces text-lg">{p.name}</p>
                 <Badge>{p.type}</Badge>
+                <p>Views in last 90 days: {p.analyticsLast90Days.total}</p>
                 <p>{p.summary}</p>
               </CardContent>
               <CardFooter className="grid grid-cols-3 gap-2 mt-auto">

@@ -63,6 +63,7 @@ import type { ProducerSearchResult } from "@/backend/data/producer";
 import { useHomePageStore } from "@/stores";
 import { searchProducersLocalV2 } from "@/client/local-search";
 import { useRef } from "react";
+import type { ProducerProfileAnalyticsHelper } from "./types";
 
 type SimpleMutationOps<TData, TArgs> = Omit<
   MutationOptions<TData, Error, TArgs, unknown>,
@@ -467,9 +468,11 @@ export function useListCommodoties(
 export function useFetchUserProducers(
   opts?: Omit<
     UseQueryOptions<
-      ProducerCardsRow[],
+      (ProducerCardsRow &
+        ProducerProfileAnalyticsHelper<"analyticsLast90Days">)[],
       Error,
-      ProducerCardsRow[],
+      (ProducerCardsRow &
+        ProducerProfileAnalyticsHelper<"analyticsLast90Days">)[],
       readonly [string]
     >,
     "queryFn" | "queryKey"

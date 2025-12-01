@@ -79,7 +79,11 @@ import { registerProducerArgsValidator } from "@ea/validators/producers";
 import { resend } from "../lib/resend";
 import { getDnsRecords } from "@layered/dns-records";
 import { CLAIM_DNS_TXT_RECORD_NAME, RATELIMIT_ALL } from "@ea/shared/constants";
-import { PRODUCER_COUNTRIES_CACHE, USER_PRODUCER_IDS_KV } from "@ea/kv";
+import {
+  PRODUCER_COUNTRIES_CACHE,
+  PRODUCER_PROFILE_ANALYTICS,
+  USER_PRODUCER_IDS_KV,
+} from "@ea/kv";
 import { sendClaimCodeMessage } from "./helpers/sms";
 import { isMobilePhone, isNumeric } from "validator";
 import { addMinutes, isAfter, isBefore } from "date-fns";
@@ -251,7 +255,17 @@ export const fetchUserProducers = authenticatedActionClient
       .from(producerCards)
       .where(eq(producerCards.userId, userId));
 
-    return result;
+    const withAnalyticsPromise = result.map(async (r) => {
+      return {
+        ...r,
+        analyticsLast90Days: await PRODUCER_PROFILE_ANALYTICS.retrieveDays(
+          r.id,
+          90
+        ),
+      };
+    });
+
+    return await Promise.all(withAnalyticsPromise);
   });
 
 export const fetchUserProducerLight = producerActionClient
@@ -762,12 +776,12 @@ export const requestUploadUrls = producerActionClient
         tier === "Free"
           ? 1
           : tier.tier === "community"
-          ? 1
-          : tier.tier === "pro"
-          ? 4
-          : tier.tier === "premium" || tier.tier === "enterprise"
-          ? 5
-          : 1;
+            ? 1
+            : tier.tier === "pro"
+              ? 4
+              : tier.tier === "premium" || tier.tier === "enterprise"
+                ? 5
+                : 1;
 
       const remainingFiles = maxFiles - images.length;
 
@@ -1598,11 +1612,11 @@ export const listClaimRequests = authenticatedActionClient
             requestedVerification.method === "domain-dns"
               ? { ...requestedVerification, token: claimToken }
               : requestedVerification.method === "social-post"
-              ? { ...requestedVerification, token: claimToken }
-              : requestedVerification.method === "contact-phone-link"
-              ? { ...requestedVerification }
-              : requestedVerification,
-        } satisfies PublicClaimRequest)
+                ? { ...requestedVerification, token: claimToken }
+                : requestedVerification.method === "contact-phone-link"
+                  ? { ...requestedVerification }
+                  : requestedVerification,
+        }) satisfies PublicClaimRequest
     );
   });
 

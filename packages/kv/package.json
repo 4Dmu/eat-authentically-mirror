@@ -8,6 +8,7 @@
   "dependencies": {
     "@t3-oss/env-core": "^0.13.8",
     "@upstash/redis": "^1.35.6",
+    "date-fns": "^4.1.0",
     "zod": "^4.0.17"
   },
   "devDependencies": {
