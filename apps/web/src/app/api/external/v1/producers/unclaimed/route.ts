@@ -65,6 +65,10 @@ export const GET = handlers.get.search(
       where: and(...filters),
       limit: search.limit ?? 100,
       offset: search.offset,
+      with: {
+        contact: true,
+        location: true,
+      },
     });
 
     return NextResponse.json({ items: data });
