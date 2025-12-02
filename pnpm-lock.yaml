@@ -41,6 +41,9 @@ importers:
       '@clerk/types':
         specifier: ^4.100.0
         version: 4.100.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@ea/charts':
+        specifier: workspace:*
+        version: link:../../packages/charts
       '@ea/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -560,6 +563,31 @@ importers:
         specifier: ^5
         version: 5.9.2
 
+  packages/charts:
+    dependencies:
+      '@ea/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@remixicon/react':
+        specifier: ^4.7.0
+        version: 4.7.0(react@19.2.0)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.0
+      recharts:
+        specifier: 2.15.4
+        version: 2.15.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.10.0
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.0
+      typescript:
+        specifier: latest
+        version: 5.9.3
+
   packages/db:
     dependencies:
       '@ea/search':
@@ -880,6 +908,9 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
     devDependencies:
+      '@tailwindcss/forms':
+        specifier: ^0.5.10
+        version: 0.5.10(tailwindcss@4.1.16)
       '@tailwindcss/postcss':
         specifier: ^4.1.16
         version: 4.1.16
@@ -3378,6 +3409,11 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
+  '@remixicon/react@4.7.0':
+    resolution: {integrity: sha512-ODBQjdbOjnFguCqctYkpDjERXOInNaBnRPDKfZOBvbzExBAwr2BaH/6AHFTg/UAFzBDkwtylfMT8iKPAkLwPLQ==}
+    peerDependencies:
+      react: '>=18.2.0'
+
   '@selderee/plugin-htmlparser2@0.11.0':
     resolution: {integrity: sha512-P33hHGdldxGabLFjPPpaTxVolMrzrcegejx+0GxjrIb9Zv48D8yAIA/QTDR2dFl7Uz7urX8aX6+5bCZslr+gWQ==}
 
@@ -3433,6 +3469,11 @@ packages:
         optional: true
       zod:
         optional: true
+
+  '@tailwindcss/forms@0.5.10':
+    resolution: {integrity: sha512-utI1ONF6uf/pPNO68kmN1b8rEwNXv3czukalo8VtJH8ksIkZXr3Q3VYudZLkCsDd4Wku120uF02hYK25XGPorw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1 || >= 4.0.0-alpha.20 || >= 4.0.0-beta.1'
 
   '@tailwindcss/node@4.1.16':
     resolution: {integrity: sha512-BX5iaSsloNuvKNHRN3k2RcCuTEgASTo77mofW0vmeHkfrDWaoFAFvNHpEgtu0eqyypcyiBkDWzSMxJhp3AUVcw==}
@@ -5188,6 +5229,10 @@ packages:
   mimic-function@5.0.1:
     resolution: {integrity: sha512-VP79XUPxV2CigYP3jWwAUFSku2aKqBH7uTAapFWCBqutsbmDo96KY5o8uh6U+/YSIn5OxJnXp73beVkpqMIGhA==}
     engines: {node: '>=18'}
+
+  mini-svg-data-uri@1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
 
   minimatch@10.1.1:
     resolution: {integrity: sha512-enIvLvRAFZYXJzkCYG5RKmPfrFArdLv+R+lbQ53BmIMLIry74bjKzX6iHAm8WYamJkhSSEabrWN5D97XnKObjQ==}
@@ -9226,6 +9271,10 @@ snapshots:
       '@react-hook/latest': 1.0.3(react@19.2.0)
       react: 19.2.0
 
+  '@remixicon/react@4.7.0(react@19.2.0)':
+    dependencies:
+      react: 19.2.0
+
   '@selderee/plugin-htmlparser2@0.11.0':
     dependencies:
       domhandler: 5.0.3
@@ -9281,6 +9330,11 @@ snapshots:
       arktype: 2.1.25
       typescript: 5.9.3
       zod: 4.1.12
+
+  '@tailwindcss/forms@0.5.10(tailwindcss@4.1.16)':
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 4.1.16
 
   '@tailwindcss/node@4.1.16':
     dependencies:
@@ -10899,6 +10953,8 @@ snapshots:
   mimic-fn@2.1.0: {}
 
   mimic-function@5.0.1: {}
+
+  mini-svg-data-uri@1.4.4: {}
 
   minimatch@10.1.1:
     dependencies:

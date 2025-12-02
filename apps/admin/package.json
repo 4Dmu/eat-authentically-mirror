@@ -19,6 +19,7 @@
     "@ea/search": "workspace:*",
     "@ea/shared": "workspace:*",
     "@ea/ui": "workspace:*",
+    "@ea/charts": "workspace:*",
     "@ea/validators": "workspace:*",
     "@libsql/client": "^0.15.15",
     "@radix-ui/react-collapsible": "^1.1.12",

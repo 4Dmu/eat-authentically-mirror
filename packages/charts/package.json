@@ -1,0 +1,22 @@
+{
+  "name": "@ea/charts",
+  "type": "module",
+  "exports": {
+    "./utils": "./src/lib/utils.ts",
+    "./chartUtils": "./src/lib/chartUtils.ts",
+    "./hooks/useOnWindowResize": "./src/hooks/useOnWindowResize.ts",
+    "./bar-chart": "./src/components/bar-chart.tsx",
+    "./area-chart": "./src/components/area-chart.tsx"
+  },
+  "dependencies": {
+    "@ea/ui": "workspace:*",
+    "@remixicon/react": "^4.7.0",
+    "react": "catalog:",
+    "recharts": "2.15.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/react": "catalog:",
+    "typescript": "latest"
+  }
+}

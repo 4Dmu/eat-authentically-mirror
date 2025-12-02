@@ -317,24 +317,20 @@ export const COMMODITY_VARIANTS_CACHE = {
   },
 };
 
-export const PRODUCER_PROFILE_ANALYTICS = {
-  retention: 60 * 60 * 24 * 90,
+/**
+ * Base class: shared logic for hashing, retrieval, expiration, ranges, etc.
+ */
+class BaseAnalytics {
+  retention = 60 * 60 * 24 * 90;
 
   date(sub = 0) {
     return format(subDays(new Date(), sub), "dd/MM/yyyy");
-  },
+  }
 
-  generateKey(producerId: string, date: string) {
-    const staticKey = `producer:${producerId}:profile-analytics`;
-    return `${staticKey}:${date}`;
-  },
+  async _incrementHash(key: string, mode: "public" | "authenticated") {
+    let hash = await redis.hgetall(key);
 
-  async track(producerId: string, mode: "public" | "authenticated") {
-    const key = this.generateKey(producerId, this.date());
-    let hash: Record<string, unknown>;
-    const existingHash = await redis.hgetall(key);
-    if (existingHash) {
-      hash = existingHash;
+    if (hash) {
       hash[mode] = Number(hash[mode]) + 1;
     } else {
       hash = { public: 0, authenticated: 0 };
@@ -343,50 +339,216 @@ export const PRODUCER_PROFILE_ANALYTICS = {
 
     await redis.hset(key, hash);
     await redis.expire(key, this.retention);
-  },
+  }
 
-  async retrieve(producerId: string, date: string) {
-    const key = this.generateKey(producerId, date);
+  async _retrieve(key: string) {
     const hash = await redis.hgetall<{ public: number; authenticated: number }>(
       key
     );
 
-    return {
-      date: date,
-      stats: hash
-        ? { ...hash, total: hash.authenticated + hash.public }
-        : { public: 0, authenticated: 0, total: 0 },
-    };
-  },
+    return hash
+      ? { ...hash, total: hash.public + hash.authenticated }
+      : { public: 0, authenticated: 0, total: 0 };
+  }
 
-  async retrieveDays(producerId: string, nDays: number) {
-    type RetrievePromise = ReturnType<typeof this.retrieve>;
-    const promises: RetrievePromise[] = [];
+  async _retrieveDays(genKey: (date: string) => string, nDays: number) {
+    const promises = [];
+
     for (let i = 0; i < nDays; i++) {
-      const date = this.date(i);
-      promises.push(this.retrieve(producerId, date));
+      const dt = this.date(i);
+      promises.push(
+        this._retrieve(genKey(dt)).then((stats) => ({ date: dt, stats }))
+      );
     }
 
-    const fetched = await Promise.all(promises);
+    const data = await Promise.all(promises);
 
-    const data = fetched.sort((a, b) => {
-      if (
-        parse(a.date, "dd/MM/yyyy", new Date()) >
-        parse(b.date, "dd/MM/yyyy", new Date())
-      ) {
-        return 1;
-      }
-      return -1;
-    });
+    data.sort((a, b) =>
+      parse(a.date, "dd/MM/yyyy", new Date()) >
+      parse(b.date, "dd/MM/yyyy", new Date())
+        ? 1
+        : -1
+    );
 
     return {
       days: data,
-      total: data.reduce((total, item) => {
-        return item.stats.total + total;
-      }, 0),
+      total: data.reduce((sum, item) => sum + item.stats.total, 0),
     };
-  },
-};
+  }
+}
+
+/**
+ * Per-producer analytics
+ */
+class ProducerAnalytics extends BaseAnalytics {
+  generateKey(producerId: string, date: string) {
+    return `producer:${producerId}:views:${date}`;
+  }
+
+  async track(producerId: string, mode: "public" | "authenticated") {
+    const date = this.date();
+    const key = this.generateKey(producerId, date);
+
+    // 1. Increment daily producer stats
+    await this._incrementHash(key, mode);
+
+    // 2. Increment global daily stats
+    await GLOBAL_PRODUCER_PROFILE_ANALYTICS.track(mode);
+
+    // 3. Update ranking indexes
+    await redis.zincrby("producer:views:alltime", 1, producerId);
+    await redis.zincrby(`producer:views:${date}`, 1, producerId);
+
+    // 4. Increment global running total
+    await redis.incr("global:views:total");
+  }
+
+  async retrieve(producerId: string, date: string) {
+    const stats = await this._retrieve(this.generateKey(producerId, date));
+    return {
+      date,
+      stats,
+    };
+  }
+
+  retrieveDays(producerId: string, nDays: number) {
+    return this._retrieveDays(
+      (date) => this.generateKey(producerId, date),
+      nDays
+    );
+  }
+
+  async getTopProducers(n: number) {
+    const results = await redis.zrange<string[]>(
+      "producer:views:alltime",
+      0,
+      n - 1,
+      {
+        rev: true,
+        withScores: true,
+      }
+    );
+    return this._formatZsetResults(results);
+  }
+
+  // Get least viewed N producers (optional but useful)
+  async getLeastViewedProducers(n: number) {
+    const results = await redis.zrange<string[]>(
+      "producer:views:alltime",
+      0,
+      n - 1,
+      {
+        withScores: true,
+      }
+    );
+    return this._formatZsetResults(results);
+  }
+
+  // Compare today vs yesterday (difference score)
+  async getTrendingProducers(n: number) {
+    const today = this.date(0);
+    const yesterday = this.date(1);
+
+    const [todayViews, yesterdayViews] = await Promise.all([
+      redis.zrange<string[]>(`producer:views:${today}`, 0, -1, {
+        withScores: true,
+      }),
+      redis.zrange<string[]>(`producer:views:${yesterday}`, 0, -1, {
+        withScores: true,
+      }),
+    ]);
+
+    const todayMap = this._formatZsetMap(todayViews);
+    const yesterdayMap = this._formatZsetMap(yesterdayViews);
+
+    const trending = [];
+
+    for (const pid in todayMap) {
+      const diff = todayMap[pid] - (yesterdayMap[pid] ?? 0);
+      trending.push({ producerId: pid, delta: diff });
+    }
+
+    trending.sort((a, b) => b.delta - a.delta);
+    return trending.slice(0, n);
+  }
+
+  /****************************
+   *      TOTAL HELPERS
+   ****************************/
+
+  async getProducerTotalViews(producerId: string) {
+    const score = await redis.zscore("producer:views:alltime", producerId);
+    return Number(score || 0);
+  }
+
+  async getAllProducerTotals() {
+    const results = await redis.zrange<string[]>(
+      "producer:views:alltime",
+      0,
+      -1,
+      {
+        withScores: true,
+      }
+    );
+    return this._formatZsetResults(results);
+  }
+
+  async getProducerCount() {
+    return redis.zcard("producer:views:alltime");
+  }
+
+  async getGlobalTotalViews() {
+    return Number(await redis.get("global:views:total")) || 0;
+  }
+
+  /****************************
+   *      INTERNAL HELPERS
+   ****************************/
+
+  _formatZsetMap(arr: string[]) {
+    const map: Record<string, number> = {};
+    for (let i = 0; i < arr.length; i += 2) {
+      map[arr[i]] = Number(arr[i + 1]);
+    }
+    return map;
+  }
+
+  _formatZsetResults(arr: string[]) {
+    const results: Array<{ producerId: string; views: number }> = [];
+    for (let i = 0; i < arr.length; i += 2) {
+      results.push({ producerId: arr[i], views: Number(arr[i + 1]) });
+    }
+    return results;
+  }
+}
+
+/**
+ * Global analytics (no producerId)
+ */
+class GlobalProducerAnalytics extends BaseAnalytics {
+  generateKey(date: string) {
+    return `producers:views:${date}`;
+  }
+
+  async track(mode: "public" | "authenticated") {
+    const key = this.generateKey(this.date());
+    await this._incrementHash(key, mode);
+  }
+
+  retrieve(date: string) {
+    return this._retrieve(this.generateKey(date)).then((stats) => ({
+      date,
+      stats,
+    }));
+  }
+
+  retrieveDays(nDays: number) {
+    return this._retrieveDays((date) => this.generateKey(date), nDays);
+  }
+}
+
+export const PRODUCER_PROFILE_ANALYTICS = new ProducerAnalytics();
+export const GLOBAL_PRODUCER_PROFILE_ANALYTICS = new GlobalProducerAnalytics();
 
 export type NDaysAnalytics = Awaited<
   ReturnType<typeof PRODUCER_PROFILE_ANALYTICS.retrieveDays>
