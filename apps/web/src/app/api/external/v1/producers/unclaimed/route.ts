@@ -32,7 +32,7 @@ import { handlers } from "../../_helpers/request";
 export const GET = handlers.get.search(
   type({
     "limit?": type("string.json.parse").to(type.number.atLeast(1).atMost(200)),
-    "offset?": type("string.json.parse").to(type.number.atLeast(1)),
+    "offset?": type("string.json.parse").to(type.number.atLeast(0)),
     "alpha3CountryCode?": alpha3CountryCodeValidator,
     "hasEmail?": type("string.json.parse").to(type.boolean),
   }),
