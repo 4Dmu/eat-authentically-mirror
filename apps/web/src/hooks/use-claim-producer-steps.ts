@@ -75,6 +75,8 @@ export function useClaimProducerSteps(initialStep?: Step) {
     string | undefined
   >(undefined);
 
+  const [agreeToSms, setAgreeToSms] = useState(false);
+
   function setStep(step: InputStep): "success" | { error: string } {
     if (currentStep.mode === "submit") {
       setChoosenSocialHandle(undefined);
@@ -200,7 +202,9 @@ export function useClaimProducerSteps(initialStep?: Step) {
       (currentStep.verification.method === "social-post" &&
         choosenSocialHandle === undefined) ||
       (currentStep.verification.method === "manual" &&
-        manualContactEmail === undefined));
+        manualContactEmail === undefined) ||
+      (currentStep.verification.method === "contact-phone-link" &&
+        !agreeToSms));
 
   return {
     step: currentStep,
@@ -213,6 +217,8 @@ export function useClaimProducerSteps(initialStep?: Step) {
       setChoosenSocialHandle,
       manualContactEmail,
       setManualContactEmail,
+      agreeToSms,
+      setAgreeToSms,
     },
   };
 }

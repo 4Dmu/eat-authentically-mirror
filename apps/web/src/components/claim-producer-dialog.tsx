@@ -41,6 +41,7 @@ import {
   useClaimProducerSteps,
 } from "@/hooks/use-claim-producer-steps";
 import { primaryImageUrl } from "@/utils/producer-helpers";
+import { Checkbox } from "@ea/ui/checkbox";
 
 const LIMIT = 50;
 
@@ -435,6 +436,33 @@ export function ClaimProducerDialog(props: PropsWithChildren) {
                       ))}
                     </SelectContent>
                   </Select>
+                )}
+                {step.verification.method === "contact-phone-link" && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <Checkbox
+                        className="size-6"
+                        checked={submitState.agreeToSms}
+                        onCheckedChange={(e) =>
+                          submitState.setAgreeToSms(e === true)
+                        }
+                      />
+                      <Label>
+                        <span className="text-red-500">*</span>I agree to
+                        receive SMS messages from Eat Authentically regarding my
+                        business listing, verification, and account-related
+                        updates.
+                      </Label>
+                    </div>
+                    <p className="text-sm">
+                      By checking this box, you consent to receive SMS messages
+                      from Eat Authentically at the phone number provided.
+                      Message frequency varies. Message and data rates may
+                      apply. You can reply STOP at any time to unsubscribe or
+                      HELP for assistance. Consent is not a condition of
+                      purchase.
+                    </p>
+                  </div>
                 )}
               </div>
             )}
