@@ -1,6 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { getSubTier } from "./backend/rpc/utils/get-sub-tier";
-import { type NextFetchEvent, type NextRequest, NextResponse } from "next/server";
+import {
+  type NextFetchEvent,
+  type NextRequest,
+  NextResponse,
+} from "next/server";
 import { geolocation } from "@vercel/functions";
 import { CUSTOM_GEO_HEADER_NAME } from "@ea/shared/constants";
 
@@ -12,6 +16,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhook(.*)",
   "/api/notifications(.*)",
   "/api/external(.*)",
+  "/api/cron",
   "/about",
   "/claim",
   "/join-and-claim",
