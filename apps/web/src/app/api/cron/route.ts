@@ -1,18 +1,13 @@
-import { VERCEL_CRON } from "@ea/kv";
+import { env } from "@/env";
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  console.log(request);
-  console.log("Cron Handled");
-
-  const ran = await VERCEL_CRON.getRan();
-
-  if (ran) {
-    console.log("cron already ran");
-    return new Response("Handled");
+  if (request.headers.get("Authorization") !== `Bearer ${env.CRON_SECRET}`) {
+    return new NextResponse("Authorization Failed", { status: 400 });
   }
 
-  await VERCEL_CRON.setRan();
-  console.log("Running cron");
+  console.log(request);
+  console.log("Cron Handled");
 
   return new Response("Handled");
 }

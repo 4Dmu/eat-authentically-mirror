@@ -44,6 +44,8 @@ export const env = createEnv({
     GOOGLE_MAPS_API_KEY: z.string().min(1),
 
     ORGANIC_CERT_ID: z.string().min(1),
+
+    CRON_SECRET: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
