@@ -61,7 +61,8 @@
         "NEXT_PUBLIC_TYPESENSE_PROTOCOL",
         "TYPESENSE_APIKEY",
         "NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_APIKEY",
-        "ORGANIC_CERT_ID"
+        "ORGANIC_CERT_ID",
+        "CRON_SECRET"
       ]
     },
     "lint": {
