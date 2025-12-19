@@ -317,6 +317,17 @@ export const COMMODITY_VARIANTS_CACHE = {
   },
 };
 
+export const VERCEL_CRON = {
+  key: "global:vercel:cron-ran",
+  async getRan() {
+    const ran = await redis.get<string>(this.key);
+    return ran !== null;
+  },
+  async setRan() {
+    await redis.set(this.key, "yes", { ex: 60 * 60 * 24 });
+  },
+};
+
 /**
  * Base class: shared logic for hashing, retrieval, expiration, ranges, etc.
  */
