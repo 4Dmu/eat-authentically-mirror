@@ -203,7 +203,6 @@ async function sendEmail(
   const result = await resend.emails.send({
     from: "Eat Authentically <hello@eatauthentically.app>",
     to: producer.email,
-    // @ts-expect-error
     template: {
       id:
         step === 1
