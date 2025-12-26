@@ -1,0 +1,1 @@
+ALTER TABLE `producer_outreach_email_state` ADD `metadata` text NOT NULL;

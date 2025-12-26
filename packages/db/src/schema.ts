@@ -971,6 +971,30 @@ export const producerRatingAggRelations = relations(
   })
 );
 
+export const producerOutreachEmailState = sqliteTable(
+  "producer_outreach_email_state",
+  {
+    producerId: text("producer_id")
+      .notNull()
+      .references(() => producers.id, { onDelete: "cascade" })
+      .primaryKey(),
+    emailStep: integer("email_step").notNull(),
+    lastEmailSent: integer("last_email_sent", { mode: "timestamp" }).notNull(),
+    nextEmailAt: integer("next_email_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+    completedAt: integer("completed_at", { mode: "timestamp" }),
+    updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+    claimedAt: integer("claimed_at", { mode: "timestamp" }),
+    metadata: text("metadata", { mode: "json" })
+      .$type<OutreachEmailMetadata>()
+      .notNull(),
+  }
+);
+
+export type OutreachEmailMetadata = {
+  runEmailIds: string[];
+};
+
 export const producerCards = sqliteView("v_producer_cards").as((qb) =>
   qb
     .select({
@@ -1269,6 +1293,11 @@ export type OutreachDataSelect = typeof outreachData.$inferSelect;
 
 export type OutreachEventInsert = typeof outreachEvent.$inferInsert;
 export type OutreachEventSelect = typeof outreachEvent.$inferSelect;
+
+export type ProducerOutreachEmailStateInsert =
+  typeof producerOutreachEmailState.$inferInsert;
+export type ProducerOutreachEmailStateSelect =
+  typeof producerOutreachEmailState.$inferSelect;
 
 export type MediaAssetInsert = typeof mediaAssets.$inferInsert;
 export type MediaAssetSelect = typeof mediaAssets.$inferSelect;

@@ -25,6 +25,7 @@ import {
 import { rpc } from "@/rpc";
 import type { SuggestedProducersListItem } from "@/rpc/suggested-producers";
 import { searchProducersLocal } from "./local-search";
+import type { OutreachEmailState } from "@/rpc/outreach-email-state";
 
 export function useExternalApiKeys(
   opts?: Omit<
@@ -45,7 +46,7 @@ export function useExternalApiKeys(
       string[]
     >,
     "queryKey" | "queryFn"
-  >,
+  >
 ) {
   return useQuery({
     ...opts,
@@ -56,11 +57,32 @@ export function useExternalApiKeys(
   });
 }
 
+export function useProducerOutreachEmailState(
+  props: { limit: number; offset: number },
+  opts?: Omit<
+    QueryOptions<
+      OutreachEmailState[],
+      Error,
+      OutreachEmailState[],
+      [string, { limit: number; offset: number }]
+    >,
+    "queryKey" | "queryFn"
+  >
+) {
+  return useQuery({
+    ...opts,
+    queryKey: ["list-producer-outreach-email-state", props],
+    queryFn: async () => {
+      return await rpc.producerOutreachEmailState.list(props);
+    },
+  });
+}
+
 export function useCreateExternalApiKey(
   opts?: Omit<
     MutationOptions<void, Error, void, unknown>,
     "queryKey" | "queryFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -75,7 +97,7 @@ export function useCreateProducer(
   opts?: Omit<
     MutationOptions<string, Error, RegisterProducerArgs, unknown>,
     "queryKey" | "queryFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -90,7 +112,7 @@ export function useEditUserProducer(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerArgsV2, unknown>,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -105,7 +127,7 @@ export function useEditProducerContact(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerContact, unknown>,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -120,7 +142,7 @@ export function useEditProducerLocation(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerLocationArgs, unknown>,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -135,7 +157,7 @@ export function useEditProducerCertifications(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerCertifications, unknown>,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -150,7 +172,7 @@ export function useEditProducerCommodities(
   opts?: Omit<
     UseMutationOptions<void, Error, EditProducerCommodoties, unknown>,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -165,7 +187,7 @@ export function useAddCommodityAndAssociate(
   opts?: Omit<
     UseMutationOptions<void, Error, AddCommodityAndAssociate, unknown>,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -190,7 +212,7 @@ export function useUploadImages(
       unknown
     >,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -240,7 +262,7 @@ export function useUploadVideo(
       unknown
     >,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -274,7 +296,7 @@ export function useDeleteVideo(
       unknown
     >,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -296,7 +318,7 @@ export function useRemoveProducer(
       unknown
     >,
     "mutationKey" | "mutationFn"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -319,7 +341,7 @@ export function useUpdateExistingImages(
       unknown
     >,
     "mutationFn" | "mutationKey"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,
@@ -342,7 +364,7 @@ export function useListCommodoties(
       readonly [string]
     >,
     "queryFn" | "queryKey"
-  >,
+  >
 ) {
   return useQuery({
     ...(props as object),
@@ -361,7 +383,7 @@ export function useProducer(
       readonly [string, string]
     >,
     "queryFn" | "queryKey"
-  >,
+  >
 ) {
   return useQuery({
     ...(props as object),
@@ -414,7 +436,7 @@ export function useListSuggestedProducers(
       readonly [string]
     >,
     "queryFn" | "queryKey"
-  >,
+  >
 ) {
   return useQuery({
     ...(props as object),
@@ -427,7 +449,7 @@ export function useApproveSuggestedProducer(
   opts?: Omit<
     MutationOptions<string, Error, ApproveSuggestedProducerArgs, unknown>,
     "mutationFn" | "mutationKey"
-  >,
+  >
 ) {
   return useMutation({
     ...opts,

@@ -1,0 +1,2366 @@
+[
+  {
+    "email": "jwc1818@gmail.com",
+    "message_id": "460b29ad-2202-49ca-b455-b1b1f6e1379a",
+    "sent_at": "2025-12-02 19:19:30.571+00",
+    "status": "delivered"
+  },
+  {
+    "email": "zinnikerfarm@gmail.com",
+    "message_id": "cc2f612e-bdaa-4a34-8585-b6009211dadf",
+    "sent_at": "2025-12-02 19:19:35.704+00",
+    "status": "delivered"
+  },
+  {
+    "email": "caleb@winterspringcsa.com",
+    "message_id": "af1d5461-9218-4ae6-89d4-67a5b38cf1af",
+    "sent_at": "2025-12-02 19:19:41.153+00",
+    "status": "delivered"
+  },
+  {
+    "email": "winterfellacres@gmail.com",
+    "message_id": "acb4956c-bc25-45b6-bd57-28137ec67572",
+    "sent_at": "2025-12-02 19:19:46.425+00",
+    "status": "delivered"
+  },
+  {
+    "email": "whitefeatherorganics@gmail.com",
+    "message_id": "71bff11d-5445-4b46-8760-af9008bb0578",
+    "sent_at": "2025-12-02 19:19:51.805+00",
+    "status": "delivered"
+  },
+  {
+    "email": "whetstonefarmers@gmail.com",
+    "message_id": "37690912-0624-4cbe-8264-30100d97ed30",
+    "sent_at": "2025-12-02 19:19:57.354+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wheatfield@nelson-tel.net",
+    "message_id": "4cbb6698-3c2c-4c7e-a6b0-f8ef76762f70",
+    "sent_at": "2025-12-02 19:20:02.571+00",
+    "status": "delivered"
+  },
+  {
+    "email": "westridgefarmers@gmail.com",
+    "message_id": "ba176dd6-5304-4b25-9eb7-98ec305c7150",
+    "sent_at": "2025-12-02 19:20:07.883+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wholesale@tipiproduce.com",
+    "message_id": "d6ac838d-193d-4041-bf6f-50eddc531fb6",
+    "sent_at": "2025-12-02 19:20:13.146+00",
+    "status": "delivered"
+  },
+  {
+    "email": "harriet.organic@gmail.com",
+    "message_id": "29243a87-811e-432c-bed5-d41ead7b03a7",
+    "sent_at": "2025-12-02 19:20:18.376+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@steadfast-acres.com",
+    "message_id": "974b7dd3-0e14-448e-b45f-e3b9a5146d2c",
+    "sent_at": "2025-12-02 19:20:23.597+00",
+    "status": "delivered"
+  },
+  {
+    "email": "squashingtonfarm@gmail.com",
+    "message_id": "26d1acaf-3f99-4d44-bf7e-3a6c006a1a64",
+    "sent_at": "2025-12-02 19:20:28.839+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@springdalefarm.com",
+    "message_id": "2df2f417-3625-4ef8-b9cd-03353c4987a2",
+    "sent_at": "2025-12-02 19:20:34.317+00",
+    "status": "delivered"
+  },
+  {
+    "email": "swiegel@sinsinawa.org",
+    "message_id": "a7b0d106-c51b-4c74-8183-ab64454f6e0a",
+    "sent_at": "2025-12-02 19:20:39.581+00",
+    "status": "delivered"
+  },
+  {
+    "email": "rootsdownfarm@gmail.com",
+    "message_id": "aca04fbf-20b1-4e24-99d2-0743cc42ac6f",
+    "sent_at": "2025-12-02 19:20:44.844+00",
+    "status": "delivered"
+  },
+  {
+    "email": "reddoorfamilyfarm@gmail.com",
+    "message_id": "8a54c9d9-620e-40d0-b565-5e622bbc8d78",
+    "sent_at": "2025-12-02 19:20:50.117+00",
+    "status": "delivered"
+  },
+  {
+    "email": "redcloverherbal@gmail.com",
+    "message_id": "0b2f16fb-be1c-4ec3-95aa-5e45a77e408d",
+    "sent_at": "2025-12-02 19:20:55.327+00",
+    "status": "delivered"
+  },
+  {
+    "email": "racingheartfarm@gmail.com",
+    "message_id": "75cd0c41-2b0e-4855-8aa6-e0b54c6ef685",
+    "sent_at": "2025-12-02 19:21:00.814+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@parkridgeorganics.com",
+    "message_id": "73d9a76b-99cf-4b70-9fb2-2b1c8c712d83",
+    "sent_at": "2025-12-02 19:21:06.291+00",
+    "status": "delivered"
+  },
+  {
+    "email": "oldenorganics@gmail.com",
+    "message_id": "d81162b3-4451-42b4-8029-531499ec2f5c",
+    "sent_at": "2025-12-02 19:21:11.291+00",
+    "status": "delivered"
+  },
+  {
+    "email": "team@meadowlarkmill.com",
+    "message_id": "79f0a795-216d-447c-81e8-4ae822e33c8a",
+    "sent_at": "2025-12-02 19:21:16.576+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@marydirtyface.com",
+    "message_id": "5d0565ea-33a1-463d-bbd8-557df726866b",
+    "sent_at": "2025-12-02 19:21:21.743+00",
+    "status": "delivered"
+  },
+  {
+    "email": "maplebeeacres@gmail.com",
+    "message_id": "84cd0568-ace8-4b6c-9b38-7eb67e825278",
+    "sent_at": "2025-12-02 19:21:27.004+00",
+    "status": "delivered"
+  },
+  {
+    "email": "knlgarlic@gmail.com",
+    "message_id": "21978388-e83e-4fac-9a7c-7333b1574eb7",
+    "sent_at": "2025-12-02 19:21:32.246+00",
+    "status": "delivered"
+  },
+  {
+    "email": "franzsimonklein@gmail.com",
+    "message_id": "b2ee375d-65b5-4013-be69-3d3dc166c969",
+    "sent_at": "2025-12-02 19:21:37.544+00",
+    "status": "delivered"
+  },
+  {
+    "email": "rufus@keewaydinfarms.com",
+    "message_id": "9f9a108e-0eaa-49d6-bf55-fa8a208ed001",
+    "sent_at": "2025-12-02 19:21:42.704+00",
+    "status": "delivered"
+  },
+  {
+    "email": "highmeadowfarmcsa@gmail.com",
+    "message_id": "a88cac10-5fac-42e3-a298-a7b044bda7f8",
+    "sent_at": "2025-12-02 19:21:47.963+00",
+    "status": "delivered"
+  },
+  {
+    "email": "landishcfarm@gmail.com",
+    "message_id": "9f3768ab-db80-41e8-961a-1f5cfc4b909e",
+    "sent_at": "2025-12-02 19:21:53.316+00",
+    "status": "delivered"
+  },
+  {
+    "email": "csa@harmonyvalleyfarm.com",
+    "message_id": "e8729d49-c0cf-4899-a41b-b10786e9b062",
+    "sent_at": "2025-12-02 19:21:58.514+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmer@gwenynhill.com",
+    "message_id": "f72af4f9-9210-4261-beb7-ecb897f9440d",
+    "sent_at": "2025-12-02 19:22:03.807+00",
+    "status": "delivered"
+  },
+  {
+    "email": "growingearthfarm@gmail.com",
+    "message_id": "98d8b81f-5f6e-4de1-beb7-40e2e46cc672",
+    "sent_at": "2025-12-02 19:22:09.07+00",
+    "status": "delivered"
+  },
+  {
+    "email": "groundedllc@earthlink.net",
+    "message_id": "d843b7ea-84b5-4aa3-b094-ec103554aed0",
+    "sent_at": "2025-12-02 19:22:14.339+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@fullcircle.farm",
+    "message_id": "3c0bdc12-e570-43cb-9487-8d3aa6424f3a",
+    "sent_at": "2025-12-02 19:22:19.604+00",
+    "status": "delivered"
+  },
+  {
+    "email": "office@driftlessorganics.com",
+    "message_id": "14dcec47-7bb7-4217-a2a7-197840f515f7",
+    "sent_at": "2025-12-02 19:22:24.819+00",
+    "status": "delivered"
+  },
+  {
+    "email": "contact@dreamportmarket.com",
+    "message_id": "61f3bfab-c27e-434d-a7b0-382c3e3ca95a",
+    "sent_at": "2025-12-02 19:22:30.009+00",
+    "status": "delivered"
+  },
+  {
+    "email": "lucy@doudlahfarms.com",
+    "message_id": "4bd405f0-1b75-48bf-9d8b-47c9d1c9f28c",
+    "sent_at": "2025-12-02 19:22:35.278+00",
+    "status": "delivered"
+  },
+  {
+    "email": "cultivatingthecommons@gmail.com",
+    "message_id": "968009c8-bf08-4af0-b5e8-722443595edd",
+    "sent_at": "2025-12-02 19:22:40.589+00",
+    "status": "delivered"
+  },
+  {
+    "email": "crossroadscommunityfarm@gmail.com",
+    "message_id": "e9a2dac5-abd2-4829-8774-a5a3131e3aa1",
+    "sent_at": "2025-12-02 19:22:45.799+00",
+    "status": "delivered"
+  },
+  {
+    "email": "countryblossomsorganics@gmail.com",
+    "message_id": "a244df27-703e-4046-aa2a-dac14b76a7d6",
+    "sent_at": "2025-12-02 19:22:51.041+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmer@cattailorganics.com",
+    "message_id": "fb2ff75f-4c4f-4b88-9323-0b0f2e052285",
+    "sent_at": "2025-12-02 19:22:56.305+00",
+    "status": "delivered"
+  },
+  {
+    "email": "brokenearthfarm@gmail.com",
+    "message_id": "9da2d845-29b1-48ad-9962-601ba67d7c36",
+    "sent_at": "2025-12-02 19:23:01.557+00",
+    "status": "delivered"
+  },
+  {
+    "email": "danielle@boersonfarm.com",
+    "message_id": "69375409-3a50-465c-b55b-e12789ab3922",
+    "sent_at": "2025-12-02 19:23:06.824+00",
+    "status": "delivered"
+  },
+  {
+    "email": "pasturelandcoop@gmail.com",
+    "message_id": "feda89fd-e73e-4ab3-a68d-d6af2f21f045",
+    "sent_at": "2025-12-02 19:23:12.096+00",
+    "status": "delivered"
+  },
+  {
+    "email": "bearvalefarm@gmail.com",
+    "message_id": "f2b5163f-3e7c-4d48-bea7-1781e701d920",
+    "sent_at": "2025-12-02 19:23:17.375+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@lewisfarmwv.org",
+    "message_id": "8b0bb2b0-101f-4b7d-b4f0-537cfd67bdda",
+    "sent_at": "2025-12-02 19:23:22.595+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@wilridgewinery.com",
+    "message_id": "1b704aab-689e-4265-85ec-54181872f3c2",
+    "sent_at": "2025-12-02 19:23:27.784+00",
+    "status": "delivered"
+  },
+  {
+    "email": "whitestonemountainorchard@gmail.com",
+    "message_id": "5b9e07ce-6900-4645-b35a-7d931ef3b983",
+    "sent_at": "2025-12-02 19:23:33.328+00",
+    "status": "delivered"
+  },
+  {
+    "email": "waxwingfarmllc@gmail.com",
+    "message_id": "d835ebd1-6b52-4604-bb80-0a6e88fa9d8e",
+    "sent_at": "2025-12-02 19:23:38.869+00",
+    "status": "delivered"
+  },
+  {
+    "email": "gardenfuntimes@gmail.com",
+    "message_id": "4688a60c-a0fa-443c-9859-1d9299eaca88",
+    "sent_at": "2025-12-02 19:23:43.795+00",
+    "status": "delivered"
+  },
+  {
+    "email": "organicfarm@evergreen.edu",
+    "message_id": "5d092243-0303-4c91-bc21-ff538a87281d",
+    "sent_at": "2025-12-02 19:23:49.033+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@springrainfarm.org",
+    "message_id": "7092c713-5254-41c0-83f7-c0f314579984",
+    "sent_at": "2025-12-02 19:23:54.374+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmer@skokomishvalleyfarms.com",
+    "message_id": "dba0dfb8-b97c-44e6-975f-a90131e593cd",
+    "sent_at": "2025-12-02 19:23:59.663+00",
+    "status": "delivered"
+  },
+  {
+    "email": "lorenandkathy@aol.com",
+    "message_id": "da570d9d-2ea2-4728-9126-25f9eeb89647",
+    "sent_at": "2025-12-02 19:24:04.995+00",
+    "status": "delivered"
+  },
+  {
+    "email": "shadygroveorganics@gmail.com",
+    "message_id": "ed0a88e7-81da-499e-bb19-5c8cdea146d2",
+    "sent_at": "2025-12-02 19:24:10.518+00",
+    "status": "delivered"
+  },
+  {
+    "email": "griffin@saukfarm.com",
+    "message_id": "0df6134d-1b3b-4d07-b480-15d47acd082e",
+    "sent_at": "2025-12-02 19:24:15.681+00",
+    "status": "delivered"
+  },
+  {
+    "email": "rentsdueranch@gmail.com",
+    "message_id": "3bde6b72-c52e-4d1f-955f-2c393b2a5b01",
+    "sent_at": "2025-12-02 19:24:20.971+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmerdeb@radixfarm.com",
+    "message_id": "f7ad95a7-6734-4424-8632-235f98644baa",
+    "sent_at": "2025-12-02 19:24:26.235+00",
+    "status": "delivered"
+  },
+  {
+    "email": "plumforestfarm@gmail.com",
+    "message_id": "666836e7-e145-4f95-a0ee-14b2d6627b34",
+    "sent_at": "2025-12-02 19:24:31.477+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@paradisosdelsol.com",
+    "message_id": "386299c7-ad9b-4b0c-b36a-ad8542bfb820",
+    "sent_at": "2025-12-02 19:24:36.806+00",
+    "status": "delivered"
+  },
+  {
+    "email": "oysterbaycsa@gmail.com",
+    "message_id": "2097ebc6-7ff4-4993-945c-4243522e8c38",
+    "sent_at": "2025-12-02 19:24:41.935+00",
+    "status": "delivered"
+  },
+  {
+    "email": "nwgarlic@gmail.com",
+    "message_id": "e4a35258-eeb0-45e9-9efb-744096c8016a",
+    "sent_at": "2025-12-02 19:24:47.215+00",
+    "status": "delivered"
+  },
+  {
+    "email": "monkeypuzzlefarms@gmail.com",
+    "message_id": "320b4a19-527d-40fe-aa08-938893e4d7cc",
+    "sent_at": "2025-12-02 19:24:52.612+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hello@lavenderhillvashon.com",
+    "message_id": "e6e2cd85-b406-4549-93c0-c59a006a5e36",
+    "sent_at": "2025-12-02 19:25:01.831+00",
+    "status": "delivered"
+  },
+  {
+    "email": "office@canopytoursnw.com",
+    "message_id": "59b72363-9d5d-4814-9587-85e5d6583f54",
+    "sent_at": "2025-12-02 19:25:03.195+00",
+    "status": "delivered"
+  },
+  {
+    "email": "klickitatcanyonwinery@gmail.com",
+    "message_id": "6793f091-5fef-4ea4-b5c5-09d6e1bbec1e",
+    "sent_at": "2025-12-02 19:25:08.44+00",
+    "status": "delivered"
+  },
+  {
+    "email": "joel.huesby@gmail.com",
+    "message_id": "68f43c13-d6ce-439b-94a6-55187e73e8b2",
+    "sent_at": "2025-12-02 19:25:13.737+00",
+    "status": "delivered"
+  },
+  {
+    "email": "mark@highanddryfarm.com",
+    "message_id": "f35b6cba-9c07-48f6-9542-c6dd8cb71113",
+    "sent_at": "2025-12-02 19:25:18.898+00",
+    "status": "delivered"
+  },
+  {
+    "email": "helsingfarm@gmail.com",
+    "message_id": "19b801e6-c6d1-46d0-a7a2-75a9fb80d23b",
+    "sent_at": "2025-12-02 19:25:24.176+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hazelgreyfarms@gmail.com",
+    "message_id": "1bf7f332-10cb-4cee-a4be-5adab4dab2f9",
+    "sent_at": "2025-12-02 19:25:29.427+00",
+    "status": "delivered"
+  },
+  {
+    "email": "forestgardenvashon@gmail.com",
+    "message_id": "bab126e0-cd66-4d53-aa97-697cf8bec99e",
+    "sent_at": "2025-12-02 19:25:34.707+00",
+    "status": "delivered"
+  },
+  {
+    "email": "filareefruit@gmail.com",
+    "message_id": "da3d1086-54c4-40f0-a20b-2e85ccc32b39",
+    "sent_at": "2025-12-02 19:25:40.05+00",
+    "status": "delivered"
+  },
+  {
+    "email": "heather@pnwsalmoncenter.org",
+    "message_id": "87bdffbc-df0b-47fa-a673-eb3f499441d3",
+    "sent_at": "2025-12-02 19:25:45.193+00",
+    "status": "delivered"
+  },
+  {
+    "email": "cedarslopefarm@gmail.com",
+    "message_id": "994611e4-23b2-42ca-b78a-0a991a2d800e",
+    "sent_at": "2025-12-02 19:25:50.502+00",
+    "status": "delivered"
+  },
+  {
+    "email": "msimon@ncidata.com",
+    "message_id": "46e15968-3ab4-4f7a-9e2f-7d3ccdf81528",
+    "sent_at": "2025-12-02 19:25:55.638+00",
+    "status": "delivered"
+  },
+  {
+    "email": "contact@secondmountainfarm.com",
+    "message_id": "cbd98f59-8f76-4e00-b391-bc1c72dc860f",
+    "sent_at": "2025-12-02 19:26:00.896+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@riverstoneorganicfarm.com",
+    "message_id": "3f3f5b4b-d30c-4e8f-a84d-55964eda3123",
+    "sent_at": "2025-12-02 19:26:06.511+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@millgapfarms.com",
+    "message_id": "b4408c7b-41c6-4a96-b8d8-bafdd8042860",
+    "sent_at": "2025-12-02 19:26:11.802+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@zackwoodsherbs.com",
+    "message_id": "881712c9-3a97-4b1b-ab6d-f13390f20417",
+    "sent_at": "2025-12-02 19:26:16.998+00",
+    "status": "delivered"
+  },
+  {
+    "email": "woodardsfarm@gmail.com",
+    "message_id": "ef18f7de-437e-4908-8b41-b7dc44d2eab1",
+    "sent_at": "2025-12-02 19:26:22.255+00",
+    "status": "delivered"
+  },
+  {
+    "email": "witchcatfarms@gmail.com",
+    "message_id": "4848372a-79f2-4295-b0a1-8dec4ebea3f6",
+    "sent_at": "2025-12-02 19:26:27.522+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wilsonherbfarm@gmail.com",
+    "message_id": "7a594fa5-bb35-4ae9-af6a-e5e011a4b4e1",
+    "sent_at": "2025-12-02 19:26:32.763+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wildstonefarmvt@gmail.com",
+    "message_id": "b1495870-32e9-4918-b4fb-28b1ddf3e325",
+    "sent_at": "2025-12-02 19:26:38.198+00",
+    "status": "delivered"
+  },
+  {
+    "email": "katie@grassfedvermont.com",
+    "message_id": "9ab79b18-3450-4b06-be73-d39f480e812c",
+    "sent_at": "2025-12-02 19:26:43.441+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@vontrappfarmstead.com",
+    "message_id": "2061ee3e-3d23-471d-9ee2-b19b3b936bac",
+    "sent_at": "2025-12-02 19:26:48.8+00",
+    "status": "delivered"
+  },
+  {
+    "email": "josephtisbert@gmail.com",
+    "message_id": "734539b5-9da7-4998-83a5-15c79d59effb",
+    "sent_at": "2025-12-02 19:26:53.972+00",
+    "status": "delivered"
+  },
+  {
+    "email": "trilliumhillfarmjames@gmail.com",
+    "message_id": "23527018-47a5-42f7-b0ac-39c7b9557248",
+    "sent_at": "2025-12-02 19:26:59.209+00",
+    "status": "delivered"
+  },
+  {
+    "email": "thefarmupstream@gmail.com",
+    "message_id": "ac757795-e37a-4eb0-8100-c8ea0979f173",
+    "sent_at": "2025-12-02 19:27:04.425+00",
+    "status": "delivered"
+  },
+  {
+    "email": "abbie@thecorsefarmdairy.com",
+    "message_id": "013749d0-d3ed-42d9-98fa-95bb3a1e6224",
+    "sent_at": "2025-12-02 19:27:09.759+00",
+    "status": "delivered"
+  },
+  {
+    "email": "ericatparis@gmail.com",
+    "message_id": "843fdf09-deb8-41c3-9a89-3b1edbf69545",
+    "sent_at": "2025-12-02 19:27:14.993+00",
+    "status": "delivered"
+  },
+  {
+    "email": "tamarackhollowfarm@gmail.com",
+    "message_id": "0ef15163-ea5a-4ea9-bd6d-a3431b3e85ca",
+    "sent_at": "2025-12-02 19:27:20.273+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sylvanmoonfarm@gmail.com",
+    "message_id": "792fd237-4af2-49df-a54b-a085adb586a8",
+    "sent_at": "2025-12-02 19:27:25.51+00",
+    "status": "delivered"
+  },
+  {
+    "email": "rob@vermontberries.com",
+    "message_id": "8def21be-0472-4e46-8502-026ee60d9e1f",
+    "sent_at": "2025-12-02 19:27:30.779+00",
+    "status": "delivered"
+  },
+  {
+    "email": "csa@sunrisefarmvt.com",
+    "message_id": "60f6f1bc-5768-4863-a45b-d5a2fbb36f03",
+    "sent_at": "2025-12-02 19:27:35.982+00",
+    "status": "delivered"
+  },
+  {
+    "email": "stonyloamfarm@hotmail.com",
+    "message_id": "6943c0cb-2689-4722-a976-be8bf9d7ca86",
+    "sent_at": "2025-12-02 19:27:41.247+00",
+    "status": "delivered"
+  },
+  {
+    "email": "stonesthrowfarmstead@gmail.com",
+    "message_id": "65eb8fc1-05c2-40cb-ae1e-fa50a28adf33",
+    "sent_at": "2025-12-02 19:27:46.528+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kencarter72@gmail.com",
+    "message_id": "7b9d9f6b-bcab-4e06-9dc9-f0097fa34247",
+    "sent_at": "2025-12-02 19:27:51.783+00",
+    "status": "delivered"
+  },
+  {
+    "email": "squierfamilyfarm@gmail.com",
+    "message_id": "e10a739e-8d4e-442a-b372-f042fb9b0300",
+    "sent_at": "2025-12-02 19:27:57.051+00",
+    "status": "delivered"
+  },
+  {
+    "email": "bsalg@snowshoepond.com",
+    "message_id": "9854bd75-93f2-4ffd-b722-c5dbc99880b6",
+    "sent_at": "2025-12-02 19:28:02.294+00",
+    "status": "delivered"
+  },
+  {
+    "email": "smallaxefarminvt@gmail.com",
+    "message_id": "e40ee7d8-9d78-492a-997c-279cba34d072",
+    "sent_at": "2025-12-02 19:28:07.57+00",
+    "status": "delivered"
+  },
+  {
+    "email": "geral@quinta-da-fornalha.com",
+    "message_id": "3b979fe4-57bb-4f96-b337-bd4c7ea5299e",
+    "sent_at": "2025-12-03 09:52:56.617+00",
+    "status": "delivered"
+  },
+  {
+    "email": "neilhochstedler@gmail.com",
+    "message_id": "c1abf1d1-da41-40f6-8357-bd6a48d35323",
+    "sent_at": "2025-12-03 09:54:38.083+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sandybottomfarmvt@gmail.com",
+    "message_id": "3fb3b56c-8a6d-41a1-83b4-9a0adea80953",
+    "sent_at": "2025-12-03 09:54:43.324+00",
+    "status": "delivered"
+  },
+  {
+    "email": "danielle@root5farm.com",
+    "message_id": "e0a3a470-32cf-4efa-9800-eaf3c4bfa66b",
+    "sent_at": "2025-12-03 09:54:48.884+00",
+    "status": "delivered"
+  },
+  {
+    "email": "rogersfarmstead@gmail.com",
+    "message_id": "61904710-cbf3-42f6-ba53-4d99f4743422",
+    "sent_at": "2025-12-03 09:54:54.173+00",
+    "status": "delivered"
+  },
+  {
+    "email": "riverberryfarm@gmail.com",
+    "message_id": "d8371ad5-d3ec-4892-ab25-113f43bae9b6",
+    "sent_at": "2025-12-03 09:54:59.435+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@redwagonplants.com",
+    "message_id": "663f4a25-6a0f-4b1a-b89f-247c301feebf",
+    "sent_at": "2025-12-03 21:58:05.553+00",
+    "status": "delivered"
+  },
+  {
+    "email": "ravenrdg@gmail.com",
+    "message_id": "8ac10ac2-2f9b-4e37-a225-48301a7e61ee",
+    "sent_at": "2025-12-03 21:58:10.784+00",
+    "status": "delivered"
+  },
+  {
+    "email": "pete@petesgreens.com",
+    "message_id": "5edfadc7-4f42-413a-8573-188888028735",
+    "sent_at": "2025-12-03 21:58:16.097+00",
+    "status": "delivered"
+  },
+  {
+    "email": "henry@oldroadfarmvt.com",
+    "message_id": "23893c06-9efc-49ac-9aac-f7a0fb1f62fe",
+    "sent_at": "2025-12-03 21:58:21.427+00",
+    "status": "delivered"
+  },
+  {
+    "email": "csa@oldathensfarm.com",
+    "message_id": "8539a3fc-d8d8-4231-9419-2799c4fe09a6",
+    "sent_at": "2025-12-03 21:58:26.74+00",
+    "status": "delivered"
+  },
+  {
+    "email": "northhardwickfarm@gmail.com",
+    "message_id": "3b142743-c941-4e0e-81df-6a320198d59b",
+    "sent_at": "2025-12-03 21:58:32.03+00",
+    "status": "delivered"
+  },
+  {
+    "email": "herbs@newfieldherbfarm.com",
+    "message_id": "45a5aefe-dd4b-4080-a1e4-dc3c2f7f9947",
+    "sent_at": "2025-12-03 21:58:37.444+00",
+    "status": "delivered"
+  },
+  {
+    "email": "newleaf@gmavt.net",
+    "message_id": "d274b379-48c0-49d5-8ec3-836d2b1d406c",
+    "sent_at": "2025-12-03 21:58:42.664+00",
+    "status": "delivered"
+  },
+  {
+    "email": "nakedacrefarm@gmail.com",
+    "message_id": "bdc26660-283c-4bf3-a940-46cce05b80f7",
+    "sent_at": "2025-12-03 21:58:47.958+00",
+    "status": "delivered"
+  },
+  {
+    "email": "mtydfm@gmail.com",
+    "message_id": "a9aabf36-5f8b-48db-b5aa-2eb9c0f5043d",
+    "sent_at": "2025-12-03 21:58:53.242+00",
+    "status": "delivered"
+  },
+  {
+    "email": "dkbecker@montpeliervineyards.com",
+    "message_id": "87af190e-bb04-42bb-a665-07018624c566",
+    "sent_at": "2025-12-03 21:58:58.803+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@mightyfoodfarm.com",
+    "message_id": "c26324f3-5293-46ee-9fad-c66a81428145",
+    "sent_at": "2025-12-03 21:59:04.136+00",
+    "status": "delivered"
+  },
+  {
+    "email": "psstecker@gmail.com",
+    "message_id": "cf40c347-92ae-4d90-92e1-7e068bb9b8c9",
+    "sent_at": "2025-12-03 21:59:09.419+00",
+    "status": "delivered"
+  },
+  {
+    "email": "longwinterfarmstowe@gmail.com",
+    "message_id": "9f3709c6-ef00-488a-b316-2ec8b92e9b94",
+    "sent_at": "2025-12-03 21:59:14.704+00",
+    "status": "delivered"
+  },
+  {
+    "email": "longwindfarm@gmail.com",
+    "message_id": "1202aef5-256a-41d7-88e7-a57d9418f075",
+    "sent_at": "2025-12-03 21:59:19.937+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@leapingbearfarm.com",
+    "message_id": "4bd23de3-afc1-4722-9539-c3b3e80ed2d4",
+    "sent_at": "2025-12-03 21:59:25.21+00",
+    "status": "delivered"
+  },
+  {
+    "email": "richardrobertlarson@gmail.com",
+    "message_id": "9c620095-6b21-44f6-8f0d-efde6d1baac9",
+    "sent_at": "2025-12-03 21:59:30.538+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kneedeepfarm@gmail.com",
+    "message_id": "20dae23e-8fe4-4075-9391-19de443aea8d",
+    "sent_at": "2025-12-03 21:59:35.794+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@kissthecowfarm.com",
+    "message_id": "00d511d8-130c-4060-9c0c-3347e30fccc1",
+    "sent_at": "2025-12-03 21:59:41.272+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kathy@kindhornfarm.com",
+    "message_id": "1b8cf1cf-2a1e-4f19-8d36-b73e373a178d",
+    "sent_at": "2025-12-03 21:59:46.559+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jake.guest@wavecomm.com",
+    "message_id": "5ef2a187-f831-42df-a21b-7ad5d68f1731",
+    "sent_at": "2025-12-03 21:59:51.8+00",
+    "status": "delivered"
+  },
+  {
+    "email": "joesbrookfarm@gmail.com",
+    "message_id": "db5bf77c-bd97-42a7-bcc3-0f1ffe18865d",
+    "sent_at": "2025-12-03 21:59:57.063+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@jerichosettlersfarm.com",
+    "message_id": "6573be10-38c9-4710-933d-d4e4d1cdf544",
+    "sent_at": "2025-12-03 22:00:02.6+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@intervalecommunityfarm.com",
+    "message_id": "667e89ad-0925-4b66-b00d-b4de08fe5eb1",
+    "sent_at": "2025-12-03 22:00:09.827+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hungermoonfarm@gmail.com",
+    "message_id": "84966f02-85ce-406d-8ec5-0f934bcab2f5",
+    "sent_at": "2025-12-03 22:00:17.289+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hooliefarm@gmail.com",
+    "message_id": "59c44d34-108a-4b7b-aad1-678c8e401a8d",
+    "sent_at": "2025-12-03 22:00:22.239+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@hillsidebotanicals.com",
+    "message_id": "bddcae73-e88e-4e7d-a867-d48172f4d7ee",
+    "sent_at": "2025-12-03 22:00:27.984+00",
+    "status": "delivered"
+  },
+  {
+    "email": "292@rooneys.com",
+    "message_id": "d7988d11-48a7-41d3-8aaa-d02c97b763d5",
+    "sent_at": "2025-12-03 22:00:33.253+00",
+    "status": "delivered"
+  },
+  {
+    "email": "prussack@gmail.com",
+    "message_id": "2b1a9b9b-c09a-4636-9559-1b824a6790b4",
+    "sent_at": "2025-12-03 22:00:38.523+00",
+    "status": "delivered"
+  },
+  {
+    "email": "headoverfieldsvt@gmail.com",
+    "message_id": "38fadf59-89d0-42f7-a379-fc80e1ddcb23",
+    "sent_at": "2025-12-03 22:00:43.803+00",
+    "status": "delivered"
+  },
+  {
+    "email": "havenhillfarmstead@gmail.com",
+    "message_id": "d235e57f-826c-4543-8e40-a042fa4ed7b2",
+    "sent_at": "2025-12-03 22:00:49.113+00",
+    "status": "delivered"
+  },
+  {
+    "email": "gershunhalf@gmail.com",
+    "message_id": "5e87c409-51d6-48e6-888a-48b4e16a2c1e",
+    "sent_at": "2025-12-03 22:00:54.504+00",
+    "status": "delivered"
+  },
+  {
+    "email": "orders@goldenrussetfarm.com",
+    "message_id": "b52bed50-4aa7-48b7-8d5d-c2bace870ab2",
+    "sent_at": "2025-12-03 22:00:59.716+00",
+    "status": "delivered"
+  },
+  {
+    "email": "glinnishillfarm@gmail.com",
+    "message_id": "e9f6f471-bc6c-4e92-9fc7-e4be04e1fc85",
+    "sent_at": "2025-12-03 22:01:05.374+00",
+    "status": "delivered"
+  },
+  {
+    "email": "nevittrac@gmail.com",
+    "message_id": "ec1c78f3-d9ed-4acf-8bd2-cc78fe9cdfdc",
+    "sent_at": "2025-12-03 22:01:10.747+00",
+    "status": "delivered"
+  },
+  {
+    "email": "orders@fosterfarmbotanicals.com",
+    "message_id": "937494df-5a93-408a-99fc-b10d686bb8e6",
+    "sent_at": "2025-12-03 22:01:15.959+00",
+    "status": "delivered"
+  },
+  {
+    "email": "csa@footprintfarmvt.com",
+    "message_id": "9db86b59-9b7b-4d39-ae78-0ec75602c7ea",
+    "sent_at": "2025-12-03 22:01:21.688+00",
+    "status": "delivered"
+  },
+  {
+    "email": "vermontcider@gmail.com",
+    "message_id": "18710529-5277-4796-9454-8085193a5463",
+    "sent_at": "2025-12-03 22:01:27.829+00",
+    "status": "delivered"
+  },
+  {
+    "email": "flackfarmferments@gmail.com",
+    "message_id": "1d5e1eb0-0eee-42d9-a521-8c9496046c47",
+    "sent_at": "2025-12-03 22:01:32.751+00",
+    "status": "delivered"
+  },
+  {
+    "email": "eveningsongcsa@gmail.com",
+    "message_id": "520488ae-8738-444b-a688-57c93fc0d1c0",
+    "sent_at": "2025-12-03 22:01:38.082+00",
+    "status": "delivered"
+  },
+  {
+    "email": "fruitpal@elmoreroots.com",
+    "message_id": "a5ff7414-052c-4b93-b797-5aa091b11a8e",
+    "sent_at": "2025-12-03 22:01:43.378+00",
+    "status": "delivered"
+  },
+  {
+    "email": "elmer.farm@yahoo.com",
+    "message_id": "c5e56796-109e-4716-a080-5d58c9376f2a",
+    "sent_at": "2025-12-03 22:01:48.668+00",
+    "status": "delivered"
+  },
+  {
+    "email": "maryellen.lovinsky@gmail.com",
+    "message_id": "3bab20d6-018e-4381-8191-04f0fdb55b14",
+    "sent_at": "2025-12-03 22:01:54.189+00",
+    "status": "delivered"
+  },
+  {
+    "email": "doesleap@gmail.com",
+    "message_id": "a5675550-794f-4603-80f2-b250e0854451",
+    "sent_at": "2025-12-03 22:01:59.48+00",
+    "status": "delivered"
+  },
+  {
+    "email": "diggersmirthcollectivefarm@gmail.com",
+    "message_id": "b6470131-329b-4842-a48f-8d01bf7c64cd",
+    "sent_at": "2025-12-03 22:02:04.758+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info1@deepmeadowfarm.net",
+    "message_id": "8fb6b966-fccf-41cf-bbd6-250ec49313f8",
+    "sent_at": "2025-12-03 22:02:10.048+00",
+    "status": "delivered"
+  },
+  {
+    "email": "colin@commonroots.org",
+    "message_id": "af16b2fb-7744-4b49-a168-ec9619713ae4",
+    "sent_at": "2025-12-03 22:02:15.392+00",
+    "status": "delivered"
+  },
+  {
+    "email": "choinierefamilyfarm@gmail.com",
+    "message_id": "2c56022f-e1c4-4db6-a35d-0f8e407bd47c",
+    "sent_at": "2025-12-03 22:02:20.701+00",
+    "status": "delivered"
+  },
+  {
+    "email": "growing@cedarcirclefarm.org",
+    "message_id": "77751103-df57-4d45-b545-4c5922dcef13",
+    "sent_at": "2025-12-03 22:02:26.21+00",
+    "status": "delivered"
+  },
+  {
+    "email": "catefarmvt@gmail.com",
+    "message_id": "d2e1701a-c8ce-41b9-96cc-fe0e2c459947",
+    "sent_at": "2025-12-03 22:02:31.547+00",
+    "status": "delivered"
+  },
+  {
+    "email": "dairyorders@butterworksfarm.com",
+    "message_id": "cb06ab1c-9f96-43c2-b8b5-9fe09593d205",
+    "sent_at": "2025-12-03 22:02:36.851+00",
+    "status": "delivered"
+  },
+  {
+    "email": "justin@burntrockfarm.com",
+    "message_id": "0eff5c4f-10bf-4759-ac42-81400de23033",
+    "sent_at": "2025-12-03 22:02:42.173+00",
+    "status": "delivered"
+  },
+  {
+    "email": "breadandbutterfarm@gmail.com",
+    "message_id": "0a753c8a-705b-414c-9edd-b7f556736229",
+    "sent_at": "2025-12-03 22:02:47.981+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kagendewey@gmail.com",
+    "message_id": "eaba09c0-b8a7-4e4d-b607-c41b3095fe5e",
+    "sent_at": "2025-12-03 22:02:53.187+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@basinfarm.com",
+    "message_id": "9f7b8350-4b9f-4b20-a5e6-0061799516ca",
+    "sent_at": "2025-12-03 22:03:03.852+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@ascutneyharvest.com",
+    "message_id": "e37503ee-f047-4d93-8807-311c02be7ac9",
+    "sent_at": "2025-12-03 22:03:09.4+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wellness@anandagardens.com",
+    "message_id": "91055d0c-9d0a-4365-90e8-02796a179714",
+    "sent_at": "2025-12-03 22:03:14.717+00",
+    "status": "delivered"
+  },
+  {
+    "email": "susan@ajshappychick.farm",
+    "message_id": "c2179dff-22fe-4610-95c2-c3e404bd08ac",
+    "sent_at": "2025-12-03 22:03:19.996+00",
+    "status": "delivered"
+  },
+  {
+    "email": "adam@adamsberryfarm.com",
+    "message_id": "e153d13a-dab4-4d42-ac77-125e13d39505",
+    "sent_at": "2025-12-03 22:03:25.286+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kyle@1000stonefarm.com",
+    "message_id": "ba0a440b-5a88-4094-8b22-ceb04227cd46",
+    "sent_at": "2025-12-03 22:03:30.538+00",
+    "status": "delivered"
+  },
+  {
+    "email": "howdy@redacrefarmcsa.org",
+    "message_id": "fda00bbb-e37d-44ce-a9ce-99e7c62f5c4f",
+    "sent_at": "2025-12-03 22:03:36.156+00",
+    "status": "delivered"
+  },
+  {
+    "email": "firstfrostfarm@gmail.com",
+    "message_id": "8debe5e2-b712-4f16-93e9-79ee43c0d871",
+    "sent_at": "2025-12-03 22:03:41.412+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@therefugeecollective.org",
+    "message_id": "c000d40b-3770-4ffe-bc81-0fbddf3b1feb",
+    "sent_at": "2025-12-03 22:03:46.731+00",
+    "status": "delivered"
+  },
+  {
+    "email": "millbergfarm@austin.rr.com",
+    "message_id": "e58b356f-777b-4f62-8582-435167e49ca8",
+    "sent_at": "2025-12-03 22:03:51.975+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@leafycreekfarm.com",
+    "message_id": "4d14e9e0-fc20-4699-a782-a967e80753ce",
+    "sent_at": "2025-12-03 22:03:57.352+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@greenerpastureschicken.com",
+    "message_id": "ba9c9661-4943-4d80-952f-eaaad1c5f306",
+    "sent_at": "2025-12-03 22:04:02.662+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmmanager@farmshareaustin.org",
+    "message_id": "a95e5e3b-817f-4382-9a31-d276aed8dbac",
+    "sent_at": "2025-12-03 22:04:13.154+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@coyotecreekfarm.com",
+    "message_id": "ca67573b-870e-4e4f-ba28-9b4870a944f6",
+    "sent_at": "2025-12-03 22:04:18.543+00",
+    "status": "delivered"
+  },
+  {
+    "email": "buenatierrafredonia@gmail.com",
+    "message_id": "2ec4ab75-524a-4c1b-aefe-f32664d96b1b",
+    "sent_at": "2025-12-03 22:04:23.849+00",
+    "status": "delivered"
+  },
+  {
+    "email": "ken@winfarms.com",
+    "message_id": "a52c9a36-182d-43f3-bdd0-ea50b8ef0943",
+    "sent_at": "2025-12-03 22:04:29.215+00",
+    "status": "delivered"
+  },
+  {
+    "email": "adifferentchickfarmandorchard@gmail.com",
+    "message_id": "2ca26fca-9c58-49ae-bf06-d6ccd646487d",
+    "sent_at": "2025-12-03 22:04:39.746+00",
+    "status": "delivered"
+  },
+  {
+    "email": "mathagman2@hotmail.com",
+    "message_id": "0c67c96c-0d00-4260-b541-2fd168653dd3",
+    "sent_at": "2025-12-03 22:04:45.226+00",
+    "status": "delivered"
+  },
+  {
+    "email": "prairiegarlicsd@gmail.com",
+    "message_id": "71ae3a3d-1ad0-4190-93f8-1aba43363855",
+    "sent_at": "2025-12-03 22:04:50.404+00",
+    "status": "delivered"
+  },
+  {
+    "email": "cjorganic81@gmail.com",
+    "message_id": "3aaaad63-3ff3-4ee8-8ec2-dfb0a16bc287",
+    "sent_at": "2025-12-03 22:04:55.681+00",
+    "status": "delivered"
+  },
+  {
+    "email": "brian@bellevalleyancientgrains.com",
+    "message_id": "6e661388-0c00-4086-81ec-843de7f58a52",
+    "sent_at": "2025-12-03 22:05:01.603+00",
+    "status": "delivered"
+  },
+  {
+    "email": "michelle@bearbuttegardens.com",
+    "message_id": "f1322aa7-6830-4b9c-98db-6169b2bc5e56",
+    "sent_at": "2025-12-03 22:05:06.873+00",
+    "status": "delivered"
+  },
+  {
+    "email": "katherine@wildhopefarm.com",
+    "message_id": "605a8976-cf73-4908-aeb6-c1b0e65809c3",
+    "sent_at": "2025-12-03 22:05:12.164+00",
+    "status": "delivered"
+  },
+  {
+    "email": "fenwaysfarmacy@gmail.com",
+    "message_id": "efbe79cf-72c3-4c32-a04a-b170ad20c084",
+    "sent_at": "2025-12-03 22:05:17.49+00",
+    "status": "delivered"
+  },
+  {
+    "email": "mary@daisybranchfarm.com",
+    "message_id": "882b4134-6d70-4f9c-be53-7a93f798ab9a",
+    "sent_at": "2025-12-03 22:05:22.728+00",
+    "status": "delivered"
+  },
+  {
+    "email": "cityroots@cityrootsfarm.com",
+    "message_id": "c8413360-b16f-4506-aa3b-d3e52e88603e",
+    "sent_at": "2025-12-03 22:05:27.972+00",
+    "status": "delivered"
+  },
+  {
+    "email": "timrowe2463@gmail.com",
+    "message_id": "94389d8c-d821-4d53-95a6-41b08fd69be0",
+    "sent_at": "2025-12-03 22:05:33.291+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wildharmonyfarm@gmail.com",
+    "message_id": "a27b7746-8665-4154-9130-4f558566fce3",
+    "sent_at": "2025-12-03 22:05:38.714+00",
+    "status": "delivered"
+  },
+  {
+    "email": "pwestfarm26@gmail.com",
+    "message_id": "0a3cf93b-6000-45b3-aa5b-d1e371720b1d",
+    "sent_at": "2025-12-03 22:05:44.054+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@saunderstowngarlicfarm.com",
+    "message_id": "689b934d-1eeb-4e8d-84b5-e8e24d11d7b0",
+    "sent_at": "2025-12-03 22:05:49.337+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@lovewellfarms.com",
+    "message_id": "d51b0f2e-19a8-4245-bd25-d9af90969a2f",
+    "sent_at": "2025-12-03 22:05:54.994+00",
+    "status": "delivered"
+  },
+  {
+    "email": "ayersfoundation@gmail.com",
+    "message_id": "1ec1e7fd-e900-4d9d-9d41-56b2cad77418",
+    "sent_at": "2025-12-03 22:06:00.303+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@farmingturtles.com",
+    "message_id": "0774ed54-74d8-43e8-b43c-51238e40bb86",
+    "sent_at": "2025-12-03 22:06:05.637+00",
+    "status": "delivered"
+  },
+  {
+    "email": "caseyfarm@historicnewengland.org",
+    "message_id": "35e09909-980a-4b1d-9747-c96782b9038a",
+    "sent_at": "2025-12-03 22:06:10.978+00",
+    "status": "delivered"
+  },
+  {
+    "email": "bigtrainfarm@gmail.com",
+    "message_id": "84da2935-5a92-470f-a765-d985afabec03",
+    "sent_at": "2025-12-03 22:06:16.254+00",
+    "status": "delivered"
+  },
+  {
+    "email": "fermesanders@gmail.com",
+    "message_id": "c72052f6-fc54-4195-a2e3-d38a15286518",
+    "sent_at": "2025-12-03 22:06:21.511+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@fermesamson.ca",
+    "message_id": "a35dd1ca-3626-410f-8269-7339ec7b6cce",
+    "sent_at": "2025-12-03 22:06:26.736+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@twocreek.net",
+    "message_id": "46f4809e-f550-4e6b-9603-51569e71e87e",
+    "sent_at": "2025-12-04 13:01:07.994+00",
+    "status": "delivered"
+  },
+  {
+    "email": "swallowhillfarmpa@gmail.com",
+    "message_id": "5d84d8a0-2a57-4f2d-885c-4c2d40d60a11",
+    "sent_at": "2025-12-04 13:01:13.209+00",
+    "status": "delivered"
+  },
+  {
+    "email": "tnfrescura@gmail.com",
+    "message_id": "7fa2fb07-1780-472d-aa0b-7bb7125838f2",
+    "sent_at": "2025-12-04 13:01:18.537+00",
+    "status": "delivered"
+  },
+  {
+    "email": "csa@spiralpathfarm.com",
+    "message_id": "472e670d-772e-47cc-a8c0-6cedbe6ac9af",
+    "sent_at": "2025-12-04 13:01:23.905+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@poconoorganics.com",
+    "message_id": "56510d90-7101-418c-8cf0-999d43d9b3b7",
+    "sent_at": "2025-12-04 13:01:29.177+00",
+    "status": "delivered"
+  },
+  {
+    "email": "patriotfarmsonline@gmail.com",
+    "message_id": "120a9587-7e81-4d50-ba04-bae8689a76bb",
+    "sent_at": "2025-12-04 13:01:34.489+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jennifer@oaknutfarm.com",
+    "message_id": "19cbe217-9cbb-4dd8-86eb-9401a17b9382",
+    "sent_at": "2025-12-04 13:01:39.816+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jennifer@newmorningfarm.net",
+    "message_id": "195fccb0-e1ab-4152-b1da-f9f3d53b114d",
+    "sent_at": "2025-12-04 13:01:45.198+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmer@mudcollege.com",
+    "message_id": "eff21a87-f71b-4078-bed2-c0592c471226",
+    "sent_at": "2025-12-04 13:01:50.533+00",
+    "status": "delivered"
+  },
+  {
+    "email": "randy@morrisorganic.com",
+    "message_id": "578ec334-5d6f-4afc-b2f2-2a6e4f53e70a",
+    "sent_at": "2025-12-04 13:01:55.826+00",
+    "status": "delivered"
+  },
+  {
+    "email": "limerickhomegrownproduce@gmail.com",
+    "message_id": "ca5b0fc8-901d-4af6-968c-7c34baafee80",
+    "sent_at": "2025-12-04 13:02:01.131+00",
+    "status": "delivered"
+  },
+  {
+    "email": "landisdalefarm@gmail.com",
+    "message_id": "c416128f-815f-48ad-8384-aef85039d649",
+    "sent_at": "2025-12-04 13:02:06.356+00",
+    "status": "delivered"
+  },
+  {
+    "email": "don@kretschmannfarm.com",
+    "message_id": "bcd85d63-d259-4253-b585-309f35821b89",
+    "sent_at": "2025-12-04 13:02:11.732+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@kimbertoncsa.org",
+    "message_id": "3a692c09-3717-4915-b229-1772681fdaa6",
+    "sent_at": "2025-12-04 13:02:17.003+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jadefamilyfarm@gmail.com",
+    "message_id": "eb9ad608-b1bd-4bfc-90e5-656e6c12c32a",
+    "sent_at": "2025-12-04 13:02:22.651+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sales@greensupreme.net",
+    "message_id": "643b0110-3531-4027-8624-e334b205903c",
+    "sent_at": "2025-12-04 13:02:27.854+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@goodkeeperfarm.com",
+    "message_id": "430fc212-0c19-45cd-8448-7ee2abac9670",
+    "sent_at": "2025-12-04 13:02:33.144+00",
+    "status": "delivered"
+  },
+  {
+    "email": "thefarmers@goodfindfarm.com",
+    "message_id": "e6c41b3b-1b62-4e77-9dc2-8b2f67fa36b4",
+    "sent_at": "2025-12-04 13:02:38.382+00",
+    "status": "delivered"
+  },
+  {
+    "email": "frostridge@zoominternet.net",
+    "message_id": "2c261219-6b06-4a19-979d-fddc17598b70",
+    "sent_at": "2025-12-04 13:02:43.669+00",
+    "status": "delivered"
+  },
+  {
+    "email": "cleangreenfarmer@gmail.com",
+    "message_id": "fa7144d9-66f8-4f3e-8258-ff8905cf5eb4",
+    "sent_at": "2025-12-04 13:02:48.974+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@carltonfarms.net",
+    "message_id": "f129f0c0-acc9-4100-8b58-70c9f95e281e",
+    "sent_at": "2025-12-04 13:02:54.235+00",
+    "status": "delivered"
+  },
+  {
+    "email": "blackbirdfarmspa@gmail.com",
+    "message_id": "74f82831-68ac-4877-8c1a-b951b3d04e20",
+    "sent_at": "2025-12-04 13:02:59.471+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@beshorehillfarm.com",
+    "message_id": "8534304d-30c2-4334-b237-b70234f7c28d",
+    "sent_at": "2025-12-04 13:03:04.932+00",
+    "status": "delivered"
+  },
+  {
+    "email": "anchorruncsa@gmail.com",
+    "message_id": "af3d489e-1803-4d31-9077-06302dffe785",
+    "sent_at": "2025-12-04 13:03:10.092+00",
+    "status": "delivered"
+  },
+  {
+    "email": "bowerpower2020@gmail.com",
+    "message_id": "e4c20a25-7909-4136-b2ae-0fdf296beacf",
+    "sent_at": "2025-12-04 13:03:15.374+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wduckorders@gmail.com",
+    "message_id": "70a16354-c78d-40d4-a65f-1688bfac2e28",
+    "sent_at": "2025-12-04 13:03:20.706+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sungrounded@gmail.com",
+    "message_id": "9f99d52b-6a97-4cef-abb9-a04d4d0ec063",
+    "sent_at": "2025-12-04 13:03:25.93+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sunbowproduce@peak.org",
+    "message_id": "61dee974-84b2-438f-8737-80cd2a476917",
+    "sent_at": "2025-12-04 13:03:31.226+00",
+    "status": "delivered"
+  },
+  {
+    "email": "organicssublime@gmail.com",
+    "message_id": "d37bf70d-c53c-4efa-8b72-4c6d0f6f654a",
+    "sent_at": "2025-12-04 13:03:36.51+00",
+    "status": "delivered"
+  },
+  {
+    "email": "squarepegfarm@gmail.com",
+    "message_id": "220215d3-f45f-477e-8b09-970a3725e4d4",
+    "sent_at": "2025-12-04 13:03:41.759+00",
+    "status": "delivered"
+  },
+  {
+    "email": "springbankfarms@gmail.com",
+    "message_id": "c4daba8c-aabd-4602-b721-574151a3b34b",
+    "sent_at": "2025-12-04 13:03:47.074+00",
+    "status": "delivered"
+  },
+  {
+    "email": "springupfarm@gmail.com",
+    "message_id": "0890575b-e0bd-4159-9d00-1c89325f1b90",
+    "sent_at": "2025-12-04 13:03:52.423+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@rainshadoworganics.com",
+    "message_id": "1fcb8161-385f-46e1-ae48-9cac3a4b4a8e",
+    "sent_at": "2025-12-04 13:03:57.664+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@oshalafarm.com",
+    "message_id": "83a01a85-7ded-447b-a108-e9a551d0d6ae",
+    "sent_at": "2025-12-04 13:04:02.905+00",
+    "status": "delivered"
+  },
+  {
+    "email": "lumos@lumoswine.com",
+    "message_id": "8dca33b6-10d7-441a-ae4e-b8ca047a99d9",
+    "sent_at": "2025-12-04 13:04:13.558+00",
+    "status": "delivered"
+  },
+  {
+    "email": "littlewingsfarm@gmail.com",
+    "message_id": "13775a29-2eea-43fa-a75d-82861741dbf0",
+    "sent_at": "2025-12-04 13:04:18.785+00",
+    "status": "delivered"
+  },
+  {
+    "email": "emily@infinite-tree.com",
+    "message_id": "c4371c01-00c5-49ff-8bca-435ec6e5cf45",
+    "sent_at": "2025-12-04 13:04:24.043+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hollanddale56@gmail.com",
+    "message_id": "877d7542-0c3a-460a-8cf1-d3727d5c3a2c",
+    "sent_at": "2025-12-04 13:04:29.385+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hinsvarkfarm@gmail.com",
+    "message_id": "eaa81589-dbb9-4b53-a935-19efd3529017",
+    "sent_at": "2025-12-04 13:04:34.612+00",
+    "status": "delivered"
+  },
+  {
+    "email": "beth@goodfootfarm.com",
+    "message_id": "323f3a04-6f68-4851-ba24-1e686b5d21db",
+    "sent_at": "2025-12-04 13:04:39.919+00",
+    "status": "delivered"
+  },
+  {
+    "email": "admin@goodearthfarm.org",
+    "message_id": "0c796434-d776-4dfb-a7c5-67b77233f102",
+    "sent_at": "2025-12-04 13:04:45.15+00",
+    "status": "delivered"
+  },
+  {
+    "email": "gentlerainfarmer@gmail.com",
+    "message_id": "25326484-e783-4e4f-994d-e44b0f18ea76",
+    "sent_at": "2025-12-04 13:04:50.475+00",
+    "status": "delivered"
+  },
+  {
+    "email": "redprairiefarm@garnetts.net",
+    "message_id": "6909e218-2e36-4830-95b8-b6b7c041208e",
+    "sent_at": "2025-12-04 13:04:55.84+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@eveshamwood.com",
+    "message_id": "9b355291-782e-49dd-b209-788c03022b08",
+    "sent_at": "2025-12-04 13:05:01.145+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jeremy@commonplacefarm.com",
+    "message_id": "39ead3f4-10c1-4aa0-b58e-646109f7e1df",
+    "sent_at": "2025-12-04 13:05:06.333+00",
+    "status": "delivered"
+  },
+  {
+    "email": "michelle@bethelspringsfarm.com",
+    "message_id": "863f39d8-3b1e-4101-8a4f-204c64d22ced",
+    "sent_at": "2025-12-04 13:05:11.725+00",
+    "status": "delivered"
+  },
+  {
+    "email": "king@kingorganicgrain.com",
+    "message_id": "d9726058-b898-43ba-aa1b-a706b4a03ab5",
+    "sent_at": "2025-12-04 13:05:16.994+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@dbranchfarm.com",
+    "message_id": "646bac13-7de7-4e3b-b0c9-e6e71362dbf9",
+    "sent_at": "2025-12-04 13:05:22.331+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@threespringsfarm.com",
+    "message_id": "209f0a0e-89fd-4738-b21a-a1a2d47530ed",
+    "sent_at": "2025-12-04 13:05:27.656+00",
+    "status": "delivered"
+  },
+  {
+    "email": "peaceofprairieorganicfarm@gmail.com",
+    "message_id": "b2b8ef3f-8785-4ab5-af82-0a32f75d7d5c",
+    "sent_at": "2025-12-04 13:05:32.981+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kris@johnsfarm.com",
+    "message_id": "d1e2d5dc-beb2-4183-93d2-b7a4ae998715",
+    "sent_at": "2025-12-04 13:05:38.244+00",
+    "status": "delivered"
+  },
+  {
+    "email": "tasty@bettertogetherfarm.com",
+    "message_id": "e359de82-df8f-448e-8453-6d7c9c2940e3",
+    "sent_at": "2025-12-04 13:05:43.624+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jdhay73@hotmail.com",
+    "message_id": "bb7e8688-e08c-4360-87ac-de559369b519",
+    "sent_at": "2025-12-04 13:05:48.815+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wildfarmohio@gmail.com",
+    "message_id": "9c0bcfa6-2f2d-447a-862c-53036ad069b5",
+    "sent_at": "2025-12-04 13:05:54.15+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@turnerfarm.org",
+    "message_id": "eb3befe2-9461-492b-9a64-469806865cb0",
+    "sent_at": "2025-12-04 13:05:59.492+00",
+    "status": "delivered"
+  },
+  {
+    "email": "guy@thatguysfamilyfarm.com",
+    "message_id": "5252bbc1-413c-4acc-b9b0-6b7b28f7e681",
+    "sent_at": "2025-12-04 13:06:04.79+00",
+    "status": "delivered"
+  },
+  {
+    "email": "timmyflour@yahoo.com",
+    "message_id": "74682503-5072-4681-89f8-d228698bac87",
+    "sent_at": "2025-12-04 13:06:10.066+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sunbeamfamilyfarm@gmail.com",
+    "message_id": "f26a3da5-bc09-46b0-a758-47b3c58784c9",
+    "sent_at": "2025-12-04 13:06:15.253+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@simonorganics.com",
+    "message_id": "97dbe3fb-a69a-43a0-97ae-475ca0840fcd",
+    "sent_at": "2025-12-04 13:06:20.52+00",
+    "status": "delivered"
+  },
+  {
+    "email": "slfarms2@gmail.com",
+    "message_id": "4e202327-ddf1-48c8-af76-054c4c8c9d38",
+    "sent_at": "2025-12-04 13:06:25.764+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@pureheirloomseeds.com",
+    "message_id": "a5242bf6-5002-4894-bd4e-ec3789336bf7",
+    "sent_at": "2025-12-04 13:06:31.057+00",
+    "status": "delivered"
+  },
+  {
+    "email": "pmofarms@gmail.com",
+    "message_id": "51ac8094-5152-4fb0-ae31-09cf5bae0732",
+    "sent_at": "2025-12-04 13:06:36.33+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jsashba@gmail.com",
+    "message_id": "d9b69af0-8c52-4b1d-907e-eea377f79388",
+    "sent_at": "2025-12-04 13:06:41.76+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@mudrunfarmorganics.com",
+    "message_id": "64b67c8b-37bd-43e3-adbe-26fedf20a793",
+    "sent_at": "2025-12-04 13:06:47.092+00",
+    "status": "delivered"
+  },
+  {
+    "email": "milecreekfarm@gmail.com",
+    "message_id": "01355455-fa70-4ed3-973e-a6eaa670426a",
+    "sent_at": "2025-12-04 13:06:52.607+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kingeryorganics@gmail.com",
+    "message_id": "10e10be0-f6e9-44fe-aa91-94430833e231",
+    "sent_at": "2025-12-04 13:06:57.926+00",
+    "status": "delivered"
+  },
+  {
+    "email": "lluschek@msn.com",
+    "message_id": "e80e2063-3408-4c6a-933c-5ae06a0859f1",
+    "sent_at": "2025-12-04 13:07:03.175+00",
+    "status": "delivered"
+  },
+  {
+    "email": "grumpygoatexperiment@gmail.com",
+    "message_id": "a5429c96-f47b-4796-98a6-455ef99a0814",
+    "sent_at": "2025-12-04 13:07:08.444+00",
+    "status": "delivered"
+  },
+  {
+    "email": "stephen@greentablegardens.com",
+    "message_id": "ec23c2a5-aef9-4199-a786-bfa1222edea7",
+    "sent_at": "2025-12-04 13:07:13.906+00",
+    "status": "delivered"
+  },
+  {
+    "email": "louise@foxtailfarmllc.com",
+    "message_id": "9c77d09a-dfdc-4623-bb76-95a7f703e02f",
+    "sent_at": "2025-12-04 13:07:19.211+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hammonorganic@gmail.com",
+    "message_id": "fa0629a2-b7d0-4f22-b34c-580160eac51d",
+    "sent_at": "2025-12-04 13:07:24.563+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hello@foragedandsown.com",
+    "message_id": "de48e3bf-f723-421b-87e9-61a03a76179f",
+    "sent_at": "2025-12-04 13:07:29.984+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmbeachbethel@roadrunner.com",
+    "message_id": "14782fce-3413-407b-9ec2-d6db8eab204b",
+    "sent_at": "2025-12-04 13:07:35.328+00",
+    "status": "delivered"
+  },
+  {
+    "email": "edenurbangardens@gmail.com",
+    "message_id": "c37aa7e1-3ba2-4a19-beec-ad2ed37c8cdb",
+    "sent_at": "2025-12-04 13:07:40.553+00",
+    "status": "delivered"
+  },
+  {
+    "email": "cntylinefarm@gmail.com",
+    "message_id": "4ea1ee4c-5999-403f-b996-c7d5e7dccdde",
+    "sent_at": "2025-12-04 13:07:45.861+00",
+    "status": "delivered"
+  },
+  {
+    "email": "bluebirdorganicfarm@gmail.com",
+    "message_id": "1589f534-a17a-4541-acff-bee48addd253",
+    "sent_at": "2025-12-04 13:07:51.15+00",
+    "status": "delivered"
+  },
+  {
+    "email": "banzhafgarten@hughes.net",
+    "message_id": "2434107e-04a6-4dec-9efd-86b457a4e73c",
+    "sent_at": "2025-12-04 13:07:56.401+00",
+    "status": "delivered"
+  },
+  {
+    "email": "stuart@hudsonvalleyhopsandgrains.com",
+    "message_id": "b6b5942e-83d3-4015-95eb-2007a6a8f03b",
+    "sent_at": "2025-12-04 13:08:01.757+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sales@schockfarms.com",
+    "message_id": "c8c8cccd-d8d3-4306-840f-a82fb26675be",
+    "sent_at": "2025-12-04 13:08:07.113+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@prairieroadorganic.co",
+    "message_id": "ecb518de-c001-46e8-8404-54b1831a1314",
+    "sent_at": "2025-12-04 13:08:12.513+00",
+    "status": "delivered"
+  },
+  {
+    "email": "gdlarson@gondtc.com",
+    "message_id": "6dc42d2c-e714-45b8-afc4-64e557a6f2c5",
+    "sent_at": "2025-12-04 13:08:17.675+00",
+    "status": "delivered"
+  },
+  {
+    "email": "martin.goter@gmail.com",
+    "message_id": "6d792a97-82b7-4223-9d03-ba9975a91b86",
+    "sent_at": "2025-12-04 13:08:23.01+00",
+    "status": "delivered"
+  },
+  {
+    "email": "thatchmore@main.nc.us",
+    "message_id": "4ecd8fa8-ef03-4dff-94f8-02d7a42232de",
+    "sent_at": "2025-12-04 13:08:28.29+00",
+    "status": "delivered"
+  },
+  {
+    "email": "danielle@tendwell-farm.com",
+    "message_id": "50726878-d76a-450b-a088-cdc4fc904508",
+    "sent_at": "2025-12-04 13:08:33.611+00",
+    "status": "delivered"
+  },
+  {
+    "email": "southwindproduce@gmail.com",
+    "message_id": "8f46b950-1a00-4389-94d0-39296a832d46",
+    "sent_at": "2025-12-04 13:08:38.884+00",
+    "status": "delivered"
+  },
+  {
+    "email": "redscoutfarm@gmail.com",
+    "message_id": "9bbd5b9e-6869-46a7-8f0b-dacad41af386",
+    "sent_at": "2025-12-04 13:08:44.191+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jane@ramblerillfarm.com",
+    "message_id": "e0f6529f-411e-486a-9733-8860521a0e5c",
+    "sent_at": "2025-12-04 13:08:49.518+00",
+    "status": "delivered"
+  },
+  {
+    "email": "obie@abanituorganics.com",
+    "message_id": "325d2338-a846-4a88-95cd-8cc49eef7783",
+    "sent_at": "2025-12-04 13:08:54.801+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@carolinaheritagevineyards.com",
+    "message_id": "60dd96e8-0492-4e83-bb83-c15858758052",
+    "sent_at": "2025-12-04 13:09:00.073+00",
+    "status": "delivered"
+  },
+  {
+    "email": "atgfarm@gmail.com",
+    "message_id": "e5362a31-d8b4-4664-9ad4-0209e7ab7703",
+    "sent_at": "2025-12-04 13:09:05.351+00",
+    "status": "delivered"
+  },
+  {
+    "email": "awayoflifefarm@gmail.com",
+    "message_id": "9ee4e637-b732-4334-baae-45ae0818f4b7",
+    "sent_at": "2025-12-04 13:09:10.643+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@zenafarmstead.com",
+    "message_id": "003d6569-e73e-42c9-8e46-762e16127512",
+    "sent_at": "2025-12-04 13:09:16.45+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@youngs.farm",
+    "message_id": "669e5ac5-35b1-4f33-b379-e2c179720b98",
+    "sent_at": "2025-12-04 13:09:21.827+00",
+    "status": "delivered"
+  },
+  {
+    "email": "admin@whitefeatherfarm.org",
+    "message_id": "94dd4dd1-1b7a-4252-91a9-913702445f89",
+    "sent_at": "2025-12-04 13:09:27.159+00",
+    "status": "delivered"
+  },
+  {
+    "email": "weathertopfarmny@gmail.com",
+    "message_id": "ef38953d-e795-4f1f-aaf2-3b06d2c44acb",
+    "sent_at": "2025-12-04 13:09:32.436+00",
+    "status": "delivered"
+  },
+  {
+    "email": "turtle@turtletreeseed.org",
+    "message_id": "b433cfa5-32b3-44a2-b258-2e66b1dbbdf1",
+    "sent_at": "2025-12-04 13:09:37.718+00",
+    "status": "delivered"
+  },
+  {
+    "email": "mail@michaelmcdonough.com",
+    "message_id": "f64588cc-7e21-489e-b42c-ec9a2d95ae04",
+    "sent_at": "2025-12-04 13:09:43.133+00",
+    "status": "delivered"
+  },
+  {
+    "email": "thirstyfruitfarm@gmail.com",
+    "message_id": "e3b54775-a5d9-4a40-b668-ee197fda86cd",
+    "sent_at": "2025-12-04 13:09:48.479+00",
+    "status": "delivered"
+  },
+  {
+    "email": "becca@themeadowfarmstead.com",
+    "message_id": "d1ee6b01-f877-4bd0-84ee-f0f0ec48d665",
+    "sent_at": "2025-12-04 13:09:53.942+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@valedalama.net",
+    "message_id": "e31df047-be62-4e57-9618-6cc008224a07",
+    "sent_at": "2025-12-04 20:41:54.462+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sunsetskyfarm@gmail.com",
+    "message_id": "07505bec-a7eb-4e67-aeab-f8e9698b5bc5",
+    "sent_at": "2025-12-05 13:01:07.361+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@sunsproutfarm.com",
+    "message_id": "6b3a406d-48d3-40f3-a144-0a4504183921",
+    "sent_at": "2025-12-05 13:01:12.721+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmer@stonewoodny.org",
+    "message_id": "b838a2a0-9992-4668-ad58-82aac5c1f1b9",
+    "sent_at": "2025-12-05 13:01:17.905+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sales@stonehousegrain.com",
+    "message_id": "8dedb6f6-a92c-4f92-9314-026cc32f852e",
+    "sent_at": "2025-12-05 13:01:23.128+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hello@steelbowfarm.com",
+    "message_id": "ea6198d1-45b0-4c29-ae54-e8bca3dfc731",
+    "sent_at": "2025-12-05 13:01:28.446+00",
+    "status": "delivered"
+  },
+  {
+    "email": "ed@sovafarm.com",
+    "message_id": "5543df7a-d106-4f82-8b73-62efad282288",
+    "sent_at": "2025-12-05 13:01:33.68+00",
+    "status": "delivered"
+  },
+  {
+    "email": "solidgroundfarm@gmail.com",
+    "message_id": "92c40022-2b9e-49fa-b90c-bc7c4025d9c9",
+    "sent_at": "2025-12-05 13:01:38.949+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@roxburyfarm.com",
+    "message_id": "64da46fd-95c5-4188-b8e1-f11abb940c4f",
+    "sent_at": "2025-12-05 13:01:44.217+00",
+    "status": "delivered"
+  },
+  {
+    "email": "rockytopacres@frontiernet.net",
+    "message_id": "17bc0989-1704-4f3e-aebc-7b50ea844a6e",
+    "sent_at": "2025-12-05 13:01:49.454+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sales@rockyridgemaple.com",
+    "message_id": "3c21e1c8-4252-4c39-8a76-e56c4d7e3f73",
+    "sent_at": "2025-12-05 13:01:54.743+00",
+    "status": "delivered"
+  },
+  {
+    "email": "rjfishfamilyfarm@gmail.com",
+    "message_id": "d838e83d-b552-4f19-9591-375b1910465f",
+    "sent_at": "2025-12-05 13:02:00.026+00",
+    "status": "delivered"
+  },
+  {
+    "email": "riverandrailfarms@gmail.com",
+    "message_id": "e1205054-a802-4a96-b690-ab4238d13350",
+    "sent_at": "2025-12-05 13:02:05.373+00",
+    "status": "delivered"
+  },
+  {
+    "email": "remembrancefarm@gmail.com",
+    "message_id": "0b8844cf-83f4-47e0-93df-883ff56a9a38",
+    "sent_at": "2025-12-05 13:02:10.607+00",
+    "status": "delivered"
+  },
+  {
+    "email": "dharmalea@gmail.com",
+    "message_id": "c152e6a9-b2d6-469a-b734-2d82dd0acb10",
+    "sent_at": "2025-12-05 13:02:15.886+00",
+    "status": "delivered"
+  },
+  {
+    "email": "peasandharmonyfarm@gmail.com",
+    "message_id": "c8e52169-35b6-4e11-a19f-35000f435136",
+    "sent_at": "2025-12-05 13:02:21.186+00",
+    "status": "delivered"
+  },
+  {
+    "email": "gregdortensi@gmail.com",
+    "message_id": "9015f64f-76b9-4093-bc3e-1a9bbbce52a4",
+    "sent_at": "2025-12-05 13:02:26.435+00",
+    "status": "delivered"
+  },
+  {
+    "email": "orientorganicsfarm@gmail.com",
+    "message_id": "cfb082c8-a90c-4b0f-a4f2-ed73705cbd75",
+    "sent_at": "2025-12-05 13:02:31.651+00",
+    "status": "delivered"
+  },
+  {
+    "email": "ondafarm@yahoo.com",
+    "message_id": "66eee037-5ba6-47dc-ba38-97aab94bc86d",
+    "sent_at": "2025-12-05 13:02:36.895+00",
+    "status": "delivered"
+  },
+  {
+    "email": "marketing@obercreekfarm.com",
+    "message_id": "88d21387-8d61-4a4e-b9ed-fecd0356f152",
+    "sent_at": "2025-12-05 13:02:42.176+00",
+    "status": "delivered"
+  },
+  {
+    "email": "tripletree@frontiernet.net",
+    "message_id": "88f615ca-5c05-40fa-b7bc-7e592019fe08",
+    "sent_at": "2025-12-05 13:02:47.453+00",
+    "status": "delivered"
+  },
+  {
+    "email": "fmyer12@yahoo.com",
+    "message_id": "d64b7077-adae-4685-abb0-319dfd0b7948",
+    "sent_at": "2025-12-05 13:02:57.953+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@mxmorningstarfarm.com",
+    "message_id": "7d35309b-e72e-43a4-b4f3-31c9de014e31",
+    "sent_at": "2025-12-05 13:03:03.458+00",
+    "status": "delivered"
+  },
+  {
+    "email": "tmarzolino@yahoo.com",
+    "message_id": "61cd4c8f-7f36-4f6c-97fe-e8bdf3431095",
+    "sent_at": "2025-12-05 13:03:08.545+00",
+    "status": "delivered"
+  },
+  {
+    "email": "mgorganic@outlook.com",
+    "message_id": "06e03b33-e485-4be7-a363-ffce0237a332",
+    "sent_at": "2025-12-05 13:03:13.869+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@maitriny.com",
+    "message_id": "76bad596-d348-4d4b-ac7a-f4ebf8f86248",
+    "sent_at": "2025-12-05 13:03:19.118+00",
+    "status": "delivered"
+  },
+  {
+    "email": "lovinmamafarm@gmail.com",
+    "message_id": "c23f609f-44e8-4189-ba95-620a7732f2dd",
+    "sent_at": "2025-12-05 13:03:24.403+00",
+    "status": "delivered"
+  },
+  {
+    "email": "littleseedgardens@yahoo.com",
+    "message_id": "ef39706d-f1fd-4576-8900-5e5b919fe158",
+    "sent_at": "2025-12-05 13:03:29.609+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmers@laughingearth.farm",
+    "message_id": "8c9b2aef-9488-403b-9675-7d40b94704ba",
+    "sent_at": "2025-12-05 13:03:34.898+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kandmhfarm@lakevieworganicgrain.com",
+    "message_id": "916ff633-1e50-44ba-ab65-4ab222f44925",
+    "sent_at": "2025-12-05 13:03:40.138+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kingfisherfarm.jason@gmail.com",
+    "message_id": "8a27f631-9c1f-4aee-959a-bd57c1c01784",
+    "sent_at": "2025-12-05 13:03:45.432+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kingbirdfarm@gmail.com",
+    "message_id": "a296e565-aa44-4b3a-aa88-4bfe82af0505",
+    "sent_at": "2025-12-05 13:03:50.667+00",
+    "status": "delivered"
+  },
+  {
+    "email": "28kezialainfarm@gmail.com",
+    "message_id": "4e0992b2-6c25-48f0-a689-30a0186af75f",
+    "sent_at": "2025-12-05 13:03:55.925+00",
+    "status": "delivered"
+  },
+  {
+    "email": "juniperhillfarm@gmail.com",
+    "message_id": "a22a9302-58c7-4396-b1eb-edaa763d6402",
+    "sent_at": "2025-12-05 13:04:01.274+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jasper.meadows.farm@gmail.com",
+    "message_id": "a0edc9df-26b8-4c5b-ba12-96587ff66d53",
+    "sent_at": "2025-12-05 13:04:11.869+00",
+    "status": "delivered"
+  },
+  {
+    "email": "huftalenfarms@aol.com",
+    "message_id": "813c43bb-9729-4cdd-be68-c719f4208be4",
+    "sent_at": "2025-12-05 13:04:17.124+00",
+    "status": "delivered"
+  },
+  {
+    "email": "horsetailherbfarm@gmail.com",
+    "message_id": "5ba15758-ff2e-4346-a968-390a37c0f5c4",
+    "sent_at": "2025-12-05 13:04:22.374+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sunshine@hiddenacre.farm",
+    "message_id": "54933aaf-e200-43bd-b6d6-ad35d368c6d7",
+    "sent_at": "2025-12-05 13:04:27.689+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hgforganicapples@gmail.com",
+    "message_id": "d441ed36-3097-4b8b-aa92-d49e2bc2f9a0",
+    "sent_at": "2025-12-05 13:04:33.004+00",
+    "status": "delivered"
+  },
+  {
+    "email": "csa@hawthornevalleyfarm.org",
+    "message_id": "9ee18fa3-c47c-4c7c-8b35-aee6b7216874",
+    "sent_at": "2025-12-05 13:04:38.328+00",
+    "status": "delivered"
+  },
+  {
+    "email": "happenchance396@gmail.com",
+    "message_id": "734255f7-743a-4d12-9861-b2c378be74a1",
+    "sent_at": "2025-12-05 13:04:43.514+00",
+    "status": "delivered"
+  },
+  {
+    "email": "customerservice@grindstonefarm.com",
+    "message_id": "e98fe0b8-b1f6-41fc-a678-942886156b8d",
+    "sent_at": "2025-12-05 13:04:48.84+00",
+    "status": "delivered"
+  },
+  {
+    "email": "srockcastle@gmail.com",
+    "message_id": "c0ca4eed-7fa2-4843-acd3-a16687d65a6c",
+    "sent_at": "2025-12-05 13:04:54.146+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@gilliebrookfarm.com",
+    "message_id": "165ee7be-ad3d-4d34-82f4-d36bbd6c1274",
+    "sent_at": "2025-12-05 13:04:59.332+00",
+    "status": "delivered"
+  },
+  {
+    "email": "frostymorningfarm@yahoo.com",
+    "message_id": "fe4bf90f-2f49-4b60-bdf7-5034f63d264a",
+    "sent_at": "2025-12-05 13:05:04.615+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@fromermg.com",
+    "message_id": "68419986-8434-44da-9721-bb3a806e81d9",
+    "sent_at": "2025-12-05 13:05:09.967+00",
+    "status": "delivered"
+  },
+  {
+    "email": "bradley@freshmeadowfarm.com",
+    "message_id": "e0634ab2-5a13-48c4-a83a-56b14b06ae4e",
+    "sent_at": "2025-12-05 13:05:15.252+00",
+    "status": "delivered"
+  },
+  {
+    "email": "steven@hudsonvalleyseed.com",
+    "message_id": "01bc0398-1f2d-4160-ba06-64699241b687",
+    "sent_at": "2025-12-05 13:05:20.563+00",
+    "status": "delivered"
+  },
+  {
+    "email": "floweringsunecology@gmail.com",
+    "message_id": "ca033622-bab1-498b-91b8-070e3e6612bf",
+    "sent_at": "2025-12-05 13:05:25.832+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@fingerlakesciderhouse.com",
+    "message_id": "88586c6e-707e-4d5e-b200-733a195665a1",
+    "sent_at": "2025-12-05 13:05:31.054+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@egfcsa.com",
+    "message_id": "cefed5cc-6578-4470-bca3-4c7795c3c49c",
+    "sent_at": "2025-12-05 13:05:36.384+00",
+    "status": "delivered"
+  },
+  {
+    "email": "eightmilecreekfarm@gmail.com",
+    "message_id": "4b9c51b5-a420-4353-a7bc-e6d6c7bf478e",
+    "sent_at": "2025-12-05 13:05:41.558+00",
+    "status": "delivered"
+  },
+  {
+    "email": "drumlins.end@gmail.com",
+    "message_id": "fb330b2f-a8ed-4dc1-8b06-56f18e8a9146",
+    "sent_at": "2025-12-05 13:05:46.852+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@dizzylizziesfarm.com",
+    "message_id": "6c223a73-7947-48ac-ad35-82eca51b3dab",
+    "sent_at": "2025-12-05 13:05:52.107+00",
+    "status": "delivered"
+  },
+  {
+    "email": "dirtrichfarm@gmail.com",
+    "message_id": "036ac22f-ce2f-40e6-b4f0-4cdd1e590c07",
+    "sent_at": "2025-12-05 13:05:57.382+00",
+    "status": "delivered"
+  },
+  {
+    "email": "denisonfarm@gmail.com",
+    "message_id": "fc7debca-a83e-4b80-9871-af1958d67079",
+    "sent_at": "2025-12-05 13:06:02.675+00",
+    "status": "delivered"
+  },
+  {
+    "email": "demetrasbiofarm@gmail.com",
+    "message_id": "41a8ab73-0e44-45a0-8e20-33eb47b36168",
+    "sent_at": "2025-12-05 13:06:08.381+00",
+    "status": "delivered"
+  },
+  {
+    "email": "deeprootsfarmny@gmail.com",
+    "message_id": "6366498b-7ee3-4d59-a505-1c58e885bb4a",
+    "sent_at": "2025-12-05 13:06:13.701+00",
+    "status": "delivered"
+  },
+  {
+    "email": "organic@crossislandfarms.com",
+    "message_id": "bb6777e7-bc15-4c32-ad4c-a295b175a29c",
+    "sent_at": "2025-12-05 13:06:18.87+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kgilber2@rochester.rr.com",
+    "message_id": "41762885-7415-4a1f-8a97-71a8a5781f15",
+    "sent_at": "2025-12-05 13:06:24.177+00",
+    "status": "delivered"
+  },
+  {
+    "email": "maureen@cobblestonevalley.com",
+    "message_id": "1f11bd5c-b1ab-4b1b-91c0-36c5bde6e70c",
+    "sent_at": "2025-12-05 13:06:29.494+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@churchtowndairy.org",
+    "message_id": "473cb87d-53f9-4d22-a8b3-680cf8f174d2",
+    "sent_at": "2025-12-05 13:06:34.694+00",
+    "status": "delivered"
+  },
+  {
+    "email": "chicorycreekfarm@gmail.com",
+    "message_id": "f34f5af0-8a73-41df-b56a-7748a80cd85e",
+    "sent_at": "2025-12-05 13:06:39.934+00",
+    "status": "delivered"
+  },
+  {
+    "email": "chestnutcreekfarmsales@gmail.com",
+    "message_id": "d413b19d-6bc6-4cc5-8227-4895189a7a07",
+    "sent_at": "2025-12-05 13:06:45.259+00",
+    "status": "delivered"
+  },
+  {
+    "email": "chaseholmfarm@gmail.com",
+    "message_id": "2b0cbcbd-1c7f-4814-a6b2-5d211485ba67",
+    "sent_at": "2025-12-05 13:06:50.568+00",
+    "status": "delivered"
+  },
+  {
+    "email": "birdsfootfarm@gmail.com",
+    "message_id": "700e92c7-c419-4e21-bbde-3c4c8cbff65b",
+    "sent_at": "2025-12-05 13:06:55.795+00",
+    "status": "delivered"
+  },
+  {
+    "email": "barbatop@aol.com",
+    "message_id": "4c7672e5-3dd8-4a73-8a04-179a4d6cfb7d",
+    "sent_at": "2025-12-05 13:07:01.111+00",
+    "status": "delivered"
+  },
+  {
+    "email": "bawden@cit-tele.com",
+    "message_id": "78d5015e-167f-4238-8ec4-d1a3269e775e",
+    "sent_at": "2025-12-05 13:07:06.45+00",
+    "status": "delivered"
+  },
+  {
+    "email": "amysacres@hotmail.com",
+    "message_id": "a153a407-50b2-4ff3-bf56-635dbc494982",
+    "sent_at": "2025-12-05 13:07:11.691+00",
+    "status": "delivered"
+  },
+  {
+    "email": "info@abersacres.com",
+    "message_id": "904423a4-844d-4ad5-9f2f-b32dc2fdbc63",
+    "sent_at": "2025-12-05 13:07:16.945+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmerdave24601@gmail.com",
+    "message_id": "d0ff104e-68f9-40f7-90d2-a2dbc9803d5c",
+    "sent_at": "2025-12-05 13:07:22.69+00",
+    "status": "delivered"
+  },
+  {
+    "email": "anna@thenakedbotanical.com",
+    "message_id": "7e3588b1-33f5-460f-ba60-f3205e3c1ae7",
+    "sent_at": "2025-12-05 13:07:28.052+00",
+    "status": "delivered"
+  },
+  {
+    "email": "allison@snappingturtlefarm.com",
+    "message_id": "266cbbdb-b7b4-44f3-aa3c-e9d826491b95",
+    "sent_at": "2025-12-05 13:07:33.344+00",
+    "status": "delivered"
+  },
+  {
+    "email": "margaretmnoon@gmail.com",
+    "message_id": "262451ef-c86e-46fc-92d8-d01b662caa61",
+    "sent_at": "2025-12-05 13:07:38.592+00",
+    "status": "delivered"
+  },
+  {
+    "email": "nmmanabe@gmail.com",
+    "message_id": "7c086823-5786-46ca-8634-90991e18259e",
+    "sent_at": "2025-12-05 13:07:43.968+00",
+    "status": "delivered"
+  },
+  {
+    "email": "ramblinsolfarm@gmail.com",
+    "message_id": "eeaf8a81-e9ac-4fa3-9a10-85d5e2eb7d94",
+    "sent_at": "2025-12-05 13:07:49.244+00",
+    "status": "delivered"
+  },
+  {
+    "email": "martenettefarms@gmail.com",
+    "message_id": "88e13522-8371-4c27-bba4-a5760e522058",
+    "sent_at": "2025-12-05 13:07:54.553+00",
+    "status": "delivered"
+  },
+  {
+    "email": "kimballsupick@comcast.net",
+    "message_id": "af4c2cd1-93cf-4d13-81d8-60a9b640ca1e",
+    "sent_at": "2025-12-05 13:07:59.841+00",
+    "status": "delivered"
+  },
+  {
+    "email": "inquiry@ethosfarmtohealth.org",
+    "message_id": "9cd55c88-a67c-40d8-862f-dfa390e11ad6",
+    "sent_at": "2025-12-05 13:08:05.042+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmer@closterfarm.com",
+    "message_id": "166aa161-1ea4-493c-91d8-5fa8f936a169",
+    "sent_at": "2025-12-05 13:08:10.586+00",
+    "status": "delivered"
+  },
+  {
+    "email": "chickadeecreekfarm@gmail.com",
+    "message_id": "a067a283-582e-464a-a054-e4874e2876cc",
+    "sent_at": "2025-12-05 13:08:15.794+00",
+    "status": "delivered"
+  },
+  {
+    "email": "wildfernfarmnh@gmail.com",
+    "message_id": "2feffe96-1476-4414-94ba-c3437714b04f",
+    "sent_at": "2025-12-05 13:08:21.047+00",
+    "status": "delivered"
+  },
+  {
+    "email": "uphillfarmnh@gmail.com",
+    "message_id": "8a626524-457f-4feb-bab4-423026e3c8e6",
+    "sent_at": "2025-12-05 13:08:26.327+00",
+    "status": "delivered"
+  },
+  {
+    "email": "terraorganicsnh@gmail.com",
+    "message_id": "8957a58a-758c-474f-bb65-86de7c2a57b9",
+    "sent_at": "2025-12-05 13:08:31.59+00",
+    "status": "delivered"
+  },
+  {
+    "email": "hello@terrabasics.com",
+    "message_id": "0b275135-a6e8-401b-9723-0911489c162a",
+    "sent_at": "2025-12-05 13:08:36.848+00",
+    "status": "delivered"
+  },
+  {
+    "email": "stoutoakfarm@gmail.com",
+    "message_id": "efe198ee-c491-440c-b1df-49bbbd3ce885",
+    "sent_at": "2025-12-05 13:08:42.123+00",
+    "status": "delivered"
+  },
+  {
+    "email": "alex@rosalysgarden.com",
+    "message_id": "c028e4b1-f1c5-42ea-9215-5909b99bab6b",
+    "sent_at": "2025-12-05 13:08:47.414+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jenny@picadillyfarm.com",
+    "message_id": "495b19fe-ef47-4fca-87d5-a3a90d4b81ad",
+    "sent_at": "2025-12-05 13:08:52.647+00",
+    "status": "delivered"
+  },
+  {
+    "email": "nubiriverfarm@gmail.com",
+    "message_id": "bbd349a6-e898-44fe-9b71-50ccf93597e3",
+    "sent_at": "2025-12-05 13:08:57.935+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sarah@minkmeadowfarm.com",
+    "message_id": "65a37679-0f13-4b52-9246-497d0cb92c35",
+    "sent_at": "2025-12-05 13:09:03.192+00",
+    "status": "delivered"
+  },
+  {
+    "email": "farmer@hopnhenfarm.com",
+    "message_id": "a01b8fc4-7aaa-4043-b28d-456ff2b3ddb7",
+    "sent_at": "2025-12-05 13:09:08.514+00",
+    "status": "delivered"
+  },
+  {
+    "email": "greenhillfarmerben@gmail.com",
+    "message_id": "6db86c02-269c-4b54-8f56-3d1c8a50bf15",
+    "sent_at": "2025-12-05 13:09:13.711+00",
+    "status": "delivered"
+  },
+  {
+    "email": "sullivan@bwmq.com",
+    "message_id": "94f078fc-44aa-4ed9-92bd-42b8e9cfa6d9",
+    "sent_at": "2025-12-05 13:09:18.965+00",
+    "status": "delivered"
+  },
+  {
+    "email": "jimi@clydefarm.com",
+    "message_id": "122a4cfe-ae2c-4b21-b6bb-9ec22265ed2e",
+    "sent_at": "2025-12-05 13:09:24.232+00",
+    "status": "delivered"
+  },
+  {
+    "email": "brandmoorefarm@gmail.com",
+    "message_id": "10f90831-dd96-46d0-a603-e9486a4bee6a",
+    "sent_at": "2025-12-05 13:09:29.609+00",
+    "status": "delivered"
+  },
+  {
+    "email": "churchillbutte@gmail.com",
+    "message_id": "47d755d7-0b00-4108-8086-4516755954a8",
+    "sent_at": "2025-12-05 13:09:34.77+00",
+    "status": "delivered"
+  },
+  {
+    "email": "barry.young44@yahoo.com",
+    "message_id": "8cdb4338-1d35-4bf8-b604-89222ade6218",
+    "sent_at": "2025-12-05 13:09:40.098+00",
+    "status": "delivered"
+  },
+  {
+    "email": "tom@meristemfarmandnursery.com",
+    "message_id": "0a4dab8e-d28d-4aea-9c21-bef0ed9637e6",
+    "sent_at": "2025-12-05 13:09:45.309+00",
+    "status": "delivered"
+  },
+  {
+    "email": "seeds@meadowlarkhearth.org",
+    "message_id": "5617129c-599a-42be-a2e7-f21f08ca83e7",
+    "sent_at": "2025-12-05 13:09:50.567+00",
+    "status": "delivered"
+  }
+]

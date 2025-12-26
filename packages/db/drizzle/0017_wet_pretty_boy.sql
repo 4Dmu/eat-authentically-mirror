@@ -1,0 +1,1 @@
+ALTER TABLE `producer_outreach_email_state` ADD `claimed_at` integer;

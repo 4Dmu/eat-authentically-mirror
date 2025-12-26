@@ -1,3 +1,4 @@
+import * as producerOutreachEmailState from "./outreach-email-state";
 import * as certifications from "./certifications";
 import * as commodities from "./commodities";
 import * as externalApiKeys from "./external-api-keys";
@@ -12,4 +13,5 @@ export const rpc = {
   certifications,
   users,
   suggestedProducers,
+  producerOutreachEmailState,
 };

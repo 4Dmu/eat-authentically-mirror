@@ -45,6 +45,10 @@ const data = {
           title: "External Api Keys",
           url: "/misc/external-api-keys",
         },
+        {
+          title: "Email Outreach",
+          url: "/misc/outreach-emails",
+        },
       ],
     },
   ],
