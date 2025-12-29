@@ -13,6 +13,7 @@ import { and, asc, eq, isNotNull, isNull, lt, lte, sql } from "drizzle-orm";
 import { resend } from "../lib/resend";
 import { generateToken } from "@ea/shared/generate-tokens";
 import { env } from "@/env";
+import { VERCEL_CRON } from "@ea/kv";
 
 /* Based on a cursor starting at 0 select 100 people
     Day 1:
@@ -26,6 +27,16 @@ import { env } from "@/env";
 // If not sent yet send first email
 
 export async function runEmailFlow() {
+  console.log("Starting email flow");
+  const ran = await VERCEL_CRON.getRan();
+
+  if (ran) {
+    console.log("Canceling email flow because it already ran today");
+    return;
+  } else {
+    await VERCEL_CRON.setRan();
+  }
+
   const today = new Date();
 
   const followUps = await db
@@ -64,6 +75,9 @@ export async function runEmailFlow() {
     .orderBy(asc(producerOutreachEmailState.nextEmailAt))
     .limit(76);
 
+  console.log("Follow up emails");
+  console.log(followUps);
+
   const newProducers = await db
     .select({
       producerId: producerContact.producerId,
@@ -96,11 +110,17 @@ export async function runEmailFlow() {
     .orderBy(asc(producers.createdAt)) // or id
     .limit(19);
 
+  console.log("New emails");
+  console.log(newProducers);
+
   const producersToProcess = [...followUps, ...newProducers];
 
   for (const producer of producersToProcess) {
     // User was claimed so stop email flow
     if (producer.userId !== null) {
+      console.warn(
+        `Producer ${producer.producerId} was claimed and will be removed from email list`
+      );
       await db
         .update(producerOutreachEmailState)
         .set({
@@ -112,10 +132,14 @@ export async function runEmailFlow() {
     }
     // New User receiving first email
     else if (producer.emailStep === null) {
+      console.log(`Sending first email to producer ${producer.producerId}`);
       let claimUrl: string;
 
       // Create claim invitation if it does'nt exist
       if (producer.claimInvitationToken === null) {
+        console.log(
+          `Generating claimInvitation for producer ${producer.producerId}`
+        );
         const token = generateToken();
         const id = crypto.randomUUID();
 
@@ -157,6 +181,9 @@ export async function runEmailFlow() {
       const claimUrl = `${env.SITE_URL}/join-and-claim?token=${producer.claimInvitationToken}`;
       const nextStep = producer.emailStep + 1;
 
+      console.log(
+        `Sending follow up number ${nextStep} for producer ${producer.producerId}`
+      );
       const updates = await db
         .update(producerOutreachEmailState)
         .set({
