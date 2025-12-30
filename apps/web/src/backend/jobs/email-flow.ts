@@ -14,6 +14,7 @@ import { resend } from "../lib/resend";
 import { generateToken } from "@ea/shared/generate-tokens";
 import { env } from "@/env";
 import { VERCEL_CRON } from "@ea/kv";
+import * as logging from "../lib/log";
 
 /* Based on a cursor starting at 0 select 100 people
     Day 1:
@@ -27,11 +28,12 @@ import { VERCEL_CRON } from "@ea/kv";
 // If not sent yet send first email
 
 export async function runEmailFlow() {
-  console.log("Starting email flow");
+  const log = logging.multiLoggerFactory([console, logging.logger]);
+  log("info", "Starting email flow");
   const ran = await VERCEL_CRON.getRan();
 
   if (ran) {
-    console.log("Canceling email flow because it already ran today");
+    log("info", "Canceling email flow because it already ran today");
     return;
   } else {
     await VERCEL_CRON.setRan();
@@ -75,8 +77,7 @@ export async function runEmailFlow() {
     .orderBy(asc(producerOutreachEmailState.nextEmailAt))
     .limit(76);
 
-  console.log("Follow up emails");
-  console.log(followUps);
+  log("info", "Follow up emails", followUps);
 
   const newProducers = await db
     .select({
@@ -110,12 +111,13 @@ export async function runEmailFlow() {
     .orderBy(asc(producers.createdAt)) // or id
     .limit(19);
 
-  console.log("New emails");
-  console.log(newProducers);
+  log("info", "New emails", newProducers);
 
   const producersToProcess = [...followUps, ...newProducers];
 
   for (const producer of producersToProcess) {
+    log("info", "Sleeping 500 ms before processing producer");
+    await new Promise((r) => setTimeout(r, 600));
     // User was claimed so stop email flow
     if (producer.userId !== null) {
       console.warn(
@@ -132,12 +134,13 @@ export async function runEmailFlow() {
     }
     // New User receiving first email
     else if (producer.emailStep === null) {
-      console.log(`Sending first email to producer ${producer.producerId}`);
+      log("info", `Sending first email to producer ${producer.producerId}`);
       let claimUrl: string;
 
       // Create claim invitation if it does'nt exist
       if (producer.claimInvitationToken === null) {
-        console.log(
+        log(
+          "info",
           `Generating claimInvitation for producer ${producer.producerId}`
         );
         const token = generateToken();
@@ -181,7 +184,8 @@ export async function runEmailFlow() {
       const claimUrl = `${env.SITE_URL}/join-and-claim?token=${producer.claimInvitationToken}`;
       const nextStep = producer.emailStep + 1;
 
-      console.log(
+      log(
+        "info",
         `Sending follow up number ${nextStep} for producer ${producer.producerId}`
       );
       const updates = await db
