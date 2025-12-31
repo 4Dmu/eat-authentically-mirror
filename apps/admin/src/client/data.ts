@@ -25,7 +25,7 @@ import {
 import { rpc } from "@/rpc";
 import type { SuggestedProducersListItem } from "@/rpc/suggested-producers";
 import { searchProducersLocal } from "./local-search";
-import type { OutreachEmailState } from "@/rpc/outreach-email-state";
+import type { OutreachEmailStateList } from "@/rpc/outreach-email-state";
 
 export function useExternalApiKeys(
   opts?: Omit<
@@ -61,9 +61,9 @@ export function useProducerOutreachEmailState(
   props: { limit: number; offset: number },
   opts?: Omit<
     QueryOptions<
-      OutreachEmailState[],
+      OutreachEmailStateList,
       Error,
-      OutreachEmailState[],
+      OutreachEmailStateList,
       [string, { limit: number; offset: number }]
     >,
     "queryKey" | "queryFn"

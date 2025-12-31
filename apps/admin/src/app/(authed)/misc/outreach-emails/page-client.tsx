@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ea/ui/card";
 import { Separator } from "@ea/ui/separator";
 import { useProducerOutreachEmailState } from "@/client/data";
 import { AppWrapper } from "@/components/app-wrapper";
-import { OutreachEmailState } from "@/rpc/outreach-email-state";
+import {
+  OutreachEmailState,
+  OutreachEmailStateList,
+} from "@/rpc/outreach-email-state";
 import {
   Table,
   TableBody,
@@ -29,7 +32,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@ea/ui/dropdown-menu";
 import { LIMIT } from "./_shared";
@@ -92,7 +94,7 @@ export const columns: ColumnDef<OutreachEmailState>[] = [
   },
 ];
 
-export function ClientPage(props: { emailStates: OutreachEmailState[] }) {
+export function ClientPage(props: { emailStates: OutreachEmailStateList }) {
   const [offset, setOffset] = useState(0);
   const outreachEmailStates = useProducerOutreachEmailState(
     { limit: LIMIT, offset: offset },
@@ -101,10 +103,10 @@ export function ClientPage(props: { emailStates: OutreachEmailState[] }) {
     }
   );
 
-  const data = outreachEmailStates.data ?? [];
+  const data = outreachEmailStates.data?.data ?? [];
 
   const table = useReactTable({
-    data,
+    data: data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -184,11 +186,12 @@ export function ClientPage(props: { emailStates: OutreachEmailState[] }) {
             >
               Previous
             </Button>
+            <p>{offset / LIMIT + 1}</p>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setOffset(offset + LIMIT)}
-              disabled={data.length === 0}
+              disabled={!outreachEmailStates.data?.hasMore}
             >
               Next
             </Button>

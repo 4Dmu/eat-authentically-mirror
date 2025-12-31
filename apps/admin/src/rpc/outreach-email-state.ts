@@ -39,10 +39,24 @@ export const list = authenticatedActionClient
       )
       .leftJoin(producers, eq(producers.id, producerContact.producerId))
       .where(isNotNull(producerContact.email))
-      .limit(limit)
+      .limit(limit + 1)
       .offset(offset);
 
-    return data;
+    if (data.length <= limit) {
+      return {
+        data: data,
+        hasMore: false,
+      };
+    }
+
+    return {
+      data: data,
+      hasMore: true,
+    };
   });
 
-export type OutreachEmailState = Awaited<ReturnType<typeof list>>[number];
+export type OutreachEmailState = Awaited<
+  ReturnType<typeof list>
+>["data"][number];
+
+export type OutreachEmailStateList = Awaited<ReturnType<typeof list>>;
